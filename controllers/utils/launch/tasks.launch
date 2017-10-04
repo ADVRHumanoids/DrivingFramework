@@ -1,0 +1,37 @@
+<launch>
+
+  <!-- centauro model configuration parameters -->
+  <arg name="arms" default="true"/>
+  <arg name="torso" default="true"/>
+  <arg name="legs" default="true"/>
+  <arg name="wheels" default="false"/>
+  <arg name="static" default="false"/>
+  <arg name="one_arm" default="false"/>
+  <arg name="end_effector" default="stick"/>
+
+
+  <include file="$(find centauro_gazebo)/launch/centauro_world.launch" ns="centauro">
+
+      <arg name="visual_model" value="convex_hull"/>
+
+      <arg name="gazebo" value="false"/>
+      <arg name="rviz" value="false"/>
+
+      <arg name="mass" value="0"/>
+      <arg name="arms" value="$(arg arms)"/>
+      <arg name="torso" value="$(arg torso)"/>
+      <arg name="legs" value="$(arg legs)"/>
+      <arg name="wheels" value="$(arg wheels)"/>
+      <arg name="static" value="$(arg static)"/>
+      <arg name="one_arm" value="$(arg one_arm)"/>
+      <arg name="end_effector" value="$(arg end_effector)"/>
+
+  </include>
+
+ <node name="centralized_controller" pkg="programs" type="centralized_controller" ns="centauro" />
+
+ <node name="hierearchical_controller_with_events" pkg="programs" type="hierarchical_controller_with_events" ns="centauro" />
+ <node name="real_robot_tracker" pkg="programs" type="real_robot_tracker" ns="centauro"/> 
+
+</launch>
+

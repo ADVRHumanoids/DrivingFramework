@@ -1,0 +1,56 @@
+#ifndef COMMUNICATION_MODULES_ROS_CONTROLLER_H
+#define COMMUNICATION_MODULES_ROS_CONTROLLER_H
+
+#include "mwoibn/communication_modules/basic_controller.h"
+#include "ros/ros.h"
+#include <custom_messages/CustomCmnd.h>
+
+namespace mwoibn
+{
+namespace communication_modules
+{
+
+class RosController : public BasicController
+{
+
+public:
+  RosController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, std::string topic, bool position = true, bool velocity = true, bool effort = true)
+      : BasicController(command, map, position, velocity, effort)
+  {
+    _command_pub = _node.advertise<custom_messages::CustomCmnd>(topic, 1);
+
+      _des_q.position.resize(getDofs(),0);
+      _des_q.velocity.resize(getDofs(),0);
+      _des_q.effort.resize(getDofs(),0);
+  }
+
+  // for now only full robot is supported for this controller
+  RosController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, YAML::Node config)
+      : BasicController(command, map, config)
+  {
+    if(!config["sink"]) throw(std::invalid_argument("Missing required parameter: topic"));
+
+    _command_pub = _node.advertise<custom_messages::CustomCmnd>(config["sink"].as<std::string>(), 1);
+
+    _des_q.position.resize(getDofs(),0);
+    _des_q.velocity.resize(getDofs(),0);
+    _des_q.effort.resize(getDofs(),0);
+
+    std::cout << "Loaded ROS controller " << config["name"] << std::endl;
+
+  }
+  virtual ~RosController() {}
+
+  virtual bool send();
+
+protected:
+  ros::NodeHandle _node;
+  ros::Publisher _command_pub;
+  custom_messages::CustomCmnd _des_q;
+//  std::vector<double> pub_qq;
+
+};
+}
+}
+
+#endif // COMMUNICATION_MODULES_ROS_BASIC_H

@@ -1,0 +1,13 @@
+set(CombinedController_VERSION @CombinedController_VERSION@)
+
+@PACKAGE_INIT@
+
+set_and_check(CombinedController_INCLUDEDIR "@PACKAGE_CombinedController_INCLUDEDIR@")
+
+if(NOT TARGET CombinedController::CombinedController)
+  include("${CMAKE_CURRENT_LIST_DIR}/CombinedControllerTargets.cmake")
+endif()
+
+# Compatibility
+set(CombinedController_LIBRARIES CombinedController::CombinedController)
+set(CombinedController_INCLUDE_DIRS ${CombinedController_INCLUDEDIR})

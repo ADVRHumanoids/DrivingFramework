@@ -1,0 +1,4 @@
+// the configured options and settings for Tutorial
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define LOG_INFO std::cout << "@LOG_INFO@::__FUNCTION__: "

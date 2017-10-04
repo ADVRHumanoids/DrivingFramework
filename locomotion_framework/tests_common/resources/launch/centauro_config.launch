@@ -1,0 +1,5 @@
+<launch>
+
+<rosparam file="$(find tests_common)/resources/config/contacts.yaml" command="load"/>
+<rosparam file="$(find tests_common)/resources/config/actuators.yaml" command="load"/>
+</launch>

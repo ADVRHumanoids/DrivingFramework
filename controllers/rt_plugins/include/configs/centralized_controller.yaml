@@ -1,0 +1,43 @@
+mwoibn:        
+        robot:
+                default:
+                        feedback:
+                                layer: "online"
+                        controller:
+                                layer: "lower_level"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: true
+                                feedback: false 
+                reference:
+                        controller: 
+                                list: []
+                        feedback:
+                                layer: "offline"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: true
+                                feedback: false 
+                my_test:
+                        rate: 200
+                        controller: 
+                                layer: "higher_level"
+                        feedback: 
+                                layer: ""
+                        actuators: 
+                                read: false
+                        contacts: 
+                                read: true
+                                feedback: false 
+        xbot:
+                feedback:
+                        whole_body: 
+                                layer: RT
+                                source: desired_state
+                controller:
+                        whole_body:
+                                layer: RT
+                                sink: desired_state
+

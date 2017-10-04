@@ -1,0 +1,13 @@
+set(OnlineCentralizedControllerPlugin_VERSION @OnlineCentralizedControllerPlugin_VERSION@)
+
+@PACKAGE_INIT@
+
+set_and_check(OnlineCentralizedControllerPlugin_INCLUDEDIR "@PACKAGE_OnlineCentralizedControllerPlugin_INCLUDEDIR@")
+
+if(NOT TARGET OnlineCentralizedControllerPlugin::OnlineCentralizedControllerPlugin)
+  include("${CMAKE_CURRENT_LIST_DIR}/OnlineCentralizedControllerPluginTargets.cmake")
+endif()
+
+# Compatibility
+set(OnlineCentralizedControllerPlugin_LIBRARIES OnlineCentralizedControllerPlugin::OnlineCentralizedControllerPlugin)
+set(OnlineCentralizedControllerPlugin_INCLUDE_DIRS ${OnlineCentralizedControllerPlugin_INCLUDEDIR})

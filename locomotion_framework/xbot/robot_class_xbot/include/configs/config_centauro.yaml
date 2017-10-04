@@ -1,0 +1,357 @@
+# CENTAURO config
+XBotInterface:
+  urdf_path: "../malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
+  srdf_path: "../malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+  joint_map_path: "../malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
+
+RobotInterface:
+  framework_name: "ROS"
+
+ModelInterface:
+  model_type: "RBDL"
+  is_model_floating_base: "true"
+
+RobotInterfaceROS:
+  subclass_name: "RobotInterfaceROS"
+  path_to_shared_lib: "libRobotInterfaceROS.so"
+  subclass_factory_name: "robot_interface_ros"
+  control_message_type: "AdvrCommandMessage"
+  jointstate_message_type: "AdvrJointStateMessage"
+  ft_topic_names: []
+  imu_topic_names: ["/xbotcore/centauro/imu/imu_link"]
+
+RobotInterfaceXBotRT:
+  subclass_name: "RobotInterfaceXBotRT"
+  path_to_shared_lib: "libRobotInterfaceXBotRT.so"
+  subclass_factory_name: "robot_interface_xbot_rt"
+
+XBotRTPlugins:
+  plugins: []
+#  plugins: ["HomingExample", "RtMyTest", "CombinedController", "OnlineCentralizedControllerPlugin"]
+
+MasterCommunicationInterface:
+  framework_name: "ROS"
+
+AdvrCommandMessage:
+  subclass_name: "CommandAdvr"
+  path_to_shared_lib: "libAdvrCommandMessage.so"
+  subclass_factory_name: "advrcommandmessage_control_message"
+  joint_service_name: "/centauro/position_controller/get_joint_names"
+  command_topic_name: "/xbotcore/centauro/command"
+
+AdvrJointStateMessage:
+  subclass_name: "AdvrJointState"
+  path_to_shared_lib: "libAdvrJointStateMessage.so"
+  subclass_factory_name: "advrjointstate_jointstate_message"
+  joint_state_topic_name: "/xbotcore/centauro/joint_states"
+
+RobotInterfaceDUMMY:
+  subclass_name: "RobotInterfaceDUMMY"
+  path_to_shared_lib: "libRobotInterfaceDUMMY.so"
+  subclass_factory_name: "robot_interface_dummy"
+
+ModelInterfaceRBDL:
+  subclass_name: "ModelInterfaceRBDL"
+  path_to_shared_lib: "libModelInterfaceRBDL.so"
+  subclass_factory_name: "model_interface_rbdl"
+
+GazeboXBotPlugin:
+  gains:
+    j_arm1_1: {p: 500, d: 30}
+    j_arm1_2: {p: 800, d: 50}
+    j_arm1_3: {p: 500, d: 30}
+    j_arm1_4: {p: 500, d: 30}
+    j_arm1_6: {p: 200, d: 5}
+    j_arm2_1: {p: 500, d: 30}
+    j_arm2_2: {p: 800, d: 50}
+    j_arm2_3: {p: 500, d: 30}
+    j_arm2_4: {p: 500, d: 30}
+    j_arm2_6: {p: 200, d: 5}
+    torso_yaw: {p: 500, d: 30}
+    hip_yaw_1:  &hip_yaw {p: 500, d: 20}
+    hip_yaw_2: *hip_yaw
+    hip_yaw_3: *hip_yaw
+    hip_yaw_4: *hip_yaw
+    hip_pitch_1: &hip_pitch {p: 500, d: 20}
+    hip_pitch_2: *hip_pitch
+    hip_pitch_3: *hip_pitch
+    hip_pitch_4: *hip_pitch
+    knee_pitch_1: &knee_pitch {p: 500, d: 20}
+    knee_pitch_2: *knee_pitch
+    knee_pitch_3: *knee_pitch
+    knee_pitch_4: *knee_pitch
+    ankle_yaw_1: &ankle_yaw {p: 500, d: 20}
+    ankle_yaw_2: *ankle_yaw
+    ankle_yaw_3: *ankle_yaw
+    ankle_yaw_4: *ankle_yaw
+    ankle_pitch_1: &ankle_pitch {p: 500, d: 20}
+    ankle_pitch_2: *ankle_pitch
+    ankle_pitch_3: *ankle_pitch
+    ankle_pitch_4: *ankle_pitch
+    wheel_1: &wheel {p: 100, d: 10}
+    wheel_2: *wheel
+    wheel_3: *wheel
+    wheel_4: *wheel
+
+mwoibnRobot:
+  robot1:
+        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: default
+        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+  robot2:
+        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: reference
+        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+  robot3:
+        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: my_test
+        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+  higher_scheme:
+        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: higher_scheme
+  default:
+        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: default
+
+
+x_bot_core:
+  urdf_path: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/urdf/centauro_bonn_review.urdf
+  srdf_path: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/srdf/centauro_bonn_review.srdf
+  joint_map_config: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/joint_map/centauro_bonn_review.yaml
+
+x_bot_ecat:
+  name: XBotCore
+  sdo_xddp_prefix :
+  # periodic - priority if needed here
+
+
+#
+ec_board_ctrl:
+  eth_iface: rteth0
+  #eth_iface: eth1
+  #sync_cycle_time_ns: 500000
+  sync_cycle_time_ns: 1000000
+  #sync_cycle_time_ns: 2000000
+  #sync_cycle_time_ns: 5000000
+  #sync_cycle_time_ns: 10000000
+  #sync_cycle_time_ns: 0
+  sync_cycle_offset_ns: 1000000000
+  power_off_boards: false
+
+#
+ec_boards_base:
+  create_pipes: false
+
+firmware_update:
+  #
+  fw_path: ../examples/fw_update/fw_test/
+  #slave_pos_list: [7]
+  #slave_rId_list: [7]
+  # all esc
+  #slave_pos_list: [0]
+  # all BigMotor
+  #slave_pos_list: [-1]
+  # all MedMotor
+  #slave_pos_list: [-2]
+  # all LowPower motor
+  #slave_pos_list: [-3]
+  # all CentAC motor
+  slave_pos_list: [-4]
+  #slave_pos_list: [1]
+
+  cent_AC:
+    m3:
+      bin_file: cent_AC_m3.bin
+      passwd: 0xA550
+    c28:
+      bin_file: cent_AC_c28.bin
+      passwd: 0xDAD0
+
+#############################
+# GENERIC ESC config
+#############################
+
+LpESC_X:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 6.0
+  pid :
+    position: [100000.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [100.0, 3.0, 1.0, 0.001, 0.0]
+
+HpESC_X:
+  sign: 1
+  pos_offset: 0
+
+CentAcESC_X:
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position: [220.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [0.0, 0.0, 1.0, 0.002, 0.0]
+
+#############################
+# waist
+#############################
+
+CentAcESC_1:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position:   [180.0 , 0.0 , 1.0]
+    # pos_Kp pos_Kd tor_Kp tor_Kd tor_Ki
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 0.5, 0.001, 0.0]
+
+
+##############################
+# Right Arm
+
+CentAcESC_2:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 45
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.0, 0.003, 0.0]
+
+CentAcESC_3:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 45
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.0, 0.003, 0.0]
+
+CentAcESC_4:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.2, 0.003, 0.0]
+
+CentAcESC_5:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.4, 0.003, 0.0]
+
+CentAcESC_6:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [100.0, 3.0, 1.0, 0.001, 0.0]
+
+CentAcESC_7:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 2.0, 1.0, 0.001, 0.0]
+
+CentAcESC_8:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 6.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [100.0, 3.0, 1.0, 0.001, 0.0]
+
+##############################
+# Left Arm
+
+CentAcESC_9:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: -45
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.0, 0.003, 0.0]
+
+CentAcESC_10:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: -45
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.0, 0.003, 0.0]
+
+CentAcESC_11:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.2, 0.003, 0.0]
+
+CentAcESC_12:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 15.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 0.0, 1.4, 0.003, 0.0]
+
+CentAcESC_13:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [100.0, 3.0, 1.0, 0.001, 0.0]
+
+CentAcESC_14:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 10.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+    impedance:  [50.0, 2.0, 1.0, 0.001, 0.0]
+
+CentAcESC_15:
+  control_mode: pos_3b
+  sign: 1
+  pos_offset: 0
+  max_current_A: 6.0
+  pid :
+    position: [150.0 , 0.0 , 5.0]
+    #  .... tor_K divided by 10000 to respect the int range [0..65536]
+impedance: [100.0, 3.0, 1.0, 0.001, 0.0]

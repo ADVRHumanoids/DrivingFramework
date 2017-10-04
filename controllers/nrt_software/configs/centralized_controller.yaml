@@ -1,0 +1,15 @@
+mwoibn:        
+        robot:
+                default:
+                        feedback:
+                                layer: "online"
+                        controller:
+                                layer: "lower_level"
+                reference:
+                        controller: 
+                                list: []
+                        feedback:
+                                layer: "offline"
+                        actuators: 
+                                read: "true"
+

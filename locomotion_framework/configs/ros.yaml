@@ -1,0 +1,130 @@
+mwoibn:
+        ros:
+                source:
+                        urdf: "/robot_description"
+                        srdf: "/robot_semantic_description"
+                        actuators: "actuators_yaml"
+                        contacts: "contacts_yaml"
+                feedback:
+                        online:        
+                                link_side: 
+                                        source: "joint_states"
+                                        mapping: PYTHON 
+                                        message: sensor_msgs::JointState
+                                motor_side:
+                                floating_base: 
+                                        source: "/gazebo/link_states"
+                        offline:
+                                link_side:
+                                        source: "position_controller/reference"
+                                        mapping: RBDL
+                                        message: custom_messages::CustomCmnd
+                                motor_side:
+                                floating_base: 
+                controllers:
+                        lower_level:
+                                position_controller:
+                                        type: custom_controller/ActuatorPositionControllerClasses
+                                        sink: /command
+                                        dofs: 
+                                                chain: all
+                                                type: actuated
+                                                mapping: PYTHON
+                                        ff_service: /set_ff_torque
+                                        interface:
+                                                position: true
+                                                velocity: false
+                                                effort: true
+                        higher_level:
+                                whole_body:
+                                        type: reference
+                                        sink: "position_controller/reference"
+                                        dofs: 
+                                                chain: all
+                                                type: all
+                                                mapping: RBDL
+                                        interface:
+                                                position: true
+                                                velocity: false
+                                                effort: false
+
+        xbot:
+                source:
+                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
+                        srdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                        actuators: "/home/user/malgorzata/workspace/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: "/home/user/malgorzata/workspace/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                feedback:
+                        online: 
+                                link_side:
+                                        source: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                                        dofs: 
+                                                chain: all
+                                                type: actuated
+                                                mapping: XBOT
+                                        interface:
+                                                position: true
+                                                velocity: true
+                                                effort: true
+                                floating_base: 
+                                        name: imu_link
+
+                controllers:
+                        lower_level:
+                                position_controller:
+                                        sink: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                                        dofs: 
+                                                chain: all
+                                                type: actuated
+                                                mapping: XBOT
+                                        interface:
+                                                position: true
+                                                velocity: false
+                                                effort: true
+                xbot_nrt:
+                        feedback:
+                                offline:
+                                        link_side:
+                                                type: NRT
+                        controllers:
+                                higher_level:
+                                        whole_body:
+                                                type: NRT
+                                 
+        robot:
+                name: "centauro"
+                default:
+                        rate: 100
+                        controller: 
+                                layer: "lower_level"
+                                list:   ["all"]
+                        feedback: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false
+
+                reference:
+                        rate: 100
+                        controller: 
+                                layer: "higher_level"
+                                list: ["whole_body"]
+                        feedback: "offline"
+                        actuators: 
+                                read: "false"
+                        contacts: 
+                                read: "true"
+                                feedback: false
+
+                higher_scheme:
+                        rate: 100
+                        controller: 
+                                layer: "higher_level"
+                                list:   ["all"]
+                        feedback: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false                              

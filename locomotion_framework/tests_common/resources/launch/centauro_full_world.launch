@@ -1,0 +1,66 @@
+<launch>
+
+  <!-- basic set-up which progrmas should run -->
+  <arg name="gazebo" default="true"/>
+  <arg name="legs" default="true"/>
+
+  <!-- gazebo cofiguration parameters -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="false"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="physics" default="ode"/>
+  <arg name="verbose" default="false"/>
+  <arg name="extra_gazebo_args" default=""/>
+
+  <!-- from where the simulation enviornment will be loaded: 
+       WARNING: exactly one parameter has to be true, otherwise simulation behaviour is undefined -->
+  <arg name="world_name" value="$(find tests_common)/resources/worlds/centauro.world"/>
+
+  <!-- Internal arguments, rewrite human-readable gazebo arguments to it's internal arguments -->
+  <arg unless="$(arg paused)" name="command_arg1" value=""/>
+  <arg     if="$(arg paused)" name="command_arg1" value="-u"/>
+  <arg unless="$(arg headless)" name="command_arg2" value=""/>
+  <arg     if="$(arg headless)" name="command_arg2" value="-r"/>
+  <arg unless="$(arg verbose)" name="command_arg3" value=""/>
+  <arg     if="$(arg verbose)" name="command_arg3" value="--verbose"/>
+  <arg unless="$(arg debug)" name="script_type" value="gzserver"/>
+  <arg     if="$(arg debug)" name="script_type" value="debug"/>
+
+  <!-- Load the URDF/SRDF into the ROS Parameter Server -->
+
+  <param name="robot_description" textfile="$(find tests_common)/resources/urdf/centauro_full_test.urdf" if="$(arg legs)"/>
+  <param name="robot_description" textfile="$(find tests_common)/resources/urdf/centauro.urdf" unless="$(arg legs)"/>
+
+  <param name="robot_semantic_description" textfile="$(find tests_common)/resources/srdf/centauro.srdf"/>
+
+  <!-- run gazebo -->
+  <group if="$(arg gazebo)">
+  <!-- start gazebo server-->
+  	<node name="gazebo" pkg="gazebo_ros" type="$(arg script_type)" respawn="false" output="screen"
+		args="$(arg command_arg1) $(arg command_arg2) $(arg command_arg3) -e $(arg physics) $(arg extra_gazebo_args) $(arg world_name) -namespace centauro" />
+	
+  <!-- start gazebo client -->
+    	<node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen" if="$(arg gui)"/>
+
+        <rosparam file="$(find tests_common)/resources/config/centauro_control_joint_state_publisher.yaml" command="load"/>
+
+        <node name="joint_state_spawner" pkg="controller_manager" type="spawner"
+           respawn="false" output="screen" ns="/centauro"
+           args="joint_state_controller">
+	</node>
+  
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+	  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
+		args="-urdf -model centauro -param robot_description"/>
+
+  	<!-- ros_control centauro launch file -->
+	  <include file="$(find tests_common)/resources/launch/centauro_control.launch">
+		    <arg name="leg_actuators" value="$(arg legs)"/>
+                    <arg name="torso_actuators" value="true"/>
+                    <arg name="arm_actuators"  value="true"/>
+	  </include>
+  </group>
+
+</launch>

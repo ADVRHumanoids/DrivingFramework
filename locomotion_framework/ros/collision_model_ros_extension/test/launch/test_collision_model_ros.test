@@ -1,0 +1,15 @@
+<launch>
+
+ 	 <!-- Simulation launch file -->
+         <include file="$(find tests_common)/resources/launch/centauro_full_world.launch">
+                <arg name="paused" value="false"/>
+                <arg name="gazebo" value="false"/>
+
+ 		 <!-- centauro configuration parameters -->
+                <arg name="legs" value="false"/>
+	  </include>
+
+
+          <test test-name="collision_model_ros_test" pkg="collision_model_ros_extension" type="collision_model_ros_test" ns="centauro" time-limit="1000.0"/>
+
+</launch>

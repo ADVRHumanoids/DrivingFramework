@@ -1,0 +1,151 @@
+#!/usr/bin/env python2.7
+import pandas as pd
+from custom_messages.msg import CustomCmnd
+from programs.srv import string
+from sensor_msgs.msg import JointState
+import rospy
+import sys
+import signal
+import time
+
+class Map:
+    controller_order = [
+        'torso_yaw',
+        'j_arm1_1',
+        'j_arm1_2',
+        'j_arm1_3',
+        'j_arm1_4',
+        'j_arm1_5',
+        'j_arm1_6',
+        'j_arm1_7',
+        'j_arm2_1',
+        'j_arm2_2',
+        'j_arm2_3',
+        'j_arm2_4',
+        'j_arm2_5',
+        'j_arm2_6',
+        'j_arm2_7',
+    ]
+    links = [
+        'torso_2',
+        'arm1_1',
+        'arm1_2',
+        'arm1_3',
+        'arm1_4',
+        'arm1_5',
+        'arm1_6',
+        'arm1_7',
+        'arm2_1',
+        'arm2_2',
+        'arm2_3',
+        'arm2_4',
+        'arm2_5',
+        'arm2_6',
+        'arm2_7',
+    ]
+    def __init__(self,file):
+
+        self.pub = rospy.Publisher('/centauro/position_controller/command', CustomCmnd, queue_size=1)
+        self.df = pd.read_csv(file,  delimiter='\t')
+        self.command = CustomCmnd()
+        names = list(self.df.columns.values)[2:-1]
+
+        self.idx = [names.index(item) if item in names else -1 for i, item in enumerate(self.controller_order) ]
+
+        if -1 in self.idx:
+            raise ValueError('Mapping is missing the command, collision not comupted correctly')
+
+        rate = rospy.Rate(1.0)
+        service_ok = False
+        while (not rospy.is_shutdown() and not service_ok):
+          try:
+            print('wait for service: update_links')
+            rospy.wait_for_service('update_links', 0.5)
+            service_ok = True
+            print('service found')
+          except:
+            pass
+          rate.sleep()
+
+        self.update_links = rospy.ServiceProxy('update_links', string)
+
+    def update(self,num):
+        self.command.position = [self.df.iloc[num,2+i] for i in self.idx]
+        try:
+                self.update_links(self.df.iloc[num,0:2].values.tolist())
+        except rospy.ServiceException as exc:
+                print("Service did not process request: " + str(exc))
+
+    def publish(self):
+        self.pub.publish(self.command)
+
+    def getCurrentBodies(self):
+       idx = [enum[0] for enum in enumerate(self.df.iloc[:,0:2].values.tolist())  if (enum[1][0] in self.links and enum[1][1] in self.links)]
+       return idx
+
+class GracefulKiller:
+  kill_now = False
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+  def exit_gracefully(self,signum, frame):
+    self.kill_now = True
+
+
+if __name__ == '__main__':
+    killer = GracefulKiller()
+    rospy.init_node('verify_collision')
+
+    try:
+        file_name = rospy.get_param('~file_name')
+    except:
+        print("give file_name as ros arguement ~file_name")
+    try:
+        map = Map(file_name)
+    except:
+        print("Couldn't open the file "+ file_name)
+
+
+    idx = map.getCurrentBodies()
+    print(idx)
+
+    i = 0;
+    while True:
+      command = raw_input("Waiting for command...")
+      if command == '' and i < len(idx):
+        map.update(idx[i])
+        i = i+1
+        print('collision ' + str(i+1) + '/' + str(len(idx)))
+      elif command == '':
+        break
+      elif command == 'z':
+        i = i-1
+        print('collision ' + str(i+1) + '/' + str(len(idx)))
+        map.update(idx[i])
+      else:
+        try:
+          int(command)
+          if int(command) > -1 and int(command) < len(idx):
+                map.update(int(command))
+          else:
+                print("Unknown command")
+        except:
+                print("Unknown command") 
+      map.publish()
+
+      if killer.kill_now:
+            break
+
+
+
+#    map.update(pair)
+#    try:
+#
+#    except:
+#	raise TypeError('Give one argumen')
+#    rate = rospy.Rate(1000.0)
+#    while not rospy.is_shutdown():
+#    map.publish()
+#	rate.sleep()
+

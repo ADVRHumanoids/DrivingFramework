@@ -1,0 +1,64 @@
+<launch>
+  <arg name="controller" default="compliance"/>
+  <rosparam file="$(find tests_common)/resources/config/compliance_gains_test.yaml"/>
+
+  <arg name="torso_actuators" default="false"/>
+  <arg name="arm_actuators"  default="false"/>
+  <arg name="leg_actuators" default="false"/>
+  <arg name="wheels_actuators" default="false"/>
+  <arg name="one_arm" default="false"/>
+
+  <rosparam command="delete" param="omit" ns="/centauro/position_controller" />
+
+  <group unless="$(arg one_arm)" ns="/centauro/position_controller">
+    <group unless="$(arg torso_actuators)" ns="/centauro/position_controller">
+      <rosparam param="omit" unless="$(arg leg_actuators)" >
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+      </rosparam>
+      <rosparam param="omit" if="$(arg leg_actuators)" >
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      </rosparam>
+    </group>
+    <group if="$(arg torso_actuators)" ns="/centauro/position_controller">
+      <group if="$(arg arm_actuators)" ns="/centauro/position_controller">
+        <rosparam param="omit" unless="$(arg leg_actuators)" >
+          [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+        </rosparam>
+        <rosparam param="omit" if="$(arg leg_actuators)" >
+          []
+        </rosparam>
+      </group>
+      <group unless="$(arg arm_actuators)" ns="/centauro/position_controller">
+        <rosparam param="omit" unless="$(arg leg_actuators)" >
+          [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+        </rosparam>
+        <rosparam param="omit" if="$(arg leg_actuators)" >
+          [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        </rosparam>
+      </group>
+    </group>
+
+    <rosparam param="omit" unless="$(arg leg_actuators)" ns="/centauro/wheels_controller">
+      [1, 2, 3, 4, 5, 6, 7, 8]
+    </rosparam>
+
+    <group if="$(arg leg_actuators)" ns="/centauro/position_controller">
+      <rosparam param="omit" unless="$(arg wheels_actuators)" ns="/centauro/wheels_controller">
+        [1, 2, 3, 4, 5, 6, 7, 8]
+      </rosparam>
+    </group>
+  </group>
+
+  <rosparam param="omit" if="$(arg one_arm)" ns="/centauro/position_controller">
+    [1, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+  </rosparam>
+  <rosparam param="omit" if="$(arg one_arm)" ns="/centauro/wheels_controller">
+    [1, 2, 3, 4, 5, 6, 7, 8]
+  </rosparam>
+
+  <node name="position_controller_spawner" pkg="controller_manager" type="spawner"
+    respawn="true" output="screen" ns="/centauro"
+    args="position_controller"/>
+
+
+</launch>

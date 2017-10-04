@@ -1,0 +1,255 @@
+defaults: &defaults
+    type: effort_controllers/JointPositionController
+
+defaults: &gains_yaw_pitch
+    a_Kp: 5000
+    a_Kd: 500
+    j_Kp: 0
+    j_Kd: 0
+    Ki: 0
+
+defaults: &gains_hip_pitch
+    a_Kp: 5000
+    a_Kd: 500
+    j_Kp: 0
+    j_Kd: 0
+    Ki: 0
+
+defaults: &gains_knee_pitch
+    a_Kp: 5000
+    a_Kd: 500
+    j_Kp: 0
+    j_Kd: 0
+    Ki: 0
+
+defaults: &gains_wheel_hip
+    Kp: 20
+    Kd: 1
+
+defaults: &gains_wheel_knee
+    Kp: 20
+    Kd: 1
+
+defaults: &torque_limit_wheels
+   Torque_limit: 1000
+
+centauro:
+
+# controller_namespace:
+#   type: custom_controller/ActuatorPositionController4 #(required)
+#   dof: number of controlled joints #(required)
+#     print_data: #(optional)
+#        - first published joint
+#        - second published joint
+#        -
+#        - nth published joint
+#   joint{jointnumber} (ex. joint1, joint2): #(required)
+#     name: joint name in urdf #(required)
+#     a_Kp: controller actuator proportional gain #(required)
+#     a_Kd: controller actuator derivative gain #(required)
+#     j_Kp: controller joint proportional gain #(required)
+#     j_Kd: controller joint derivative gain #(required)
+#     Ki: controller integral gain #(required)
+#     Ks: spring stiffness #(required)
+#     D: spring damping #(required)
+#     Bm: motor inertia #(required)
+#     phim: motor damping #(required)
+#     nu: gear ration #(required)
+#     Torque_limit: maximum motor torque #(required)
+
+  position_controller:
+#    type: custom_controller/ActuatorPositionController4
+    type: custom_controller/ActuatorPositionControllerClasses
+    print_data:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 16
+      - 19
+      - 20
+      - 23
+      - 24
+      - 27
+    controller_update: 4
+    dof: 27
+    joint16:
+      name: hip_yaw_1
+      <<: *gains_yaw_pitch
+    joint17:
+      name: hip_yaw_2
+      <<: *gains_yaw_pitch
+    joint18:
+      name: hip_yaw_3
+      <<: *gains_yaw_pitch
+    joint19:
+      name: hip_yaw_4
+      <<: *gains_yaw_pitch
+    joint20:
+      name: hip_pitch_1
+      <<: *gains_hip_pitch
+    joint21:
+      name: hip_pitch_2
+      <<: *gains_hip_pitch
+    joint22:
+      name: hip_pitch_3
+      <<: *gains_hip_pitch
+    joint23:
+      name: hip_pitch_4
+      <<: *gains_hip_pitch
+    joint24:
+      name: knee_pitch_1
+      <<: *gains_knee_pitch
+    joint25:
+      name: knee_pitch_2
+      <<: *gains_knee_pitch
+    joint26:
+      name: knee_pitch_3
+      <<: *gains_knee_pitch
+    joint27:
+      name: knee_pitch_4
+      <<: *gains_knee_pitch
+    joint1:
+      name: torso_yaw
+      a_Kp: 20000
+      a_Kd: 2000
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint2:
+      name: j_arm1_1
+      a_Kp: 5000
+      a_Kd: 500
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint3:
+      name: j_arm1_2
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint4:
+      name: j_arm1_3
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint5:
+      name: j_arm1_4
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint6:
+      name: j_arm1_5
+      a_Kp: 3000
+      a_Kd: 300
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint7:
+      name: j_arm1_6
+      a_Kp: 3000
+      a_Kd: 300
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint8:
+      name: j_arm1_7
+      a_Kp: 2000
+      a_Kd: 200
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint9:
+      name: j_arm2_1
+      a_Kp: 5000
+      a_Kd: 500
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint10:
+      name: j_arm2_2
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint11:
+      name: j_arm2_3
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint12:
+      name: j_arm2_4
+      a_Kp: 4000
+      a_Kd: 400
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint13:
+      name: j_arm2_5
+      a_Kp: 3000
+      a_Kd: 300
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint14:
+      name: j_arm2_6
+      a_Kp: 3000
+      a_Kd: 300
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+    joint15:
+      name: j_arm2_7
+      a_Kp: 2000
+      a_Kd: 200
+      j_Kp: 0
+      j_Kd: 0
+      Ki: 0
+
+  wheels_controller:
+    type: custom_controller/ActuatorPositionController1
+    dof: 8
+    print_data: 1
+    joint1:
+      name: j_wheel_hip_1
+      <<: *gains_wheel_hip
+      <<: *torque_limit_wheels
+    joint2:
+      name: j_wheel_hip_2
+      <<: *gains_wheel_hip
+      <<: *torque_limit_wheels
+    joint3:
+      name: j_wheel_hip_3
+      <<: *gains_wheel_hip
+      <<: *torque_limit_wheels
+    joint4:
+      name: j_wheel_hip_4
+      <<: *gains_wheel_hip
+      <<: *torque_limit_wheels
+    joint5:
+      name: j_wheel_knee_1
+      <<: *gains_wheel_knee
+      <<: *torque_limit_wheels
+    joint6:
+      name: j_wheel_knee_2
+      <<: *gains_wheel_knee
+      <<: *torque_limit_wheels
+    joint7:
+      name: j_wheel_knee_3
+      <<: *gains_wheel_knee
+      <<: *torque_limit_wheels
+    joint8:
+      name: j_wheel_knee_4
+      <<: *gains_wheel_knee
+      <<: *torque_limit_wheels

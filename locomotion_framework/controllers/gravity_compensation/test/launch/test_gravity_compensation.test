@@ -1,0 +1,18 @@
+<launch>
+
+ 	 <!-- Simulation launch file -->
+         <include file="$(find tests_common)/resources/launch/centauro_full_world.launch">
+                <arg name="paused" value="false"/>
+                <arg name="gui" value="false"/>
+
+ 		 <!-- centauro configuration parameters -->
+                <arg name="legs" value="true"/>
+	  </include>
+
+          <!-- Load other no program-specific config files-->
+          <include file="$(find tests_common)/resources/launch/centauro_config.launch"/>
+
+          <test test-name="gravity_compensation_test" pkg="gravity_compensation" type="gravity_compensation_test" ns="centauro" time-limit="1000.0" launch-prefix="xterm -e gdb --args"/>
+
+
+</launch>

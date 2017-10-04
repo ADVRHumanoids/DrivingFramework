@@ -1,0 +1,8 @@
+# request field
+string[] str
+
+-----
+# response
+bool success
+
+

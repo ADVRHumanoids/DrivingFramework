@@ -1,0 +1,25 @@
+# catking tutorial for ros kinetic
+
+
+## to build collision model
+# install srdfdom
+sudo apt-get install ros-kinetic-srdfdom
+
+# install sch-core 
+# remark: in order to ensure the convergence of the algorithm in case of capsule model build from provided files
+
+# optional
+# instal sch-visualization for visualization of collision models
+# to install this module set VISUALIZATION_MODULE to ON
+
+
+robot_class cmake options
+LOGGER whether the simple_log should be attached or not, temporary solution until final looger will be avaiable
+ROS whether ros is avaiable, compile ros dependent modules
+ROS_NRT whether the non-real time robot module shoudl be compiled
+
+default:
+LOGGER ON
+ROS ON
+ROS_NRT OFF
+

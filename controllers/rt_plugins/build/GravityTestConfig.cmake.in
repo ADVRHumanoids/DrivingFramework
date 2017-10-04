@@ -1,0 +1,13 @@
+set(GravityTest_VERSION @GravityTest_VERSION@)
+
+@PACKAGE_INIT@
+
+set_and_check(GravityTest_INCLUDEDIR "@PACKAGE_GravityTest_INCLUDEDIR@")
+
+if(NOT TARGET GravityTest::GravityTest)
+  include("${CMAKE_CURRENT_LIST_DIR}/GravityTestTargets.cmake")
+endif()
+
+# Compatibility
+set(GravityTest_LIBRARIES GravityTest::GravityTest)
+set(GravityTest_INCLUDE_DIRS ${GravityTest_INCLUDEDIR})

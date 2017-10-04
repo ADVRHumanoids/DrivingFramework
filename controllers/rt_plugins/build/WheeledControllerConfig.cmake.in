@@ -1,0 +1,13 @@
+set(WheeledController_VERSION @WheeledController_VERSION@)
+
+@PACKAGE_INIT@
+
+set_and_check(WheeledController_INCLUDEDIR "@PACKAGE_WheeledController_INCLUDEDIR@")
+
+if(NOT TARGET WheeledController::WheeledController)
+  include("${CMAKE_CURRENT_LIST_DIR}/WheeledControllerTargets.cmake")
+endif()
+
+# Compatibility
+set(WheeledController_LIBRARIES WheeledController::WheeledController)
+set(WheeledController_INCLUDE_DIRS ${WheeledController_INCLUDEDIR})
