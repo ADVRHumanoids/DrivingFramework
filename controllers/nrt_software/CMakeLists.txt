@@ -168,7 +168,7 @@ if(COLLISION_CHECK)
 endif(COLLISION_CHECK)
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  INCLUDE_DIRS ${catkin_INCLUDE_DIRS}
   LIBRARIES
   CATKIN_DEPENDS 
 	${CATKIN_DEPENDS_SET}
@@ -177,7 +177,6 @@ catkin_package(
 )
 
 include_directories(
-  include
   ${catkin_INCLUDE_DIRS}
 #  ${XBotCore-interfaces_INCLUDE_DIRS}
 )
