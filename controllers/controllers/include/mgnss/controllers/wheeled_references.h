@@ -94,16 +94,20 @@ public:
   void step() { _t += _direction * _step; }
   bool limitedStep()
   {
-    std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
+
     if (std::fabs(_t - _limit) > (_step))
     {
       _t += _direction * _step;
       return false;
     }
-    else if (_direction == 1)
+    else if (_direction == 1){
       _t = _t_max;
-    else
+    std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
+	}
+    else{
       _t = _t_min;
+    std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
+	}
 
     return true;
   }

@@ -17,6 +17,7 @@ FIND_PATH (MathGeoLib_INCLUDE_DIRS MathGeoLib/MathGeoLib.h
 	/usr/local/include
 	/usr/include
         $ENV{HOME}/malgorzata/third_party/lib/include
+	${THIRD_PARTY_DIR}/include
 	)
 
 FIND_LIBRARY (MathGeoLib_LIBRARIES NAMES MathGeoLib
@@ -30,6 +31,7 @@ FIND_LIBRARY (MathGeoLib_LIBRARIES NAMES MathGeoLib
 	/usr/lib
 	/usr/lib/x86_64-linux-gnu
         $ENV{HOME}/malgorzata/third_party/lib/lib
+        ${THIRD_PARTY_DIR}/lib
 	)
 
 IF (NOT MathGeoLib_LIBRARIES)

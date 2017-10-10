@@ -25,14 +25,14 @@ int main(int argc, char** argv)
 
   mwoibn::SupportPolygon support(0.4, 0.22);
   support.setBase(0.225, 0.125);             // HARDCODED
-  support.setUpperLimit(-10 * 3.1416 / 180);  // HARDCODED
-  support.setLowerLimit(-80 * 3.1416 / 180); // HARDCODED
-  support.setRadious(0.38);                  // HARDCODED
+  support.setUpperLimit(-10 * 3.1416 / 180);  
+  support.setLowerLimit(-80 * 3.1416 / 180); 
+  support.setRadious(0.38);                  
 
   mwoibn::Base base;
 
-  base.heading.setUpperLimit(2 * 3.1416 / 180);  // HARDCODED
-  base.heading.setLowerLimit(-2 * 3.1416 / 180); // HARDCODED
+  base.heading.setUpperLimit(2 * 3.1416 / 180);  
+  base.heading.setLowerLimit(-2 * 3.1416 / 180);
 
   // ros topics/service support
   ros::ServiceServer service =

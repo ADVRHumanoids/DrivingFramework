@@ -146,8 +146,8 @@ public:
 
       _error[i] = _point2D[0];
     }
-
-//    std::cout << "error\n" << _error << std::endl;
+ //   std::cout << "error\n" << _error << std::endl;
+ //   std::cout << "_full_error\n" << _full_error << std::endl;
   }
 
   void updateState()

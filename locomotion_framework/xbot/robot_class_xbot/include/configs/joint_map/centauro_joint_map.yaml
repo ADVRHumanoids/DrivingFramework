@@ -38,9 +38,9 @@ joint_map:
   37: ankle_pitch_4
   38: ankle_yaw_4
   39: j_wheel_4
-  53: j_ft_arm2
-  99: imu_joint
-  98: j_fl_foot_ft
-  97: j_fr_foot_ft
-  96: j_hl_foot_ft
-95: j_hr_foot_ft
+  99: plevis_imu_joint
+#  53: j_ft_arm2
+#  98: j_fl_foot_ft
+#  97: j_fr_foot_ft
+#  96: j_hl_foot_ft
+#  95: j_hr_foot_ft

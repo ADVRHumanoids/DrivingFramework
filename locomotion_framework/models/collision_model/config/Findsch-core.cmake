@@ -21,7 +21,8 @@ FIND_PATH (sch-core_INCLUDE_DIRS sch/sch_api.h
 	/usr/local/include
 	/usr/include
         $ENV{HOME}/malgorzata/third_party/lib/include
-	)
+	${THIRD_PARTY_DIR}/include		
+)
 
 FIND_LIBRARY (sch-core_LIBRARIES NAMES sch-core
 	PATHS
@@ -34,6 +35,7 @@ FIND_LIBRARY (sch-core_LIBRARIES NAMES sch-core
 	/usr/lib
 	/usr/lib/x86_64-linux-gnu
         $ENV{HOME}/malgorzata/third_party/lib/lib
+	${THIRD_PARTY_DIR}/lib
 	)
 
 IF (NOT sch-core_LIBRARIES)

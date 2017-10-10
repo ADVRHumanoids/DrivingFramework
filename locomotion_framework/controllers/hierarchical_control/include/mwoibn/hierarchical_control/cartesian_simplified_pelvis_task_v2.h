@@ -102,6 +102,8 @@ public:
       _error.segment(2 * i, 2) =
           _reference.segment(2 * i, 2) - _point_flat.head(2);
     }
+
+
   }
 
   void updateState()
@@ -148,6 +150,7 @@ public:
     _state[5] = _temp_point[2];
 
     RigidBodyDynamics::UpdateKinematics(_flat_model, _state, _zero, _zero);
+
   }
 
   virtual void updateJacobian()
@@ -235,7 +238,7 @@ public:
   }
 
   const mwoibn::VectorN& getState() const { return _state; }
-
+  const mwoibn::VectorN& getWorldError() const { return _error; }
 protected:
   mwoibn::VectorN _state, _height, _zero;
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;

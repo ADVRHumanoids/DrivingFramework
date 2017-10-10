@@ -13,6 +13,7 @@
   <arg name="arms" default="true"/>
   <arg name="torso" default="true"/>
   <arg name="legs" default="true"/>
+  <arg name="head" default="true"/>
   <arg name="wheels" default="false"/>
   <arg name="static" default="false"/>
   <arg name="one_arm" default="false"/>
@@ -26,9 +27,13 @@
   <!-- sensors set-up-->
   <arg name="arm_sensors" default="true"/>
   <arg name="leg_sensors" default="true"/>
+  <arg name="head_sensors" default="true"/>
+
   <arg name="ft_sensors" default="true"/>
-  <arg name="bumbers" default="true"/>
+  <arg name="bumpers" default="true"/>
   <arg name="imu" default="true"/>
+  <arg name="kinect" default="true"/>
+  <arg name="velodyne" default="true"/>
 
   <arg name="middleware" default="xbotcore"/>
 
@@ -47,13 +52,18 @@
   <arg name="arm_actuators" default="true"/>
   <arg name="leg_actuators" default="true"/>
   <arg name="wheels_actuators" default="true"/>
+  <arg name="head_actuators" default="true"/>
 
   <include file="$(find centauro_gazebo)/launch/centauro_world.launch">
       <arg name="arm_sensors" value="$(arg arm_sensors)"/>
       <arg name="leg_sensors" value="$(arg leg_sensors)"/>
+      <arg name="head_sensors" value="$(arg head_sensors)"/>
+
       <arg name="ft_sensors" value="$(arg ft_sensors)"/>
-      <arg name="bumbers" value="$(arg bumbers)"/>
+      <arg name="bumpers" value="$(arg bumpers)"/>
       <arg name="imu" value="$(arg imu)"/>
+      <arg name="kinect" value="$(arg kinect)"/>
+      <arg name="velodyne" value="$(arg velodyne)"/>
 
       <arg name="middleware" value="$(arg middleware)"/>
       <arg name="collision_model" value="$(arg collision_model)"/>
@@ -71,6 +81,7 @@
       <arg name="arms" value="$(arg arms)"/>
       <arg name="torso" value="$(arg torso)"/>
       <arg name="legs" value="$(arg legs)"/>
+      <arg name="head" value="$(arg head)"/>
       <arg name="wheels" value="$(arg wheels)"/>
       <arg name="static" value="$(arg static)"/>
       <arg name="one_arm" value="$(arg one_arm)"/>
@@ -89,6 +100,7 @@
 		    <arg name="arm_actuators" value="$(arg arm_actuators)" if="$(arg arms)"/>
 		    <arg name="leg_actuators" value="$(arg leg_actuators)" if="$(arg legs)"/>
 		    <arg name="wheels_actuators" value="$(arg wheels_actuators)" if="$(arg wheels)"/>
+		    <arg name="head_actuators" value="$(arg head_actuators)" if="$(arg head)"/>
     		    <arg name="one_arm" value="$(arg one_arm)"/>
 		    <arg name="controller" value="$(arg controller)"/>
 	  	</include>
