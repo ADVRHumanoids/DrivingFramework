@@ -47,10 +47,10 @@
         <joint name="j_ft_arm2"/>-->
     </group>
 
-<!--    <group name="imu_sensors">
-        <link name="pelvis_imu_link"/>
+   <group name="imu_sensors">
+        <link name="imu_link"/>
     </group>
--->
+
    <group name="chains">
 
 	<group name="left_arm"/>

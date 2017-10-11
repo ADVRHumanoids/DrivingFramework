@@ -8,9 +8,6 @@ void mwoibn::hierarchical_control::ConstraintsTask::updateJacobian()
   _last_jacobian.noalias() = _jacobian;
   _jacobian.noalias() = -_robot.contacts().getJacobian();
 
-//  std::cout << "_jacobian" << std::endl;
-//  std::cout << _jacobian << std::endl;
-
   int row = 0;
   int size;
   for (int i = 0; i < _selector.size(); i++)

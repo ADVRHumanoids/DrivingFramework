@@ -106,14 +106,14 @@ int main(int argc, char** argv)
   bool motor_side = true;
 
   // init real robot
-  mwoibn::robot_class::RobotXBotNRT robot(
-      "/home/user/malgorzata/workspace/src/locomotion_framework/configs/"
+  mwoibn::robot_class::RobotRosNRT robot(
+      "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "default", "/home/user/malgorzata/workspace/src/controllers/nrt_software/configs/centralized_controller.yaml");
-  mwoibn::robot_class::RobotXBotNRT robot_ref(
-      "/home/user/malgorzata/workspace/src/locomotion_framework/configs/"
+      "default", "/home/user/malgorzata/test_workspace/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+  mwoibn::robot_class::RobotRosNRT robot_ref(
+      "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "reference", "/home/user/malgorzata/workspace/src/controllers/nrt_software/configs/centralized_controller.yaml");
+      "reference", "/home/user/malgorzata/test_workspace/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
 
   mgnss::controllers::OnlineCentralizedController controller(robot);
 
@@ -146,6 +146,6 @@ int main(int argc, char** argv)
   while (robot.isRunning())
   {
     if (robot_ref.get())
-      controller.fullUpdate(robot_ref.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      controller.fullUpdate(robot_ref.state.get(mwoibn::robot_class::INTERFACE::POSITION), robot_ref.state.get(mwoibn::robot_class::INTERFACE::VELOCITY));
   }
 }

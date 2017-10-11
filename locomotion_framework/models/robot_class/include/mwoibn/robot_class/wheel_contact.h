@@ -218,6 +218,8 @@ public:
         _ref_position(other._ref_position), _state(other._state)
   {
     update();
+   // _resize();
+
   }
 
   WheelContactV2(WheelContactV2& other)
@@ -226,7 +228,10 @@ public:
         _state_quat(other._state_quat), _temp_quat(other._temp_quat),
         _ref_position(other._ref_position), _state(other._state)
   {
+
     update();
+    //_resize();
+
   }
 
   ~WheelContactV2() {}
@@ -253,6 +258,7 @@ public:
   {
     update();
     _jacobian.setZero();
+
 
     if (!_is_active)
       return _jacobian;

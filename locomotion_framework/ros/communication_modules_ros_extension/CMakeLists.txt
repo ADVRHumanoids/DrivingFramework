@@ -43,7 +43,7 @@ find_package(Eigen3 REQUIRED)
 if(CUSTOM_CONTROLLER)
 
 LIST( APPEND CATKIN_DEPENDS_SET roscpp custom_controller)
-LIST( APPEND SOURCE_FILES src/custom_controller.cpp src/ros_controller.cpp)
+LIST( APPEND SOURCE_FILES src/custom_controller.cpp src/ros_controller.cpp src/velocity_controller.cpp)
 
 endif(CUSTOM_CONTROLLER)
 

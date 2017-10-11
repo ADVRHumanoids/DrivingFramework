@@ -197,6 +197,16 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
                   command, map, entry.second)));
       continue;
     }
+    if (entry.second["type"].as<std::string>() ==
+        "custom_controller/ActuatorVelocityController")
+    {
+
+      controllers.add(
+          std::unique_ptr<mwoibn::communication_modules::BasicController>(
+              new mwoibn::communication_modules::VelocityController(
+                  command, map, entry.second)));
+      continue;
+    }
 
     loadRosControllers(entry.second, controllers, command, map);
 

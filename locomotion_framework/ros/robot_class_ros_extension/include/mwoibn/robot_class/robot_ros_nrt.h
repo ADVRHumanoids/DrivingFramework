@@ -9,6 +9,7 @@
 #include <gazebo_msgs/LinkStates.h>
 #include <climits>
 #include "mwoibn/communication_modules/custom_controller.h"
+#include "mwoibn/communication_modules/velocity_controller.h"
 #include "mwoibn/communication_modules/ros_controller.h"
 #include "mwoibn/communication_modules/ros_feedback.h"
 #include "mwoibn/communication_modules/ros_operational_euler.h"

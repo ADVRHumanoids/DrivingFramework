@@ -1,8 +1,8 @@
 # CENTAURO config
 XBotInterface:
-  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
-  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
+  urdf_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full.urdf"
+  srdf_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+  joint_map_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
 
 RobotInterface:
   framework_name: "ROS"
@@ -95,22 +95,22 @@ GazeboXBotPlugin:
 
 mwoibnRobot:
   robot1:
-        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: default
-        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
   robot2:
-        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: reference
-        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
   robot3:
-        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: my_test
-        secondary_file: /home/user/malgorzata/workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
   higher_scheme:
-        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: higher_scheme
   default:
-        config_file: /home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: default
 
 

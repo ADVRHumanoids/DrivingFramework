@@ -321,7 +321,7 @@ public:
       {
 //        std::cout << "support DEFAULT" << std::endl;
 
-        setDesired(0.45, 0.22);
+        setDesired(0.50, 0.22);
         // support.setAngle(-0.17453333);
         return true;
       }

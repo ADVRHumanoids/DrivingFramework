@@ -187,7 +187,8 @@ HEADERS += common/include/mwoibn/common/ros.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_feedback_from_rt.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_controller_to_nrt.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_operational_euler_from_nrt.h \
-    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h \
+    ros/communication_modules_ros_extension/include/mwoibn/communication_modules/velocity_controller.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \
@@ -331,7 +332,8 @@ SOURCES += point_handling/devel_tests/simple_test.cpp \
     xbot/communication_modules_xbot/src/xbot_operational_euler.cpp \
     xbot/robot_class_xbot/src/robot_xbot_nrt.cpp \
     xbot/robot_class_xbot/src/robot_xbot_rt.cpp \
-    xbot/robot_class_xbot/src/contact_ros.cpp
+    xbot/robot_class_xbot/src/contact_ros.cpp \
+    ros/communication_modules_ros_extension/src/velocity_controller.cpp
 
 DISTFILES += \
     controllers/motor_side_reference/test/launch/test_motor_side_reference.test \

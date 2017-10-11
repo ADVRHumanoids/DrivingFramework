@@ -82,7 +82,7 @@ mwoibn:
                                 mapping: RBDL
                         interface:
                                 position: true
-                                velocity: false
+                                velocity: true
                                 effort: false
         controller:
                 position_controller:
@@ -94,6 +94,15 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: true
+                velocity_controller:
+                        dofs: 
+                                chain: all
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: false
+                                velocity: true
+                                effort: false
                 whole_body:
                         dofs: 
                                 chain: all
@@ -101,13 +110,13 @@ mwoibn:
                                 mapping: RBDL
                         interface:
                                 position: true
-                                velocity: false
+                                velocity: true
                                 effort: false
         feedbacks:
                 online: [link_side_online, motor_side_online, floating_base]
                 offline: [whole_body]
         controllers:
-                lower_level: [position_controller]
+                lower_level: [position_controller, velocity_controller]
                 higher_level: [whole_body]
         ros:
                 mapping:
@@ -142,18 +151,21 @@ mwoibn:
                                 type: custom_controller/ActuatorPositionControllerClasses
                                 sink: /command
                                 ff_service: /set_ff_torque
+                        velocity_controller:
+                                type: custom_controller/ActuatorVelocityController
+                                sink: /command
                         whole_body:
                                 type: "reference"
                                 sink2: "position_controller/reference"
                                 sink: "desired_state"
         xbot:
                 source:
-                        config: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
-                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                        config: "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                        urdf: "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
 #                        srdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-                        actuators: "/home/user/malgorzata/workspace/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
-                        contacts: "/home/user/malgorzata/workspace/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                        actuators: "/home/user/malgorzata/test_workspace/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: "/home/user/malgorzata/test_workspace/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
                 feedback:
                         link_side_online:
                                 layer: online

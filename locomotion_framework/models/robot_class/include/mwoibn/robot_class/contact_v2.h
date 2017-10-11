@@ -40,8 +40,9 @@ public:
         _type(type) // this zero should as some kind of constant value defined
                     // in robot_class.h
   {
-    _initDirections(directions);
     _resize();
+
+    _initDirections(directions);
 
   }
 
@@ -63,8 +64,9 @@ public:
       : BasePH("ROOT", model, positions, {body_name}, {position}, {name}),
         _is_active(is_active), _type(type)
   {
-    _initDirections(directions);
     _resize();
+
+    _initDirections(directions);
   }
 
   /**
@@ -95,16 +97,20 @@ public:
 
   ContactV2(ContactV2&& other)
       : BasePH(std::move(other)), _is_active(other._is_active),
-        _directions(other._directions)
+        _directions(other._directions), _state_size(other._state_size)
   {
+    mwoibn::Matrix temp_directions = _directions;
     _resize();
+    _directions = temp_directions;
   }
 
   ContactV2(ContactV2& other)
       : BasePH(other), _is_active(other._is_active),
-        _directions(other._directions)
+        _directions(other._directions), _state_size(other._state_size)
   {
+    mwoibn::Matrix temp_directions = _directions;
     _resize();
+    _directions = temp_directions;
   }
 
 
@@ -187,8 +193,9 @@ protected:
       : BasePH(body_ref, model, positions, {point}), _is_active(is_active),
         _type(type)
   {
-    _initDirections(directions);
     _resize();
+
+    _initDirections(directions);
   }
 
   ContactV2(int body_ref, point_handling::Point point,
@@ -198,22 +205,25 @@ protected:
       : BasePH(body_ref, model, positions, {point}), _is_active(is_active),
         _type(type)
   {
-    _initDirections(directions);
     _resize();
+
+    _initDirections(directions);
   }
 
   ContactV2(RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions, YAML::Node config, std::string reference)
       : BasePH(reference, model, positions)
   {
-    _read(config);
     _resize();
+
+    _read(config);
   }
 
   ContactV2(RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions, YAML::Node config, int reference)
       : BasePH(reference, model, positions)
   {
+        _resize();
     _read(config);
-    _resize();
+
   }
 
   virtual void _resize(){

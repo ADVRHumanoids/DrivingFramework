@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotXBotNRT robot("/home/user/malgorzata/workspace/src/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
+  mwoibn::robot_class::RobotRosNRT robot("/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
 
   robot.update();
 
@@ -114,7 +114,6 @@ int main(int argc, char** argv)
    while (robot.isRunning())
   {
 
-
     if (std::fabs(hight - com_point[2]) > eps){
       if (hight - com_point[2] > 0)
         com_point[2] += eps;
@@ -149,14 +148,12 @@ int main(int argc, char** argv)
     command =
         hierarchical_controller.update();
 
+    robot.command.set(command, mwoibn::robot_class::INTERFACE::VELOCITY);
+
     command = command * 1/200 +
         robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
     robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
-//        std::cout << "state" << std::endl;
-
-//        std::cout << robot.command.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) << std::endl;
-
 
     robot.update();
   }

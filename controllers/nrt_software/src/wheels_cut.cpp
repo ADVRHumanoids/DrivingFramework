@@ -16,18 +16,19 @@ int main(int argc, char** argv)
 
   // init wheels_controller
 
-  mwoibn::robot_class::RobotXBotNRT robot(
-        "/home/user/malgorzata/workspace/src/locomotion_framework/configs/"
+  mwoibn::robot_class::RobotRosNRT robot(
+        "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
         "mwoibn_v2.yaml",
         "higher_scheme");
 
   mwoibn::WheeledMotion wheeld_controller(robot);
 
-  mwoibn::SupportPolygon support(0.4, 0.22);
-  support.setBase(0.225, 0.125);             // HARDCODED
-  support.setUpperLimit(-10 * 3.1416 / 180);  
+  mwoibn::SupportPolygon support(0.45, 0.22);
+  support.setBase(0.25, 0.125);             // HARDCODED
+  support.setUpperLimit(-10 * 3.1416 / 180);
   support.setLowerLimit(-80 * 3.1416 / 180); 
-  support.setRadious(0.38);                  
+  support.setRadious(0.38);
+  support.setStep(0.0005);
 
   mwoibn::Base base;
 
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
   base.setBasePosition(wheeld_controller.getBodyPosition());
 
   base.pose.setCurrent(wheeld_controller.getBodyPosition());
-  base.height.setCurrent(0.45);
+  base.height.setCurrent(0.55);
   base.heading.setCurrent(0);
   support.setCurrent(wheeld_controller.getSupportReference());
 

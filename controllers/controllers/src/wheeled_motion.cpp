@@ -46,31 +46,30 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
       selection, _robot));
 
   int task = 0;
-  int ratio = 1;
+  int ratio = 2;
   double damp = 1e-4;
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
   _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
-  gain << 1000 * ratio;
+  gain << 20 * ratio;
   _hierarchical_controller.addTask(_leg_z_ptr.get(), gain, task, damp);
   task++;
-  gain << 1000 * ratio;
+  gain << 30 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 500 * ratio;
+  gain << 30 * ratio;
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 300 * ratio;
+  gain << 25 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 1000 * ratio;
+  gain << 25 * ratio;
   _hierarchical_controller.addTask(_leg_xy_ptr.get(), gain, task, 1e-3);
   task++;
-
 
   _dt = 1 / rate;
 
@@ -141,8 +140,11 @@ void mwoibn::WheeledMotion::fullUpdate(const mwoibn::VectorN& support,
 void mwoibn::WheeledMotion::compute()
 {
 
-  _command.noalias() = _hierarchical_controller.update() * _dt;
+  _command.noalias() = _hierarchical_controller.update();
 
+  _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
+
+  _command.noalias() = _command * _dt;
   _command.noalias() += _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);

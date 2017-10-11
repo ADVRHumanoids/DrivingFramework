@@ -22,11 +22,31 @@ void mgnss::controllers::OnlineCentralizedController::update(){
 }
 
 void mgnss::controllers::OnlineCentralizedController::fullUpdate(const mwoibn::VectorN& reference){
+
   if(!_robot.get()) return;
 
   _robot.updateKinematics();
+
   _robot.command.set(reference,
       mwoibn::robot_class::INTERFACE::POSITION);
+
+  update();
+
+  _robot.send();
+  _robot.wait();
+}
+
+void mgnss::controllers::OnlineCentralizedController::fullUpdate(const mwoibn::VectorN& reference, const mwoibn::VectorN& vel_reference){
+
+  if(!_robot.get()) return;
+
+  _robot.updateKinematics();
+
+  _robot.command.set(reference,
+      mwoibn::robot_class::INTERFACE::POSITION);
+
+  _robot.command.set(vel_reference,
+      mwoibn::robot_class::INTERFACE::VELOCITY);
 
   update();
 

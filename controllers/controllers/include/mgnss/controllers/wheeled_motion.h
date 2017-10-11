@@ -111,7 +111,7 @@ protected:
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 
-  double rate = 1000;
+  double rate = 200;
   double _dt, orientation = 0;
   mwoibn::VectorN steerings, _command;
   mwoibn::Vector3 axis, position, _next_step;
