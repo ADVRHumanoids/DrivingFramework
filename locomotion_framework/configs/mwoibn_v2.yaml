@@ -160,12 +160,12 @@ mwoibn:
                                 sink: "desired_state"
         xbot:
                 source:
-                        config: "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
-                        urdf: "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                        config: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                        urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
 #                        srdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-                        actuators: "/home/user/malgorzata/test_workspace/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
-                        contacts: "/home/user/malgorzata/test_workspace/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                        actuators: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
                 feedback:
                         link_side_online:
                                 layer: online
@@ -183,6 +183,10 @@ mwoibn:
                                 source: "desired_state"
                 controller:
                         position_controller:
+                                layer: lower_level
+                                dofs:
+                                        mapping: XBOT
+                        velocity_controller:
                                 layer: lower_level
                                 dofs:
                                         mapping: XBOT

@@ -7,6 +7,7 @@
   <!-- /constants -->
   <!-- Here all arguments from launch file are evaluated to the final xacro poropeties.
      Also all the parameter dependencies are resolved-->
+  <!-- dependend arguments -->
   <material name="grey">
     <color rgba="0.5 0.5 0.5 1"/>
   </material>
@@ -24,11 +25,13 @@
   </material>
   <!-- Here all arguments from launch file are evaluated to the final xacro poropeties.
      Also all the parameter dependencies are resolved-->
+  <!-- dependend arguments -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- Here all arguments from launch file are evaluated to the final xacro poropeties.
      Also all the parameter dependencies are resolved-->
+  <!-- dependend arguments -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
@@ -38,7 +41,7 @@
   <link name="world"/>
   <link name="pelvis">
     <inertial>
-      <origin xyz="-0.013541342 -0.0029098264 0.18060721"/>
+      <origin xyz="-0.013541342 -0.0029098264 0.01400721"/>
       <mass value="24.190945"/>
       <inertia ixx="0.20021119" ixy="-0.0038421093" ixz="-0.033298849" iyy="0.51136214" iyz="0.004469847" izz="0.54401411"/>
     </inertial>
@@ -55,8 +58,19 @@
       </geometry>
     </collision>
   </link>
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="pelvis"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+    <child link="imu_link"/>
+  </joint>
   <joint name="reference" type="floating">
-    <origin xyz="0.0 0.0 0.759"/>
+    <origin xyz="0.0 0.0 0.9256"/>
     <parent link="world"/>
     <child link="pelvis"/>
   </joint>
@@ -194,9 +208,9 @@
   <joint name="hip_yaw_1" type="revolute">
     <parent link="pelvis"/>
     <child link="hip1_1"/>
-    <origin rpy="3.14159265359 0.0 0.50709869865" xyz="0.225 0.125 0.11"/>
+    <origin rpy="3.14159265359 0.0 0.50709869865" xyz="0.25 0.125 -0.0566"/>
     <axis xyz="0 0 1"/>
-    <limit effort="304" lower="-0.78539816" upper="2.35619449" velocity="8.8"/>
+    <limit effort="304" lower="-1.13446401" upper="2.70526034" velocity="8.8"/>
   </joint>
   <joint name="hip_pitch_1" type="revolute">
     <parent link="hip1_1"/>
@@ -236,10 +250,10 @@
   <transmission name="t_hip_yaw_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_yaw_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_yaw_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -247,10 +261,10 @@
   <transmission name="t_hip_pitch_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -258,10 +272,10 @@
   <transmission name="t_knee_pitch_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="knee_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_knee_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -269,10 +283,10 @@
   <transmission name="t_ankle_pitch_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_pitch_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -280,10 +294,10 @@
   <transmission name="t_ankle_yaw_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_yaw_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_yaw_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -291,10 +305,10 @@
   <transmission name="t_j_wheel_1">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="j_wheel_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_j_wheel_1">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -431,9 +445,9 @@
   <joint name="hip_yaw_2" type="revolute">
     <parent link="pelvis"/>
     <child link="hip1_2"/>
-    <origin rpy="3.14159265359 0.0 -0.50709869865" xyz="0.225 -0.125 0.11"/>
+    <origin rpy="3.14159265359 0.0 -0.50709869865" xyz="0.25 -0.125 -0.0566"/>
     <axis xyz="0 0 1"/>
-    <limit effort="304" lower="-2.35619449" upper="0.78539816" velocity="8.8"/>
+    <limit effort="304" lower="-2.70526034" upper="1.13446401" velocity="8.8"/>
   </joint>
   <joint name="hip_pitch_2" type="revolute">
     <parent link="hip1_2"/>
@@ -473,10 +487,10 @@
   <transmission name="t_hip_yaw_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_yaw_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_yaw_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -484,10 +498,10 @@
   <transmission name="t_hip_pitch_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -495,10 +509,10 @@
   <transmission name="t_knee_pitch_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="knee_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_knee_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -506,10 +520,10 @@
   <transmission name="t_ankle_pitch_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_pitch_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -517,10 +531,10 @@
   <transmission name="t_ankle_yaw_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_yaw_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_yaw_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -528,10 +542,10 @@
   <transmission name="t_j_wheel_2">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="j_wheel_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_j_wheel_2">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -668,9 +682,9 @@
   <joint name="hip_yaw_3" type="revolute">
     <parent link="pelvis"/>
     <child link="hip1_3"/>
-    <origin rpy="3.14159265359 0.0 2.63449395494" xyz="-0.225 0.125 0.11"/>
+    <origin rpy="3.14159265359 0.0 2.63449395494" xyz="-0.25 0.125 -0.0566"/>
     <axis xyz="0 0 1"/>
-    <limit effort="304" lower="-2.35619449" upper="0.78539816" velocity="8.8"/>
+    <limit effort="304" lower="-2.70526034" upper="1.13446401" velocity="8.8"/>
   </joint>
   <joint name="hip_pitch_3" type="revolute">
     <parent link="hip1_3"/>
@@ -710,10 +724,10 @@
   <transmission name="t_hip_yaw_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_yaw_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_yaw_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -721,10 +735,10 @@
   <transmission name="t_hip_pitch_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -732,10 +746,10 @@
   <transmission name="t_knee_pitch_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="knee_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_knee_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -743,10 +757,10 @@
   <transmission name="t_ankle_pitch_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_pitch_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -754,10 +768,10 @@
   <transmission name="t_ankle_yaw_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_yaw_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_yaw_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -765,10 +779,10 @@
   <transmission name="t_j_wheel_3">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="j_wheel_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_j_wheel_3">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -905,9 +919,9 @@
   <joint name="hip_yaw_4" type="revolute">
     <parent link="pelvis"/>
     <child link="hip1_4"/>
-    <origin rpy="3.14159265359 0.0 3.64869135224" xyz="-0.225 -0.125 0.11"/>
+    <origin rpy="3.14159265359 0.0 3.64869135224" xyz="-0.25 -0.125 -0.0566"/>
     <axis xyz="0 0 1"/>
-    <limit effort="304" lower="-0.78539816" upper="2.35619449" velocity="8.8"/>
+    <limit effort="304" lower="-1.13446401" upper="2.70526034" velocity="8.8"/>
   </joint>
   <joint name="hip_pitch_4" type="revolute">
     <parent link="hip1_4"/>
@@ -947,10 +961,10 @@
   <transmission name="t_hip_yaw_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_yaw_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_yaw_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -958,10 +972,10 @@
   <transmission name="t_hip_pitch_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="hip_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_hip_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -969,10 +983,10 @@
   <transmission name="t_knee_pitch_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="knee_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_knee_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -980,10 +994,10 @@
   <transmission name="t_ankle_pitch_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_pitch_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -991,10 +1005,10 @@
   <transmission name="t_ankle_yaw_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="ankle_yaw_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_ankle_yaw_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>
@@ -1002,10 +1016,10 @@
   <transmission name="t_j_wheel_4">
     <type> transmission_interface/SimpleTransmission</type>
     <joint name="j_wheel_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor_j_wheel_4">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
       <machanicalReduction>1</machanicalReduction>
     </actuator>
     <robotNamespace>/centauro</robotNamespace>

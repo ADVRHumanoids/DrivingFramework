@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotRosNRT robot("/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
+  mwoibn::robot_class::RobotXBotNRT robot("/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
 
   robot.update();
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
   hierarchical_controller.addTask(&constraints_task, gain, 0, 1e-6);
-  gain << 200;
+  gain << 100;
   hierarchical_controller.addTask(&pelvis_hight, gain, 1, 1e-6);
   gain << 100;
   hierarchical_controller.addTask(&pelvis_orientation, gain, 2, 1e-6);

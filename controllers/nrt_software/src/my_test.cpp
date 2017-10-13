@@ -39,8 +39,9 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   ros::Rate rate(200);
 
-  mwoibn::robot_class::RobotRosNRT robot("/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", "/home/user/malgorzata/workspace/src/controllers/nrt_software/configs/centralized_controller.yaml");
-
+  std::string path = "/home/malgorzata/catkin_ws/src/";
+//  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
+   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default", path+"DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
   //  robot.contacts().contact(1).deactivate();
 
     std::cout << "Dofs: " << robot.getDofs() << std::endl;
@@ -81,6 +82,12 @@ int main(int argc, char** argv)
       0,  1.57,  1.57,  0.0, 0, 0.5,
       0,  1.57,  1.57,  0.0, 0, 0.5,
       0, -1.57, -1.57, -0.0, 0, -0.5;
+
+//  command << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+//      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+//      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+//      0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+//      0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
   velocities << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0, 0.0, 0.0, -0.0, 0, -0.0,

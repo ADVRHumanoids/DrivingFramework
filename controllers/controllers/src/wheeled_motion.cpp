@@ -67,7 +67,7 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
   gain << 25 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 25 * ratio;
+  gain << 30 * ratio;
   _hierarchical_controller.addTask(_leg_xy_ptr.get(), gain, task, 1e-3);
   task++;
 

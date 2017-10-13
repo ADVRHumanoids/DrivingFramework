@@ -1,8 +1,8 @@
 # CENTAURO config
 XBotInterface:
-  urdf_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full.urdf"
-  srdf_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-  joint_map_path: "../malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
+  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_static.urdf"
+  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_lower_body.srdf"
+  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_lower_body.yaml"
 
 RobotInterface:
   framework_name: "ROS"
@@ -18,7 +18,7 @@ RobotInterfaceROS:
   control_message_type: "AdvrCommandMessage"
   jointstate_message_type: "AdvrJointStateMessage"
   ft_topic_names: []
-  imu_topic_names: ["/xbotcore/centauro/imu/imu_link"]
+  imu_topic_names: []
 
 RobotInterfaceXBotRT:
   subclass_name: "RobotInterfaceXBotRT"
@@ -57,17 +57,6 @@ ModelInterfaceRBDL:
 
 GazeboXBotPlugin:
   gains:
-    j_arm1_1: {p: 500, d: 30}
-    j_arm1_2: {p: 800, d: 50}
-    j_arm1_3: {p: 500, d: 30}
-    j_arm1_4: {p: 500, d: 30}
-    j_arm1_6: {p: 200, d: 5}
-    j_arm2_1: {p: 500, d: 30}
-    j_arm2_2: {p: 800, d: 50}
-    j_arm2_3: {p: 500, d: 30}
-    j_arm2_4: {p: 500, d: 30}
-    j_arm2_6: {p: 200, d: 5}
-    torso_yaw: {p: 500, d: 30}
     hip_yaw_1:  &hip_yaw {p: 500, d: 20}
     hip_yaw_2: *hip_yaw
     hip_yaw_3: *hip_yaw
@@ -88,29 +77,29 @@ GazeboXBotPlugin:
     ankle_pitch_2: *ankle_pitch
     ankle_pitch_3: *ankle_pitch
     ankle_pitch_4: *ankle_pitch
-    wheel_1: &wheel {p: 100, d: 10}
-    wheel_2: *wheel
-    wheel_3: *wheel
-    wheel_4: *wheel
+    j_wheel_1: &wheel {p: 0, d: 20}
+    j_wheel_2: *wheel
+    j_wheel_3: *wheel
+    j_wheel_4: *wheel
 
 mwoibnRobot:
   robot1:
-        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: default
-        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/controllers/rt_plugins/include/configs/centralized_controller.yaml
   robot2:
-        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: reference
-        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/controllers/rt_plugins/include/configs/centralized_controller.yaml
   robot3:
-        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: my_test
-        secondary_file: /home/user/malgorzata/test_workspace/src/controllers/rt_plugins/include/configs/centralized_controller.yaml
+        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/controllers/rt_plugins/include/configs/centralized_controller.yaml
   higher_scheme:
-        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: higher_scheme
   default:
-        config_file: /home/user/malgorzata/test_workspace/src/locomotion_framework/configs/mwoibn_v2.yaml
+        config_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
         config_name: default
 
 

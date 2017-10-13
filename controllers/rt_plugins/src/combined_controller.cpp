@@ -44,7 +44,6 @@ void mgnss::rt_plugins::CombinedController::_readReference() {
 
   if(references[12] == mwoibn::IS_VALID) _references = references.head(12);
 
-//  std::cout << _references << std::endl;
 }
 
 void mgnss::rt_plugins::CombinedController::control_loop(double time, double period)

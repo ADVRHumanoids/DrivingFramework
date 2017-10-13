@@ -103,17 +103,17 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "centralized_controller"); // initalize node
 
   ros::NodeHandle n;
-  bool motor_side = true;
+  bool motor_side = false;
 
   // init real robot
-  mwoibn::robot_class::RobotRosNRT robot(
-      "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
+  mwoibn::robot_class::RobotXBotNRT robot(
+      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "default", "/home/user/malgorzata/test_workspace/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
-  mwoibn::robot_class::RobotRosNRT robot_ref(
-      "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
+      "default", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+  mwoibn::robot_class::RobotXBotNRT robot_ref(
+      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "reference", "/home/user/malgorzata/test_workspace/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+      "reference", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
 
   mgnss::controllers::OnlineCentralizedController controller(robot);
 
