@@ -40,10 +40,15 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
       config["source"]["config"].as<std::string>());
 
   biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
-  //  _xbot_map = biMaps().getId("XBOT");
 
+  _loadMappings(robot["mapping"], true);
   _loadFeedbacks(robot["feedback"]);
   _loadControllers(robot["controller"]);
+
+  mwoibn::VectorN reference(_robot->getJointNum());
+  _robot->getJointPosition(reference);
+  _robot->setPositionReference(reference);
+
 }
 
 void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
@@ -117,3 +122,5 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     continue;
   }
 }
+
+

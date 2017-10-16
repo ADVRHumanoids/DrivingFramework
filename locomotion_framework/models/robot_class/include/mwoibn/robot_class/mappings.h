@@ -9,13 +9,14 @@ namespace robot_class
 {
 
 // Handles multiple maps, each map has to have a unique name
+template <typename Map>
 class Mappings{
 
 public:
   Mappings(){}
   ~Mappings(){}
 
-  bool addMap(BiMap map){
+  bool addMap(Map map){
 
     // add checking if the map has already been defined
     if(isDefined(map.getName())) return false;
@@ -24,7 +25,7 @@ public:
     return true;
   }
 
-  const BiMap& get(int i) const {
+  const Map& get(int i) const {
     return _mappings[i];
   }
 
@@ -34,7 +35,7 @@ public:
    *
    * @see isDefined
    */
-  const BiMap& get(std::string name) const {
+  const Map& get(std::string name) const {
       return _mappings[getId(name)];
   }
 
@@ -63,9 +64,10 @@ public:
   }
 
 protected:
-  std::vector<BiMap> _mappings;
+  std::vector<Map> _mappings;
 
 };
+
 } // namespace package
 } // namespace library
 

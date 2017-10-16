@@ -14,9 +14,11 @@
 #include "mwoibn/robot_class/center_of_mass.h"
 #include "mwoibn/robot_class/state.h"
 #include "mwoibn/robot_class/mappings.h"
+#include "mwoibn/robot_class/map.h"
 #include <memory>
 #include <boost/bimap.hpp>
 #include <urdf/model.h>
+#include <srdfdom/model.h>
 
 namespace mwoibn
 {
@@ -88,7 +90,8 @@ public:
    *  Functions releated to hendle robot actuators
    */
   Actuators& actuators() { return _actuators; }
-  Mappings& biMaps() { return _bi_maps; }
+  Mappings<BiMap>& biMaps() { return _bi_maps; }
+  Mappings<Map>& uniMaps() { return _uni_maps; }
 
   const mwoibn::VectorInt& getActuationState() { return _actuation; }
 
@@ -171,7 +174,8 @@ protected:
   Actuators _actuators;
 
   //! Mappings Module
-  Mappings _bi_maps;
+  Mappings<BiMap> _bi_maps;
+  Mappings<Map> _uni_maps;
 
   /** @brief Keeps information about robot actuation type
    *
@@ -202,6 +206,11 @@ protected:
   virtual void _loadFeedbacks(YAML::Node config) {}
   virtual void _loadControllers(YAML::Node config) {}
 
+  virtual void _loadMappings(YAML::Node config, bool from_file);
+  virtual void _loadMap(YAML::Node config, bool from_file);
+  virtual void _loadMapFromModel(YAML::Node config, bool from_file);
+
+
   YAML::Node _getConfig(const std::string config_file,
                         const std::string secondary_file);
   YAML::Node _readRobotConfig(const YAML::Node full_config,
@@ -214,6 +223,8 @@ protected:
   bool _loadFeedback(YAML::Node entry, std::string name);
 
   mwoibn::VectorN _zeroVec;
+
+  void _loadGroup(const srdf::Model::Group& group, mwoibn::VectorInt& map, const std::vector<srdf::Model::Group>& groups);
 
 };
 } // namespace package

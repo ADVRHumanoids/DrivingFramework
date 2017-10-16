@@ -26,6 +26,7 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
 
   config_robot["actuators"]["source"] = config["source"]["actuators"];
   config_robot["contacts"]["source"] = config["source"]["contacts"];
+  config_robot["mapping"] = config["mapping"];
 
   _readActuators(config_robot);
   _readContacts(config_robot);

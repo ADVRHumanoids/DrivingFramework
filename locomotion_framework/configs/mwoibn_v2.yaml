@@ -16,7 +16,7 @@ mwoibn:
                 reference:
                         rate: 200
                         controller: 
-                                list: ["whole_body"]
+                                list: ["lower_body"]
                         feedback: 
                                 layer: "offline"
                         actuators: 
@@ -84,6 +84,16 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
+                lower_body:
+                        space: JOINT
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
         controller:
                 position_controller:
                         dofs: 
@@ -112,17 +122,31 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
+                lower_body:
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL #this he RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
         feedbacks:
                 online: [link_side_online, motor_side_online, floating_base]
-                offline: [whole_body]
+                offline: [lower_body]
         controllers:
                 lower_level: [position_controller, velocity_controller]
-                higher_level: [whole_body]
+                higher_level: [lower_body]
         ros:
                 mapping:
                         PYTHON:
+                                loading: topic
                                 source: "joint_states"
                                 message: sensor_msgs::JointState
+                mapping:
+                        RBDL_LOWER:
+                                loading: model
+                                urdf: "/robot_lower_body"
                 source:
                         urdf: "/robot_description"
                         srdf: "/robot_semantic_description"
@@ -143,6 +167,10 @@ mwoibn:
                                 source: "desired_state"
                                 message: custom_messages::CustomCmnd
                                 initialize: false
+                        lower_body:
+                                source: "desired_state"
+                                message: custom_messages::CustomCmnd
+                                initialize: false
                         motor_side_online: 
                                 space: SKIP
                                 
@@ -158,14 +186,21 @@ mwoibn:
                                 type: "reference"
                                 sink2: "position_controller/reference"
                                 sink: "desired_state"
+                        lower_body:
+                                type: "reference"
+                                sink: "desired_state"
         xbot:
                 source:
                         config: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
                         urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
-#                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
-#                        srdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+#                        urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+                        srdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
                         actuators: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
                         contacts: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                mapping:
+                        RBDL_LOWER:
+                                loading: model
+                                urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                 feedback:
                         link_side_online:
                                 layer: online
@@ -181,6 +216,9 @@ mwoibn:
                         whole_body: 
                                 layer: NRT
                                 source: "desired_state"
+                        lower_body: 
+                                layer: NRT
+                                source: "desired_state"
                 controller:
                         position_controller:
                                 layer: lower_level
@@ -191,6 +229,9 @@ mwoibn:
                                 dofs:
                                         mapping: XBOT
                         whole_body:
+                                layer: NRT
+                                sink: "desired_state"
+                        lower_body:
                                 layer: NRT
                                 sink: "desired_state"
                                  

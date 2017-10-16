@@ -86,8 +86,8 @@ protected:
   void _loadControllers(YAML::Node config);
 
   virtual void _loadContacts(YAML::Node contacts_config);
-  virtual void _loadMappings(YAML::Node config);
-  virtual void _loadMap(YAML::Node config);
+  virtual void _loadMapFromTopic(YAML::Node config);
+  virtual void _loadMap(YAML::Node config, bool from_file);
 
   std::unique_ptr<ros::Rate> _rate_ptr;
 

@@ -20,7 +20,7 @@ mwoibn::robot_class::RobotRosNRT::RobotRosNRT(std::string config_file,
 
   try
   {
-    _loadMappings(robot["mapping"]);
+    _loadMappings(robot["mapping"], false);
     _loadFeedbacks(robot["feedback"]);
     _loadControllers(robot["controller"]);
   }
@@ -117,43 +117,37 @@ bool mwoibn::robot_class::RobotRosNRT::loadRosControllers(
   return false;
 }
 
-void mwoibn::robot_class::RobotRosNRT::_loadMappings(YAML::Node config)
+void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config, bool from_file)
 {
-
-  for (auto entry : config)
-  {
-    if (biMaps().isDefined(entry.first.as<std::string>()))
-    {
-      std::cout << "Map " + entry.first.as<std::string>() +
-                       " has been previously initilized, skip this map"
-                << std::endl;
-      continue;
-    }
-
-    entry.second["name"] = entry.first.as<std::string>();
-    _loadMap(entry.second);
-  }
-}
-void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config)
-{
-
-  // link side state
-  if (!config["source"])
-    throw(std::invalid_argument("Define mapping source"));
-
-  std::string topic = config["source"].as<std::string>();
 
   if (!config["name"])
     throw(std::invalid_argument("Please define a mapping name"));
+
+  if (biMaps().isDefined(config["name"].as<std::string>()))
+    return;
+
+  if (!config["loading"])
+    throw(std::invalid_argument("Please defined a mapping loading method."));
+
+  if(config["loading"].as<std::string>() == "topic") _loadMapFromTopic(config);
+  else if(config["loading"].as<std::string>() == "model") _loadMapFromModel(config, from_file);
+  else throw(std::invalid_argument("Unknown loading method for mapping " + config["name"].as<std::string>()));
+
+  std::cout << "Map " << config["name"].as<std::string>()
+            << " has been sucesfully loaded." << std::endl;
+}
+
+void mwoibn::robot_class::RobotRosNRT::_loadMapFromTopic(YAML::Node config){
 
   if (!config["message"])
     throw(std::invalid_argument("Please defined a message type."));
 
   std::string message = config["message"].as<std::string>();
-  // if mappings has not been yet initialized try to do this from ROS base on a
-  // message
-  if (biMaps().isDefined(config["name"].as<std::string>()))
-    return;
+
+  if (!config["source"])
+    throw(std::invalid_argument("Please defined a source."));
+
+  std::string topic = config["source"].as<std::string>();
 
   if (message == "sensor_msgs::JointState")
   {
@@ -169,9 +163,6 @@ void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config)
       throw(std::invalid_argument(err_msg.str().c_str()));
     }
   }
-
-  std::cout << "Map " << config["name"].as<std::string>()
-            << " has been sucesfully loaded." << std::endl;
 }
 
 void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
