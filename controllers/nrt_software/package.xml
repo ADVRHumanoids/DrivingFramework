@@ -50,8 +50,8 @@
 
   <depend>point_handling</depend> <!--TRAJECTORY_GENERATION -->
   <depend>hierarchical_control</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>collision_model_ros_extension</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>reference_generation</depend> <!--TRAJECTORY_GENERATION -->
+  <!-- <depend>collision_model_ros_extension</depend> TRAJECTORY_GENERATION -->
+  <!-- <depend>reference_generation</depend> TRAJECTORY_GENERATION -->
 
   <depend>message_generation</depend> <!--COLLISION_MODEL -->
   <depend>std_msgs</depend> <!--COLLISION_MODEL -->

@@ -1,5 +1,5 @@
 #include "mwoibn/robot_class/robot_xbot_nrt.h"
-#include "mwoibn/robot_class/robot_ros_nrt.h"
+//#include "mwoibn/robot_class/robot_ros_nrt.h"
 
 mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
                                                 std::string config_name,

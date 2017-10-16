@@ -4,6 +4,7 @@
 #include "mwoibn/robot_class/robot_xbot_feedback.h"
 #include "mwoibn/communication_modules/xbot_controller_to_rt.h"
 #include "mwoibn/communication_modules/xbot_feedback_from_rt.h"
+#include "mwoibn/robot_class/robot_ros_nrt.h"
 
 namespace mwoibn
 {
@@ -31,7 +32,7 @@ public:
   }
 
   virtual void wait() { _rate_ptr->sleep(); }
-
+  virtual bool isRunning() { _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
 

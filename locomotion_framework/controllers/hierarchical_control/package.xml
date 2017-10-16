@@ -46,8 +46,9 @@
   <!-- <depend>visualization_tools</depend> -->
   <depend>basic_controllers</depend>
   <depend>robot_class</depend>
-  <depend>collision_model</depend>
+  <!-- <depend>collision_model</depend> -->
   <depend>point_handling</depend>
+  <depend>robot_point_handling</depend>
   <!-- The export tag contains other, unspecified, tags -->
 
   <test_depend>centauro</test_depend>

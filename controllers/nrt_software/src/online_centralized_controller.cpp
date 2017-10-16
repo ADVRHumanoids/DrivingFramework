@@ -107,13 +107,13 @@ int main(int argc, char** argv)
 
   // init real robot
   mwoibn::robot_class::RobotXBotNRT robot(
-      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
+      "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "default", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+      "default", "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
   mwoibn::robot_class::RobotXBotNRT robot_ref(
-      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
+      "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "reference", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+      "reference", "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
 
   mgnss::controllers::OnlineCentralizedController controller(robot);
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
   robot_ref.state.set(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
                       mwoibn::robot_class::INTERFACE::POSITION);
 
-  while (robot.isRunning())
+  while (ros::ok())
   {
     if (robot_ref.get())
       controller.fullUpdate(robot_ref.state.get(mwoibn::robot_class::INTERFACE::POSITION), robot_ref.state.get(mwoibn::robot_class::INTERFACE::VELOCITY));

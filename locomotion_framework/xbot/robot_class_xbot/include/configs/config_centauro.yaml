@@ -1,8 +1,8 @@
 # CENTAURO config
 XBotInterface:
-  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_static.urdf"
-  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_lower_body.srdf"
-  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_lower_body.yaml"
+  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
+  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
+  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
 
 RobotInterface:
   framework_name: "ROS"
@@ -26,11 +26,14 @@ RobotInterfaceXBotRT:
   subclass_factory_name: "robot_interface_xbot_rt"
 
 XBotRTPlugins:
-  plugins: []
+  plugins: ["HomingExample"]
 #  plugins: ["HomingExample", "RtMyTest", "CombinedController", "OnlineCentralizedControllerPlugin"]
 
 MasterCommunicationInterface:
   framework_name: "ROS"
+
+NRTPlugins:
+  plugins: [] 
 
 AdvrCommandMessage:
   subclass_name: "CommandAdvr"

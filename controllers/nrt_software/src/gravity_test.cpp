@@ -21,13 +21,13 @@
 #include <custom_messages/CustomCmnd.h>
 
 // trajectory generation
-#include <mwoibn/reference_generation/line.h>
-#include <mwoibn/reference_generation/local_circle.h>
+//#include <mwoibn/reference_generation/line.h>
+//#include <mwoibn/reference_generation/local_circle.h>
 //#include <mgnss/communication/basic_handler.h>
 
 // temp
-#include <MathGeoLib/Algorithm/Random/LCG.h>
-#include <MathGeoLib/Geometry/GeometryAll.h>
+//#include <MathGeoLib/Algorithm/Random/LCG.h>
+//#include <MathGeoLib/Geometry/GeometryAll.h>
 
 #include <mwoibn/eigen_utils/eigen_utils.h>
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotXBotNRT robot("/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
+  mwoibn::robot_class::RobotXBotNRT robot("/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
 
   robot.update();
 
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
   std::cout << "orientation reference\n " << pelvis_orientation.getReference(0) << std::endl;
   std::cout << "orientation offset\n " << pelvis_orientation.getOffset(0) << std::endl;
 
-   while (robot.isRunning())
+   while (ros::ok())
   {
 
     if (std::fabs(hight - com_point[2]) > eps){

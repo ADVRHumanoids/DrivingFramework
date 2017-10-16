@@ -18,12 +18,13 @@ set(DEPENDS_OPTIONAL "")
 
 if(HANDLERS)
  LIST( APPEND INSTALL_TARGETS events_handler)
- LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_class_xbot hierarchical_control reference_generation )
+ LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_class_xbot hierarchical_control    reference_generation 
+)
 endif(HANDLERS)
 
 if(XBOT)
   find_package(XBotCore-interfaces)
-  LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt wheels_references)
+  LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt)
   LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services)
 endif(XBOT)
 
@@ -36,7 +37,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS} ${XBotCore-interfaces_INCLUDE_DIRS}
   LIBRARIES
-        events_handler
+#        events_handler
   CATKIN_DEPENDS 
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -78,11 +79,11 @@ target_link_libraries(base_to_rt
     ${catkin_LIBRARIES}
  )
 
-add_executable(wheels_references src/wheels_refs.cpp)
-add_dependencies(wheels_references ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS})
-target_link_libraries(wheels_references
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheels_references src/wheels_refs.cpp)
+#add_dependencies(wheels_references ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS})
+#target_link_libraries(wheels_references
+#    ${catkin_LIBRARIES}
+# )
 
 endif(XBOT)
 

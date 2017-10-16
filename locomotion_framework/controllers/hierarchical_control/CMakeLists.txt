@@ -12,7 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   simple_log
   eigen_utils
   point_handling
-  collision_model
+  robot_point_handling
+#  collision_model
   robot_class
   basic_controllers
 )
@@ -32,8 +33,9 @@ catkin_package(
   CATKIN_DEPENDS 
 	roscpp 
 	eigen_utils 
-	collision_model 
+#	collision_model 
 	point_handling
+	robot_point_handling
         basic_controllers
         robot_class
   DEPENDS 
@@ -58,10 +60,10 @@ include_directories(
 ## Declare a C++ library
    add_library(controller_tasks
      src/controller_task.cpp
-     src/self_collision_task.cpp
+#     src/self_collision_task.cpp
      src/cartesian_world_task.cpp
      src/orientation_world_task.cpp
-     src/self_collisions_task.cpp
+#     src/self_collisions_task.cpp
      src/joint_positions_task.cpp
      src/center_of_mass_task.cpp
      src/constraints_task.cpp

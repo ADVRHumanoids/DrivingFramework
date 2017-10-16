@@ -53,7 +53,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   point_handling
   hierarchical_control
   collision_model_ros_extension
-  reference_generation
+#  reference_generation
 )
 
 endif(TRAJECTORY_GENERATION)
@@ -85,7 +85,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   hierarchical_control
   custom_services
-  reference_generation
+#  reference_generation
   communication
   visualization_tools
 )
@@ -103,7 +103,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   hierarchical_control
   custom_services
-  reference_generation
+#  reference_generation
 )
 
 endif(GRAVITY_TEST)
@@ -112,9 +112,9 @@ endif(GRAVITY_TEST)
 if(WHEELS_MOTION)
 
   LIST( APPEND INSTALL_TARGETS
-    wheeled_locomotion_6
+#    wheeled_locomotion_6
     wheels_cut
-    wheeled_motion_run
+#    wheeled_motion_run
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -122,7 +122,7 @@ if(WHEELS_MOTION)
     robot_class_xbot
     hierarchical_control
     custom_services
-    reference_generation
+#    reference_generation
     controllers
     communication
     visualization_tools
@@ -141,7 +141,7 @@ if(TEST_TEMP)
     robot_class_ros_extension
     hierarchical_control
     custom_services
-    reference_generation
+#    reference_generation
   )
 endif(TEST_TEMP)
 
@@ -236,11 +236,11 @@ endif(GRAVITY_TEST)
 
 if(WHEELS_MOTION)
 
-add_executable(wheeled_locomotion_6 src/wheeled_locomotion_v6.cpp)
-add_dependencies(wheeled_locomotion_6 ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheeled_locomotion_6
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheeled_locomotion_6 src/wheeled_locomotion_v6.cpp)
+#add_dependencies(wheeled_locomotion_6 ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(wheeled_locomotion_6
+#    ${catkin_LIBRARIES}
+# )
 
 add_executable(wheels_cut src/wheels_cut.cpp)
 add_dependencies(wheels_cut ${catkin_EXPORTED_TARGETS})
@@ -248,11 +248,11 @@ target_link_libraries(wheels_cut
     ${catkin_LIBRARIES}
  )
 
-add_executable(wheeled_motion_run src/wheeled_motion_run.cpp)
-add_dependencies(wheeled_motion_run ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheeled_motion_run
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheeled_motion_run src/wheeled_motion_run.cpp)
+#add_dependencies(wheeled_motion_run ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(wheeled_motion_run
+#    ${catkin_LIBRARIES}
+# )
 #add_executable(wheeled_locomotion_7 src/wheeled_locomotion_v7.cpp)
 #add_dependencies(wheeled_locomotion_7 ${catkin_EXPORTED_TARGETS})
 #target_link_libraries(wheeled_locomotion_7

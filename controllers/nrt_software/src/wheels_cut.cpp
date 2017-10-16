@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   // init wheels_controller
 
   mwoibn::robot_class::RobotRosNRT robot(
-        "/home/user/malgorzata/test_workspace/src/DrivingFramework/locomotion_framework/configs/"
+        "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/"
         "mwoibn_v2.yaml",
         "higher_scheme");
 
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
                      mwoibn::SUPPORT_STATE::DEFAULT);
   base.initMotion(mwoibn::BASE_MOTION::STOP, mwoibn::BASE_DIRECTION::POSITIVE);
 
-  while (wheeld_controller.isRunning())
+  while (ros::ok())
   {
     support.update();
     base.update();

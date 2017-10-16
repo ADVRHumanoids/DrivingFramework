@@ -7,6 +7,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
     {
      // pub.setZero();
        _robot.getPositionReference(pub);
+
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
                       pub);
       _robot.setPositionReference(pub);
