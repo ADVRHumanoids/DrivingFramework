@@ -45,10 +45,13 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
   _loadFeedbacks(robot["feedback"]);
   _loadControllers(robot["controller"]);
 
+  _robot->sense();
+  
   mwoibn::VectorN reference(_robot->getJointNum());
-  _robot->getJointPosition(reference);
-  _robot->setPositionReference(reference);
 
+  _robot->getMotorPosition(reference);
+  _robot->setPositionReference(reference);
+  
 }
 
 void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
@@ -70,6 +73,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
 
     if (entry.second["space"].as<std::string>() == "JOINT")
     {
+
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
               new mwoibn::communication_modules::XBotFeedbackOnline(
@@ -81,12 +85,13 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
 
     if (entry.second["space"].as<std::string>() == "OPERATIONAL")
     {
-      _getDefaultPosition(entry.second, false, true, true);
+        
+      _getDefaultPosition(entry.second, true, true, true);
 
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
               new mwoibn::communication_modules::XBotOperationalEuler(
-                  state, map, entry.second, *_robot)));
+                  state, map, entry.second, *_robot, rate())));
 
       _sense = true;
 
@@ -98,8 +103,12 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
 void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
 {
 
+  std::cout << "load controllers" << std::endl;
   for (auto entry : config)
   {
+    std::cout << entry.first << std::endl;
+    if (entry.first.as<std::string>() == "gains") continue;
+    if (entry.first.as<std::string>() == "source") continue;
 
     if (!entry.second["layer"])
       throw(std::invalid_argument("Please defined type of a feedack " +
@@ -108,8 +117,9 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     if (entry.second["layer"].as<std::string>() != "lower_level")
       continue;
 
-    entry.second["name"] = entry.first.as<std::string>();
-
+    entry.second["name"] = entry.first.as<std::string>(); 
+    entry.second["gains"] = config["gains"][entry.second["name"].as<std::string>()];
+       
     BiMap map = readBiMap(entry.second["dofs"]);
 
     controllers.add(

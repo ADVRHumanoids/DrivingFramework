@@ -58,6 +58,8 @@ public:
 
   //! Returns number of actuated(?) DOFs
   int getDofs() { return _model.dof_count; }
+  
+  virtual double rate() {};
 
   //! Returns pointer to the robot model
   RigidBodyDynamics::Model& getModel() { return _model; }

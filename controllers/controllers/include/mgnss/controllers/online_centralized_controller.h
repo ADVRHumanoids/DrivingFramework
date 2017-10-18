@@ -28,7 +28,7 @@ protected:
   std::unique_ptr<mwoibn::gravity_compensation::SimpleQRGravityCompensation> _gravity_compensation_ptr;
   std::unique_ptr<mwoibn::motor_side_reference::SeaReference> _actuation_model_ptr;
 
-  bool _motor_side = true;
+  bool _motor_side = false;
 //  bool _valid = false;
 
 };

@@ -16,7 +16,7 @@
 
 #include <mwoibn/point_handling/robot_points_handler.h>
 //#endif
-#include <custom_services/updatePDGains.h>
+#include <custom_services/updateGains.h>
 #include <custom_services/updatePrint.h>
 #include <custom_messages/CustomCmnd.h>
 
@@ -31,9 +31,9 @@
 
 #include <mwoibn/eigen_utils/eigen_utils.h>
 
-bool wheelHandler(custom_services::updatePDGains::Request& req,
-                  custom_services::updatePDGains::Response& res,
-                  double* hight, double *y, double *x);
+bool wheelHandler(custom_services::updateGains::Request& req,
+                  custom_services::updateGains::Response& res,
+                  double* x, double *y, double *z, double* th);
 
 int main(int argc, char** argv)
 {
@@ -70,16 +70,17 @@ int main(int argc, char** argv)
   mwoibn::hierarchical_control::HierarchicalController hierarchical_controller;
 
   Eigen::Vector3d com_point = pelvis_ph.getPointStateWorld(0);
-  double hight = com_point[2];
-  double y = com_point[1];
-  double x = com_point[0];
+  double z = com_point[2]*robot.rate();
+  double y = com_point[1]*robot.rate();
+  double x = com_point[0]*robot.rate();
+  double th = 0;
 
   std::cout << "init" << com_point << std::endl;
 
   ros::ServiceServer trajectory_service =
-      n.advertiseService<custom_services::updatePDGains::Request,
-                         custom_services::updatePDGains::Response>(
-          "trajectory", boost::bind(&wheelHandler, _1, _2, &hight, &y, &x));
+      n.advertiseService<custom_services::updateGains::Request,
+                         custom_services::updateGains::Response>(
+          "trajectory", boost::bind(&wheelHandler, _1, _2, &x, &y, &z, &th));
 
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
@@ -113,7 +114,7 @@ int main(int argc, char** argv)
 
    while (ros::ok())
   {
-
+/*
     if (std::fabs(hight - com_point[2]) > eps){
       if (hight - com_point[2] > 0)
         com_point[2] += eps;
@@ -140,17 +141,24 @@ int main(int argc, char** argv)
     }
     else
       com_point[0] = x;
+    */
+    com_point[0] += x*robot.rate();
+    com_point[1] += y*robot.rate();
+    com_point[2] += z*robot.rate();
+    
 //    std::cout << "com_point" << std::endl;
 
 //    std::cout << com_point << std::endl;
     pelvis_hight.setReference(com_point);
-
+    pelvis_orientation.setReference(
+      0, pelvis_orientation.getOffset(0)*mwoibn::Quaternion::fromAxisAngle(axis, th));
     command =
         hierarchical_controller.update();
 
     robot.command.set(command, mwoibn::robot_class::INTERFACE::VELOCITY);
+//     std::cout << "velocity" << command.head(6) << std::endl;
 
-    command = command * 1/200 +
+    command = command * robot.rate() +
         robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
     robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
@@ -159,14 +167,15 @@ int main(int argc, char** argv)
   }
 }
 
-bool wheelHandler(custom_services::updatePDGains::Request& req,
-                  custom_services::updatePDGains::Response& res,
-                  double* hight, double* y, double* x)
+bool wheelHandler(custom_services::updateGains::Request& req,
+                  custom_services::updateGains::Response& res,
+                  double* x, double* y, double* z, double* th)
 {
 
-  *hight =  req.p/100.0;
-  *y = req.d/100.0;
-  *x = req.nr/100.0;
+  *x =  req.a_p/100.0;
+  *y = req.a_d/100.0;
+  *z = req.j_p/100.0;
+  *th = req.j_d/100.0;
 
   res.success = true;
   return true;

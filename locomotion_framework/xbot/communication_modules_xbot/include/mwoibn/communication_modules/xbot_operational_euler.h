@@ -15,18 +15,21 @@ class XBotOperationalEuler : public BasicOperationalEuler
 public:
   XBotOperationalEuler(mwoibn::robot_class::State& command,
                  mwoibn::robot_class::BiMap map, YAML::Node config,
-                 XBot::RobotInterface& robot);
+                 XBot::RobotInterface& robot, double rate);
 
   virtual bool initialized(){return true;} // not implemented yet
-
+  virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 velocity);
   virtual ~XBotOperationalEuler(){}
 
   virtual bool get();
 
 protected:
   XBot::ImuSensor::ConstPtr _imu;
+
   mwoibn::Vector3 _linear_state;
   mwoibn::Matrix3 _rotation;
+  mwoibn::VectorN _base;
+  double _rate;
 
 
 };

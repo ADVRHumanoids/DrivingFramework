@@ -15,15 +15,14 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
   {
     YAML::Node robot =
         mwoibn::robot_class::RobotXBot::_init(config, config_name);
-
     if (!robot["rate"])
       throw(std::invalid_argument(
           "Desired frequency not defined in a configuration " + config_file +
           ", " + config_name));
-
     _rate_ptr.reset(new ros::Rate(robot["rate"].as<double>()));
 
     _sense = true; // because of the weird XBot behaviour in the NRT layer
+
     _loadConfig(middleware["feedback"], robot["feedback"]);
     _loadConfig(middleware["controller"], robot["controller"]);
 
@@ -98,6 +97,10 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(
 
   for (auto entry : config)
   {
+
+    if (entry.first.as<std::string>() == "gains") continue;
+    if (entry.first.as<std::string>() == "source") continue;
+
     entry.second["name"] = entry.first.as<std::string>();
 
     BiMap map = readBiMap(entry.second["dofs"]);

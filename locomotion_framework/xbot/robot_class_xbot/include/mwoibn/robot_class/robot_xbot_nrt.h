@@ -31,6 +31,10 @@ public:
       ros::spinOnce();
   }
 
+  virtual double rate() {
+      return _rate_ptr->expectedCycleTime().toSec();     
+    }
+
   virtual void wait() { _rate_ptr->sleep(); }
   virtual bool isRunning() { _robot->isRunning(); }
 protected:

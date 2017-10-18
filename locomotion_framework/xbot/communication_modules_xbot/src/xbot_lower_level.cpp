@@ -5,8 +5,9 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
 //  std::cout << "send()\n";
     if (_position)
     {
-     // pub.setZero();
-       _robot.getPositionReference(pub);
+//        std::cout << "position" << std::endl;
+//        std::cout << _command.get(mwoibn::robot_class::INTERFACE::POSITION) << std::endl;
+        _robot.getPositionReference(pub);
 
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
                       pub);
@@ -24,12 +25,16 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
     }
     if (_torque)
     {
+//        std::cout << "torque" << std::endl;
+//        std::cout << _command.get(mwoibn::robot_class::INTERFACE::TORQUE) << std::endl;
       //pub.setZero(_dofs); // maybe remove?
       _robot.getEffortReference(pub);
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE),
                       pub);
       _robot.setEffortReference(pub);
     }
-
+    
+      _robot.setStiffness(stiffness);
+      _robot.setDamping(damping);
     return true;
 }

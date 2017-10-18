@@ -64,6 +64,7 @@ public:
    **/
   virtual void compute()
   {
+     
     if (_dynamic_model.changed())
       _transform = _dynamic_model.getTransformationMatrix();
     else

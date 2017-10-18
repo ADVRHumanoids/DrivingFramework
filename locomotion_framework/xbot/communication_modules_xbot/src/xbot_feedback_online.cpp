@@ -4,8 +4,8 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::get()
 {
 
   if (_position){
-     _robot.getJointPosition(_pub);
-
+//     _robot.getJointPosition(_pub);
+    _robot.getMotorPosition(_pub);
     _command.set(_pub, _map.reversed(), robot_class::INTERFACE::POSITION);
 
   }

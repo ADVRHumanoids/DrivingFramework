@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
   std::string path = "/home/centauro/src/catkin_malgorzata/src/";
 //  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
-   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default", path+"DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme");
   //  robot.contacts().contact(1).deactivate();
 
   double pos = 0, vel = 0, step = 0.0001;
@@ -98,10 +98,10 @@ int main(int argc, char** argv)
        1.5,  0.8,  0.8, 0.0,  1.5, 0.0;
 
   command_1 << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0,  -0.3, -0.3,  0.3, 0.0, 0.0,
-      0.0,   0.3,  0.3, -0.3, 0.0, 0.0,
-      0.0,   0.3,  0.3, -0.3, 0.0, 0.0,
-      0.0,  -0.3, -0.3,  0.3, 0.0, 0.0;
+      0.0,  -0.0, -0.0,  0.0, 0.0, 0.0,
+      0.0,   0.0,  0.0, -0.0, 0.0, 0.0,
+      0.0,   0.0,  0.0, -0.0, 0.0, 0.0,
+      0.0,  -0.0, -0.0,  0.0, 0.0, 0.0;
 
 
   command_2 << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -160,18 +160,18 @@ int main(int argc, char** argv)
 //      0.0, 0.0, 0.5236, 0.5236, 0.7854,  0.0, 0.7854,  0.0,
 //      0.0;
 
-
-
       
   while (ros::ok())
   {
-    if(pos == 0)
+    if(pos == 1)
       des_pos = command_0;
-    else if(pos == 1)
-      des_pos = command_1;
     else if(pos == 2)
+      des_pos = command_1;
+    else if(pos == 3)
       des_pos = command_2;
-
+    else if(pos == 4)
+      des_pos = robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+    
     if(vel == 0)
         des_vel = velocities_0;
     else if(vel == 1)

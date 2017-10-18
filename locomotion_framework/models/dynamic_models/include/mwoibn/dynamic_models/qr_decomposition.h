@@ -32,6 +32,7 @@ public:
 
   virtual const mwoibn::VectorLimited& getGravityUnconstrained()
   {
+
     _qr_gravity.noalias() =  _independent * BasicModel::getGravity();
 
     return _qr_gravity;
@@ -67,10 +68,14 @@ public:
 
   void updateDecomposition()
   {
+
+      
     _contacts_transpose.noalias() = _robot.contacts().getJacobian().transpose();
 
     _qr_ptr->compute(_contacts_transpose);
 
+    getQMatrix();
+    
     if (getRank() != _rank)
       resize(); // NRT
     else

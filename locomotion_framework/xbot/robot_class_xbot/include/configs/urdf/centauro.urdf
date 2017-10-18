@@ -65,16 +65,16 @@
   <!-- Here all arguments from launch file are evaluated to the final xacro poropeties.
      Also all the parameter dependencies are resolved-->
   <!-- dependend arguments -->
-  <link name="pelvis_imu_link">
+  <link name="imu_link">
     <inertial>
       <mass value="0.0"/>
-      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
     </inertial>
   </link>
-  <joint name="pelvis_imu_joint" type="fixed">
+  <joint name="imu_joint" type="fixed">
     <parent link="pelvis"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
-    <child link="pelvis_imu_link"/>
+    <child link="imu_link"/>
   </joint>
   <gazebo reference="pelvis">
     <sensor name="pelvis_imu" type="imu">

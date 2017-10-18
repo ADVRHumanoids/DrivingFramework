@@ -82,7 +82,6 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
   _is_static = (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
                    ? false
                    : true;
-
   // Init RBDL model
   try
   {
@@ -762,17 +761,19 @@ void mwoibn::robot_class::Robot::_getDefaultPosition(YAML::Node config,
   mwoibn::Vector3 offset_position = mwoibn::Vector3::Zero();
   mwoibn::Matrix3 offset_orientation = mwoibn::Matrix3::Identity();
 
+  
   for (int i = 0;
        i < _model.GetBodyId(config["dofs"]["name"].as<std::string>().c_str());
        i++)
   {
+
     offset_position += _model.GetJointFrame(i).r;
     offset_orientation =
         offset_orientation * _model.GetJointFrame(i).E.transpose();
   }
-
   if (orientation)
   {
+
     config["offset_orientation"]["xx"] = offset_orientation(0, 0);
     config["offset_orientation"]["yy"] = offset_orientation(1, 1);
     config["offset_orientation"]["zz"] = offset_orientation(2, 2);
@@ -785,16 +786,19 @@ void mwoibn::robot_class::Robot::_getDefaultPosition(YAML::Node config,
   }
   if (position)
   {
+
     config["offset_position"]["x"] = offset_position[0];
     config["offset_position"]["y"] = offset_position[1];
     config["offset_position"]["z"] = offset_position[2];
   }
   if (angels)
   {
+
     config["output_angles"]["angle_1"] = 0;
     config["output_angles"]["angle_2"] = 1;
     config["output_angles"]["angle_3"] = 2;
   }
+
 }
 
 bool mwoibn::robot_class::Robot::_loadFeedback(YAML::Node entry,

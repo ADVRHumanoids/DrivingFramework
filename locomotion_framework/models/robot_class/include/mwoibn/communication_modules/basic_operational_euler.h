@@ -140,13 +140,7 @@ public:
                            mwoibn::Vector3 position)
   {
     mwoibn::VectorN base(_size);
-    //    mwoibn::Quaternion orientation(msg->pose[_base_ref].orientation.x,
-    //                                   msg->pose[_base_ref].orientation.y,
-    //                                   msg->pose[_base_ref].orientation.z,
-    //                                   -msg->pose[_base_ref].orientation.w);
 
-    //    base.head(3) << msg->pose[_base_ref].position.x,
-    //        msg->pose[_base_ref].position.y, msg->pose[_base_ref].position.z;
     base.head(3) = position - _offset_position;
     base.tail(3) =
         (_offset_orientation * orientation)
@@ -154,7 +148,8 @@ public:
                          _angels[2]); // Check if the convention is met here
 
 
-    _command.set(base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+    _command.set(base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);  
+    
   }
 
 protected:

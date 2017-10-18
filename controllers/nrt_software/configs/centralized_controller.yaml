@@ -1,15 +1,13 @@
 mwoibn:        
         robot:
-                default:
-                        feedback:
-                                layer: "online"
-                        controller:
-                                layer: "lower_level"
                 reference:
                         controller: 
                                 list: []
-                        feedback:
-                                layer: "offline"
                         actuators: 
                                 read: "true"
+        xbot:
+                source:
+#                        urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                        urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+
 

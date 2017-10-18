@@ -18,7 +18,7 @@ RobotInterfaceROS:
   control_message_type: "AdvrCommandMessage"
   jointstate_message_type: "AdvrJointStateMessage"
   ft_topic_names: []
-  imu_topic_names: []
+  imu_topic_names: ["/xbotcore/centauro/imu/imu_link"]
 
 RobotInterfaceXBotRT:
   subclass_name: "RobotInterfaceXBotRT"

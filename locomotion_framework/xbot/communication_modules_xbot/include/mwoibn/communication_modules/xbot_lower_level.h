@@ -28,16 +28,55 @@ public:
     if (_torque)
       std::cout << "\tInitialized torque interface\n";
 
-    if (_position && !_velocity)
-      _turnJoints(true, config["name"].as<std::string>());
-    if (!_position && _velocity)
-      _turnJoints(false, config["name"].as<std::string>());
 
-    _resize(false);
+    stiffness.setZero(_dofs);
+    damping.setZero(_dofs);
+    _robot.getStiffness(stiffness);
+    _robot.getDamping(damping);
+
+      std::cout << "stiffness original" << std::endl;
+
+     std::cout << stiffness << std::endl;
+     std::cout << "damping original" << std::endl;
+
+     std::cout << damping << std::endl;
+    
+    for(auto entry: config["gains"]){
+        if(!entry.second.IsMap()) continue;
+        if(!entry.second["name"]) continue;
+        
+//        std::cout << "name " << entry.second["name"].as<std::string>() << std::endl;
+        
+//        std::cout << "dof index " << _robot.getDofIndex(entry.second["name"].as<std::string>()) << std::endl;
+        if(!entry.second["a_Kp"])     
+            throw std::invalid_argument(
+            std::string("Required argument a_Kp has not been defined for the joint: " + 
+            entry.first.as<std::string>() + ", name " + entry.second["name"].as<std::string>()));
+        if(!entry.second["a_Kd"])     
+            throw std::invalid_argument(
+            std::string("Required argument a_Kd has not been defined for the joint: " + 
+            entry.first.as<std::string>() + ", name " + entry.second["name"].as<std::string>()));
+//        std::cout << "Kp " << entry.second["a_Kp"].as<double>() << std::endl;
+//        std::cout << "Kd " << entry.second["a_Kd"].as<double>() << std::endl;
+
+        stiffness[ _robot.getDofIndex(entry.second["name"].as<std::string>())] = entry.second["a_Kp"].as<double>();
+        damping[ _robot.getDofIndex(entry.second["name"].as<std::string>())] = entry.second["a_Kd"].as<double>();
+        
+     }
+
+    
+    _robot.setStiffness(stiffness);
+    _robot.setDamping(damping);
+    
+ //   if (_position && !_velocity)
+ //     _turnJoints(true, config["name"].as<std::string>());
+ //   if (!_position && _velocity)
+ //     _turnJoints(false, config["name"].as<std::string>());
+
+ //   _resize(false);
 
     pub.setZero(_dofs);
 
-    std::cout << "\tSuccess" << std::endl;
   }
 
   virtual ~XBotLowerLevel() {}
@@ -47,6 +86,9 @@ public:
 protected:
   XBot::RobotInterface& _robot;
   mwoibn::VectorN pub;
+  mwoibn::VectorN stiffness;
+  mwoibn::VectorN damping;
+  
 
   void _turnJoints(bool position, std::string name)
   {
@@ -82,8 +124,7 @@ protected:
     }
 
     _map = mwoibn::robot_class::BiMap(name, map_local);
-
-  }
+      }
 };
 }
 }

@@ -81,6 +81,8 @@ public:
 
 protected:
 
+  virtual double rate() {_rate_ptr->expectedCycleTime();}
+
   virtual void _loadFeedbacks(YAML::Node config);
 
   void _loadControllers(YAML::Node config);

@@ -47,9 +47,7 @@
         <joint name="j_ft_arm2"/>-->
     </group>
 
-   <group name="imu_sensors">
-        <link name="imu_link"/>
-    </group>
+<group name="imu_sensors"><link name="imu_link"/></group>
 
    <group name="chains">
 
@@ -63,6 +61,53 @@
     <group name="rear_right_leg"/>
     <group name="rear_left_leg"/>
 
+   </group>
+
+   <group name="wheels">
+
+    <link name="wheel_1"/>
+    <link name="wheel_2"/>
+    <link name="wheel_3"/>
+    <link name="wheel_4"/>
+
+   </group>
+
+   <group name="front_left_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_1"/>
+   </group>
+
+   <group name="front_right_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_2"/>
+   </group>
+
+   <group name="rear_right_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_4"/>
+   </group>
+
+   <group name="rear_left_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_3"/>
+   </group>
+
+   <group name="position">
+
+    <group name="left_arm"/>
+    <group name="right_arm"/>
+
+    <group name="torso"/>
+
+    <group name="front_left_leg_no_wheel"/>
+    <group name="front_right_leg_no_wheel"/>
+    <group name="rear_right_leg_no_wheel"/>
+    <group name="rear_left_leg_no_wheel"/>
+
+   </group>
+
+   <group name="lower_body">
+    <group name="front_left_leg"/>
+    <group name="front_right_leg"/>
+    <group name="rear_right_leg"/>
+    <group name="rear_left_leg"/>
+    <link name="pelvis"/>
    </group>
 
 

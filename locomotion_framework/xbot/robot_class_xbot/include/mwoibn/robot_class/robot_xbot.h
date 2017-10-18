@@ -46,6 +46,7 @@ protected:
 //  virtual void _readContacts();
   virtual void _readActuators(YAML::Node config);
   virtual void _readContacts(YAML::Node config);
+  virtual void _readController(YAML::Node config);
 
 
 //  void _initActuation();

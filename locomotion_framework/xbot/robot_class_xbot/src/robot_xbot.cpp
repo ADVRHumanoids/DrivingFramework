@@ -26,10 +26,13 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
 
   config_robot["actuators"]["source"] = config["source"]["actuators"];
   config_robot["contacts"]["source"] = config["source"]["contacts"];
+  config_robot["controller"]["source"] = config["source"]["controller"];
+  
   config_robot["mapping"] = config["mapping"];
 
   _readActuators(config_robot);
   _readContacts(config_robot);
+  _readController(config_robot);
 
   _loadConfig(config["feedback"], config_robot["feedback"]);
   _loadConfig(config["controller"], config_robot["controller"]);
@@ -77,5 +80,17 @@ void mwoibn::robot_class::RobotXBot::_readContacts(YAML::Node config)
 
   contacts["settings"] = config["contacts"];
   _loadContacts(contacts);
+
+}
+
+void mwoibn::robot_class::RobotXBot::_readController(YAML::Node config)
+{
+  if(!config["controller"]["source"])
+   return;
+
+  std::cout << config["controller"]["source"].as<std::string>() << std::endl;
+  
+  config["controller"]["gains"] = YAML::LoadFile(config["controller"]["source"].as<std::string>())[config["name"].as<std::string>()];
+  //config["controller"].remove("source");
 
 }

@@ -2,8 +2,8 @@
 
 mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
     mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map,
-    YAML::Node config, XBot::RobotInterface& robot)
-    : BasicOperationalEuler(command, map, config)
+    YAML::Node config, XBot::RobotInterface& robot, double rate)
+    : BasicOperationalEuler(command, map, config), _rate(rate)
 {
 
   std::map<std::string, XBot::ImuSensor::ConstPtr> imus = robot.getImu();
@@ -37,9 +37,19 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
         config["sensor"].as<std::string>())); // if there is only one sensor this
                                             // could be automatic
 
-  _linear_state << 0,0,0; // the postition estimation is not supported yet
-  std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
+  _base.setZero(_size);
 
+//  std::cout << "offset\n" << _offset_position << std::endl;
+
+//  _linear_state << 0,0,0; // start from the zero position?
+//  _rotation << 1,0,0,0,1,0,0,0,1;
+  
+//  BasicOperationalEuler::getPosition(_rotation, _linear_state);
+    
+  
+//  std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
+
+//  std::cout <<_map_dofs << std::endl;
 
 }
 
@@ -47,7 +57,31 @@ bool mwoibn::communication_modules::XBotOperationalEuler::get()
 {
 
   _imu->getOrientation(_rotation);
-  getPosition(_rotation, _linear_state);
+
+  _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
+//  std::cout << "velocity\n" << _base << std::endl;
+  getPosition(_rotation, _base.head(3));
   return true;
 
 }
+
+void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Matrix3 orientation,
+                           mwoibn::Vector3 velocity)
+  {
+
+    _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+    
+    
+    _base.head(3) += velocity*_rate;
+
+    //    _base[2] += velocity[2]*_rate;
+    _base.tail(3) =
+        (_offset_orientation * orientation)
+            .eulerAngles(_angels[0], _angels[1],
+                         _angels[2]); // Check if the convention is met here
+
+
+    // std::cout << "after\n" << _base << std::endl;
+
+    _command.set(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+  }

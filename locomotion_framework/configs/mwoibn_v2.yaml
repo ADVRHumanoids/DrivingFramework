@@ -73,7 +73,7 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false  		
+                                effort: false
                 whole_body:
                         space: JOINT
                         dofs: 
@@ -94,10 +94,20 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
+                velocity_reference:
+                        space: JOINT
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: false
+                                velocity: true
+                                effort: false
         controller:
                 position_controller:
                         dofs: 
-                                chain: all
+                                chain: position
                                 type: actuated
                                 mapping: PYTHON
                         interface:
@@ -106,7 +116,7 @@ mwoibn:
                                 effort: true
                 velocity_controller:
                         dofs: 
-                                chain: all
+                                chain: wheels
                                 type: actuated
                                 mapping: PYTHON
                         interface:
@@ -132,7 +142,7 @@ mwoibn:
                                 velocity: true
                                 effort: false
         feedbacks:
-                online: [link_side_online, motor_side_online]
+                online: [link_side_online, motor_side_online, floating_base, velocity_reference]
                 offline: [lower_body]
         controllers:
                 lower_level: [position_controller, velocity_controller]
@@ -171,6 +181,10 @@ mwoibn:
                                 source: "desired_state"
                                 message: custom_messages::CustomCmnd
                                 initialize: false
+                        velocity_reference:
+                                source: "desired_state"
+                                message: custom_messages::CustomCmnd
+                                initialize: false
                         motor_side_online: 
                                 space: SKIP
                                 
@@ -194,9 +208,10 @@ mwoibn:
                         config: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
                         urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
-#                        srdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                        srdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
                         actuators: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
                         contacts: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                        controller: "/home/centauro/src/catkin_malgorzata/src/ComplianceRos/centauro_control/config/compliance_gains_medium_new.yaml"
 
                 mapping:
                         RBDL_LOWER:
@@ -211,10 +226,13 @@ mwoibn:
                                 layer: online
                                 space: SKIP
                         floating_base:
-                                layer: NRT
+                                layer: online
                                 sensor: imu_link
                                 source: "floating_base"
                         whole_body: 
+                                layer: NRT
+                                source: "desired_state"
+                        velocity_reference: 
                                 layer: NRT
                                 source: "desired_state"
                         lower_body: 
