@@ -33,19 +33,22 @@
 
 bool wheelHandler(custom_services::updateGains::Request& req,
                   custom_services::updateGains::Response& res,
-                  double* x, double *y, double *z, double* th);
+                  double* x, double *y, double *z, double* th, bool* reset);
 
 int main(int argc, char** argv)
 {
 
   ros::init(argc, argv, "gravity_test"); // initalize node needed for the service
+  
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotXBotNRT robot("/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"higher_scheme");
+  mwoibn::robot_class::RobotXBotNRT robot("/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
 
-  robot.update();
-
+  robot.wait();
+  robot.get();
+  robot.updateKinematics();
+  
   RigidBodyDynamics::Math::VectorNd command =
       Eigen::VectorXd::Zero(robot.getDofs());
 
@@ -65,30 +68,30 @@ int main(int argc, char** argv)
 
   axis << 0, 0, 1;
   pelvis_orientation.setReference(
-      0, pelvis_orientation.getOffset(0)*mwoibn::Quaternion::fromAxisAngle(axis, 0.0));
+      0, pelvis_orientation.getOffset(0)*pelvis_orientation.points().getPointStateWorld(0));
 //  pelvis_orientation.setReference(0, RigidBodyDynamics::Math::Quaternion(0,0,0,1));
   mwoibn::hierarchical_control::HierarchicalController hierarchical_controller;
 
   Eigen::Vector3d com_point = pelvis_ph.getPointStateWorld(0);
-  double z = com_point[2]*robot.rate();
-  double y = com_point[1]*robot.rate();
-  double x = com_point[0]*robot.rate();
+  double z = 0;
+  double y = 0;
+  double x = 0;
   double th = 0;
-
+  bool reset = false;
   std::cout << "init" << com_point << std::endl;
 
   ros::ServiceServer trajectory_service =
       n.advertiseService<custom_services::updateGains::Request,
                          custom_services::updateGains::Response>(
-          "trajectory", boost::bind(&wheelHandler, _1, _2, &x, &y, &z, &th));
+          "trajectory", boost::bind(&wheelHandler, _1, _2, &x, &y, &z, &th, &reset));
 
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
   hierarchical_controller.addTask(&constraints_task, gain, 0, 1e-6);
-  gain << 100;
+  gain << 20;
   hierarchical_controller.addTask(&pelvis_hight, gain, 1, 1e-6);
-  gain << 100;
+  gain << 20;
   hierarchical_controller.addTask(&pelvis_orientation, gain, 2, 1e-6);
 
   //#ifdef VISUALIZATION_TOOLS
@@ -114,69 +117,47 @@ int main(int argc, char** argv)
 
    while (ros::ok())
   {
-/*
-    if (std::fabs(hight - com_point[2]) > eps){
-      if (hight - com_point[2] > 0)
-        com_point[2] += eps;
-      else
-        com_point[2] -= eps;
-    }
-    else
-      com_point[2] = hight;
 
-    if (std::fabs(y - com_point[1]) > eps){
-      if (y - com_point[1] > 0)
-        com_point[1] += eps;
-      else
-        com_point[1] -= eps;
-    }
-    else
-      com_point[1] = y;
-
-    if (std::fabs(x - com_point[0]) > eps){
-      if (x - com_point[0] > 0)
-        com_point[0] += eps;
-      else
-        com_point[0] -= eps;
-    }
-    else
-      com_point[0] = x;
-    */
+//    std::cout << "com_point" << std::endl;
+//    std::cout << com_point << std::endl;
+    
     com_point[0] += x*robot.rate();
     com_point[1] += y*robot.rate();
     com_point[2] += z*robot.rate();
     
-//    std::cout << "com_point" << std::endl;
-
-//    std::cout << com_point << std::endl;
+    if(reset){
+       com_point = pelvis_ph.getPointStateWorld(0);
+       reset = false;
+    }
     pelvis_hight.setReference(com_point);
+    
     pelvis_orientation.setReference(
       0, pelvis_orientation.getOffset(0)*mwoibn::Quaternion::fromAxisAngle(axis, th));
     command =
         hierarchical_controller.update();
 
     robot.command.set(command, mwoibn::robot_class::INTERFACE::VELOCITY);
-//     std::cout << "velocity" << command.head(6) << std::endl;
 
     command = command * robot.rate() +
         robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
-
+//    std::cout << "base" << std::endl;
+//    std::cout << robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) << std::endl;
     robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
-
+    
     robot.update();
   }
 }
 
 bool wheelHandler(custom_services::updateGains::Request& req,
                   custom_services::updateGains::Response& res,
-                  double* x, double* y, double* z, double* th)
+                  double* x, double* y, double* z, double* th, bool* reset)
 {
 
-  *x =  req.a_p/100.0;
-  *y = req.a_d/100.0;
-  *z = req.j_p/100.0;
-  *th = req.j_d/100.0;
-
+  *x =  req.a_p/1000.0;
+  *y = req.a_d/1000.0;
+  *z = req.j_p/1000.0;
+  *th = req.j_d/1000.0;
+  *reset = true;
   res.success = true;
   return true;
 }

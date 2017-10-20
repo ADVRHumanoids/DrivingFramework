@@ -9,5 +9,7 @@ mwoibn:
                 source:
 #                        urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                         urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+                        controller: "/home/centauro/src/catkin_malgorzata/src/ComplianceRos/centauro_control/config/compliance_gains_medium_new.yaml"
+
 
 

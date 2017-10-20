@@ -45,8 +45,7 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 //  _rotation << 1,0,0,0,1,0,0,0,1;
   
 //  BasicOperationalEuler::getPosition(_rotation, _linear_state);
-    
-  
+
 //  std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
 
 //  std::cout <<_map_dofs << std::endl;
@@ -57,10 +56,13 @@ bool mwoibn::communication_modules::XBotOperationalEuler::get()
 {
 
   _imu->getOrientation(_rotation);
-
-  _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
+  _imu->getLinearAcceleration(_linear_state);
+//  _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
 //  std::cout << "velocity\n" << _base << std::endl;
-  getPosition(_rotation, _base.head(3));
+  _linear_state[2] -= 9.81;
+
+  _linear_state = _rotation*_linear_state;
+  getPosition(_rotation, _linear_state);
   return true;
 
 }
@@ -70,18 +72,21 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
   {
 
     _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
-    
-    
-    _base.head(3) += velocity*_rate;
 
-    //    _base[2] += velocity[2]*_rate;
+//    std::cout << "reading" << std::endl;
+//    std::cout << _rate << std::endl;
+//     std::cout << "increment" << std::endl;
+//    std::cout << velocity*(_rate*_rate/2) << std::endl;   
+    _base.head(3) -= velocity*(_rate*_rate/2);
+//    _base.head(3) += velocity*_rate;
+
+ //   std::cout << "base" << std::endl;
+ //   std::cout << _base.head(3) << std::endl;
+
     _base.tail(3) =
         (_offset_orientation * orientation)
             .eulerAngles(_angels[0], _angels[1],
                          _angels[2]); // Check if the convention is met here
-
-
-    // std::cout << "after\n" << _base << std::endl;
 
     _command.set(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
   }

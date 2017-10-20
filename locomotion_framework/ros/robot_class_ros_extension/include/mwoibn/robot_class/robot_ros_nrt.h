@@ -67,7 +67,10 @@ public:
       LOG_INFO << "waiting for callback" << std::endl;
   #endif
       count++;
-      update();
+      wait();
+      
+      get();
+      //update();
     }
 
     init_sub.shutdown();

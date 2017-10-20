@@ -37,8 +37,9 @@ public:
     _steering_ptr->setReference(support);
   }
 
-  void updateBase(const mwoibn::Vector3& pose, const double heading)
+/*  void updateBase(const mwoibn::Vector3& pose, const double heading)
   {
+    
     position.head(2) = pose.head(2);
     position[2] = heading;
 
@@ -47,17 +48,35 @@ public:
     _pelvis_orientation_ptr->setReference(
         0, _pelvis_orientation_ptr->getOffset(0) *
                mwoibn::Quaternion::fromAxisAngle(axis, heading));
+  }*/
+
+    void updateBase(const mwoibn::Vector3& velocity, const double omega)
+  {
+
+    for(int i = 0; i < _pelvis_state.size(); i++)
+        if(_previous_command[i] != velocity[i]) _pelvis_state[i] = _pelvis_position_ptr->points().getPointStateWorld(0)[i];
+    _pelvis_state += velocity*_robot.rate();
+    //_pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0) + 
+    _heading += omega * _robot.rate();
+
+
+    _pelvis_position_ptr->setReference(0, _pelvis_state);
+
+    _pelvis_orientation_ptr->setReference(
+        0, _pelvis_orientation_ptr->getOffset(0) *
+               mwoibn::Quaternion::fromAxisAngle(axis, _heading));
   }
 
+  
   void steering();
 
-  void fullUpdate(const mwoibn::VectorN& support, const mwoibn::Vector3& pose,
-                  const double heading);
+  void fullUpdate(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity,
+                  const double omega);
   void compute();
 
-  void nextStep(const mwoibn::VectorN& support, const mwoibn::Vector3& pose, const double heading);
+  void nextStep(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity, const double omega);
 
-  void update(const mwoibn::VectorN& support, const mwoibn::Vector3& pose, const double heading);
+  void update(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity, const double omega);
 
   double limit(const double th);
 
@@ -112,9 +131,9 @@ protected:
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 
   double rate = 200;
-  double _dt, orientation = 0;
-  mwoibn::VectorN steerings, _command;
-  mwoibn::Vector3 axis, position, _next_step;
+  double _dt, orientation = 0, _heading;
+  mwoibn::VectorN steerings, _command, _previous_command;
+  mwoibn::Vector3 axis, _next_step, _pelvis_state;
   bool _reference = false;
 
 };

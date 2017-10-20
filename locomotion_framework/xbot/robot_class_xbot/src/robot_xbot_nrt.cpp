@@ -86,7 +86,10 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
     }
   }
 
-  update();
+  wait();
+  get();
+  updateKinematics();
+    
 }
 
 void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(

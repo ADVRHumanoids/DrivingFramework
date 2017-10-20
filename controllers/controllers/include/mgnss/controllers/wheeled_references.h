@@ -19,6 +19,7 @@ enum class SUPPORT_MOTION
   CIRCULAR = 2,
 };
 
+/*
 enum class BASE_DIRECTION
 {
   POSITIVE = 0,
@@ -31,6 +32,7 @@ enum class BASE_MOTION
   HEADING = 1,
   FULL = 2,
 };
+*/
 
 class Reference
 {
@@ -157,118 +159,66 @@ class Base
 {
 
 public:
-  Base() {}
+  Base() {_state << 0,0,0; _omega = 0;}
   ~Base() {}
 
-  void setRadious(double r)
+  void set(mwoibn::Vector3 velocity, double omega)
   {
-    pose.setRadious(r);
-    heading.setRadious(r);
-  }
-  void setAngle(double th)
-  {
-    pose.setAngle(th);
-    heading.setAngle(th);
-  }
 
+    _state = velocity;
+    _omega = omega;
+
+ }
+ 
+  void setX(double v_x)
+  {
+    _state[0] = v_x;
+  }
+  void setY(double v_y)
+  {
+    _state[1] = v_y;
+  }
+  void setZ(double v_z)
+  {
+    _state[2] = v_z;
+  }
+    void setHeading(double omega)
+  {
+    _omega = omega;
+  }
+ 
+ void setPose(double v_x, double v_y, double omega)
+  {
+
+    _state[0] = v_x;
+    _state[1] = v_y;
+    _omega = omega;
+
+ }
+
+    const double& getHeading()
+  {
+    return _omega;
+  }
+ 
+   const mwoibn::Vector3& getPosition()
+  {
+    return _state;
+  }
+ 
   const mwoibn::Vector3& get()
   {
 
-    _state.head(2) = pose.get();
-    _state[2] = heading.get()[0];
+    _returner.head(2) = _state.head(2);
+    _returner[2] = _omega;
 
-    return _state;
+    return _returner;
   }
-
-  bool initMotion(BASE_MOTION motion, BASE_DIRECTION direction)
-  {
-    _motion = motion;
-    if (direction == BASE_DIRECTION::POSITIVE)
-    {
-//      std::cout << "base positive" << std::endl;
-      heading.setPositive();
-      pose.setPositive();
-    }
-    else if (direction == BASE_DIRECTION::NEGATIVE)
-    {
-//      std::cout << "base negative" << std::endl;
-      heading.setNegative();
-      pose.setNegative();
-    }
-    initMotion();
-  }
-
-  bool initMotion()
-  {
-
-    if (_motion == BASE_MOTION::HEADING)
-      return true;
-    if (_motion == BASE_MOTION::FULL)
-      return true;
-
-  }
-
-  bool update()
-  {
-    bool done = false;
-    if (_motion == BASE_MOTION::STOP){
-      done = true;
-    }
-    else if (_motion == BASE_MOTION::HEADING)
-    {
-      done = heading.limitedStep();
-      heading.nextStep();
-    }
-    else if (_motion == BASE_MOTION::FULL)
-    {
-      heading.step();
-      pose.step();
-      nextStep();
-      done = false;
-    }
-
-    return done;
-  }
-
-  void nextStep()
-  {
-    pose.nextStep();
-    heading.moveTangential();
-    //    height.nextStep();
-  }
-
-  void setCurrentPosition(const mwoibn::VectorN position)
-  {
-    height.setCurrent(position[2]);
-    pose.setCurrent(position.head(2));
-  }
-
-  const mwoibn::Vector3& getPosition()
-  {
-    _state.head(2) << pose.get();
-    _state[2] = height.get()[0];
-    return _state;
-  }
-
-  void setDesiredPosition(const mwoibn::VectorN position)
-  {
-    height.setDesired(position[2]);
-    pose.setDesired(position.head(2));
-  }
-
-  void setBasePosition(const mwoibn::VectorN& position)
-  {
-    height.setBase(position[2]);
-    pose.setBase(position);
-  }
-
-  ScalarRef height;
-  ScalarRef heading;
-  Pose pose;
 
 protected:
-  BASE_MOTION _motion;
-  mwoibn::Vector3 _state;
+  mwoibn::Vector3 _state, _returner;
+  double _omega;
+
 };
 
 class SupportPolygon : public Reference

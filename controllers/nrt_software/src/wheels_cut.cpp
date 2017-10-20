@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
   // init wheels_controller
 
-  mwoibn::robot_class::RobotRosNRT robot(
+  mwoibn::robot_class::RobotXBotNRT robot(
         "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/"
         "mwoibn_v2.yaml",
         "higher_scheme");
@@ -32,8 +32,8 @@ int main(int argc, char** argv)
 
   mwoibn::Base base;
 
-  base.heading.setUpperLimit(2 * 3.1416 / 180);  
-  base.heading.setLowerLimit(-2 * 3.1416 / 180);
+//  base.heading.setUpperLimit(2 * 3.1416 / 180);  
+//  base.heading.setLowerLimit(-2 * 3.1416 / 180);
 
   // ros topics/service support
   ros::ServiceServer service =
@@ -43,24 +43,27 @@ int main(int argc, char** argv)
           boost::bind(&evenstHandler, _1, _2, &support, &base));
 
   // starting
-  base.setBasePosition(wheeld_controller.getBodyPosition());
+//  base.setBasePosition(wheeld_controller.getBodyPosition());
 
-  base.pose.setCurrent(wheeld_controller.getBodyPosition());
-  base.height.setCurrent(0.55);
-  base.heading.setCurrent(0);
+//  base.pose.setCurrent(wheeld_controller.getBodyPosition());
+
+//  base.height.setCurrent(0.55); //?
+//  base.heading.setCurrent(0); //?
+  
   support.setCurrent(wheeld_controller.getSupportReference());
 
   support.initMotion(mwoibn::SUPPORT_MOTION::DIRECT,
                      mwoibn::SUPPORT_STATE::DEFAULT);
-  base.initMotion(mwoibn::BASE_MOTION::STOP, mwoibn::BASE_DIRECTION::POSITIVE);
+//  base.initMotion(mwoibn::BASE_MOTION::STOP, mwoibn::BASE_DIRECTION::POSITIVE);
 
   while (ros::ok())
   {
     support.update();
-    base.update();
+//    base.update();
 
+//    std::cout << base.getPosition() << std::endl;
     wheeld_controller.fullUpdate(support.get(), base.getPosition(),
-                                 base.heading.get()[0]);
+                                 base.getHeading());
 
   }
 }
@@ -72,42 +75,12 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
   bool correct = true;
   if (req.p == 1) // base
   {
-    mwoibn::BASE_MOTION motion;
-    mwoibn::BASE_DIRECTION direction;
-    if (req.d > 0 && req.d < 3)
-    {
-      motion = static_cast<mwoibn::BASE_MOTION>(req.d);
-
-      if (req.nr > 1 || req.nr < 0)
-        correct = false;
-      else
-        direction = static_cast<mwoibn::BASE_DIRECTION>(req.nr);
-      if (correct)
-        base->initMotion(motion, direction);
-    }
-    else if (req.d == 3)
-    {
-      base->heading.setStep(req.nr / 10000.0);
-      base->pose.setStep(req.nr / 10000.0);
-    }
-    else if (req.d == 4)
-    {
-      base->heading.setUpperLimit(req.nr / 100.0);
-    }
-    else if (req.d == 5)
-    {
-      base->heading.setLowerLimit(req.nr / 100.0);
-    }
-    else if (req.d == 6)
-    {
-      base->pose.setRadious(req.nr / 100.0);
-    }
-    else if (req.d == 7)
-    {
-      base->height.setCurrent(req.nr / 100.0);
-    }
-    else
-      correct = false;
+     if(req.d == 1)
+         base->setX(req.nr/100.0);
+     else if(req.d == 2)
+         base->setY(req.nr/100.0);
+     else if(req.d == 3)
+         base->setZ(req.nr/100.0);
   }
   else if (req.p == 2) // support
   {

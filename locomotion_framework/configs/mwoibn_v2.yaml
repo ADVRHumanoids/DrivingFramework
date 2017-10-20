@@ -4,7 +4,7 @@ mwoibn:
                 default:
                         rate: 200
                         controller: 
-                                layer: "lower_level"
+                                list: [position_controller, velocity_controller, lower_body]
                         feedback: 
                                 layer: "online"
                         actuators: 
@@ -211,7 +211,6 @@ mwoibn:
                         srdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
                         actuators: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
                         contacts: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
-                        controller: "/home/centauro/src/catkin_malgorzata/src/ComplianceRos/centauro_control/config/compliance_gains_medium_new.yaml"
 
                 mapping:
                         RBDL_LOWER:
@@ -226,7 +225,7 @@ mwoibn:
                                 layer: online
                                 space: SKIP
                         floating_base:
-                                layer: online
+                                layer: NRT
                                 sensor: imu_link
                                 source: "floating_base"
                         whole_body: 

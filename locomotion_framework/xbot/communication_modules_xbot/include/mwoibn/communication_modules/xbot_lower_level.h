@@ -34,12 +34,12 @@ public:
     _robot.getStiffness(stiffness);
     _robot.getDamping(damping);
 
-      std::cout << "stiffness original" << std::endl;
+ //     std::cout << "stiffness original" << std::endl;
 
-     std::cout << stiffness << std::endl;
-     std::cout << "damping original" << std::endl;
+//     std::cout << stiffness << std::endl;
+//     std::cout << "damping original" << std::endl;
 
-     std::cout << damping << std::endl;
+//     std::cout << damping << std::endl;
     
     for(auto entry: config["gains"]){
         if(!entry.second.IsMap()) continue;

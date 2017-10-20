@@ -352,7 +352,7 @@ class Steering
 public:
   Steering(mwoibn::robot_class::Robot& robot,
            mwoibn::hierarchical_control::CartesianSimplifiedPelvisTask& plane,
-           double K_icm, double K_sp, double dt, double margin = 0.03,
+           double K_icm, double K_sp, double dt, double margin = 0.05,
            double max = 2.79252680)
       : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt), _margin(margin),
         _max(max),
@@ -365,7 +365,8 @@ public:
     _b.setZero(_size);
     _b_st.setZero(_size);
     _plane_ref.setZero(2);
-
+    _temp.setZero(_size);
+    
     std::vector<std::string> names = {"hip1_1",   "hip1_2",   "hip1_3",
                                       "hip1_4",   "ankle2_1", "ankle2_2",
                                       "ankle2_3", "ankle2_4"};
@@ -382,6 +383,7 @@ public:
 
   void compute(const mwoibn::Vector3 next_step)
   {
+//      std::cout << next_step << std::endl;
     _plane.updateState();
     _heading = _plane.getState()[2];
 
@@ -389,14 +391,35 @@ public:
 
     _SPT(); // returns a velue in a robot space
 
+    double l = _margin/_dt;
+    
+    l = l*l*l;
+    
     for (int i = 0; i < _size; i++)
     {
-      if (std::fabs(_v_icm[i]) + std::fabs(_v_sp[i]) < _margin / _dt)
+      double vel = std::fabs(_v_icm[i] + _v_sp[i]);
+      
+      if (vel < _margin / _dt)
       {
-        _v_icm[i] = 0;
-        _v_sp[i] = 0;
+        //_v_icm[i] = 0;
+        //_v_sp[i] = 0;
 
+        _b[i] = std::atan2(_K_icm * _v_icm[i] * std::sin(_b_icm[i]) +
+                               _K_sp * _v_sp[i] * std::sin(_b_sp[i]),
+                           _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
+                               _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
+        
+        limit(_b_st[i]-_heading, _b[i]);
+        _temp[i] = _b[i] - (_b_st[i] - _heading);
+         
+      //  std::cout << i << "\t"  << (std::fabs(_v_icm[i]) + std::fabs(_v_sp[i]))*(std::fabs(_v_icm[i]) + std::fabs(_v_sp[i]))/(_margin / _dt)/(_margin / _dt) << std::endl;
+        std::cout << i << "\tpervious: " << _b_st[i] << "\t new: " << _b[i] << "\t error: " << _temp[i] << ",\t factor: " << vel*vel*vel/l; 
         _b[i] = _b_st[i] - _heading;
+        _b[i] += vel*vel*vel/l*_temp[i];
+        
+        std::cout << ",\t final: " << _b[i] << std::endl;
+        
+        
       }
       else
       {
@@ -437,7 +460,7 @@ public:
 protected:
   mwoibn::hierarchical_control::CartesianSimplifiedPelvisTask& _plane;
   double _dt, _margin, _max, _K_icm, _K_sp, _heading, _x, _y;
-  mwoibn::VectorN _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref;
+  mwoibn::VectorN _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _temp;
   const mwoibn::VectorN& _state;
   mwoibn::VectorInt _dofs;
   int _size = 4;

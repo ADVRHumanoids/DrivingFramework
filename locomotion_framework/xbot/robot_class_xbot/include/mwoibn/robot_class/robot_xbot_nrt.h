@@ -32,10 +32,10 @@ public:
   }
 
   virtual double rate() {
-      return _rate_ptr->expectedCycleTime().toSec();     
+      return _rate_ptr->expectedCycleTime().toSec();  
     }
 
-  virtual void wait() { _rate_ptr->sleep(); }
+  virtual void wait() {_rate_ptr->sleep(); }
   virtual bool isRunning() { _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
