@@ -17,9 +17,9 @@ int main(int argc, char** argv)
   // init wheels_controller
 
   mwoibn::robot_class::RobotXBotNRT robot(
-        "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/"
+        "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
         "mwoibn_v2.yaml",
-        "higher_scheme");
+        "default");
 
   mwoibn::WheeledMotion wheeld_controller(robot);
 
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   {
     support.update();
 //    base.update();
-
+    std::cout << ros::Time::now().toSec() << "\t";
 //    std::cout << base.getPosition() << std::endl;
     wheeld_controller.fullUpdate(support.get(), base.getPosition(),
                                  base.getHeading());

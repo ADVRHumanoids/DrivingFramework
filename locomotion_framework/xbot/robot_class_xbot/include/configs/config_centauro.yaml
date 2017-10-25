@@ -1,9 +1,11 @@
 # CENTAURO config
 XBotInterface:
-  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
-  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
-  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
-
+#  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
+#  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
+#  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
+  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
 RobotInterface:
   framework_name: "ROS"
 
@@ -60,27 +62,38 @@ ModelInterfaceRBDL:
 
 GazeboXBotPlugin:
   gains:
-    hip_yaw_1:  &hip_yaw {p: 500, d: 20}
+    j_arm1_1: {p: 5000, d: 30}
+    j_arm1_2: {p: 8000, d: 50}
+    j_arm1_3: {p: 5000, d: 30}
+    j_arm1_4: {p: 5000, d: 30}
+    j_arm1_6: {p: 2000, d: 5}
+    j_arm2_1: {p: 5000, d: 30}
+    j_arm2_2: {p: 8000, d: 50}
+    j_arm2_3: {p: 5000, d: 30}
+    j_arm2_4: {p: 5000, d: 30}
+    j_arm2_6: {p: 2000, d: 5}
+    torso_yaw: {p: 5000, d: 30}
+    hip_yaw_1:  &hip_yaw {p: 5000, d: 20}
     hip_yaw_2: *hip_yaw
     hip_yaw_3: *hip_yaw
     hip_yaw_4: *hip_yaw
-    hip_pitch_1: &hip_pitch {p: 500, d: 20}
+    hip_pitch_1: &hip_pitch {p: 5000, d: 20}
     hip_pitch_2: *hip_pitch
     hip_pitch_3: *hip_pitch
     hip_pitch_4: *hip_pitch
-    knee_pitch_1: &knee_pitch {p: 500, d: 20}
+    knee_pitch_1: &knee_pitch {p: 5000, d: 20}
     knee_pitch_2: *knee_pitch
     knee_pitch_3: *knee_pitch
     knee_pitch_4: *knee_pitch
-    ankle_yaw_1: &ankle_yaw {p: 500, d: 20}
+    ankle_yaw_1: &ankle_yaw {p: 5000, d: 20}
     ankle_yaw_2: *ankle_yaw
     ankle_yaw_3: *ankle_yaw
     ankle_yaw_4: *ankle_yaw
-    ankle_pitch_1: &ankle_pitch {p: 500, d: 20}
+    ankle_pitch_1: &ankle_pitch {p: 5000, d: 20}
     ankle_pitch_2: *ankle_pitch
     ankle_pitch_3: *ankle_pitch
     ankle_pitch_4: *ankle_pitch
-    j_wheel_1: &wheel {p: 0, d: 20}
+    j_wheel_1: &wheel {p: 0, d: 5}
     j_wheel_2: *wheel
     j_wheel_3: *wheel
     j_wheel_4: *wheel

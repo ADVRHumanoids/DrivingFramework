@@ -188,7 +188,8 @@ HEADERS += common/include/mwoibn/common/ros.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_controller_to_nrt.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_operational_euler_from_nrt.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h \
-    ros/communication_modules_ros_extension/include/mwoibn/communication_modules/velocity_controller.h
+    ros/communication_modules_ros_extension/include/mwoibn/communication_modules/velocity_controller.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v4.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \

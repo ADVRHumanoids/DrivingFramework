@@ -30,8 +30,8 @@ public:
                                 mwoibn::robot_class::Robot& robot)
       : CartesianWorldTask(ik), _robot(robot)
   {
-    _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
-        "ROOT", robot, {"pelvis"}));
+//    _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
+//        "ROOT", robot, {"pelvis"}));
     _wheels_ptr.reset(
           new mwoibn::point_handling::OrientationsHandler("ROOT", robot, {"ankle2_1", "ankle2_2", "ankle2_3", "ankle2_4"}));
 
@@ -83,6 +83,7 @@ public:
     _wheels.setZero(ik.size());
     _point2D.setZero(2);
     _full_error.setZero(ik.size() * 2);
+    _pelvis_reference.setZero(6);
     // init the wheels orientations
 
     mwoibn::VectorN state =
@@ -155,20 +156,38 @@ public:
 
   }
 
+  void setPelvisPosition(const mwoibn::Vector3& position){
+    _pelvis_reference.head(3) = position;
+  }
+  void setPelvisOrientation(const mwoibn::Quaternion& quaternion){
+
+    setPelvisOrientation(quaternion.toMatrix());
+  }
+
+  void setPelvisOrientation(const mwoibn::Matrix3& rotation){
+    _pelvis_reference.tail(3) = rotation.transpose().eulerAngles(2, 1, 0);
+  }
+
+  void setPelvisHeading(double heading){
+    _pelvis_reference[3] = heading;
+  }
+
   void updateState()
   {
     // update state
 
-    _temp_point = _pelvis_ptr->getPointStateWorld(0);
+   // _temp_point = _pelvis_ptr->getPointStateWorld(0);
+    _temp_point = _pelvis_reference.head(3);
     _state[0] = _temp_point[0];
     _state[1] = _temp_point[1];
     _state[3] = _temp_point[2];
 
-    _temp_point = _pelvis_ptr->point(0)
-                      .getRotationWorld(_robot.state.get(
-                          mwoibn::robot_class::INTERFACE::POSITION))
-                      .transpose()
-                      .eulerAngles(2, 1, 0);
+    //_temp_point = _pelvis_ptr->point(0)
+    //                  .getRotationWorld(_robot.state.get(
+    //                      mwoibn::robot_class::INTERFACE::POSITION))
+    //                  .transpose()
+    //                  .eulerAngles(2, 1, 0);
+    _temp_point = _pelvis_reference.tail(3);
 
     //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
     //    -pi:pi)
@@ -341,8 +360,8 @@ public:
   const mwoibn::VectorN& getWorldError() const { return _full_error; }
 
 protected:
-  mwoibn::VectorN _state, _height, _zero, _wheels, _point2D, _full_error;
-  std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
+  mwoibn::VectorN _state, _height, _zero, _wheels, _point2D, _full_error, _pelvis_reference;
+//  std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
   mwoibn::robot_class::Robot& _robot;
   RigidBodyDynamics::Model _flat_model;

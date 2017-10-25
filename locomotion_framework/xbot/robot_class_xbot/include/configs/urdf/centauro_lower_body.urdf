@@ -29,9 +29,11 @@
   <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
+  <!-- load proper collision model -->
   <!-- Here all arguments from launch file are evaluated to the final xacro poropeties.
      Also all the parameter dependencies are resolved-->
   <!-- dependend arguments -->
+  <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
   <!-- load proper collision model -->
@@ -70,7 +72,7 @@
     <child link="imu_link"/>
   </joint>
   <joint name="reference" type="floating">
-    <origin xyz="0.0 0.0 0.9256"/>
+    <origin xyz="0.0 0.0 0.92795000"/>
     <parent link="world"/>
     <child link="pelvis"/>
   </joint>
@@ -243,7 +245,7 @@
   <joint name="j_wheel_1" type="continuous">
     <parent link="ankle2_1"/>
     <child link="wheel_1"/>
-    <origin rpy="1.57079632679 0.0 0.0" xyz="0.0 0.00085 0.235"/>
+    <origin rpy="1.57079632679 0.0 3.14159265359" xyz="0.0 0.00085 0.237350"/>
     <axis xyz="0 0 1"/>
     <limit effort="35" velocity="20.0"/>
   </joint>
@@ -480,7 +482,7 @@
   <joint name="j_wheel_2" type="continuous">
     <parent link="ankle2_2"/>
     <child link="wheel_2"/>
-    <origin rpy="1.57079632679 0.0 0.0" xyz="0.0 0.00085 0.235"/>
+    <origin rpy="1.57079632679 0.0 3.14159265359" xyz="0.0 0.00085 0.237350"/>
     <axis xyz="0 0 1"/>
     <limit effort="35" velocity="20.0"/>
   </joint>
@@ -717,7 +719,7 @@
   <joint name="j_wheel_3" type="continuous">
     <parent link="ankle2_3"/>
     <child link="wheel_3"/>
-    <origin rpy="1.57079632679 0.0 0.0" xyz="0.0 0.00085 0.235"/>
+    <origin rpy="1.57079632679 0.0 3.14159265359" xyz="0.0 0.00085 0.237350"/>
     <axis xyz="0 0 1"/>
     <limit effort="35" velocity="20.0"/>
   </joint>
@@ -954,7 +956,7 @@
   <joint name="j_wheel_4" type="continuous">
     <parent link="ankle2_4"/>
     <child link="wheel_4"/>
-    <origin rpy="1.57079632679 0.0 0.0" xyz="0.0 0.00085 0.235"/>
+    <origin rpy="1.57079632679 0.0 3.14159265359" xyz="0.0 0.00085 0.237350"/>
     <axis xyz="0 0 1"/>
     <limit effort="35" velocity="20.0"/>
   </joint>

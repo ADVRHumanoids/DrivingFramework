@@ -53,12 +53,17 @@ public:
     void updateBase(const mwoibn::Vector3& velocity, const double omega)
   {
 
-    for(int i = 0; i < _pelvis_state.size(); i++)
+    for(int i = 0; i < _pelvis_state.size(); i++){
         if(_previous_command[i] != velocity[i]) _pelvis_state[i] = _pelvis_position_ptr->points().getPointStateWorld(0)[i];
+        _previous_command[i] = velocity[i];
+    }
+
     _pelvis_state += velocity*_robot.rate();
     //_pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0) + 
     _heading += omega * _robot.rate();
 
+    //_steering_ptr->setPelvisPosition(_pelvis_state);
+    //_steering_ptr->setPelvisHeading(_pelvis_state);
 
     _pelvis_position_ptr->setReference(0, _pelvis_state);
 

@@ -104,11 +104,11 @@ public:
     }
     else if (_direction == 1){
       _t = _t_max;
-    std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
+ //   std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
 	}
     else{
       _t = _t_min;
-    std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
+ //   std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
 	}
 
     return true;

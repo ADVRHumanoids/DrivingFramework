@@ -17,7 +17,8 @@
   <arg name="wheels" default="true"/>
   <arg name="static" default="false"/>
   <arg name="one_arm" default="false"/>
-  <arg name="end_effector" default="stick"/>
+  <arg name="left_end_effector" default="stick"/>
+  <arg name="right_end_effector" default="stick"/>
   <arg name="mass" default="0.0"/>
 
   <!-- which controller should be loaded:
@@ -76,7 +77,8 @@
       <arg name="wheels" value="$(arg wheels)"/>
       <arg name="static" value="$(arg static)"/>
       <arg name="one_arm" value="$(arg one_arm)"/>
-      <arg name="end_effector" value="$(arg end_effector)"/>
+      <arg name="right_end_effector" value="$(arg right_end_effector)"/>
+      <arg name="left_end_effector" value="$(arg left_end_effector)"/>
       <arg name="mass" value="$(arg mass)"/>
 
   </include>

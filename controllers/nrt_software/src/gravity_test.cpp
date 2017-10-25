@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotXBotNRT robot("/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
+  mwoibn::robot_class::RobotXBotNRT robot("/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
 
   robot.wait();
   robot.get();
@@ -133,6 +133,7 @@ int main(int argc, char** argv)
     
     pelvis_orientation.setReference(
       0, pelvis_orientation.getOffset(0)*mwoibn::Quaternion::fromAxisAngle(axis, th));
+
     command =
         hierarchical_controller.update();
 
@@ -140,8 +141,10 @@ int main(int argc, char** argv)
 
     command = command * robot.rate() +
         robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+
 //    std::cout << "base" << std::endl;
 //    std::cout << robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) << std::endl;
+
     robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
     
     robot.update();

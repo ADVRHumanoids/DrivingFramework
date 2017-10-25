@@ -49,34 +49,35 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
       selection, _robot));
 
   int task = 0;
-  int ratio = 2;
+  int ratio = 1;
   double damp = 1e-4;
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
   _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
-  gain << 20 * ratio;
+  gain << 25 * ratio;
   _hierarchical_controller.addTask(_leg_z_ptr.get(), gain, task, damp);
  task++;
-  gain << 30 * ratio;
+ gain << 30 * ratio;
+ _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
+                                  damp);
+ gain << 20 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 30 * ratio;
-  _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
-                                   damp);
+
   task++;
-  gain << 25 * ratio;
+  gain << 10 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << 30 * ratio;
   _hierarchical_controller.addTask(_leg_xy_ptr.get(), gain, task, 1e-3);
-//  task++;
+  task++;
 
   _dt = _robot.rate();
 
-  _steering_ref_ptr.reset(new events::Steering(_robot, *_steering_ptr, 0.3, 0.7,
+  _steering_ref_ptr.reset(new events::Steering(_robot, *_steering_ptr, 0.6, 0.4,
                                                _dt));
 
   steerings.resize(_leg_z_ptr->points().size());
@@ -105,10 +106,15 @@ void mwoibn::WheeledMotion::nextStep(const mwoibn::VectorN& support,
   updateSupport(support);
 
 
-  _next_step[0] = (_pelvis_state[0] - _pelvis_position_ptr->points().getPointStateWorld(0)[0])/_robot.rate();
-  _next_step[1] = (_pelvis_state[1] - _pelvis_position_ptr->points().getPointStateWorld(0)[1])/_robot.rate();
+  _next_step[0] = (_pelvis_state[0] - _steering_ptr->getState()[0])/_robot.rate();
+  _next_step[1] = (_pelvis_state[1] - _steering_ptr->getState()[1])/_robot.rate();
+
+//  _next_step[0] = velocity[0];
+//  _next_step[1] = velocity[1];
   _next_step[2] = omega;
 
+//  std::cout << "_next_step" << std::endl;
+//  std::cout << _next_step << std::endl;
   steering();
 }
 
@@ -148,8 +154,8 @@ void mwoibn::WheeledMotion::fullUpdate(const mwoibn::VectorN& support,
 void mwoibn::WheeledMotion::compute()
 {
 
-   std::cout << "_pelvis_state" << std::endl;
-  std::cout << _pelvis_state << std::endl;
+//   std::cout << "_pelvis_state" << std::endl;
+//  std::cout << _pelvis_state << std::endl;
   _command.noalias() = _hierarchical_controller.update();
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);

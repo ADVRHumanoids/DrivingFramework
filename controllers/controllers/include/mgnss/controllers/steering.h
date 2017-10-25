@@ -366,7 +366,7 @@ public:
     _b_st.setZero(_size);
     _plane_ref.setZero(2);
     _temp.setZero(_size);
-    
+
     std::vector<std::string> names = {"hip1_1",   "hip1_2",   "hip1_3",
                                       "hip1_4",   "ankle2_1", "ankle2_2",
                                       "ankle2_3", "ankle2_4"};
@@ -375,6 +375,52 @@ public:
 
     for (int i = 0; i < _size; i++)
       _dofs[i] = robot.getDof(names[_size + i])[0];
+
+    std::cout << "time\t"
+              << "heading\t"
+              << "next_x\t"
+              << "next_y\t"
+              << "next_th\t"
+              << "des_x_1\t"
+              << "des_y_1\t"
+              << "b_st_1\t"
+              << "new_1\t"
+              << "b_icm_1\t"
+              << "v_icm_1\t"
+              << "b_sp_1\t"
+              << "v_sp_1\t"
+              << "factor_1\t"
+              << "final_1\t"
+              << "des_x_2\t"
+              << "des_y_2\t"
+              << "b_st_2\t"
+              << "new_2\t"
+              << "b_icm_2\t"
+              << "v_icm_2\t"
+              << "b_sp_2\t"
+              << "v_sp_2\t"
+              << "factor_2\t"
+              << "final_2\t"
+              << "des_x_3\t"
+              << "des_y_3\t"
+              << "b_st_3\t"
+              << "new_3\t"
+              << "b_icm_3\t"
+              << "v_icm_3\t"
+              << "b_sp_3\t"
+              << "v_sp_3\t"
+              << "factor_3\t"
+              << "final_3\t"
+              << "des_x_4\t"
+              << "des_y_4\t"
+              << "b_st_4\t"
+              << "new_4\t"
+              << "b_icm_4\t"
+              << "v_icm_4\t"
+              << "b_sp_4\t"
+              << "v_sp_4\t"
+              << "factor_4\t"
+              << "final_4\t" << std::endl;
   }
 
   ~Steering() {}
@@ -383,7 +429,7 @@ public:
 
   void compute(const mwoibn::Vector3 next_step)
   {
-//      std::cout << next_step << std::endl;
+    //      std::cout << next_step << std::endl;
     _plane.updateState();
     _heading = _plane.getState()[2];
 
@@ -391,14 +437,21 @@ public:
 
     _SPT(); // returns a velue in a robot space
 
-    double l = _margin/_dt;
-    
-    l = l*l*l;
-    
+    double l = _margin / _dt;
+
+    l = l * l * l;
+
+    std::cout << _heading << "\t";
+    std::cout << next_step[0] << "\t";
+    std::cout << next_step[1] << "\t";
+    std::cout << next_step[2] << "\t";
+
     for (int i = 0; i < _size; i++)
     {
       double vel = std::fabs(_v_icm[i] + _v_sp[i]);
-      
+      std::cout << _plane.getReference(i)[0] << "\t";
+      std::cout << _plane.getReference(i)[1] << "\t";
+
       if (vel < _margin / _dt)
       {
         //_v_icm[i] = 0;
@@ -408,18 +461,17 @@ public:
                                _K_sp * _v_sp[i] * std::sin(_b_sp[i]),
                            _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
                                _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
-        
-        limit(_b_st[i]-_heading, _b[i]);
-        _temp[i] = _b[i] - (_b_st[i] - _heading);
-         
-      //  std::cout << i << "\t"  << (std::fabs(_v_icm[i]) + std::fabs(_v_sp[i]))*(std::fabs(_v_icm[i]) + std::fabs(_v_sp[i]))/(_margin / _dt)/(_margin / _dt) << std::endl;
-        std::cout << i << "\tpervious: " << _b_st[i] << "\t new: " << _b[i] << "\t error: " << _temp[i] << ",\t factor: " << vel*vel*vel/l; 
+
+                limit(_b_st[i]-_heading, _b[i]);
+                _temp[i] = _b[i] - (_b_st[i] - _heading);
+
+        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
+                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
+
         _b[i] = _b_st[i] - _heading;
+
         _b[i] += vel*vel*vel/l*_temp[i];
-        
-        std::cout << ",\t final: " << _b[i] << std::endl;
-        
-        
+
       }
       else
       {
@@ -427,18 +479,23 @@ public:
                                _K_sp * _v_sp[i] * std::sin(_b_sp[i]),
                            _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
                                _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
+
+        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
+                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
       }
 
+      std::cout << "\t" << _b[i] << "\t";
+
       _b_st[i] -= _heading;
-
     }
-
+    std::cout << std::endl;
 
     limit(_b_st, _b); // ensure continuity
                       //  std::cout << "continous\n" <<  b << std::endl;
 
     for (int i = 0; i < _size; i++)
     {
+
 
       if (std::fabs(_state[_dofs[i]]) > (_max - 0.005))
       {
@@ -452,9 +509,7 @@ public:
       }
 
       _b_st[i] = _b[i] + _heading;
-
     }
-
   }
 
 protected:
@@ -500,13 +555,11 @@ protected:
     _plane_ref[0] = _plane.getWorldError()[2 * i]; // size 2
     _plane_ref[1] = _plane.getWorldError()[2 * i + 1];
 
-    _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]); // this should always give a positive
-                                           // result? - I need a diagram for that
+    _b_sp[i] = std::atan2(_plane_ref[1],
+                          _plane_ref[0]);
+
     _v_sp[i] = _plane_ref.norm() / _dt;
-
   }
-
-
 };
 }
 

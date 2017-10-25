@@ -43,9 +43,9 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   ros::Rate rate(200);
 
-  std::string path = "/home/centauro/src/catkin_malgorzata/src/";
+  std::string path = "/home/malgorzata/catkin_ws/src/";
 //  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
-   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme");
+   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default");
   //  robot.contacts().contact(1).deactivate();
 
   double pos = 0, vel = 0, step = 0.0001;

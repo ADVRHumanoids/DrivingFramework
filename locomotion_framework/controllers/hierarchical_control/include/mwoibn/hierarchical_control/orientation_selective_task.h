@@ -69,7 +69,7 @@ public:
       k += _ik.getPointJacobianRows(i);
 
   //    _previous_state[i] = _current;
-
+  //    std::cout << "orientation" << _error << "\n done" << std::endl;
     }
 
     int j = 0;

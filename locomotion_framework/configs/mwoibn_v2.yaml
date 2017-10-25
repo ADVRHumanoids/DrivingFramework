@@ -205,17 +205,17 @@ mwoibn:
                                 sink: "desired_state"
         xbot:
                 source:
-                        config: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
-                        urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                        config: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                        urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
-                        srdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-                        actuators: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
-                        contacts: "/home/centauro/advr-superbuild/robots/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                        srdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                        actuators: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
 
                 mapping:
                         RBDL_LOWER:
                                 loading: model
-                                urdf: "/home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                                urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                 feedback:
                         link_side_online:
                                 layer: online
