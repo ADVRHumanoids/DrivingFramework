@@ -46,6 +46,27 @@ public:
     return state(interface);
   }
 
+  template <typename Vector>
+  void
+  get(Vector& state, const std::vector<int> selector,
+      const INTERFACE interface = INTERFACE::POSITION)
+  {
+     for (int i = 0; i < selector.size(); i++)
+         if (selector[i] != NON_EXISTING)
+           state[i] = _state(interface)[selector[i]];
+
+  }
+
+  template <typename Vector>
+  void
+  get(Vector& state, const mwoibn::VectorInt& selector,
+      const INTERFACE interface = INTERFACE::POSITION)
+  {
+     for (int i = 0; i < selector.size(); i++)
+         if (selector[i] != NON_EXISTING)
+            state[i] = _state(interface)[selector[i]];
+  }
+
   template <typename Vector, typename Selector>
   void
   get(Vector& state, const Selector& selector,
@@ -62,6 +83,26 @@ public:
      _select(state, _state(interface), selector);
   }
 
+  template <typename Vector>
+  void
+  set(const Vector& state, std::vector<int> selector,
+      const INTERFACE interface = INTERFACE::POSITION)
+  {
+     for (int i = 0; i < selector.size(); i++)
+         if (selector[i] != NON_EXISTING)
+             _state(interface)[selector[i]] = state[i];
+  }
+
+  template <typename Vector>
+  void
+  set(const Vector& state, const mwoibn::VectorInt& selector,
+      const INTERFACE interface = INTERFACE::POSITION)
+  {
+     for (int i = 0; i < selector.size(); i++)
+         if (selector[i] != NON_EXISTING)
+             _state(interface)[selector[i]] = state[i];
+  }
+
   const mwoibn::VectorN& state(INTERFACE interface) const;
 
   ~State() {}
@@ -72,6 +113,7 @@ protected:
   mwoibn::VectorN _torque;
 
   mwoibn::VectorN& _state(const INTERFACE interface);
+  const mwoibn::VectorN& _state(const INTERFACE interface) const;
 
   template<typename Vector1, typename Vector2>
   void _select(const Vector1& new_state, Vector2& state, mwoibn::VectorBool selector)
@@ -81,22 +123,22 @@ protected:
         state[i] = new_state[i];
   }
 
-  template<typename Vector, typename Vector2>
-  void _select(const Vector& new_state, Vector2& state, std::vector<int> selector)
-  {
-    for (int i = 0; i < selector.size(); i++)
-      if (selector[i] != NON_EXISTING)
-        state[selector[i]] = new_state[i];
-  }
+//  template<typename Vector, typename Vector2>
+//  void _select(const Vector& new_state, Vector2& state, std::vector<int> selector)
+//  {
+//    for (int i = 0; i < selector.size(); i++)
+//      if (selector[i] != NON_EXISTING)
+//        state[selector[i]] = new_state[i];
+//  }
 
-  template<typename Vector, typename Vector2>
-  void _select(const Vector& new_state, Vector2& state, const mwoibn::VectorInt& selector)
-  {
+//  template<typename Vector, typename Vector2>
+//  void _select(const Vector& new_state, Vector2& state, const mwoibn::VectorInt& selector)
+//  {
 
-    for (int i = 0; i < selector.size(); i++)
-      if (selector[i] != NON_EXISTING)
-        state[selector[i]] = new_state[i];
-  }
+//    for (int i = 0; i < selector.size(); i++)
+//      if (selector[i] != NON_EXISTING)
+//        state[selector[i]] = new_state[i];
+//  }
 
   void _init(int dofs){
     _position = mwoibn::VectorN::Zero(dofs);

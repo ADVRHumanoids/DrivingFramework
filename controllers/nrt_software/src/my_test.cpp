@@ -1,6 +1,7 @@
 #include <mwoibn/robot_class/robot_ros_nrt.h>
 #include <mwoibn/robot_class/robot_xbot_nrt.h>
 #include <mwoibn/robot_class/robot_xbot_rt.h>
+#include <config.h>
 
 #include <mwoibn/hierarchical_control/hierarchical_controller.h>
 #include <mwoibn/hierarchical_control/joint_positions_task.h>
@@ -11,22 +12,11 @@
 #include <mwoibn/hierarchical_control/orientation_world_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
 
-//#ifdef VISUALIZATION_TOOLS
-//#include <mwoibn/visualization_tools/rviz_track_point.h>
-
 #include <mwoibn/point_handling/robot_points_handler.h>
-//#endif
 #include <custom_services/updatePDGains.h>
 #include <custom_services/updatePrint.h>
 
-// trajectory generation
-//include <mwoibn/reference_generation/line.h>
-//include <mwoibn/reference_generation/local_circle.h>
-//#include <mgnss/communication/basic_handler.h>
 
-// temp
-//#include <MathGeoLib/Algorithm/Random/LCG.h>
-//#include <MathGeoLib/Geometry/GeometryAll.h>
 #include <custom_services/updatePDGains.h>
 #include <mwoibn/eigen_utils/eigen_utils.h>
 
@@ -43,9 +33,9 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   ros::Rate rate(200);
 
-  std::string path = "/home/malgorzata/catkin_ws/src/";
+  std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
 //  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
-   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default");
+   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "joint_space");
   //  robot.contacts().contact(1).deactivate();
 
   double pos = 0, vel = 0, step = 0.0001;

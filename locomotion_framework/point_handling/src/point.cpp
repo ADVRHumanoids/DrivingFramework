@@ -225,7 +225,7 @@ Point::getRotationWorld(const mwoibn::VectorN& joint_positions, bool update)
 
 Point::Rotation Point::getRotationWorld(const mwoibn::VectorN& joint_positions,
                                         bool update) const
-{
+{  
   return RigidBodyDynamics::CalcBodyWorldOrientation(_model, joint_positions,
                                                      _body_id, update) *
          getRotationFixed();

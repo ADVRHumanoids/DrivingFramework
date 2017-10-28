@@ -41,6 +41,14 @@ public:
     (*this)[3] = q[3];
   }
 
+  void transpose(){
+    (*this)[3] = -q[3];
+  }
+
+  Quaternion transposed(){
+    return Quaternion((*this).x(), (*this).y(), (*this).z(), -(*this).w());
+  }
+
   double norm()
   {
     double n = (*this)[0]*(*this)[0]+(*this)[1]*(*this)[1]+(*this)[2]*(*this)[2]+(*this)[3]*(*this)[3];

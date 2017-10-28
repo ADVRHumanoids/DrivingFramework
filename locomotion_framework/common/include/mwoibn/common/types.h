@@ -33,6 +33,8 @@ namespace mwoibn
 typedef RigidBodyDynamics::Math::VectorNd VectorN;
 typedef RigidBodyDynamics::Math::Vector3d Vector3;
 
+typedef Vector3 Point;
+
 typedef RigidBodyDynamics::Math::MatrixNd Matrix;
 typedef Eigen::Matrix<double, 6, 6> Matrix6;
 typedef Eigen::Matrix<double, 3, 6> MatrixJ;
@@ -42,6 +44,8 @@ typedef Eigen::Matrix<bool,Eigen::Dynamic,1> VectorBool;
 typedef Eigen::Matrix<double, RT_SIZE, 1> VectorRT;
 typedef Eigen::Matrix<double, FS_SIZE, 1> VectorFS;
 typedef Eigen::Matrix<double, 7, 1> Vector7;
+typedef Eigen::Matrix<double, 6, 1> Vector6;
+
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 0, RT_SIZE, RT_SIZE> MatrixLimited; //???
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 

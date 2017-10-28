@@ -115,21 +115,23 @@ public:
   getPositionWorld(const mwoibn::VectorN& joint_positions, bool update = false);
 
   const mwoibn::Vector7&
-  getFullStateWorld(const mwoibn::VectorN& joint_positions, bool update = false);
+  getFullStateWorld(const mwoibn::VectorN& joint_positions,
+                    bool update = false);
 
   /** @brief set new tracked point giving data in a world frame*/
   void setPositionWorld(const Point::Position position,
                         const mwoibn::VectorN& joint_positions,
                         bool update = false);
   void setFullStateWorld(const mwoibn::Vector7 state,
-                                const mwoibn::VectorN& joint_positions,
-                                bool update);
+                         const mwoibn::VectorN& joint_positions, bool update);
 
-  static void toFullState(mwoibn::Vector7& full_state, const Point::Position& position,
-                                 const Point::Orientation& orientation);
+  static void toFullState(mwoibn::Vector7& full_state,
+                          const Point::Position& position,
+                          const Point::Orientation& orientation);
 
-  static void fromFullState(const mwoibn::Vector7& full_state, Point::Position& position,
-                     Point::Orientation& orientation);  
+  static void fromFullState(const mwoibn::Vector7& full_state,
+                            Point::Position& position,
+                            Point::Orientation& orientation);
 
   /** @brief get Position in a user-defined reference frame */
   const Point::Position&
@@ -139,8 +141,8 @@ public:
 
   const mwoibn::Vector7&
   getFullStateReference(unsigned int refernce_id,
-                       const mwoibn::VectorN& joint_positions,
-                       bool update = false);
+                        const mwoibn::VectorN& joint_positions,
+                        bool update = false);
   /** @brief get Position in a user-defined reference frame
    * @note this method is slower that the respective function using RBDL id
    * number
@@ -153,8 +155,8 @@ public:
 
   const mwoibn::Vector7&
   getFullStateReference(std::string reference_name,
-                       const mwoibn::VectorN& joint_positions,
-                       bool update = false);
+                        const mwoibn::VectorN& joint_positions,
+                        bool update = false);
   /** @brief set new tracked point giving data in a user-defined reference
    * frame*/
   void setPositionReference(const Point::Position position,
@@ -163,14 +165,14 @@ public:
                             bool update = false);
 
   void setFullStateReference(const mwoibn::Vector7 position,
-                            unsigned int reference_id,
-                            const mwoibn::VectorN& joint_positions,
-                            bool update = false);
+                             unsigned int reference_id,
+                             const mwoibn::VectorN& joint_positions,
+                             bool update = false);
 
   void setFullStateReference(const mwoibn::Vector7 position,
-                            std::string reference_name,
-                            const mwoibn::VectorN& joint_positions,
-                            bool update = false);
+                             std::string reference_name,
+                             const mwoibn::VectorN& joint_positions,
+                             bool update = false);
   /** @brief set new tracked point giving data in a user-defined reference frame
    *
    * @note this method is slower that the respective function using RBDL id
@@ -200,7 +202,14 @@ public:
         getRotationWorld(joint_positions, update));
     return _temp_orientation;
   }
-
+  /** @brief get orientation in a world frame as a quaternion
+   */
+  Point::Orientation getOrientationWorld(const mwoibn::VectorN& joint_positions,
+                                         bool update = false) const
+  {
+    return mwoibn::Quaternion::fromMatrix(
+        getRotationWorld(joint_positions, update));
+  }
   /** @brief set new tracked point giving data in a world frame
    */
   void setOrientationWorld(const Point::Orientation orientation,

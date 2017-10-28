@@ -64,12 +64,16 @@ void mwoibn::robot_class::RobotXBotRT::_init(
   if (!config["source"])
     throw(std::invalid_argument("Please define sources for XBot.\n"));
 
-  if (!config["source"]["config"])
+  if (!config["source"]["config"]["file"])
     throw(std::invalid_argument(
         "Please define path to XBot configuration file for feedback.\n"));
 
-  _robot = XBot::RobotInterface::getRobot(
-      config["source"]["config"].as<std::string>());
+  std::string file = "";
+  if (config["source"]["config"]["path"]) file = config["source"]["config"]["path"].as<std::string>();
+
+  file += config["source"]["config"]["file"].as<std::string>();
+
+  _robot = XBot::RobotInterface::getRobot(file);
 
   biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
   //  _xbot_map = biMaps().getId("XBOT");
@@ -94,7 +98,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
     BiMap map = readBiMap(entry.second["dofs"]);
 
     if (!entry.second["layer"])
-      throw(std::invalid_argument("Please defined type of a feedack " +
+      throw(std::invalid_argument("Please defined type of a feedback " +
                                   entry.first.as<std::string>()));
 
     if (entry.second["layer"].as<std::string>() == "RT")

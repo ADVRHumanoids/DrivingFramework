@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   {
     support.update();
 //    base.update();
-    std::cout << ros::Time::now().toSec() << "\t";
+//    std::cout << ros::Time::now().toSec() << "\t";
 //    std::cout << base.getPosition() << std::endl;
     wheeld_controller.fullUpdate(support.get(), base.getPosition(),
                                  base.getHeading());

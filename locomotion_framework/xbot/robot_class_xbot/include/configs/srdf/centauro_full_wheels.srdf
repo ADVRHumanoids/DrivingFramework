@@ -102,6 +102,10 @@
 
    </group>
 
+   <group name="base">
+    <link name="pelvis"/>
+   </group>
+
    <group name="lower_body">
     <group name="front_left_leg"/>
     <group name="front_right_leg"/>
@@ -109,6 +113,7 @@
     <group name="rear_left_leg"/>
     <link name="pelvis"/>
    </group>
+
 
 
     <group_state name="home" group="chains">

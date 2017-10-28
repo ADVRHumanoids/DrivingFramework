@@ -640,6 +640,7 @@ public:
   /** @brief Returns a std::vector of states for all points. States are returned
    *in the world frame.
    *
+   *  NRT!
    */
   virtual std::vector<State> getFullStatesWorld(mwoibn::VectorN joint_states,
                                                 bool update = false)

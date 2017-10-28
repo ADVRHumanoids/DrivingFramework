@@ -375,7 +375,7 @@ public:
 
     for (int i = 0; i < _size; i++)
       _dofs[i] = robot.getDof(names[_size + i])[0];
-
+/*
     std::cout << "time\t"
               << "heading\t"
               << "next_x\t"
@@ -420,7 +420,7 @@ public:
               << "b_sp_4\t"
               << "v_sp_4\t"
               << "factor_4\t"
-              << "final_4\t" << std::endl;
+              << "final_4\t" << std::endl; */
   }
 
   ~Steering() {}
@@ -440,17 +440,17 @@ public:
     double l = _margin / _dt;
 
     l = l * l * l;
-
+/*
     std::cout << _heading << "\t";
     std::cout << next_step[0] << "\t";
     std::cout << next_step[1] << "\t";
     std::cout << next_step[2] << "\t";
-
+*/
     for (int i = 0; i < _size; i++)
     {
       double vel = std::fabs(_v_icm[i] + _v_sp[i]);
-      std::cout << _plane.getReference(i)[0] << "\t";
-      std::cout << _plane.getReference(i)[1] << "\t";
+//      std::cout << _plane.getReference(i)[0] << "\t";
+//      std::cout << _plane.getReference(i)[1] << "\t";
 
       if (vel < _margin / _dt)
       {
@@ -465,8 +465,8 @@ public:
                 limit(_b_st[i]-_heading, _b[i]);
                 _temp[i] = _b[i] - (_b_st[i] - _heading);
 
-        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
-                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
+//        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
+//                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
 
         _b[i] = _b_st[i] - _heading;
 
@@ -480,15 +480,15 @@ public:
                            _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
                                _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
 
-        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
-                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
+//        std::cout << _b_st[i] << "\t" << _b[i] << "\t" << _b_icm[i] << "\t" << _v_icm[i]
+//                  << "\t" << _b_sp[i] << "\t" << _v_sp[i] << "\t" << vel* vel* vel / l;
       }
 
-      std::cout << "\t" << _b[i] << "\t";
+//      std::cout << "\t" << _b[i] << "\t";
 
       _b_st[i] -= _heading;
     }
-    std::cout << std::endl;
+//    std::cout << std::endl;
 
     limit(_b_st, _b); // ensure continuity
                       //  std::cout << "continous\n" <<  b << std::endl;

@@ -36,8 +36,16 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
     throw(std::invalid_argument(
         "Please define path to XBot configuration file for feedback.\n"));
 
-  _robot = XBot::RobotInterface::getRobot(
-      config["source"]["config"].as<std::string>());
+  if (!config["source"]["config"]["file"])
+    throw(std::invalid_argument(
+        "Please define path to XBot configuration file for feedback.\n"));
+
+  std::string file = "";
+  if (config["source"]["config"]["path"]) file = config["source"]["config"]["path"].as<std::string>();
+
+  file += config["source"]["config"]["file"].as<std::string>();
+
+  _robot = XBot::RobotInterface::getRobot(file);
 
   biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
 
@@ -63,7 +71,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
       continue;
 
     if (!entry.second["layer"])
-      throw(std::invalid_argument("Please defined type of a feedack " +
+      throw(std::invalid_argument("Please defined type of a feedback " +
                                   entry.first.as<std::string>()));
 
     if (entry.second["layer"].as<std::string>() != "online")
@@ -111,7 +119,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     if (entry.first.as<std::string>() == "source") continue;
 
     if (!entry.second["layer"])
-      throw(std::invalid_argument("Please defined type of a feedack " +
+      throw(std::invalid_argument("Please defined type of a controller " +
                                   entry.first.as<std::string>()));
 
     if (entry.second["layer"].as<std::string>() != "lower_level")

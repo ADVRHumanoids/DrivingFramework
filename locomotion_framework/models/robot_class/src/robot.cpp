@@ -384,13 +384,13 @@ mwoibn::robot_class::Robot::_getConfig(const std::string config_file,
   {
     throw std::invalid_argument(
         std::string("Couldn\t find the secondary configuration file: ") +
-        config_file);
+        secondary_file);
   }
   catch (...)
   {
     throw std::invalid_argument(
         std::string("Unkown error reading the secondary configuration file: ") +
-        config_file);
+        secondary_file);
   }
 
   config = config["mwoibn"];
@@ -761,7 +761,6 @@ void mwoibn::robot_class::Robot::_getDefaultPosition(YAML::Node config,
   mwoibn::Vector3 offset_position = mwoibn::Vector3::Zero();
   mwoibn::Matrix3 offset_orientation = mwoibn::Matrix3::Identity();
 
-  
   for (int i = 0;
        i < _model.GetBodyId(config["dofs"]["name"].as<std::string>().c_str());
        i++)
@@ -798,7 +797,6 @@ void mwoibn::robot_class::Robot::_getDefaultPosition(YAML::Node config,
     config["output_angles"]["angle_2"] = 1;
     config["output_angles"]["angle_3"] = 2;
   }
-
 }
 
 bool mwoibn::robot_class::Robot::_loadFeedback(YAML::Node entry,
@@ -875,11 +873,19 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config,
 
   urdf::Model urdf;
   RigidBodyDynamics::Model model;
-
-  std::string source = config["urdf"].as<std::string>();
+  std::string source = "";
 
   if (from_file)
   {
+    if (!config["urdf"]["file"])
+      throw(std::invalid_argument(
+          "Please define an urdf source in the yaml file.\n"));
+
+    if (config["urdf"]["path"])
+      source = config["urdf"]["path"].as<std::string>();
+
+    source += config["urdf"]["file"].as<std::string>();
+
     if (!urdf.initFile(source))
     {
       errMsg << "Could not load urdf description for mapping " +
@@ -889,6 +895,8 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config,
   }
   else
   {
+    source = config["urdf"].as<std::string>();
+
     if (!urdf.initString(source))
     {
       errMsg << "Could not load urdf description  for mapping " +
@@ -971,5 +979,4 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config,
   }
 
   biMaps().addMap(BiMap(config["name"].as<std::string>(), mapNew));
-
 }

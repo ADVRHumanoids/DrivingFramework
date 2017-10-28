@@ -15,11 +15,18 @@ option(CENTER_OF_MASS_CONTROLLER ON)
 option(WHEELS_MOTION ON)
 option(TEST_TEMP ON)
 option(GRAVITY_TEST ON)
+option(ODOMETRY ON)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+
+include_directories(${CMAKE_BINARY_DIR})
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config.h.in
+    ${CMAKE_BINARY_DIR}/config.h
+)
 
 set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
@@ -145,8 +152,19 @@ if(TEST_TEMP)
   )
 endif(TEST_TEMP)
 
-find_package(catkin REQUIRED COMPONENTS
+if(ODOMETRY)
+  LIST( APPEND INSTALL_TARGETS
+    odometry
+  )
+  LIST( APPEND CATKIN_DEPENDS_SET
+    roscpp
+    robot_class_xbot
+    robot_class_ros_extension
+    odometry
+  )
+endif(ODOMETRY)
 
+find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
   ${CATKIN_DEPENDS_BUILD}
 )
@@ -288,6 +306,14 @@ target_link_libraries(wheels_cut
 #    ${catkin_LIBRARIES}
 # )
 endif(WHEELS_MOTION)#############
+
+if(ODOMETRY)
+add_executable(odometry src/odometry.cpp)
+add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odometry
+    ${catkin_LIBRARIES}
+ )
+endif(ODOMETRY)
 
 if(TEST_TEMP)
 add_executable(my_test src/my_test.cpp)

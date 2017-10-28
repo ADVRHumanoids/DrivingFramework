@@ -4,6 +4,7 @@
 #include <std_srvs/Empty.h>
 #include <custom_messages/CustomCmnd.h>
 #include <mgnss/controllers/online_centralized_controller.h>
+#include <config.h>
 
 void switchMode(mwoibn::robot_class::Robot* robot_ptr,
                 mwoibn::robot_class::Robot* robot_ref_ptr, bool* motor_side)
@@ -104,16 +105,15 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
   bool motor_side = false;
-
+  std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
   // init real robot
-  mwoibn::robot_class::RobotXBotNRT robot(
-      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
+  mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "default", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+      "default", path+"DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
   mwoibn::robot_class::RobotXBotNRT robot_ref(
-      "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
+      path+"DrivingFramework/locomotion_framework/configs/"
       "mwoibn_v2.yaml",
-      "reference", "/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+      "reference", path+"DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
 
   mgnss::controllers::OnlineCentralizedController controller(robot);
 

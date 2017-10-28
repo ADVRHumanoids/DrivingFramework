@@ -41,7 +41,7 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 
 //  std::cout << "offset\n" << _offset_position << std::endl;
 
-//  _linear_state << 0,0,0; // start from the zero position?
+  _linear_state << 0,0,0; // position estimation is not supported
 //  _rotation << 1,0,0,0,1,0,0,0,1;
   
 //  BasicOperationalEuler::getPosition(_rotation, _linear_state);
@@ -56,12 +56,12 @@ bool mwoibn::communication_modules::XBotOperationalEuler::get()
 {
 
   _imu->getOrientation(_rotation);
-  _imu->getLinearAcceleration(_linear_state);
+//  _imu->getLinearAcceleration(_linear_state);
 //  _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
 //  std::cout << "velocity\n" << _base << std::endl;
-  _linear_state[2] -= 9.81;
+//  _linear_state[2] -= 9.81;
 
-  _linear_state = _rotation*_linear_state;
+//  _linear_state = _rotation*_linear_state;
   getPosition(_rotation, _linear_state);
   return true;
 
@@ -71,17 +71,10 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
                            mwoibn::Vector3 velocity)
   {
 
-    _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+//    _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
 
-//    std::cout << "reading" << std::endl;
-//    std::cout << _rate << std::endl;
-//     std::cout << "increment" << std::endl;
-//    std::cout << velocity*(_rate*_rate/2) << std::endl;   
-    _base.head(3) -= velocity*(_rate*_rate/2);
+//    _base.head(3) -= velocity*(_rate*_rate/2);
 //    _base.head(3) += velocity*_rate;
-
- //   std::cout << "base" << std::endl;
- //   std::cout << _base.head(3) << std::endl;
 
     _base.tail(3) =
         (_offset_orientation * orientation)

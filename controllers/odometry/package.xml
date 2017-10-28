@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>nrt_software</name>
+  <name>odometry</name>
   <version>0.0.0</version>
-  <description>The nrt_software package</description>
+  <description>The odometry package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="user@todo.todo">user</maintainer>
+  <maintainer email="malgorzata@todo.todo">malgorzata</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/nrt_software</url> -->
+  <!-- <url type="website">http://wiki.ros.org/odometry</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -41,31 +41,8 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>roscpp</depend> <!-- all programs -->
-  <depend>robot_class_ros_extension</depend> <!-- all programs -->
-  <depend>robot_class_xbot</depend> <!-- all programs -->
   <depend>robot_class</depend> <!-- all programs -->
-
-  <depend>visualization_tools</depend> <!-- optional -->
-
-  <depend>point_handling</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>hierarchical_control</depend> <!--TRAJECTORY_GENERATION -->
-  <!-- <depend>collision_model_ros_extension</depend> TRAJECTORY_GENERATION -->
-  <!-- <depend>reference_generation</depend> TRAJECTORY_GENERATION -->
-
-  <depend>message_generation</depend> <!--COLLISION_MODEL -->
-  <depend>std_msgs</depend> <!--COLLISION_MODEL -->
-
-  <depend>gravity_compensation</depend> <!-- CENTRALIZED_CONTROLLER -->
-  <depend>motor_side_reference</depend> <!-- CENTRALIZED_CONTROLLER -->
-  <depend>std_srvs</depend> <!--CENTRALIZED_CONTROLLER -->
-
-  <!--<depend>hierarchical_control</depend>--> <!-- CENTER_OF_MASS_CONTROLLER -->
-  <depend>robot_point_handling</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>custom_services</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>controllers</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>communication</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>odometry</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>robot_point_handling</depend> <!-- all programs -->
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

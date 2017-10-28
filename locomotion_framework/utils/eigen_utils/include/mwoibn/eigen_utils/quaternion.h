@@ -74,6 +74,14 @@ public:
   using Eigen::Quaterniond::y;
   using Eigen::Quaterniond::z;
 
+  void transpose(){
+    (*this).w() = -(*this).w();
+  }
+
+  Quaternion transposed(){
+    return Quaternion((*this).x(), (*this).y(), (*this).z(), -(*this).w());
+  }
+
   friend std::ostream &operator<<(std::ostream& os, const Quaternion& q){
         os << q.x() << '\t' << q.y() << '\t' <<  q.z() << '\t' << q.w()  << '\n' ;
         return os;
@@ -114,7 +122,6 @@ public:
 
   static Quaternion fromMatrix(const Eigen::Matrix3d& mat)
   {
-
       return Quaternion(Eigen::Quaterniond(mat.transpose()));
   }
 

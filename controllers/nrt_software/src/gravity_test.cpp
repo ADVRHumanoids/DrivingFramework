@@ -1,6 +1,7 @@
 #include <mwoibn/robot_class/robot_xbot_nrt.h>
 #include <mwoibn/robot_class/robot_ros_nrt.h>
 //#include <mwoibn/robot_class/wheel_contact.h>
+#include <config.h>
 
 #include <mwoibn/hierarchical_control/hierarchical_controller.h>
 #include <mwoibn/hierarchical_control/joint_positions_task.h>
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
 
-  mwoibn::robot_class::RobotXBotNRT robot("/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
+  mwoibn::robot_class::RobotXBotNRT robot(std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
 
   robot.wait();
   robot.get();
@@ -89,9 +90,9 @@ int main(int argc, char** argv)
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
   hierarchical_controller.addTask(&constraints_task, gain, 0, 1e-6);
-  gain << 20;
+  gain << 50;
   hierarchical_controller.addTask(&pelvis_hight, gain, 1, 1e-6);
-  gain << 20;
+  gain << 50;
   hierarchical_controller.addTask(&pelvis_orientation, gain, 2, 1e-6);
 
   //#ifdef VISUALIZATION_TOOLS

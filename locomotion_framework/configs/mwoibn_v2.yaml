@@ -1,3 +1,5 @@
+driving_apth: &driving  "/home/malgorzata/catkin_ws/src/"
+simulator_path: &simulator "/home/malgorzata/advr-superbuild/robots/"
 mwoibn:
         robot:
                 name: "centauro"
@@ -47,6 +49,28 @@ mwoibn:
                         contacts: 
                                 read: false
                                 feedback: false  
+                odometry:
+                        rate: 200
+                        controller: 
+                                list: [odometry]
+                        feedback: 
+                                list: [link_side_online, imu_base]
+                        actuators: 
+                                read: false
+                        contacts: 
+                                read: true
+                                feedback: false 
+                joint_space:
+                        rate: 200
+                        controller: 
+                                layer: "lower_level"
+                        feedback: 
+                                list: [link_side_online]
+                        actuators: 
+                                read: false
+                        contacts: 
+                                read: false
+                                feedback: false  
         feedback:
                 link_side_online: 
                         space: JOINT
@@ -60,6 +84,21 @@ mwoibn:
                                 effort: false                               
                 motor_side_online:
                 floating_base:
+                        space: OPERATIONAL 
+                        convention:
+                                orientation:
+                                        type: QUATERNION
+                                        convention: HAMILTONIAN
+                        dofs: 
+                                chain: all
+                                type: body
+                                name: pelvis
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
+                imu_base:
                         space: OPERATIONAL 
                         convention:
                                 orientation:
@@ -93,6 +132,16 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: true
+                                effort: false
+                odometry:
+                        space: JOINT
+                        dofs: 
+                                chain: base
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: false
                                 effort: false
                 velocity_reference:
                         space: JOINT
@@ -141,8 +190,18 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
+                                effort: false
+                odometry:
+                        dofs: 
+                                chain: base
+                                type: all
+                                mapping: RBDL_LOWER #this he RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
         feedbacks:
-                online: [link_side_online, motor_side_online, floating_base, velocity_reference]
+                online: [link_side_online, motor_side_online, odometry]
                 offline: [lower_body]
         controllers:
                 lower_level: [position_controller, velocity_controller]
@@ -172,6 +231,11 @@ mwoibn:
                                 message: gazebo_msgs::LinkStates
                                 reference: 1
                                 initialize: true
+                        imu_base: 
+                                source: "/gazebo/link_states"
+                                message: gazebo_msgs::LinkStates
+                                reference: 1
+                                initialize: true
                         whole_body:
                                 source2: "position_controller/reference"
                                 source: "desired_state"
@@ -181,6 +245,10 @@ mwoibn:
                                 source: "desired_state"
                                 message: custom_messages::CustomCmnd
                                 initialize: false
+                        odometry:
+                                source: "base_odometry"
+                                message: custom_messages::CustomCmnd
+                                initialize: true
                         velocity_reference:
                                 source: "desired_state"
                                 message: custom_messages::CustomCmnd
@@ -203,19 +271,37 @@ mwoibn:
                         lower_body:
                                 type: "reference"
                                 sink: "desired_state"
+                        odometry:
+                                type: "reference"
+                                sink: "base_odometry"
         xbot:
                 source:
-                        config: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
-                        urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                        config: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                        urdf: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
-                        srdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-                        actuators: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
-                        contacts: "/home/malgorzata/catkin_ws/src/centauro-simulator/centauro/centauro_config/config/contacts.yaml" 
+                        srdf:
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                        actuators: 
+                                path: *simulator
+                                file: "centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: 
+                                path: *simulator 
+                                file: "centauro-simulator/centauro/centauro_config/config/contacts.yaml"
+                        controller: 
+                                path: *driving
+                                file: "" 
 
                 mapping:
                         RBDL_LOWER:
                                 loading: model
-                                urdf: "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                                urdf: 
+                                        path: *driving
+                                        file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                 feedback:
                         link_side_online:
                                 layer: online
@@ -228,6 +314,10 @@ mwoibn:
                                 layer: NRT
                                 sensor: imu_link
                                 source: "floating_base"
+                        imu_base:
+                                layer: online
+                                sensor: imu_link
+                                source: "floating_base"
                         whole_body: 
                                 layer: NRT
                                 source: "desired_state"
@@ -237,6 +327,9 @@ mwoibn:
                         lower_body: 
                                 layer: NRT
                                 source: "desired_state"
+                        odometry: 
+                                layer: NRT
+                                source: "base_odometry"
                 controller:
                         position_controller:
                                 layer: lower_level
@@ -252,5 +345,8 @@ mwoibn:
                         lower_body:
                                 layer: NRT
                                 sink: "desired_state"
+                        odometry:
+                                layer: NRT
+                                sink: "base_odometry"
                                  
                               
