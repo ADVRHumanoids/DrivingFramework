@@ -23,6 +23,7 @@
 #ifdef DECOMPOSITIONS_EIGEN
   #include "mwoibn/eigen_utils/eigen_utils.h"
 #endif
+#include "float.h"
 
 #define RT_SIZE 50
 #define FS_SIZE 8
@@ -52,6 +53,9 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 typedef eigen_utils::PseudoInverse2<mwoibn::Matrix> PseudoInverse;
 typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited> PseudoInverseLimited;
 typedef mwoibn::eigen_utils::AgumentedNullSpaceProjection<mwoibn::Matrix> Projection;
+
+const double MAX_DOUBLE= DBL_MAX;
+const double EPS =  std::numeric_limits<double>::epsilon();
 
 const int NON_EXISTING = INT_MAX;
 const unsigned int RBDL_NON_EXISTING = UINT_MAX;

@@ -61,6 +61,9 @@ public:
     _pelvis_state += velocity*_robot.rate();
     //_pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0) + 
     _heading += omega * _robot.rate();
+    _heading -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
+
+    // limit to -pi:pi
 
     //_steering_ptr->setPelvisPosition(_pelvis_state);
     //_steering_ptr->setPelvisHeading(_pelvis_state);

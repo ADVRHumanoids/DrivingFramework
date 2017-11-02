@@ -14,11 +14,10 @@ void limit(double b_ref, double& b)
                                6.28318531); // this should normalize to -pi;pi
   b_ref -= 6.28318531 * std::floor((b_ref + 3.14159265) / 6.28318531);
 
-  //  b = (std::fabs(b - b_ref) < 1.57079633) ? b : (b - b_ref < 0)
-  //                                                    ? b + 3.14159265
-  //                                                    : b - 3.14159265;
+
   b = (std::fabs(b - b_ref) < 1.57) ? b : (b - b_ref < 0) ? b + 3.14159265
                                                           : b - 3.14159265;
+
 }
 
 void limit(const mwoibn::VectorN& b_ref, mwoibn::VectorN& b)
@@ -375,52 +374,53 @@ public:
 
     for (int i = 0; i < _size; i++)
       _dofs[i] = robot.getDof(names[_size + i])[0];
-/*
-    std::cout << "time\t"
-              << "heading\t"
-              << "next_x\t"
-              << "next_y\t"
-              << "next_th\t"
-              << "des_x_1\t"
-              << "des_y_1\t"
-              << "b_st_1\t"
-              << "new_1\t"
-              << "b_icm_1\t"
-              << "v_icm_1\t"
-              << "b_sp_1\t"
-              << "v_sp_1\t"
-              << "factor_1\t"
-              << "final_1\t"
-              << "des_x_2\t"
-              << "des_y_2\t"
-              << "b_st_2\t"
-              << "new_2\t"
-              << "b_icm_2\t"
-              << "v_icm_2\t"
-              << "b_sp_2\t"
-              << "v_sp_2\t"
-              << "factor_2\t"
-              << "final_2\t"
-              << "des_x_3\t"
-              << "des_y_3\t"
-              << "b_st_3\t"
-              << "new_3\t"
-              << "b_icm_3\t"
-              << "v_icm_3\t"
-              << "b_sp_3\t"
-              << "v_sp_3\t"
-              << "factor_3\t"
-              << "final_3\t"
-              << "des_x_4\t"
-              << "des_y_4\t"
-              << "b_st_4\t"
-              << "new_4\t"
-              << "b_icm_4\t"
-              << "v_icm_4\t"
-              << "b_sp_4\t"
-              << "v_sp_4\t"
-              << "factor_4\t"
-              << "final_4\t" << std::endl; */
+
+//    std::cout << "time\t"
+//              << "heading\t"
+//              << "next_x\t"
+//              << "next_y\t"
+//              << "next_th\t"
+//              << "des_x_1\t"
+//              << "des_y_1\t"
+//              << "b_st_1\t"
+//              << "new_1\t"
+//              << "b_icm_1\t"
+//              << "v_icm_1\t"
+//              << "b_sp_1\t"
+//              << "v_sp_1\t"
+//              << "factor_1\t"
+//              << "final_1\t"
+//              << "des_x_2\t"
+//              << "des_y_2\t"
+//              << "b_st_2\t"
+//              << "new_2\t"
+//              << "b_icm_2\t"
+//              << "v_icm_2\t"
+//              << "b_sp_2\t"
+//              << "v_sp_2\t"
+//              << "factor_2\t"
+//              << "final_2\t"
+//              << "des_x_3\t"
+//              << "des_y_3\t"
+//              << "b_st_3\t"
+//              << "new_3\t"
+//              << "b_icm_3\t"
+//              << "v_icm_3\t"
+//              << "b_sp_3\t"
+//              << "v_sp_3\t"
+//              << "factor_3\t"
+//              << "final_3\t"
+//              << "des_x_4\t"
+//              << "des_y_4\t"
+//              << "b_st_4\t"
+//              << "new_4\t"
+//              << "b_icm_4\t"
+//              << "v_icm_4\t"
+//              << "b_sp_4\t"
+//              << "v_sp_4\t"
+//              << "factor_4\t"
+//              << "final_4\t"
+//              << std::endl;
   }
 
   ~Steering() {}
@@ -439,13 +439,16 @@ public:
 
     double l = _margin / _dt;
 
+    std::cout.precision(6);
+    std::cout << std::fixed;
+
     l = l * l * l;
-/*
-    std::cout << _heading << "\t";
-    std::cout << next_step[0] << "\t";
-    std::cout << next_step[1] << "\t";
-    std::cout << next_step[2] << "\t";
-*/
+
+//    std::cout << _heading << "\t";
+//    std::cout << next_step[0] << "\t";
+//    std::cout << next_step[1] << "\t";
+//    std::cout << next_step[2] << "\t";
+
     for (int i = 0; i < _size; i++)
     {
       double vel = std::fabs(_v_icm[i] + _v_sp[i]);
@@ -501,6 +504,9 @@ public:
       {
         if (std::fabs(_b_st[i] - _b[i]) < 1.57079633)
         {
+          //std::cout << i << std::endl;
+
+          //std::cout << "change" << std::endl;
           if (_b[i] > 0)
             _b[i] -= 3.1415926;
           else

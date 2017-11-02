@@ -201,7 +201,7 @@ mwoibn:
                                 velocity: false
                                 effort: false
         feedbacks:
-                online: [link_side_online, motor_side_online, odometry]
+                online: [link_side_online, motor_side_online, floating_base]
                 offline: [lower_body]
         controllers:
                 lower_level: [position_controller, velocity_controller]

@@ -231,6 +231,10 @@ protected:
 Eigen::Matrix<bool, Eigen::Dynamic, 1>
 flip(Eigen::Matrix<bool, Eigen::Dynamic, 1> vector);
 
+inline void wrapToPi(double& th){
+  th -= 6.28318531 * std::floor((th + 3.14159265) / 6.28318531);
+}
+
 } // namespace package
 } // namespace library
 #endif

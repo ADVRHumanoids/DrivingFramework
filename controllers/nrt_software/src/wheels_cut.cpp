@@ -81,6 +81,8 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
          base->setY(req.nr/100.0);
      else if(req.d == 3)
          base->setZ(req.nr/100.0);
+     else if(req.d == 4)
+         base->setHeading(req.nr/100.0);
   }
   else if (req.p == 2) // support
   {

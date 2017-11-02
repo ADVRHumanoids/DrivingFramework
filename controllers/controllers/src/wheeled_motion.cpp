@@ -77,7 +77,7 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
 
   _dt = _robot.rate();
 
-  _steering_ref_ptr.reset(new events::Steering(_robot, *_steering_ptr, 0.6, 0.4,
+  _steering_ref_ptr.reset(new events::Steering(_robot, *_steering_ptr, 0.7, 0.3,
                                                _dt));
 
   steerings.resize(_leg_z_ptr->points().size());
@@ -108,13 +108,17 @@ void mwoibn::WheeledMotion::nextStep(const mwoibn::VectorN& support,
 
   _next_step[0] = (_pelvis_state[0] - _steering_ptr->getState()[0])/_robot.rate();
   _next_step[1] = (_pelvis_state[1] - _steering_ptr->getState()[1])/_robot.rate();
+  _next_step[2] = (_heading - _steering_ptr->getState()[2]); // just limit the difference
 
+  _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) / 6.28318531); // limit -pi:pi
+  _next_step[2] = _next_step[2]/_robot.rate();
 //  _next_step[0] = velocity[0];
 //  _next_step[1] = velocity[1];
-  _next_step[2] = omega;
+//  _next_step[2] = omega;
+//   std::cout << "\n" << _steering_ptr->getState()[2] << "\t" << _heading << "\t" << _next_step[2] << "\t" << std::endl;
 
-//  std::cout << "_next_step" << std::endl;
-//  std::cout << _next_step << std::endl;
+//  std::cout << "\nstate\t" << _steering_ptr->getState()[0] << "\t" << _steering_ptr->getState()[1] << "\t" << _steering_ptr->getState()[2] << "\t" << std::endl;
+//  std::cout << "reference\t" << _pelvis_state[0] << "\t" << _pelvis_state[1] << "\t" << _heading <<  std::endl;
   steering();
 }
 
