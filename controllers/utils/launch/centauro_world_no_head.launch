@@ -16,7 +16,6 @@
   <arg name="head" default="true"/>
   <arg name="wheels" default="true"/>
   <arg name="static" default="false"/>
-  <arg name="one_arm" default="false"/>
   <arg name="left_end_effector" default="stick"/>
   <arg name="right_end_effector" default="stick"/>
   <arg name="mass" default="0.0"/>
@@ -32,13 +31,14 @@
   <arg name="bumbers" default="true"/>
   <arg name="imu" default="true"/>
 
-  <arg name="middleware" default="xbotcore"/>
+  <arg name="middleware" default="ros_control"/>
+  <arg name="xbot_config_file"  default="../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml" />
 
-  <arg name="collision_model" default="convex_hull"/>
+  <arg name="collision_model" default="primitives"/>
   <arg name="visual_model" default="mesh"/>
 
   <!-- gazebo cofiguration parameters -->
-  <arg name="paused" default="true"/>
+  <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
   <arg name="debug" default="false"/>
@@ -58,6 +58,7 @@
       <arg name="bumbers" value="$(arg bumbers)"/>
       <arg name="imu" value="$(arg imu)"/>
 
+      <arg name="xbot_config_file" value="$(arg xbot_config_file)"/>
       <arg name="middleware" value="$(arg middleware)"/>
       <arg name="collision_model" value="$(arg collision_model)"/>
       <arg name="visual_model" value="$(arg visual_model)"/>
@@ -76,13 +77,26 @@
       <arg name="legs" value="$(arg legs)"/>
       <arg name="wheels" value="$(arg wheels)"/>
       <arg name="static" value="$(arg static)"/>
-      <arg name="one_arm" value="$(arg one_arm)"/>
+
       <arg name="right_end_effector" value="$(arg right_end_effector)"/>
       <arg name="left_end_effector" value="$(arg left_end_effector)"/>
       <arg name="mass" value="$(arg mass)"/>
 
   </include>
 
+  <param name="robot_lower_body"
+         command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
+                   GAZEBO:=false                        MIDDLEWARE:=none                   XBOT_CONFIG_FILE:=none
+                   STATIC:=false                        LEFT_END_EFFECTOR:=none     RIGHT_END_EFFECTOR:=none   MASS:=0
+                   ARMS:=false                            LEGS:=true                               TORSO:=false                             WHEELS:=true                           HEAD:=false
+                   ARM_ACTUATORS:=false          LEG_ACTUATORS:=true             TORSO_ACTUATORS:=true         WHEELS_ACTUATORS:=true       HEAD_ACTUATORS:=false
+                   ARM_SENSORS:=false             LEG_SENSORS:=true 
+                   FT_SENSORS:=true                BUMBERS:=true                         IMU:=true
+                   VISUAL_MODEL:=$(arg visual_model)            COLLISION_MODEL:=$(arg collision_model) 
+                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)
+        "/>
+
+  <param name="robot_srdf" textfile="$(find robot_class_xbot)/include/configs/srdf/centauro_full_wheels.srdf"/>
 
   <!-- run gazebo -->
   <group if="$(arg gazebo)">
@@ -90,16 +104,21 @@
   		<!-- ros_control centauro launch file -->
 	  	<include file="$(find centauro_control)/launch/centauro_control.launch">
 		    <arg name="torso_actuators" value="$(arg torso_actuators)" if="$(arg torso)"/>
-		    <arg name="arm_actuators" value="$(arg arm_actuators)" if="$(arg arms)"/>
+		    <arg name="left_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in ['true', 'left'])"/>
+		    <arg name="right_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in ['true', 'right'])"/>
 		    <arg name="leg_actuators" value="$(arg leg_actuators)" if="$(arg legs)"/>
 		    <arg name="wheels_actuators" value="$(arg wheels_actuators)" if="$(arg wheels)"/>
 		    <arg name="head_actuators" value="$(arg head_actuators)" if="$(arg head)"/>
-    		    <arg name="one_arm" value="$(arg one_arm)"/>
 		    <arg name="controller" value="$(arg controller)"/>
 	  	</include>
   	</group>
+  	<group unless="$(arg rviz)">
+	        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+			<param name="publish_frequency" type="double" value="250.0"/>
+                        <remap from="/joint_states" to="/centauro/joint_states"/>
+	        </node>
+  	</group>
   </group>
-
 
 
 </launch>

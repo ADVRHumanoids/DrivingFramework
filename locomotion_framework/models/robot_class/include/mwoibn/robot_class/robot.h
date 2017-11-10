@@ -83,8 +83,8 @@ public:
 
   }
   virtual bool isRunning() { return true; }
-  virtual bool get(){return true;}
-  virtual bool send(){return true;}
+  virtual bool get(){return feedbacks.get();}
+  virtual bool send(){return controllers.send();}
   virtual void wait(){}
   ///@}
   ///
@@ -93,7 +93,7 @@ public:
    */
   Actuators& actuators() { return _actuators; }
   Mappings<BiMap>& biMaps() { return _bi_maps; }
-  Mappings<Map>& uniMaps() { return _uni_maps; }
+  Mappings<SelectorMap>& selectors() { return _selector_maps; }
 
   const mwoibn::VectorInt& getActuationState() { return _actuation; }
 
@@ -111,6 +111,15 @@ public:
   /** @brief Keeps pointers for all external controllers */
   Controllers controllers;
   Feedbacks feedbacks;
+
+  /** @brief return vector of links associated with given dofs**/
+  /** @param dofs - vector of model dofs
+   *  @param unique - true: each link appears only ones, false: link is associated with each dof
+   */
+  std::vector<std::string> getLinks(mwoibn::VectorInt dofs, bool unique = true);
+
+  std::vector<std::string> getLinks(std::string chain, bool unique = true);
+
 
   /** @brief return rbdl state vetor dofs associated with given links **/
   /** @note For floating base system it gathers all flaoting base dofs in the
@@ -151,6 +160,11 @@ public:
       std::vector<std::string> link_names,
       std::string map_name); // for making a map from joints I can use getDof
 
+  static YAML::Node getConfig(const std::string config_file,
+                        const std::string secondary_file);
+  static void compareEntry(YAML::Node entry_main, YAML::Node entry_second);
+
+
 protected:
   //! Alternative robot class initializer,
   /**  it is provited as protected method as it should only be used by the
@@ -177,7 +191,7 @@ protected:
 
   //! Mappings Module
   Mappings<BiMap> _bi_maps;
-  Mappings<Map> _uni_maps;
+  Mappings<SelectorMap> _selector_maps;
 
   /** @brief Keeps information about robot actuation type
    *
@@ -200,6 +214,10 @@ protected:
   boost_map _map_names;
   void _initMapNames(boost::shared_ptr<const urdf::Link> link);
 
+  virtual bool _initUrdf(YAML::Node config, std::string& source);
+  virtual RigidBodyDynamics::Model _initModel(bool is_static,
+                                         const std::string& source);
+
   virtual void _loadContacts(YAML::Node contacts_config);
   virtual void _loadActuators(YAML::Node actuators_config);
   //  virtual void _loadFeedback(YAML::Node config, YAML::Node robot);
@@ -208,18 +226,15 @@ protected:
   virtual void _loadFeedbacks(YAML::Node config) {}
   virtual void _loadControllers(YAML::Node config) {}
 
-  virtual void _loadMappings(YAML::Node config, bool from_file);
-  virtual void _loadMap(YAML::Node config, bool from_file);
-  virtual void _loadMapFromModel(YAML::Node config, bool from_file);
+  virtual void _loadMappings(YAML::Node config);
+  virtual void _loadMap(YAML::Node config);
+  virtual void _loadMapFromModel(YAML::Node config);
 
 
-  YAML::Node _getConfig(const std::string config_file,
-                        const std::string secondary_file);
   YAML::Node _readRobotConfig(const YAML::Node full_config,
                               std::string config_name);
   YAML::Node _readConfig(const YAML::Node lists, const YAML::Node defined,
                          YAML::Node config);
-  void _compareEntry(YAML::Node entry_main, YAML::Node entry_second);
   void _getDefaultPosition(YAML::Node config, bool position, bool orientation,
                            bool angels);
   bool _loadFeedback(YAML::Node entry, std::string name);

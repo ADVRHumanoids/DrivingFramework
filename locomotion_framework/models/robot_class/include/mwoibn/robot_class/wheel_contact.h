@@ -125,12 +125,12 @@ public:
 
   virtual void update() { setPointStateReference(0, _ref_position); }
 
-  virtual std::vector<int> getChain() { return _local_chain; }
+  virtual const mwoibn::VectorInt& getChain() { return _local_chain; }
 
 protected:
   mwoibn::VectorN _ref_position;
 
-  std::vector<int> _local_chain;
+  mwoibn::VectorInt _local_chain;
 };
 
 class WheelContactV2 : public ContactV2

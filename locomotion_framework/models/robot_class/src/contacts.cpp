@@ -210,8 +210,8 @@ const mwoibn::VectorBool& mwoibn::robot_class::Contacts::getDofs()
   _boolean_checks.setConstant(false);
   for (auto& contact : _contacts)
   {
-    for (auto& dof : contact->getChain())
-      _boolean_checks[dof] = true;
+    for (int i = 0; i < contact->getChain().size(); i++)
+      _boolean_checks[contact->getChain()[i]] = true;
   }
 
   return _boolean_checks;
@@ -227,8 +227,8 @@ const mwoibn::VectorBool& mwoibn::robot_class::Contacts::getActiveDofs()
     if (!contact->isActive())
       continue;
 
-    for (auto& dof : contact->getChain())
-      _boolean_checks[dof] = true;
+    for (int i = 0; i < contact->getChain().size(); i++)
+      _boolean_checks[contact->getChain()[i]] = true;
   }
 
   return _boolean_checks;

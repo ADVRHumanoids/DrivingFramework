@@ -34,7 +34,9 @@ public:
 
     _init(map.reversed(), map.getDofs(), config["name"].as<std::string>(), sink);
     _des_q.velocity.resize(_dofs, 0);
-    std::cout << "Success" << std::endl;
+
+    std::cout << "Loaded direct controller " << config["name"] << std::endl;
+
   }
 
   virtual ~VelocityController() {}
@@ -78,8 +80,6 @@ protected:
       if (urdf_rbdl[i] != mwoibn::robot_class::NON_EXISTING)
         rbdl_controller[urdf_rbdl[i]] = urdf[i];
     }
-
-    std::cout << rbdl_controller << std::endl;
 
     _map = mwoibn::robot_class::BiMap(name, rbdl_controller);
   }

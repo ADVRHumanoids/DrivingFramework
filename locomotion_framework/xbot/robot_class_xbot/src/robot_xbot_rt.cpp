@@ -36,7 +36,7 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   {
     secondary_file = config["secondary_file"].as<std::string>();
   }
-  config = _getConfig(config_file,
+  config = getConfig(config_file,
                       secondary_file); // this is done twice with this robot
 
   try

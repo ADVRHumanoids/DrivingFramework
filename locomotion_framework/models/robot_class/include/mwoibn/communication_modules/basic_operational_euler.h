@@ -112,22 +112,27 @@ public:
 
     mwoibn::VectorInt init_map = _map.get();
     _map_dofs.resize(_size);
-    int k = 0;
-    for(int i = 0; i < init_map.size(); i++){
-      if(init_map[i] != robot_class::NON_EXISTING){
-          if(k > _size) throw(std::invalid_argument(
-                "Received wrong map, only " + std::to_string(_size) + " arguments can be deifned"));
-          _map_dofs[k] = i;
-          k++;
-    }
-    }
+    _full.setZero(_size);
 
+    int k = 0;
+    for (int i = 0; i < init_map.size(); i++)
+    {
+      if (init_map[i] != robot_class::NON_EXISTING)
+      {
+        if (k > _size)
+          throw(std::invalid_argument("Received wrong map, only " +
+                                      std::to_string(_size) +
+                                      " arguments can be deifned"));
+        _map_dofs[k] = i;
+        k++;
+      }
+    }
   }
 
   virtual ~BasicOperationalEuler() {}
 
-  virtual bool initialized() { return false;}
-  virtual bool get() { return false;}
+  virtual bool initialized() { return false; }
+  virtual bool get() { return false; }
 
   // this recomputation is correct for points descrbied by euler angels
   virtual void getPosition(mwoibn::Quaternion orientation,
@@ -139,17 +144,29 @@ public:
   virtual void getPosition(mwoibn::Matrix3 orientation,
                            mwoibn::Vector3 position)
   {
-    mwoibn::VectorN base(_size);
 
-    base.head(3) = position - _offset_position;
-    base.tail(3) =
+    _full.head(3) = position - _offset_position;
+    _full.tail(3) =
         (_offset_orientation * orientation)
             .eulerAngles(_angels[0], _angels[1],
                          _angels[2]); // Check if the convention is met here
 
+    _command.set(_full, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+  }
 
-    _command.set(base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);  
-    
+  virtual void getVelocity(const mwoibn::Vector3& linear,
+                           const mwoibn::Vector3& angular)
+  {
+
+    _full.head(3) = linear;
+    _full.tail(3) = angular; // Check if the convention is met here
+    getVelocity(_full);
+  }
+
+  virtual void getVelocity(const mwoibn::VectorN& velocity)
+  {
+
+    _command.set(velocity, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
   }
 
 protected:
@@ -157,6 +174,8 @@ protected:
   mwoibn::Matrix3 _offset_orientation;
   mwoibn::Vector3 _angels;
   mwoibn::VectorInt _map_dofs;
+  mwoibn::VectorN _full;
+
   int _size = 6;
 };
 }

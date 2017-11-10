@@ -110,14 +110,14 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 
   for (const auto& group : srdf.getGroups())
   {
-    if (uniMaps().isDefined(group.name_))
+    if (selectors().isDefined(group.name_))
       continue; // maybe some warning
 
     mwoibn::VectorInt map =
         mwoibn::VectorInt::Zero(getDofs()); // I need the bool maps
     _loadGroup(group, map, srdf.getGroups());
 
-    uniMaps().addMap(Map(group.name_, map));
+    selectors().addMap(SelectorMap(group.name_, map));
   }
 
   state.restart(getDofs());
@@ -161,7 +161,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
   biMaps().addMap(BiMap("RBDL", rbdl_map));
   mwoibn::VectorInt all =
       mwoibn::VectorInt::Ones(getDofs()); // I need the bool maps
-  uniMaps().addMap(Map("all", all));
+  selectors().addMap(SelectorMap("all", all));
 
   _zeroVec.setZero(getDofs());
 }
@@ -181,19 +181,18 @@ void mwoibn::robot_class::Robot::_loadGroup(
 
   for (const auto& chain : group.chains_)
   {
-    mwoibn::point_handling::RawPositionsHandler my_chain(chain.first, _model,
-                                                         {chain.second});
-    std::vector<int> int_chain = my_chain.getChain();
-    for (int i = 0; i < int_chain.size(); i++)
-      map[int_chain[i]] = 1;
+    mwoibn::point_handling::RawPositionsHandler my_chain(
+        chain.first, _model, std::vector<std::string>{chain.second});
+    for (int i = 0; i < my_chain.getChain().size(); i++)
+      map[my_chain.getChain()[i]] = 1;
   }
 
   for (const auto& sub : group.subgroups_)
   {
     // if subgroup is already initialized load dofs
-    if (uniMaps().isDefined(sub))
+    if (selectors().isDefined(sub))
     {
-      mwoibn::VectorInt chainMap = uniMaps().get(sub).get();
+      mwoibn::VectorInt chainMap = selectors().get(sub).get();
       for (int i = 0; i < chainMap.size(); i++)
       {
         if (chainMap[i])
@@ -292,6 +291,61 @@ std::vector<std::string> mwoibn::robot_class::Robot::getJoints(
   return joint_names;
 }
 
+std::vector<std::string> mwoibn::robot_class::Robot::getLinks(std::string chain, bool unique){
+  return getLinks(selectors().get(chain).which(), unique);
+}
+
+
+std::vector<std::string>
+mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
+{
+  std::vector<std::string> links;
+  bool found;
+  for (int i = 0; i < dofs.size(); i++)
+  {
+    found = false;
+    for (int k = 0; k < _model.mJoints.size(); k++)
+    {
+      if (dofs[i] >= _model.mJoints[k].q_index &&
+          dofs[i] < (_model.mJoints[k].q_index + _model.mJoints[k].mDoFCount))
+      {
+        if (!_is_static && _model.mJoints[k].q_index < 6 &&
+            _model.mJoints[k].q_index + _model.mJoints[k].mDoFCount != 6)
+        {
+          for (int l = k; l < _model.mJoints.size(); l++)
+          {
+            if (_model.mJoints[l].q_index < 6 &&
+                _model.mJoints[l].q_index + _model.mJoints[l].mDoFCount == 6)
+            {
+
+              links.push_back(_model.GetBodyName(l));
+              found = true;
+              break;
+            }
+          }
+        }
+        else
+        {
+          links.push_back(_model.GetBodyName(k));
+          found = true;
+          break;
+        }
+      }
+    }
+
+    if (!found)
+      throw std::invalid_argument(
+          std::string("No link is associated with dof ") +
+          std::to_string(dofs[i]));
+  }
+
+  // ensure uniquness
+  if (unique) // return repetitions
+    links.erase(std::unique(links.begin(), links.end()), links.end());
+
+  return links;
+}
+
 mwoibn::VectorInt mwoibn::robot_class::Robot::getDof(std::string link_name)
 {
   int size;
@@ -322,8 +376,8 @@ mwoibn::VectorInt mwoibn::robot_class::Robot::getDof(std::string link_name)
   }
   else
   {
-    size = _model.mJoints[_model.GetBodyId(link_name.c_str())].mDoFCount;
-    init = _model.mJoints[_model.GetBodyId(link_name.c_str())].q_index;
+    size = _model.mJoints[nr].mDoFCount;
+    init = _model.mJoints[nr].q_index;
   }
 
   mwoibn::VectorInt dofs(size);
@@ -353,7 +407,7 @@ mwoibn::robot_class::Robot::getDof(std::vector<std::string> link_names)
 }
 
 YAML::Node
-mwoibn::robot_class::Robot::_getConfig(const std::string config_file,
+mwoibn::robot_class::Robot::getConfig(const std::string config_file,
                                        const std::string secondary_file)
 {
   YAML::Node config;
@@ -396,11 +450,11 @@ mwoibn::robot_class::Robot::_getConfig(const std::string config_file,
   config = config["mwoibn"];
   config_2 = config_2["mwoibn"];
 
-  _compareEntry(config, config_2);
+  compareEntry(config, config_2);
   return config;
 }
 
-void mwoibn::robot_class::Robot::_compareEntry(YAML::Node entry_main,
+void mwoibn::robot_class::Robot::compareEntry(YAML::Node entry_main,
                                                YAML::Node entry_second)
 {
   for (auto entry : entry_second)
@@ -411,7 +465,7 @@ void mwoibn::robot_class::Robot::_compareEntry(YAML::Node entry_main,
     }
     else if (entry.second.IsMap())
     {
-      _compareEntry(entry_main[entry.first.as<std::string>()], entry.second);
+      compareEntry(entry_main[entry.first.as<std::string>()], entry.second);
     }
     else
       entry_main[entry.first.as<std::string>()] = entry.second;
@@ -596,13 +650,13 @@ mwoibn::robot_class::Robot::readBiMap(YAML::Node config)
   if (!config["type"])
     throw(std::invalid_argument("Required element type has not been defined."));
 
-  if (!uniMaps().isDefined(config["chain"].as<std::string>()))
+  if (!selectors().isDefined(config["chain"].as<std::string>()))
     throw(std::invalid_argument("Chain." + config["chain"].as<std::string>() +
                                 " has not been defined in the robot model"));
 
   mwoibn::VectorBool chain = mwoibn::VectorBool::Constant(getDofs(), false);
   mwoibn::VectorInt chainInt =
-      uniMaps().get(config["chain"].as<std::string>()).get();
+      selectors().get(config["chain"].as<std::string>()).get();
 
   for (int i = 0; i < chainInt.size(); i++)
     if (chainInt[i])
@@ -621,13 +675,17 @@ mwoibn::robot_class::Robot::readBiMap(YAML::Node config)
   {
     type = actuators().getActuationTypes({ACTUATOR_TYPE::UNACTUATED});
     type = eigen_utils::flip(type);
+
+    if (type.size() != getDofs())
+      throw(std::invalid_argument("Couldn't initialize mapping for actuated "
+                                  "dofs, actuation data has not been loaded."));
   }
 
   else if (config["type"].as<std::string>() == "body")
   {
     if (!config["name"])
-      throw(std::invalid_argument(
-          "Couldn't initialize mapping to the body, no [body][name] defined."));
+      throw(std::invalid_argument("Couldn't initialize mapping to the body, "
+                                  "no [body][name] defined."));
     mwoibn::VectorInt temp = getDof(config["name"].as<std::string>());
 
     for (int i = 0; i < temp.size(); i++)
@@ -659,7 +717,7 @@ void mwoibn::robot_class::Robot::_loadConfig(YAML::Node config,
   for (auto entry : robot)
   {
     if (config[entry.first.as<std::string>()])
-      _compareEntry(entry.second, config[entry.first.as<std::string>()]);
+      compareEntry(entry.second, config[entry.first.as<std::string>()]);
   }
 }
 
@@ -815,8 +873,7 @@ bool mwoibn::robot_class::Robot::_loadFeedback(YAML::Node entry,
   return true;
 }
 
-void mwoibn::robot_class::Robot::_loadMappings(YAML::Node config,
-                                               bool from_file)
+void mwoibn::robot_class::Robot::_loadMappings(YAML::Node config)
 {
 
   //  std::cout << "mappings" << std::endl;
@@ -833,11 +890,11 @@ void mwoibn::robot_class::Robot::_loadMappings(YAML::Node config,
     }
 
     entry.second["name"] = entry.first.as<std::string>();
-    _loadMap(entry.second, from_file);
+    _loadMap(entry.second);
   }
 }
 
-void mwoibn::robot_class::Robot::_loadMap(YAML::Node config, bool from_file)
+void mwoibn::robot_class::Robot::_loadMap(YAML::Node config)
 {
 
   //  std::cout << "load map" << std::endl;
@@ -851,7 +908,7 @@ void mwoibn::robot_class::Robot::_loadMap(YAML::Node config, bool from_file)
     throw(std::invalid_argument("Please defined a mapping loading method."));
 
   if (config["loading"].as<std::string>() == "model")
-    _loadMapFromModel(config, from_file);
+    _loadMapFromModel(config);
 
   else
     throw(std::invalid_argument("Unknown loading method for mapping " +
@@ -861,74 +918,64 @@ void mwoibn::robot_class::Robot::_loadMap(YAML::Node config, bool from_file)
             << " has been sucesfully loaded." << std::endl;
 }
 
-void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config,
-                                                   bool from_file)
+bool mwoibn::robot_class::Robot::_initUrdf(YAML::Node config,
+                                           std::string& source)
 {
-
   std::stringstream errMsg;
+  urdf::Model urdf;
+
+  if (!config["urdf"]["file"])
+    throw(std::invalid_argument(
+        "Please define an urdf source in the yaml file.\n"));
+
+  if (config["urdf"]["path"])
+    source = config["urdf"]["path"].as<std::string>();
+
+  source += config["urdf"]["file"].as<std::string>();
+  std::cout << "from file:\t" << source << std::endl;
+
+  if (!urdf.initFile(source))
+  {
+    errMsg << "Could not load urdf description for mapping " +
+                  config["name"].as<std::string>();
+    throw(std::invalid_argument(errMsg.str().c_str()));
+  }
+
+  return (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
+             ? false
+             : true;
+}
+
+RigidBodyDynamics::Model
+mwoibn::robot_class::Robot::_initModel(bool is_static,
+                                       const std::string& source)
+{
+  RigidBodyDynamics::Model model;
+
+  if (!RigidBodyDynamics::Addons::URDFReadFromFile(source.c_str(), &model,
+                                                   !is_static, false))
+    throw std::invalid_argument(
+        std::string("Error loading model from file  for mapping "));
+
+  return model;
+}
+
+void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
+{
 
   if (!config["urdf"])
     throw(std::invalid_argument("Please define a urdf source from mapping." +
                                 config["name"].as<std::string>()));
 
-  urdf::Model urdf;
-  RigidBodyDynamics::Model model;
   std::string source = "";
 
-  if (from_file)
-  {
-    if (!config["urdf"]["file"])
-      throw(std::invalid_argument(
-          "Please define an urdf source in the yaml file.\n"));
+  bool is_static = _initUrdf(config, source);
 
-    if (config["urdf"]["path"])
-      source = config["urdf"]["path"].as<std::string>();
-
-    source += config["urdf"]["file"].as<std::string>();
-
-    if (!urdf.initFile(source))
-    {
-      errMsg << "Could not load urdf description for mapping " +
-                    config["name"].as<std::string>();
-      throw(std::invalid_argument(errMsg.str().c_str()));
-    }
-  }
-  else
-  {
-    source = config["urdf"].as<std::string>();
-
-    if (!urdf.initString(source))
-    {
-      errMsg << "Could not load urdf description  for mapping " +
-                    config["name"].as<std::string>();
-      throw(std::invalid_argument(errMsg.str().c_str()));
-    }
-  }
-
-  bool is_static =
-      (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING) ? false
-                                                                       : true;
-
+  RigidBodyDynamics::Model model;
   // Init RBDL model
   try
   {
-    if (from_file)
-    {
-      if (!RigidBodyDynamics::Addons::URDFReadFromFile(source.c_str(), &model,
-                                                       !is_static, false))
-        throw std::invalid_argument(
-            std::string("Error loading model from file  for mapping " +
-                        config["name"].as<std::string>()));
-    }
-    else
-    {
-
-      if (!RigidBodyDynamics::Addons::URDFReadFromString(source.c_str(), &model,
-                                                         !is_static, false))
-        throw std::invalid_argument(
-            std::string("Error loading model from string for mapping " +
-                        config["name"].as<std::string>()));
-    }
+    model = _initModel(is_static, source);
   }
   catch (...)
   {

@@ -37,6 +37,9 @@ if(VISUALIZATION_TOOLS)
 	add_definitions(-DVISUALIZATION_TOOLS)
 endif(VISUALIZATION_TOOLS)
 
+  LIST( APPEND CATKIN_DEPENDS_SET
+        loaders
+        )
 
 if(COLLISION_CHECK)
   LIST( APPEND INSTALL_TARGETS collision_check )
@@ -141,6 +144,7 @@ if(TEST_TEMP)
 
   LIST( APPEND INSTALL_TARGETS
     my_test
+    contact_test
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -150,6 +154,10 @@ if(TEST_TEMP)
     custom_services
 #    reference_generation
   )
+  LIST( APPEND CATKIN_DEPENDS_SET
+    visualization_tools
+  )
+
 endif(TEST_TEMP)
 
 if(ODOMETRY)
@@ -162,6 +170,7 @@ if(ODOMETRY)
     robot_class_ros_extension
     odometry
   )
+
 endif(ODOMETRY)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -319,6 +328,12 @@ if(TEST_TEMP)
 add_executable(my_test src/my_test.cpp)
 add_dependencies(my_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(my_test
+    ${catkin_LIBRARIES}
+ )
+
+add_executable(contact_test src/contact_test.cpp)
+add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
+target_link_libraries(contact_test
     ${catkin_LIBRARIES}
  )
 endif(TEST_TEMP)

@@ -6,7 +6,7 @@ mwoibn::robot_class::RobotXBotFeedback::RobotXBotFeedback(
     : RobotXBot()
 {
 
-  YAML::Node config = _getConfig(
+  YAML::Node config = getConfig(
       config_file, secondary_file); // this is done twice with this robot
 
   try
@@ -49,7 +49,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
 
   biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
 
-  _loadMappings(robot["mapping"], true);
+  _loadMappings(robot["mapping"]);
   _loadFeedbacks(robot["feedback"]);
   _loadControllers(robot["controller"]);
 

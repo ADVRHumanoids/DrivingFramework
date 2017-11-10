@@ -1,5 +1,8 @@
 #include <mgnss/odometry/odometry.h>
 #include <config.h>
+
+#include <mwoibn/loaders/robot.h>
+
 #include <mwoibn/robot_class/robot_ros_nrt.h>
 #include <mwoibn/robot_class/robot_xbot_nrt.h>
 
@@ -15,8 +18,9 @@ int main(int argc, char** argv)
   pub = n.advertise<custom_messages::CustomCmnd>("odometry", 1);
 
   std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
-//  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
-   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "odometry");
+  mwoibn::loaders::Robot loader;
+  mwoibn::robot_class::Robot& robot = loader.init(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "odometry");
+   //mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "odometry");
 
    mgnss::odometry::Odometry odometry(robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078);
 

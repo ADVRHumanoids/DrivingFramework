@@ -94,10 +94,7 @@ public:
   {
     _points.push_back(std::unique_ptr<Point>(new Point(point)));
 
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
-    _fullState.setZero(getStateSize() * _points.size());
-
+    _resize();
     return _points.size() - 1;
   }
 
@@ -254,6 +251,18 @@ public:
                                  const mwoibn::VectorN& joint_states,
                                  bool update = false) = 0;
 
+  virtual void setFullStatesWorld(const std::vector<State>& states,
+                                 const mwoibn::VectorN& joint_states,
+                                 bool update = false){
+
+    for (int i = 0; i < _points.size(); i++)
+    {
+      setPointStateWorld(i, states[i], joint_states, update);
+      update = false;
+    }
+
+  }
+
   virtual void setFullStateFixed(const mwoibn::VectorN state) = 0;
   /** @brief returns Point name */
   std::string getPointName(unsigned int id) const
@@ -316,7 +325,7 @@ public:
 
     for (int j = 0; j < _chain.size(); j++)
     {
-      _reducedPointJacobian.col(j) = _fullPointJacobian.col(_chain.at(j));
+      _reducedPointJacobian.col(j) = _fullPointJacobian.col(_chain[j]);
     }
 
     return _reducedPointJacobian;
@@ -339,9 +348,9 @@ public:
 
     _fullPointJacobian.noalias() = getPointJacobian(id, joint_states, update);
 
-    for (auto i : _empty)
+    for (int i = 0; i < _empty.size(); i++)
     {
-      _fullPointJacobian.col(i).setZero();
+      _fullPointJacobian.col(_empty[i]).setZero();
     }
 
     return _fullPointJacobian;
@@ -398,7 +407,7 @@ public:
 
     for (int j = 0; j < J.cols(); j++)
     {
-      J_full.middleCols(_chain.at(j), 1) = J.middleCols(j, 1);
+      J_full.middleCols(_chain[j], 1) = J.middleCols(j, 1);
     }
   }
 
@@ -414,7 +423,7 @@ public:
 
     for (int j = 0; j < q.size(); j++)
     {
-      q_full[_chain.at(j)] = q[j];
+      q_full[_chain[j]] = q[j];
     }
   }
 
@@ -438,6 +447,7 @@ public:
 
     std::vector<RigidBodyDynamics::Joint> mJoints = _model.mJoints;
 
+    std::vector<int> chain, empty;
     for (int i = 0; i < _points.size(); i++)
     {
       success = false;
@@ -465,36 +475,44 @@ public:
         else
         {
           for (int temp = 0; temp < mJoints[current_id].mDoFCount; temp++)
-            _chain.push_back(mJoints[current_id].q_index + temp);
+            chain.push_back(mJoints[current_id].q_index + temp);
 
           current_id = _model.GetParentBodyId(current_id);
         }
       }
     }
-    sort(_chain.begin(), _chain.end());
-    _chain.erase(unique(_chain.begin(), _chain.end()), _chain.end());
+    sort(chain.begin(), chain.end());
+    chain.erase(unique(chain.begin(), chain.end()), chain.end());
 
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
-    _reducedPointJacobian.setZero(_jacobian_row, _chain.size());
+    _reducedJacobian.setZero(_points.size() * _jacobian_row, chain.size());
+    _reducedPointJacobian.setZero(_jacobian_row, chain.size());
 
     std::vector<int> full_list(_model.dof_count);
     std::iota(full_list.begin(), full_list.end(), 0);
-    std::remove_copy_if(_chain.begin(), _chain.end(),
-                        std::back_inserter(_empty), [&full_list](const int& arg)
+    std::remove_copy_if(chain.begin(), chain.end(),
+                        std::back_inserter(empty), [&full_list](const int& arg)
                         {
                           return (std::find(full_list.begin(), full_list.end(),
                                             arg) != full_list.end());
                         });
 
-    for (auto i : _empty)
+    for (auto i : empty)
       std::cout << "empty " << i << std::endl;
+
+    _chain.setZero(chain.size());
+    for (int i = 0; i < chain.size(); i++)
+      _chain[i] = chain[i];
+
+    _empty.setZero(empty.size());
+    for (int i = 0; i < empty.size(); i++)
+      _empty[i] = empty[i];
 
     return success;
   }
 
   const Point& point(int i) { return (*_points.at(i)); }
   /** @brief returns selector for a given point_handler **/
-  virtual std::vector<int> getChain() { return _chain; }
+  virtual const mwoibn::VectorInt& getChain() { return _chain; }
 
   /** @brief returns an RDBL id of a PointsHandler reference frame (base) */
   unsigned int getOriginId() const { return _reference; }
@@ -694,15 +712,23 @@ protected:
    * origin of a chain
    */
   int _jacobian_row = 0, _state_size = 0;
-  std::vector<int> _chain, _empty;
+
+  mwoibn::VectorInt _chain, _empty;
+
   mwoibn::Matrix _fullPointJacobian, _reducedPointJacobian, _fullJacobian,
       _reducedJacobian;
-   mwoibn::VectorN _fullState;
+  mwoibn::VectorN _fullState;
   State _state;
   /** keeps all the possible data*/
   std::vector<std::unique_ptr<Point>> _points;
 
   RigidBodyDynamics::Model& _model;
+
+  void _resize(){
+    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
+    _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
+    _fullState.setZero(getStateSize() * _points.size());
+  }
 
   unsigned int _reference;
 
@@ -727,7 +753,7 @@ protected:
   }
 
   template <typename Type>
-  void _initFromVectors(std::vector<Type> reference_frames,
+  void _initFromVectors(Type reference_frames,
                         std::vector<State> states,
                         std::vector<std::string> names)
   { // chack if data have consistens sizes
@@ -740,20 +766,20 @@ protected:
 
     if (!states.size() & !names.size())
     {
-      for (auto& frame : reference_frames)
-        addPoint(frame);
+      for (int i = 0; i < reference_frames.size(); i++)
+        addPoint(reference_frames[i]);
     }
     else if (!names.size())
     {
       for (int i = 0; i < reference_frames.size(); i++)
-        addPoint(states.at(i), reference_frames.at(i));
+        addPoint(states.at(i), reference_frames[i]);
     }
     else if (!states.size())
       for (int i = 0; i < reference_frames.size(); i++)
-        addPoint(reference_frames.at(i), names.at(i));
+        addPoint(reference_frames[i], names.at(i));
     else
       for (int i = 0; i < reference_frames.size(); i++)
-        addPoint(states.at(i), reference_frames.at(i), names.at(i));
+        addPoint(states.at(i), reference_frames[i], names.at(i));
 
     computeChain();
   }

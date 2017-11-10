@@ -31,9 +31,9 @@ public:
       : CartesianWorldTask(ik), _robot(robot)
   {
     _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
-        "ROOT", robot, {"pelvis"}));
+        "ROOT", robot, robot.getLinks("base")));
     _wheels_ptr.reset(
-          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}));
+          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, robot.getLinks("wheels")));
 
 //    for (int i = 0; i < ik.size(); i++)
 //      _wheels_ptr->addPoint(ik.point(i));

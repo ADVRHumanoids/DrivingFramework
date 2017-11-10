@@ -1,12 +1,14 @@
 driving_apth: &driving  "/home/malgorzata/catkin_ws/src/"
 simulator_path: &simulator "/home/malgorzata/advr-superbuild/robots/"
 mwoibn:
+        middleware: "ROS"
         robot:
                 name: "centauro"
                 default:
+                        type: "NRT"
                         rate: 200
                         controller: 
-                                list: [position_controller, velocity_controller, lower_body]
+                                list: [position_controller, velocity_controller]
                         feedback: 
                                 layer: "online"
                         actuators: 
@@ -17,6 +19,7 @@ mwoibn:
 
                 reference:
                         rate: 200
+                        type: "NRT"
                         controller: 
                                 list: ["lower_body"]
                         feedback: 
@@ -29,6 +32,7 @@ mwoibn:
 
                 higher_scheme:
                         rate: 200
+                        type: "NRT"
                         controller: 
                                 layer: "higher_level"
                         feedback: 
@@ -38,8 +42,21 @@ mwoibn:
                         contacts: 
                                 read: "true"
                                 feedback: false  
+                simulated:
+                        rate: 1000
+                        type: "NRT"
+                        controller: 
+                                layer: ""
+                        feedback: 
+                                layer: "simulated"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false  
                 empty:
                         rate: 200
+                        type: "NRT"
                         controller: 
                                 layer: ""
                         feedback: 
@@ -51,23 +68,25 @@ mwoibn:
                                 feedback: false  
                 odometry:
                         rate: 200
+                        type: "NRT"
                         controller: 
                                 list: [odometry]
                         feedback: 
                                 list: [link_side_online, imu_base]
                         actuators: 
-                                read: false
+                                read: true
                         contacts: 
                                 read: true
                                 feedback: false 
                 joint_space:
                         rate: 200
+                        type: "NRT"
                         controller: 
                                 layer: "lower_level"
                         feedback: 
                                 list: [link_side_online]
                         actuators: 
-                                read: false
+                                read: true
                         contacts: 
                                 read: false
                                 feedback: false  
@@ -81,7 +100,17 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false                               
+                                effort: false    
+                simulation_state: 
+                        space: JOINT
+                        dofs: 
+                                chain: all
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false                              
                 motor_side_online:
                 floating_base:
                         space: OPERATIONAL 
@@ -89,6 +118,8 @@ mwoibn:
                                 orientation:
                                         type: QUATERNION
                                         convention: HAMILTONIAN
+                                position:
+                                        type: FULL
                         dofs: 
                                 chain: all
                                 type: body
@@ -98,12 +129,31 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: false
+                simulation_base:
+                        space: OPERATIONAL 
+                        convention:
+                                orientation:
+                                        type: QUATERNION
+                                        convention: HAMILTONIAN
+                                position:
+                                        type: FULL
+                        dofs: 
+                                chain: all
+                                type: body
+                                name: pelvis
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
                 imu_base:
                         space: OPERATIONAL 
                         convention:
                                 orientation:
                                         type: QUATERNION
                                         convention: HAMILTONIAN
+                                position:
+                                        type: NONE
                         dofs: 
                                 chain: all
                                 type: body
@@ -201,30 +251,40 @@ mwoibn:
                                 velocity: false
                                 effort: false
         feedbacks:
-                online: [link_side_online, motor_side_online, floating_base]
+                online: [link_side_online, motor_side_online, odometry]
                 offline: [lower_body]
+                simulated: [simulation_base, simulation_state]
         controllers:
                 lower_level: [position_controller, velocity_controller]
                 higher_level: [lower_body]
+
         ros:
                 mapping:
                         PYTHON:
                                 loading: topic
                                 source: "joint_states"
                                 message: sensor_msgs::JointState
-                mapping:
                         RBDL_LOWER:
                                 loading: model
                                 urdf: "/robot_lower_body"
                 source:
                         urdf: "/robot_description"
-                        srdf: "/robot_semantic_description"
+                        srdf: "/robot_srdf"
                         actuators: "actuators_yaml"
                         contacts: "contacts_yaml"
                 feedback:
                         link_side_online: 
                                 source: "joint_states"
                                 message: sensor_msgs::JointState
+                                initialize: true
+                        simulation_state: 
+                                source: "joint_states"
+                                message: sensor_msgs::JointState
+                                initialize: true
+                        simulation_base: 
+                                source: "/gazebo/link_states"
+                                message: gazebo_msgs::LinkStates
+                                reference: 1
                                 initialize: true
                         floating_base: 
                                 source: "/gazebo/link_states"
@@ -304,6 +364,10 @@ mwoibn:
                                         file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                 feedback:
                         link_side_online:
+                                layer: online
+                                dofs:
+                                        mapping: XBOT
+                        velocity_online:
                                 layer: online
                                 dofs:
                                         mapping: XBOT

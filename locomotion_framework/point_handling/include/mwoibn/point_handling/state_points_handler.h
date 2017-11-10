@@ -41,19 +41,10 @@ public:
   {
   }
 
-  StatePointsHandler(int chain_origin, RigidBodyDynamics::Model& model,
+  template <typename Type, typename Vector>
+  StatePointsHandler(Type chain_origin, RigidBodyDynamics::Model& model,
                      const mwoibn::VectorN& positions,
-                     std::vector<int> reference_frames,
-                     std::vector<State> states = {},
-                     std::vector<std::string> names = {})
-      : rawHandler(chain_origin, model, reference_frames, states, names),
-        _positions(positions)
-  {
-  }
-
-  StatePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model,
-                     const mwoibn::VectorN& positions,
-                     std::vector<std::string> reference_frames,
+                     Vector reference_frames,
                      std::vector<State> states = {},
                      std::vector<std::string> names = {})
       : rawHandler(chain_origin, model, reference_frames, states, names),

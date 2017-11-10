@@ -6,21 +6,14 @@ mwoibn::robot_class::RobotRosNRT::RobotRosNRT(std::string config_file,
     : mwoibn::robot_class::RobotRos()
 {
 
-  YAML::Node config = _getConfig(
+  YAML::Node config = getConfig(
       config_file, secondary_file); // this is done twice with this robot
 
-  YAML::Node robot = mwoibn::robot_class::RobotRos::_init(config, config_name);
-
-  if (!robot["rate"])
-    throw(std::invalid_argument(
-        "Desired frequency not defined in a configuration " + config_file +
-        ", " + config_name));
-
-  _rate_ptr.reset(new ros::Rate(robot["rate"].as<double>()));
-
+  YAML::Node robot;
   try
   {
-    _loadMappings(robot["mapping"], false);
+    robot = mwoibn::robot_class::RobotRos::_init(config, config_name);
+    _loadMappings(robot["mapping"]);
     _loadFeedbacks(robot["feedback"]);
     _loadControllers(robot["controller"]);
   }
@@ -30,6 +23,10 @@ mwoibn::robot_class::RobotRosNRT::RobotRosNRT(std::string config_file,
                                 std::string("\nrobot:\t") + config_name +
                                 std::string("\n") + e.what()));
   }
+
+  wait();
+  get();
+  updateKinematics();
 }
 
 void mwoibn::robot_class::RobotRosNRT::_loadFeedbacks(YAML::Node config)
@@ -117,7 +114,7 @@ bool mwoibn::robot_class::RobotRosNRT::loadRosControllers(
   return false;
 }
 
-void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config, bool from_file)
+void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config)
 {
 
   if (!config["name"])
@@ -130,7 +127,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadMap(YAML::Node config, bool from_fil
     throw(std::invalid_argument("Please defined a mapping loading method."));
 
   if(config["loading"].as<std::string>() == "topic") _loadMapFromTopic(config);
-  else if(config["loading"].as<std::string>() == "model") _loadMapFromModel(config, from_file);
+  else if(config["loading"].as<std::string>() == "model") _loadMapFromModel(config);
   else throw(std::invalid_argument("Unknown loading method for mapping " + config["name"].as<std::string>()));
 
   std::cout << "Map " << config["name"].as<std::string>()

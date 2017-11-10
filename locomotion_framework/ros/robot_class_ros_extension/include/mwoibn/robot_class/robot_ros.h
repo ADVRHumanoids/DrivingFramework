@@ -40,7 +40,14 @@ public:
 
   virtual ~RobotRos() { _node.shutdown(); }
   virtual bool isRunning() { return ros::ok(); }
-  virtual void wait(){}
+
+  virtual void wait(){
+    _spined = false;
+    _rate_ptr->sleep();
+  }
+
+  virtual double rate() { return _rate_ptr->expectedCycleTime().toSec(); }
+
 
 protected:
   //! Keeps the ros_node handler
@@ -59,6 +66,11 @@ protected:
 
   std::string _readConfigString(YAML::Node config, std::string name);
 
+  virtual bool _initUrdf(YAML::Node config, std::string& source);
+  virtual RigidBodyDynamics::Model _initModel(bool is_static,
+                                         const std::string& source);
+  bool _spined = false;
+  std::unique_ptr<ros::Rate> _rate_ptr;
 
 };
 } // namespace package

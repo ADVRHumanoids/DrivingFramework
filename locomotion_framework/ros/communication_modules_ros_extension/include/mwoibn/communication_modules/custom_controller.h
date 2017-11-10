@@ -36,7 +36,8 @@ public:
     _init(map.reversed(), map.getDofs(), config["name"].as<std::string>(), sink, service);
     _des_q.position.resize(_dofs, 0);
     _des_q.effort.resize(_dofs, 0);
-    std::cout << "Success" << std::endl;
+
+    std::cout << "Loaded direct controller " << config["name"] << std::endl;
   }
 
   virtual ~CustomController() {}
@@ -52,7 +53,7 @@ protected:
   ros::Publisher _command_pub;
   custom_messages::CustomCmnd _des_q;
 
-  template <typename Vector> void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs, std::string name, std::string command = "/command", std::string service = "/set_ff_torque")
+  template <typename Vector> void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs, const std::string& name, std::string command = "/command", std::string service = "/set_ff_torque")
   {
 
     _command_pub =
@@ -62,9 +63,10 @@ protected:
         _node.serviceClient<std_srvs::SetBool>(name + service);
     std_srvs::SetBool srv;
     srv.request.data = true;
-    if(!set_feed_forward.call(srv)){
 
-      std::cout << "Couldn't initialaize a feed forward term" << std::endl;}
+
+    if(!set_feed_forward.call(srv)){
+      std::cout << "WARNING: Couldn't initialize a feed forward term from service:\n\t " << name << service << std::endl;}
 
     custom_controller::MapToUrdf map;
 

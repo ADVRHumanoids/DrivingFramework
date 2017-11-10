@@ -335,7 +335,9 @@ public:
   const mwoibn::Matrix&
   getPositionJacobian(const mwoibn::VectorN& joint_positions,
                       bool update = false);
-
+  mwoibn::Matrix
+  getPositionJacobian(const mwoibn::VectorN& joint_positions,
+                      bool update = false) const;
   /** returnes number of jacobian rows as returned by getPositionJacobian
    *
    * @see getPositionJacobian, getJacobianCols
@@ -353,6 +355,8 @@ public:
   getOrientationJacobian(const mwoibn::VectorN& joint_positions,
                          bool update = false);
 
+  mwoibn::Matrix getOrientationJacobian(const mwoibn::VectorN& joint_positions,
+                         bool update = false) const;
   /** returnes number of jacobian rows as returned by getOrientationJacobian
    *
    * @see getOrientationJacobian, getOrientationJacobianCols

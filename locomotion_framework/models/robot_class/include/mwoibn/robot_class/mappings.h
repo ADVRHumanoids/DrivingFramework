@@ -50,6 +50,8 @@ public:
       return true;
   }
 
+  int size(){return _mappings.size();}
+
   /** @brief returns ID of a given mapping, retruns robot_class::NON_EXISTING it map is not defined
    */
   int getId(std::string name) const {

@@ -85,8 +85,9 @@ protected:
       if (!_selector[i])
         continue;
 
-      for (auto& dof : _robot.contacts().contact(_selector[i]).getChain())
-        _selector_dof[dof] = true;
+
+      for (int k = 0; k < _robot.contacts().contact(_selector[i]).getChain().size(); k++)
+        _selector_dof[_robot.contacts().contact(_selector[i]).getChain()[k]] = true;
     }
 
     //    for (int i = 0; i < _selector.size(); i++)

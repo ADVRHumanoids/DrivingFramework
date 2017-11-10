@@ -6,7 +6,7 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
                                                 std::string secondary_file)
     : RobotXBotFeedback()
 {
-  YAML::Node config = _getConfig(
+  YAML::Node config = getConfig(
       config_file, secondary_file); // this is done twice with this robot
 
   YAML::Node middleware = config["ros"];

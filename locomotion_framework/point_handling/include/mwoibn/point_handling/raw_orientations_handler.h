@@ -49,23 +49,14 @@ public:
   {
   }
 
-  RawOrientationsHandler(int chain_origin, RigidBodyDynamics::Model& model,
-                         std::vector<int> reference_frames,
+  template<typename Type, typename Vector>
+  RawOrientationsHandler(Type chain_origin, RigidBodyDynamics::Model& model,
+                         Vector reference_frames,
                          std::vector<State> states = {},
                          std::vector<std::string> names = {})
       : BasePointsHandler(chain_origin, model, 3, 4)
   {
-    _initFromVectors<int>(reference_frames, states, names);
-  }
-
-  RawOrientationsHandler(std::string chain_origin,
-                         RigidBodyDynamics::Model& model,
-                         std::vector<std::string> reference_frames,
-                         std::vector<State> states = {},
-                         std::vector<std::string> names = {})
-      : BasePointsHandler(chain_origin, model, 3, 4)
-  {
-    _initFromVectors<std::string>(reference_frames, states, names);
+    _initFromVectors(reference_frames, states, names);
   }
 
   virtual ~RawOrientationsHandler() {}
@@ -95,8 +86,7 @@ public:
     _points.push_back(std::unique_ptr<Point>(
         new Point(Point::Position(0, 0, 0), body_id, _model, state, name)));
 
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
+    _resize();
 
     return _points.size() - 1;
   }

@@ -154,6 +154,18 @@ Point::getPositionJacobian(const mwoibn::VectorN& joint_positions, bool update)
   return _J_part;
 }
 
+mwoibn::Matrix
+Point::getPositionJacobian(const mwoibn::VectorN& joint_positions,
+                    bool update) const{
+
+  mwoibn::Matrix J = mwoibn::Matrix::Zero(_J_part.rows(), _J_part.cols());
+
+  CalcPointJacobian(_model, joint_positions, _body_id, _position, J,
+                    update);
+
+  return J;
+}
+
 /** @bried returnes full jacobian of a point **/
 const mwoibn::Matrix&
 Point::getOrientationJacobian(const mwoibn::VectorN& joint_positions,
@@ -166,6 +178,15 @@ Point::getOrientationJacobian(const mwoibn::VectorN& joint_positions,
   _J_part.noalias() = _J.topRows<3>();
 
   return _J_part;
+}
+
+mwoibn::Matrix Point::getOrientationJacobian(const mwoibn::VectorN& joint_positions,
+                       bool update) const{
+  mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
+
+  CalcPointJacobian6D(_model, joint_positions, _body_id, _position, J, update);
+  mwoibn::Matrix J_part = J.topRows<3>();
+  return J_part;
 }
 
 /** @bried returnes full jacobian of a point **/

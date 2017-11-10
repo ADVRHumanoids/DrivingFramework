@@ -30,43 +30,20 @@ public:
    * @param type [in] selective flag - TO BE REMOVED
    * @param name [in] name of a contact
    */
-  ContactV2(State position, int body_id, RigidBodyDynamics::Model& model,
+  template<typename Type>
+  ContactV2(State position, Type body_id, RigidBodyDynamics::Model& model,
             const mwoibn::VectorN& positions, bool is_active,
             mwoibn::Matrix6 directions,
             robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
             std::string name = "")
-      : BasePH(0, model, positions, {body_id}, {position}, {name}),
+      : BasePH(0, model, positions, std::vector<Type>{body_id}, {position}, {name}),
         _is_active(is_active),
         _type(type) // this zero should as some kind of constant value defined
                     // in robot_class.h
   {
     _resize();
-
     _initDirections(directions);
 
-  }
-
-  /**
-   * @param position [in] state of contact point in its reference frame
-   * @param body_name [in] name of a reference frame in RBDL model
-   * @param model [in] reference to the RBDL model
-   * @param positions [in] reference to a model state vector
-   * @param is_active [in] true/false whether the contact is avtive
-   * @param directions [in] set of constraint directions
-   * @param type [in] selective flag - TO BE REMOVED
-   * @param name [in] name of a contact
-   */
-  ContactV2(State position, std::string body_name,
-            RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-            bool is_active, mwoibn::Matrix6 directions,
-            robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
-            std::string name = "")
-      : BasePH("ROOT", model, positions, {body_name}, {position}, {name}),
-        _is_active(is_active), _type(type)
-  {
-    _resize();
-
-    _initDirections(directions);
   }
 
   /**

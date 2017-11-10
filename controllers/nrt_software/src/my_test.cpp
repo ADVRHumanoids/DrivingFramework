@@ -1,7 +1,9 @@
-#include <mwoibn/robot_class/robot_ros_nrt.h>
-#include <mwoibn/robot_class/robot_xbot_nrt.h>
-#include <mwoibn/robot_class/robot_xbot_rt.h>
+//#include <mwoibn/robot_class/robot_ros_nrt.h>
+//#include <mwoibn/robot_class/robot_xbot_nrt.h>
+//#include <mwoibn/robot_class/robot_xbot_rt.h>
 #include <config.h>
+
+#include <mwoibn/loaders/robot.h>
 
 #include <mwoibn/hierarchical_control/hierarchical_controller.h>
 #include <mwoibn/hierarchical_control/joint_positions_task.h>
@@ -32,11 +34,10 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n;
   ros::Rate rate(200);
-
   std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
-//  mwoibn::robot_class::RobotRosNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "higher_scheme", path+"controllers/nrt_software/configs/centralized_controller.yaml");
-   mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "joint_space");
-  //  robot.contacts().contact(1).deactivate();
+
+  mwoibn::loaders::Robot loader;
+  mwoibn::robot_class::Robot& robot = loader.init(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "joint_space");
 
   double pos = 0, vel = 0, step = 0.0001;
   ros::ServiceServer trajectory_service =

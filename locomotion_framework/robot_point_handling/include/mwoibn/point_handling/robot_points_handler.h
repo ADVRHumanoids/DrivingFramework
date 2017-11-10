@@ -38,17 +38,9 @@ public:
   {
   }
 
-  RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot,
-                     std::vector<int> reference_frames,
-                     std::vector<State> states = {},
-                     std::vector<std::string> names = {})
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), reference_frames,
-                   states, names)
-  {
-  }
-
-  RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot,
-                     std::vector<std::string> reference_frames,
+  template <typename Type, typename Vector>
+  RobotPointsHandler(Type chain_origin, mwoibn::robot_class::Robot& robot,
+                     Vector reference_frames,
                      std::vector<State> states = {},
                      std::vector<std::string> names = {})
       : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), reference_frames,

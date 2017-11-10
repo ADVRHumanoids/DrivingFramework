@@ -1,4 +1,6 @@
-﻿#include <mgnss/controllers/wheeled_motion.h>
+﻿#include <mwoibn/loaders/robot.h>
+
+#include <mgnss/controllers/wheeled_motion.h>
 #include <mgnss/controllers/wheeled_references.h>
 #include <custom_services/updatePDGains.h>
 #include <mwoibn/robot_class/robot_ros_nrt.h>
@@ -15,8 +17,9 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
 
   // init wheels_controller
+  mwoibn::loaders::Robot loader;
 
-  mwoibn::robot_class::RobotXBotNRT robot(
+  mwoibn::robot_class::Robot& robot = loader.init(
         "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/"
         "mwoibn_v2.yaml",
         "default");

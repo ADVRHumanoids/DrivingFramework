@@ -43,24 +43,25 @@ public:
   {
   }
 
-  RawFullStatesHandler(int chain_origin, RigidBodyDynamics::Model& model,
-                       std::vector<int> reference_frames,
+  template<typename Type, typename Vector>
+  RawFullStatesHandler(Type chain_origin, RigidBodyDynamics::Model& model,
+                       Vector reference_frames,
                        std::vector<State> states = {},
                        std::vector<std::string> names = {})
       : BasePointsHandler(chain_origin, model, 6, 7)
   {
-    _initFromVectors<int>(reference_frames, states, names);
+    _initFromVectors(reference_frames, states, names);
   }
 
-  RawFullStatesHandler(std::string chain_origin,
-                       RigidBodyDynamics::Model& model,
-                       std::vector<std::string> reference_frames,
-                       std::vector<State> states = {},
-                       std::vector<std::string> names = {})
-      : BasePointsHandler(chain_origin, model, 6, 7)
-  {
-    _initFromVectors<std::string>(reference_frames, states, names);
-  }
+//  RawFullStatesHandler(std::string chain_origin,
+//                       RigidBodyDynamics::Model& model,
+//                       std::vector<std::string> reference_frames,
+//                       std::vector<State> states = {},
+//                       std::vector<std::string> names = {})
+//      : BasePointsHandler(chain_origin, model, 6, 7)
+//  {
+//    _initFromVectors<std::vector<std::string>>(reference_frames, states, names);
+//  }
 
   virtual ~RawFullStatesHandler() {}
 
@@ -87,8 +88,7 @@ public:
         Point::Position(state[0], state[1], state[2]), body_id, _model,
         Point::Orientation(state[3], state[4], state[5], state[6]), name)));
 
-    _reducedJacobian.setZero(_points.size()*_jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size()*_jacobian_row, _model.dof_count);
+    _resize();
 
     return _points.size() - 1;
   }
@@ -101,8 +101,7 @@ public:
         Point::Position(state[0], state[1], state[2]), body_name, _model,
         Point::Orientation(state[3], state[4], state[5], state[6]), name)));
 
-    _reducedJacobian.setZero(_points.size()*_jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size()*_jacobian_row, _model.dof_count);
+    _resize();
 
     return _points.size() - 1;
   }
@@ -198,8 +197,6 @@ public:
   virtual const mwoibn::VectorN& getFullStateWorld(const mwoibn::VectorN& joint_states,
                                             bool update = false)
   {
-
-//    mwoibn::VectorN states(getStateSize() * _points.size());
     for (int i = 0; i < _points.size(); i++)
     {
       _fullState.segment(getStateSize() * i, getStateSize()) =

@@ -7,7 +7,7 @@ mwoibn::robot_class::RobotXBot::RobotXBot(std::string config_file,
 {
 
   // Creat final config file from obtained parameter files
-  YAML::Node config = _getConfig(config_file, secondary_file);
+  YAML::Node config = getConfig(config_file, secondary_file);
 
   _init(config, config_name); // thanks to this function more config files can
                               // be easily supported

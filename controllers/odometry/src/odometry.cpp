@@ -17,26 +17,6 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   for (const auto& name : names)
     _wheels_ph.addPoint(name);
 
-  // getOffstes -- shouldn't this be a default function?
-
-  //  mwoibn::VectorN zeros = mwoibn::VectorN::Zero((_robot.getDofs()));
-  //  mwoibn::VectorN get_state =
-  //      _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
-
-  //  _robot.state.set(zeros);
-  //  _robot.updateKinematics();
-
-  //  mwoibn::Vector7 offset = mwoibn::Vector7::Zero();
-
-  //  for (int i = 0; i < _robot.getDofs(); i++){
-  //    mwoibn::Quaternion::toVector(_wheels_ph.point(i).getOrientationWorld(zeros).transposed(),
-  //    offset, 3);
-
-  //    _wheels_ph.setPointStateFixed(i, offset);
-  //  }
-
-  //  _robot.state.set(get_state);
-  //  _robot.updateKinematics();
   mwoibn::Vector3 axis, pelvis;
   axis << 0, 0, 1; // for now assume flat ground
   pelvis = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3);
@@ -58,6 +38,7 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   }
 
   _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
+
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
 
@@ -68,10 +49,11 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
 
 void mgnss::odometry::Odometry::update()
 {
+
   _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
-  //  std::cout <<  _state << std::endl;
 
   _error.noalias() = _state - _previous_state;
+
   _selector.noalias() = _contacts;
   // estimate postion of each wheel
   for (int i = 0; i < _state.size(); i++)
@@ -85,12 +67,10 @@ void mgnss::odometry::Odometry::update()
     _directions[i].normalize();
 
     _error[i] *= _r;
-    _estimated[i] += _directions[i] * _error[i];
-  }
 
-  // input should be 0,0,0 for floating base position
-  // then the current wheel position should give the relative postion therefore
-  // the pelvis is estimated-wheel_position
+    _estimated[i] += _directions[i] * _error[i];
+
+  }
 
   for (int i = 0; i < _wheels_ph.size(); i++)
     _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);

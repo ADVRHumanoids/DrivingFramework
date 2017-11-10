@@ -24,15 +24,15 @@ public:
 //    RobotXBotFeedback::update();
 //  }
 
-  virtual bool send()
-  {
-    robot_class::RobotXBotFeedback::send();
-    if (_spin)
-      ros::spinOnce();
-  }
+//  virtual bool send()
+//  {
+//    robot_class::RobotXBotFeedback::send(); // this is spining on its own?
+//    if (_spin)
+//      ros::spinOnce();
+//  }
 
   virtual double rate() {
-      return _rate_ptr->expectedCycleTime().toSec();  
+      return _rate_ptr->expectedCycleTime().toSec();
     }
 
   virtual void wait() {_rate_ptr->sleep(); }

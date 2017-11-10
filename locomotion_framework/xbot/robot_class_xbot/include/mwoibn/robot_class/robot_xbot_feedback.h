@@ -40,12 +40,12 @@ public:
       _robot->sense(false);
     }
 
-    return feedbacks.get();
+    return Robot::get();
   }
 
   virtual bool send()
   {
-    if (controllers.send() && _move)
+    if (Robot::send() && _move)
     {
       _robot->move(); // shouldn't this go with controllers.send()?
        return true;
