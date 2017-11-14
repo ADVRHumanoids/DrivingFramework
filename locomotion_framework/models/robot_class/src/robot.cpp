@@ -27,79 +27,23 @@
 #include "mwoibn/point_handling/raw_positions_handler.h"
 
 mwoibn::robot_class::Robot::Robot(std::string urdf_description,
-                                  std::string srdf_description, bool from_file)
+                                  std::string srdf_description)
 {
-  _init(urdf_description, srdf_description, from_file);
+  _init(urdf_description, srdf_description);
 }
 
 void mwoibn::robot_class::Robot::_init(std::string urdf_description,
-                                       std::string srdf_description,
-                                       bool from_file)
+                                       std::string srdf_description)
 {
-  std::stringstream errMsg;
-
   urdf::Model urdf;
-  srdf::Model srdf;
+  _is_static = _initUrdf(urdf_description, urdf);
 
-  if (from_file)
-  {
-    if (!urdf.initFile(urdf_description))
-    {
-      errMsg << "Could not load urdf description";
-      throw(std::invalid_argument(errMsg.str().c_str()));
-    }
+  srdf::Model srdf = _initSrdf(srdf_description, urdf);
 
-    if (srdf_description != "")
-    {
-      if (!srdf.initFile(urdf, srdf_description))
-      {
-        errMsg << "Could not load srdf description";
-        throw(std::invalid_argument(errMsg.str().c_str()));
-      }
-    }
-  }
-  else
-  {
-    if (!urdf.initString(urdf_description))
-    {
-      errMsg << "Could not load urdf description";
-      throw(std::invalid_argument(errMsg.str().c_str()));
-    }
-
-    if (srdf_description != "")
-    {
-      if (!srdf.initString(urdf, srdf_description))
-      {
-        errMsg << "Could not load srdf description";
-        throw(std::invalid_argument(errMsg.str().c_str()));
-      }
-    }
-    else
-      std::cout << " WARNING: srdf file has not been defined, it will not be "
-                   "initialized" << std::endl;
-  }
-
-  _is_static = (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
-                   ? false
-                   : true;
   // Init RBDL model
   try
   {
-    if (from_file)
-    {
-      if (!RigidBodyDynamics::Addons::URDFReadFromFile(
-              urdf_description.c_str(), &_model, !_is_static, false))
-        throw std::invalid_argument(
-            std::string("Error loading model from file"));
-    }
-    else
-    {
-
-      if (!RigidBodyDynamics::Addons::URDFReadFromString(
-              urdf_description.c_str(), &_model, !_is_static, false))
-        throw std::invalid_argument(
-            std::string("Error loading model from string"));
-    }
+    _initModel(_is_static, urdf_description, _model);
   }
   catch (...)
   {
@@ -108,6 +52,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 
   _initMapNames(urdf.getRoot());
 
+  // init chains from srdf model
   for (const auto& group : srdf.getGroups())
   {
     if (selectors().isDefined(group.name_))
@@ -117,11 +62,20 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
         mwoibn::VectorInt::Zero(getDofs()); // I need the bool maps
     _loadGroup(group, map, srdf.getGroups());
 
-    selectors().addMap(SelectorMap(group.name_, map));
+    selectors().add(SelectorMap(group.name_, map));
   }
+
+
 
   state.restart(getDofs());
   command.restart(getDofs());
+  lower_limits.restart(getDofs());
+  upper_limits.restart(getDofs());
+
+  // read joint limits from urdf
+  _readJointLimits(urdf);
+  _readGroupStates(srdf);
+
   _actuation = mwoibn::VectorInt::Ones(getDofs());
 
   _center_of_mass.reset(new CenterOfMass(_model,
@@ -153,17 +107,115 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
     }
   }
 
-  // start simples mapping
+  // start simple mappings
   mwoibn::VectorInt rbdl_map(getDofs());
   for (int i = 0; i < getDofs(); i++)
     rbdl_map[i] = i;
 
-  biMaps().addMap(BiMap("RBDL", rbdl_map));
+  biMaps().add(BiMap("RBDL", rbdl_map));
   mwoibn::VectorInt all =
       mwoibn::VectorInt::Ones(getDofs()); // I need the bool maps
-  selectors().addMap(SelectorMap("all", all));
+  selectors().add(SelectorMap("all", all));
 
   _zeroVec.setZero(getDofs());
+}
+void mwoibn::robot_class::Robot::_readGroupStates(srdf::Model& srdf)
+{
+  mwoibn::VectorN state = mwoibn::VectorN::Constant(getDofs(), mwoibn::NON_EXISTING);
+  mwoibn::VectorInt dofs;
+  bool update;
+  std::cout << "read group states " << std::endl;
+
+  for (const auto& group : srdf.getGroupStates())
+  {
+    std::cout << "\t" << group.name_;
+
+    if(groupStates().isDefined(group.name_)){
+      std::cout << "\tUPDATE" << std::endl;
+
+      state = groupStates().get(group.name_).get();
+      update = true;
+    }
+    else{
+      std::cout << std::endl;
+
+      state.setConstant(mwoibn::NON_EXISTING);
+      update = false;
+    }
+
+    for(auto& joint : group.joint_values_){
+      dofs =  getDof(getLink(joint.first));
+
+     if(dofs.size() == 0)
+        std::cout << "WARNING: unknow joint while reading a group state " << group.name_ << std::endl;
+
+     for(int i = 0; i < dofs.size(); i++)
+      state[dofs[i]] = joint.second[i];
+
+    }
+
+    if(update)
+      groupStates().update(MapState(group.name_, state));
+    else
+      groupStates().add(MapState(group.name_, state));
+
+  }
+}
+
+
+void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
+{
+
+  mwoibn::VectorN limits =
+      mwoibn::VectorN::Constant(getDofs(), mwoibn::NON_EXISTING);
+
+  lower_limits.set(limits, INTERFACE::POSITION);
+  lower_limits.set(limits, INTERFACE::VELOCITY);
+  lower_limits.set(limits, INTERFACE::TORQUE);
+  upper_limits.set(limits, INTERFACE::POSITION);
+  upper_limits.set(limits, INTERFACE::VELOCITY);
+  upper_limits.set(limits, INTERFACE::TORQUE);
+
+  for (int i = 0; i < _model.mBodies.size(); i++)
+  {
+    if (_model.IsFixedBodyId(i))
+    {
+      continue;
+    }
+    std::string link_name = _model.GetBodyName(i);
+
+    if (urdf.getLink(link_name) == NULL)
+      continue;
+
+    boost::shared_ptr<const urdf::Joint> joint =
+        urdf.getJoint(getJoint(link_name));
+
+    if ((joint->limits) == NULL)
+      continue;
+    mwoibn::VectorInt dof = getDof(link_name);
+
+    if (joint->limits->lower)
+    {
+      limits.setConstant(dof.size(), joint->limits->lower);
+      lower_limits.set(limits, dof, INTERFACE::POSITION);
+    }
+    if(joint->limits->upper){
+      limits.setConstant(dof.size(), joint->limits->upper);
+      upper_limits.set(limits, dof, INTERFACE::POSITION);
+    }
+    if (joint->limits->velocity){
+      limits.setConstant(dof.size(), joint->limits->velocity);
+      upper_limits.set(limits, dof, INTERFACE::VELOCITY);
+      limits.setConstant(dof.size(), -joint->limits->velocity);
+      lower_limits.set(limits, dof, INTERFACE::VELOCITY);
+    }
+    if (joint->limits->effort){
+        limits.setConstant(dof.size(), joint->limits->effort);
+        upper_limits.set(limits, dof, INTERFACE::TORQUE);
+        limits.setConstant(dof.size(), -joint->limits->effort);
+        lower_limits.set(limits, dof, INTERFACE::TORQUE);
+      }
+}
 }
 
 void mwoibn::robot_class::Robot::_loadGroup(
@@ -291,10 +343,11 @@ std::vector<std::string> mwoibn::robot_class::Robot::getJoints(
   return joint_names;
 }
 
-std::vector<std::string> mwoibn::robot_class::Robot::getLinks(std::string chain, bool unique){
+std::vector<std::string> mwoibn::robot_class::Robot::getLinks(std::string chain,
+                                                              bool unique)
+{
   return getLinks(selectors().get(chain).which(), unique);
 }
-
 
 std::vector<std::string>
 mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
@@ -408,7 +461,7 @@ mwoibn::robot_class::Robot::getDof(std::vector<std::string> link_names)
 
 YAML::Node
 mwoibn::robot_class::Robot::getConfig(const std::string config_file,
-                                       const std::string secondary_file)
+                                      const std::string secondary_file)
 {
   YAML::Node config;
 
@@ -455,7 +508,7 @@ mwoibn::robot_class::Robot::getConfig(const std::string config_file,
 }
 
 void mwoibn::robot_class::Robot::compareEntry(YAML::Node entry_main,
-                                               YAML::Node entry_second)
+                                              YAML::Node entry_second)
 {
   for (auto entry : entry_second)
   {
@@ -918,27 +971,53 @@ void mwoibn::robot_class::Robot::_loadMap(YAML::Node config)
             << " has been sucesfully loaded." << std::endl;
 }
 
-bool mwoibn::robot_class::Robot::_initUrdf(YAML::Node config,
-                                           std::string& source)
+std::string mwoibn::robot_class::Robot::_readUrdf(YAML::Node config)
 {
-  std::stringstream errMsg;
-  urdf::Model urdf;
+
+  if (!config["urdf"])
+    throw std::invalid_argument(
+        std::string("Please define an urdf source in the yaml file."));
 
   if (!config["urdf"]["file"])
     throw(std::invalid_argument(
         "Please define an urdf source in the yaml file.\n"));
 
+  std::string file = "";
   if (config["urdf"]["path"])
-    source = config["urdf"]["path"].as<std::string>();
+    file = config["urdf"]["path"].as<std::string>();
 
-  source += config["urdf"]["file"].as<std::string>();
-  std::cout << "from file:\t" << source << std::endl;
+  file += config["urdf"]["file"].as<std::string>();
 
-  if (!urdf.initFile(source))
+  std::cout << "from file:\t" << file << std::endl;
+
+  return file;
+}
+
+std::string mwoibn::robot_class::Robot::_readSrdf(YAML::Node config)
+{
+
+  if (!config["srdf"])
+    return "";
+  if (config["srdf"]["file"].as<std::string>() == "")
+    return "";
+
+  std::string file = "";
+  if (config["srdf"]["path"])
+    file = config["srdf"]["path"].as<std::string>();
+
+  file += config["srdf"]["file"].as<std::string>();
+
+  return file;
+}
+
+bool mwoibn::robot_class::Robot::_initUrdf(std::string& urdf_description,
+                                           urdf::Model& urdf)
+{
+
+  if (!urdf.initFile(urdf_description))
   {
-    errMsg << "Could not load urdf description for mapping " +
-                  config["name"].as<std::string>();
-    throw(std::invalid_argument(errMsg.str().c_str()));
+    throw(
+        std::invalid_argument(std::string("Could not load urdf description")));
   }
 
   return (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
@@ -946,18 +1025,36 @@ bool mwoibn::robot_class::Robot::_initUrdf(YAML::Node config,
              : true;
 }
 
-RigidBodyDynamics::Model
-mwoibn::robot_class::Robot::_initModel(bool is_static,
-                                       const std::string& source)
+srdf::Model mwoibn::robot_class::Robot::_initSrdf(std::string& srdf_description,
+                                                  urdf::Model& urdf)
 {
-  RigidBodyDynamics::Model model;
+  srdf::Model srdf;
+
+  if (srdf_description == "")
+  {
+    std::cout << " WARNING: srdf file has not been defined, it will not be "
+                 "initialized" << std::endl;
+    return srdf;
+  }
+
+  if (!srdf.initFile(urdf, srdf_description))
+  {
+    throw(std::invalid_argument("Could not load srdf description"));
+  }
+
+  return srdf;
+}
+
+void mwoibn::robot_class::Robot::_initModel(bool is_static,
+                                            const std::string& source,
+                                            RigidBodyDynamics::Model& model)
+{
+  // RigidBodyDynamics::Model model;
 
   if (!RigidBodyDynamics::Addons::URDFReadFromFile(source.c_str(), &model,
                                                    !is_static, false))
     throw std::invalid_argument(
         std::string("Error loading model from file  for mapping "));
-
-  return model;
 }
 
 void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
@@ -967,15 +1064,26 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
     throw(std::invalid_argument("Please define a urdf source from mapping." +
                                 config["name"].as<std::string>()));
 
-  std::string source = "";
+  urdf::Model urdf;
 
-  bool is_static = _initUrdf(config, source);
+  std::string source = _readUrdf(config);
+
+  bool is_static;
+  try
+  {
+    is_static = _initUrdf(source, urdf);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw(std::invalid_argument(e.what() + std::string(" for mapping: ") +
+                                config["name"].as<std::string>()));
+  }
 
   RigidBodyDynamics::Model model;
   // Init RBDL model
   try
   {
-    model = _initModel(is_static, source);
+    _initModel(is_static, source, model);
   }
   catch (...)
   {
@@ -1025,5 +1133,5 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
       mapNew[map[i]] = i;
   }
 
-  biMaps().addMap(BiMap(config["name"].as<std::string>(), mapNew));
+  biMaps().add(BiMap(config["name"].as<std::string>(), mapNew));
 }

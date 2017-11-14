@@ -138,26 +138,19 @@ std::string mwoibn::robot_class::RobotRos::_readConfigString(YAML::Node config,
   std::string string_config;
 
   if (!_node.getParam(prefix, string_config))
-    throw std::invalid_argument(std::string("Wrong ") + name + std::string(" source: ") +
-                                prefix);
+    throw std::invalid_argument(std::string("Wrong ") + name +
+                                std::string(" source: ") + prefix);
 
   return string_config;
 }
 
-bool mwoibn::robot_class::RobotRos::_initUrdf(YAML::Node config,
-                                              std::string& source)
+bool mwoibn::robot_class::RobotRos::_initUrdf(std::string& urdf_description,
+                                              urdf::Model& urdf)
 {
-
-  std::stringstream errMsg;
-  urdf::Model urdf;
-
-  source = _readUrdf(config);
-
-  if (!urdf.initString(source))
+  if (!urdf.initString(urdf_description))
   {
-    errMsg << "Could not load urdf description  for mapping " +
-                  config["name"].as<std::string>();
-    throw(std::invalid_argument(errMsg.str().c_str()));
+    throw(std::invalid_argument(
+        std::string("Could not load urdf description")));
   }
   return (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
              ? false
@@ -165,15 +158,34 @@ bool mwoibn::robot_class::RobotRos::_initUrdf(YAML::Node config,
   ;
 }
 
-RigidBodyDynamics::Model
-mwoibn::robot_class::RobotRos::_initModel(bool is_static,
-                                          const std::string& source)
+srdf::Model
+mwoibn::robot_class::RobotRos::_initSrdf(std::string& srdf_description,
+                                         urdf::Model& urdf)
 {
-  RigidBodyDynamics::Model model;
+  srdf::Model srdf;
+
+  if (srdf_description == "")
+  {
+    std::cout << " WARNING: srdf file has not been defined, it will not be "
+                 "initialized" << std::endl;
+    return srdf;
+  }
+
+  if (!srdf.initString(urdf, srdf_description))
+  {
+    throw(std::invalid_argument("Could not load srdf description"));
+  }
+
+  return srdf;
+}
+
+void mwoibn::robot_class::RobotRos::_initModel(bool is_static,
+                                               const std::string& source,
+                                               RigidBodyDynamics::Model& model)
+{
+  // RigidBodyDynamics::Model model;
   if (!RigidBodyDynamics::Addons::URDFReadFromString(source.c_str(), &model,
                                                      !is_static, false))
     throw std::invalid_argument(
         std::string("Error loading model from string for mapping "));
-
-  return model;
 }

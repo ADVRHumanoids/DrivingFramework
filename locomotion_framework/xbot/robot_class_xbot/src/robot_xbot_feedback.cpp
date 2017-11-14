@@ -47,7 +47,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
 
   _robot = XBot::RobotInterface::getRobot(file);
 
-  biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
+  biMaps().add(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
 
   _loadMappings(robot["mapping"]);
   _loadFeedbacks(robot["feedback"]);
@@ -133,7 +133,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     controllers.add(
         std::unique_ptr<mwoibn::communication_modules::BasicController>(
             new mwoibn::communication_modules::XBotLowerLevel(
-                command, map, entry.second, *_robot)));
+                command, lower_limits, upper_limits, map, entry.second, *_robot)));
 
     _move = true;
 

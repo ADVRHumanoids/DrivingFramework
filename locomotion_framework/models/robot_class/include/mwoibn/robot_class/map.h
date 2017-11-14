@@ -222,6 +222,22 @@ protected:
   mwoibn::VectorInt _active;
 };
 
+class MapState
+{
+public:
+  MapState(std::string name, VectorN map) : _name(name), _map(map) {}
+
+  virtual ~MapState() {}
+
+  std::string getName() const { return _name; }
+  VectorN get() const { return _map; }
+  double getDofs() const { return _map.size(); }
+
+protected:
+  std::string _name;
+  VectorN _map;
+};
+
 } // namespace package
 } // namespace library
 #endif // MAP_H

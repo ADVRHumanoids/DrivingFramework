@@ -75,7 +75,7 @@ void mwoibn::robot_class::RobotXBotRT::_init(
 
   _robot = XBot::RobotInterface::getRobot(file);
 
-  biMaps().addMap(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
+  biMaps().add(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
   //  _xbot_map = biMaps().getId("XBOT");
 
   _loadFeedbacks(robot["feedback"], shared_memory);

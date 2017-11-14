@@ -331,6 +331,12 @@ target_link_libraries(my_test
     ${catkin_LIBRARIES}
  )
 
+add_executable(joint_states src/joint_states.cpp)
+add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joint_states
+    ${catkin_LIBRARIES}
+ )
+
 add_executable(contact_test src/contact_test.cpp)
 add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(contact_test

@@ -66,9 +66,10 @@ protected:
 
   std::string _readConfigString(YAML::Node config, std::string name);
 
-  virtual bool _initUrdf(YAML::Node config, std::string& source);
-  virtual RigidBodyDynamics::Model _initModel(bool is_static,
-                                         const std::string& source);
+  virtual bool _initUrdf(std::string& urdf_description, urdf::Model& urdf);
+  virtual srdf::Model _initSrdf(std::string& srdf_description, urdf::Model& urdf);
+
+  virtual void _initModel(bool is_static, const std::string& source, RigidBodyDynamics::Model& model);
   bool _spined = false;
   std::unique_ptr<ros::Rate> _rate_ptr;
 

@@ -30,8 +30,6 @@ public:
   mwoibn::robot_class::Robot& init(std::string config_file, std::string config_name,
                                           std::string secondary_file = ""){
       //load config
-      std::cout << "chuj: " << ROS << std::endl;
-
       YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file, secondary_file);
 
       std::string error = "config file:\t" + config_file +

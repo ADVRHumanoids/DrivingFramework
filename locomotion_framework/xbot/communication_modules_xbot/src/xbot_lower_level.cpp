@@ -2,39 +2,30 @@
 
 bool mwoibn::communication_modules::XBotLowerLevel::send()
 {
-//  std::cout << "send()\n";
-    if (_position)
-    {
-//        std::cout << "position" << std::endl;
-//        std::cout << _command.get(mwoibn::robot_class::INTERFACE::POSITION) << std::endl;
-        _robot.getPositionReference(pub);
+  if (_position)
+  {
+    _robot.getPositionReference(pub);
 
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
-                      pub);
-      _robot.setPositionReference(pub);
-    }
-    if (_velocity)
-    {
-//      std::cout << "velocity\n";
+    _limit(mwoibn::robot_class::INTERFACE::POSITION);
+    mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), pub);
+    _robot.setPositionReference(pub);
+  }
+  if (_velocity)
+  {
+    _robot.getVelocityReference(pub);
+    _limit(mwoibn::robot_class::INTERFACE::VELOCITY);
+    mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), pub);
+    _robot.setVelocityReference(pub);
+  }
+  if (_torque)
+  {
+    _robot.getEffortReference(pub);
+    _limit(mwoibn::robot_class::INTERFACE::TORQUE);
+    mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), pub);
+    _robot.setEffortReference(pub);
+  }
 
-      //pub.setZero();
-      _robot.getVelocityReference(pub);
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY),
-                      pub);
-      _robot.setVelocityReference(pub);
-    }
-    if (_torque)
-    {
-//        std::cout << "torque" << std::endl;
-//        std::cout << _command.get(mwoibn::robot_class::INTERFACE::TORQUE) << std::endl;
-      //pub.setZero(_dofs); // maybe remove?
-      _robot.getEffortReference(pub);
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE),
-                      pub);
-      _robot.setEffortReference(pub);
-    }
-    
-      _robot.setStiffness(stiffness);
-      _robot.setDamping(damping);
-    return true;
+  _robot.setStiffness(stiffness);
+  _robot.setDamping(damping);
+  return true;
 }

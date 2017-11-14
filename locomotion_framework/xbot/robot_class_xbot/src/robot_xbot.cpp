@@ -23,7 +23,7 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
   config = config["xbot"];
 
   mwoibn::robot_class::Robot::_init(_readUrdf(config["source"]),
-                                    _readSrdf(config["source"]), true);
+                                    _readSrdf(config["source"]));
 
   config_robot["actuators"]["source"] = config["source"]["actuators"];
   config_robot["contacts"]["source"] = config["source"]["contacts"];
@@ -41,41 +41,41 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
   return config_robot;
 }
 
-std::string mwoibn::robot_class::RobotXBot::_readUrdf(YAML::Node config)
-{
-  if (!config["urdf"])
-    throw std::invalid_argument(
-        std::string("Please define an urdf source in the yaml file."));
+//std::string mwoibn::robot_class::RobotXBot::_readUrdf(YAML::Node config)
+//{
+//  if (!config["urdf"])
+//    throw std::invalid_argument(
+//        std::string("Please define an urdf source in the yaml file."));
 
-  if (!config["urdf"]["file"])
-    throw(std::invalid_argument(
-        "Please define an urdf source in the yaml file.\n"));
+//  if (!config["urdf"]["file"])
+//    throw(std::invalid_argument(
+//        "Please define an urdf source in the yaml file.\n"));
 
-  std::string file = "";
-  if (config["urdf"]["path"])
-    file = config["urdf"]["path"].as<std::string>();
+//  std::string file = "";
+//  if (config["urdf"]["path"])
+//    file = config["urdf"]["path"].as<std::string>();
 
-  file += config["urdf"]["file"].as<std::string>();
+//  file += config["urdf"]["file"].as<std::string>();
 
-  return file;
-}
+//  return file;
+//}
 
-std::string mwoibn::robot_class::RobotXBot::_readSrdf(YAML::Node config)
-{
+//std::string mwoibn::robot_class::RobotXBot::_readSrdf(YAML::Node config)
+//{
 
-  if (!config["srdf"])
-    return "";
-  if (config["srdf"]["file"].as<std::string>() == "")
-    return "";
+//  if (!config["srdf"])
+//    return "";
+//  if (config["srdf"]["file"].as<std::string>() == "")
+//    return "";
 
-  std::string file = "";
-  if (config["srdf"]["path"])
-    file = config["srdf"]["path"].as<std::string>();
+//  std::string file = "";
+//  if (config["srdf"]["path"])
+//    file = config["srdf"]["path"].as<std::string>();
 
-  file += config["srdf"]["file"].as<std::string>();
+//  file += config["srdf"]["file"].as<std::string>();
 
-  return file;
-}
+//  return file;
+//}
 
 void mwoibn::robot_class::RobotXBot::_readActuators(YAML::Node config)
 {

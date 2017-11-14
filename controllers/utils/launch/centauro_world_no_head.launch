@@ -100,7 +100,7 @@
 
   <!-- run gazebo -->
   <group if="$(arg gazebo)">
-  	<group if="$(eval controller in ['high', 'medium', 'low'])">
+  	<group if="$(eval middleware in ['ros_control'])">
   		<!-- ros_control centauro launch file -->
 	  	<include file="$(find centauro_control)/launch/centauro_control.launch">
 		    <arg name="torso_actuators" value="$(arg torso_actuators)" if="$(arg torso)"/>

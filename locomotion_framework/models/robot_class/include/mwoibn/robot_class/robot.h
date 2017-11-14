@@ -48,8 +48,7 @@ public:
    * are inconsistencies in the output from certain RBDL functions between two
    * types of models
    */
-  Robot(std::string urdf_description, std::string srdf_description = "",
-        bool from_file = false);
+  Robot(std::string urdf_description, std::string srdf_description = "");
 
   virtual ~Robot() {}
 
@@ -59,7 +58,7 @@ public:
   //! Returns number of actuated(?) DOFs
   int getDofs() { return _model.dof_count; }
   
-  virtual double rate() {};
+  virtual double rate() {}
 
   //! Returns pointer to the robot model
   RigidBodyDynamics::Model& getModel() { return _model; }
@@ -94,6 +93,7 @@ public:
   Actuators& actuators() { return _actuators; }
   Mappings<BiMap>& biMaps() { return _bi_maps; }
   Mappings<SelectorMap>& selectors() { return _selector_maps; }
+  Mappings<MapState>& groupStates() {return _group_states; }
 
   const mwoibn::VectorInt& getActuationState() { return _actuation; }
 
@@ -107,6 +107,10 @@ public:
   robot_class::State state;
   //! Keeps current commands to be send to the robot
   robot_class::State command;
+
+  //! keep state limits
+  robot_class::State lower_limits; // read from urdf?
+  robot_class::State upper_limits;
 
   /** @brief Keeps pointers for all external controllers */
   Controllers controllers;
@@ -192,6 +196,7 @@ protected:
   //! Mappings Module
   Mappings<BiMap> _bi_maps;
   Mappings<SelectorMap> _selector_maps;
+  Mappings<MapState> _group_states;
 
   /** @brief Keeps information about robot actuation type
    *
@@ -205,8 +210,7 @@ protected:
   Eigen::VectorXi _actuation;
 
   //! Internal initialization function
-  void _init(std::string urdf_description, std::string srdf_description,
-             bool from_file = false);
+  void _init(std::string urdf_description, std::string srdf_description);
 
   //! keeps link - joint mapping
   typedef boost::bimap<boost::bimaps::set_of<std::string>,
@@ -214,9 +218,13 @@ protected:
   boost_map _map_names;
   void _initMapNames(boost::shared_ptr<const urdf::Link> link);
 
-  virtual bool _initUrdf(YAML::Node config, std::string& source);
-  virtual RigidBodyDynamics::Model _initModel(bool is_static,
-                                         const std::string& source);
+  virtual std::string _readUrdf(YAML::Node config);
+  virtual std::string _readSrdf(YAML::Node config);
+
+  virtual bool _initUrdf( std::string& urdf_description, urdf::Model& urdf);
+  virtual srdf::Model _initSrdf( std::string& srdf_description, urdf::Model& urdf);
+
+  virtual void _initModel(bool is_static, const std::string& source, RigidBodyDynamics::Model& model);
 
   virtual void _loadContacts(YAML::Node contacts_config);
   virtual void _loadActuators(YAML::Node actuators_config);
@@ -235,6 +243,11 @@ protected:
                               std::string config_name);
   YAML::Node _readConfig(const YAML::Node lists, const YAML::Node defined,
                          YAML::Node config);
+  void _readJointLimits(urdf::Model& urdf);
+  void _readGroupStates(srdf::Model& srdf);
+
+
+
   void _getDefaultPosition(YAML::Node config, bool position, bool orientation,
                            bool angels);
   bool _loadFeedback(YAML::Node entry, std::string name);

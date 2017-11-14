@@ -39,8 +39,8 @@ public:
 protected:
   RobotXBot(){}
   YAML::Node _init(YAML::Node config, std::string config_name);
-  std::string _readUrdf(YAML::Node config);
-  std::string _readSrdf(YAML::Node config);
+//  std::string _readUrdf(YAML::Node config);
+//  std::string _readSrdf(YAML::Node config);
 
   int _base_ref = -1;
 //  virtual void _readContacts();

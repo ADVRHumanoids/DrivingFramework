@@ -16,13 +16,28 @@ public:
   Mappings(){}
   ~Mappings(){}
 
-  bool addMap(Map map){
+  bool add(Map map){
 
     // add checking if the map has already been defined
     if(isDefined(map.getName())) return false;
 
     _mappings.push_back(map);
     return true;
+  }
+
+  void remove(int i){
+      if(i < _mappings.size())
+        _mappings.erase(_mappings.begin()+i);
+  }
+
+  void remove(std::string name){
+    if(isDefined(name))
+      _mappings.erase(_mappings.begin()+getId(name));
+  }
+
+
+  void update(Map map){
+    _mappings[getId(map.getName())] = map;
   }
 
   const Map& get(int i) const {

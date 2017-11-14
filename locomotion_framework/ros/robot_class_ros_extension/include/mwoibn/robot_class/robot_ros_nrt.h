@@ -61,7 +61,7 @@ public:
   void _initMappingCallback(const MessagePtr& msg, bool* valid,
                             std::string name)
   {
-    biMaps().addMap(makeBiMap(getLinks(msg->name), name));
+    biMaps().add(makeBiMap(getLinks(msg->name), name));
     *valid = true;
   }
 

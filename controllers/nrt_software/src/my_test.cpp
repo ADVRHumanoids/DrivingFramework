@@ -5,19 +5,8 @@
 
 #include <mwoibn/loaders/robot.h>
 
-#include <mwoibn/hierarchical_control/hierarchical_controller.h>
-#include <mwoibn/hierarchical_control/joint_positions_task.h>
-#include <mwoibn/hierarchical_control/center_of_mass_task.h>
-#include <mwoibn/hierarchical_control/constraints_task.h>
-#include <mwoibn/hierarchical_control/controller_task.h>
-#include <mwoibn/hierarchical_control/cartesian_selective_task.h>
-#include <mwoibn/hierarchical_control/orientation_world_task.h>
-#include <mwoibn/hierarchical_control/orientation_selective_task.h>
-
-#include <mwoibn/point_handling/robot_points_handler.h>
 #include <custom_services/updatePDGains.h>
 #include <custom_services/updatePrint.h>
-
 
 #include <custom_services/updatePDGains.h>
 #include <mwoibn/eigen_utils/eigen_utils.h>
@@ -33,7 +22,7 @@ int main(int argc, char** argv)
             "gravity_test"); // initalize node needed for the service
 
   ros::NodeHandle n;
-  ros::Rate rate(200);
+
   std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
 
   mwoibn::loaders::Robot loader;
