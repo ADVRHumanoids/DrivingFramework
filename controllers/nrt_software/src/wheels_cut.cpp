@@ -3,8 +3,6 @@
 #include <mgnss/controllers/wheeled_motion.h>
 #include <mgnss/controllers/wheeled_references.h>
 #include <custom_services/updatePDGains.h>
-#include <mwoibn/robot_class/robot_ros_nrt.h>
-#include <mwoibn/robot_class/robot_xbot_nrt.h>
 
 bool evenstHandler(custom_services::updatePDGains::Request& req,
                    custom_services::updatePDGains::Response& res,

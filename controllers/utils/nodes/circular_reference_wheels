@@ -1,0 +1,47 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+import rospy
+from numpy import cos, sin
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_reference')
+    dt = 0.005
+    rate = rospy.Rate(1.0/dt)
+    print(1.0/dt)
+    name = '/centauro/wheels_command'
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+
+    dth, r, th, magic = -0.1, 2.5, 0.0, 3.14
+
+    while not rospy.is_shutdown():
+      th = th + dth * dt * magic
+
+      dx = -r*cos(th)*dth*100.0
+      dy = -r*sin(th)*dth*100.0
+
+      print("dx\t", dx, "dy\t", dy, "th\t", th)
+      try:
+        ref_service(1.0, 1.0, dx)
+        ref_service(1.0, 2.0, dy)
+        ref_service(1.0, 4.0, dth*100)
+      except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
+
+
+      rate.sleep()
+
+
+
+

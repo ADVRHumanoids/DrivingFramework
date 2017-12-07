@@ -1,5 +1,5 @@
 driving_apth: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/advr-superbuild/robots/"
+simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
 mwoibn:
         middleware: "ROS"
         robot:

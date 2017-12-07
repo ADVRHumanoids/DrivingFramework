@@ -44,7 +44,7 @@ bool referenceHandler(custom_services::jointStateCmnd::Request& req,
                       mgnss::controllers::JointStates* controller)
 {
 
-  if(!controller->setPosition(req.position)){
+  if(!controller->setFullPosition(req.position)){
       res.message = "Position " + req.position + " has not been defined in the robot";
   }
   //controller->setVelocity(req.velocity);

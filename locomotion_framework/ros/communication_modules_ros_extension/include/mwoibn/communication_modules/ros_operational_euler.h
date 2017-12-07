@@ -102,7 +102,9 @@ public:
 
   void get(const MessagePtr& msg)
   {
+    _initialized = true;
 
+    if(!_size) return;
     if (_position)
     {
       // this works for the QUATERNION:HAMILTONIAN CONVENTION
@@ -126,7 +128,6 @@ public:
       getVelocity(_full);
     }
 
-    _initialized = true;
   }
 
 protected:

@@ -1,3 +1,6 @@
+#ifndef __MWOIBN_POINT_HANDLING_MAKE_LOG_H
+#define __MWOIBN_POINT_HANDLING_MAKE_LOG_H
+
 #include <iostream>
 #include <ros/ros.h>
 #include <string>
@@ -140,3 +143,4 @@ void makeLog() {
 } // namespace package
 } // namespace library
 
+#endif

@@ -24,7 +24,9 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  OrientationSelectiveTask(point_handling::OrientationsHandler ik, mwoibn::VectorN selector, mwoibn::robot_class::Robot& robot)
+  OrientationSelectiveTask(point_handling::OrientationsHandler ik,
+                           mwoibn::VectorN selector,
+                           mwoibn::robot_class::Robot& robot)
       : OrientationWorldTask(ik, robot), _selector(selector)
   {
     _resize();
@@ -38,16 +40,16 @@ public:
 
   //! updates task error based on the current state of the robot and task
   // reference position
-//  virtual void updateError()
-//  {
-//    OrientationWorldTask::updateError();
-//    _error.noalias() = _error.cwiseProduct(_selector);
-//  }
+  //  virtual void updateError()
+  //  {
+  //    OrientationWorldTask::updateError();
+  //    _error.noalias() = _error.cwiseProduct(_selector);
+  //  }
   virtual void updateError()
   {
     _last_error.noalias() = _error;
 
-  //  std::vector<mwoibn::Quaternion> current = _ik.getFullStatesWorld();
+    //  std::vector<mwoibn::Quaternion> current = _ik.getFullStatesWorld();
 
     int k = 0;
     for (int i = 0; i < _ik.size(); i++)
@@ -56,66 +58,72 @@ public:
 
       _current.ensureHemisphere(_reference[i]);
 
-      _skew <<                 0, -_reference[i].z(),  _reference[i].y(),
-              _reference[i].z(),                  0, -_reference[i].x(),
-             -_reference[i].y(),  _reference[i].x(),                  0;
+      _skew << 0, -_reference[i].z(), _reference[i].y(), _reference[i].z(), 0,
+          -_reference[i].x(), -_reference[i].y(), _reference[i].x(), 0;
 
       _axis = _current.axis();
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) = _reference[i].w() * _axis;
+      _full_error.segment(k, _ik.getPointJacobianRows(i)) =
+          _reference[i].w() * _axis;
       _axis = _reference[i].axis();
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) -= _current.w() * _axis;
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) += _skew * _current.axis();
+      _full_error.segment(k, _ik.getPointJacobianRows(i)) -=
+          _current.w() * _axis;
+      _full_error.segment(k, _ik.getPointJacobianRows(i)) +=
+          _skew * _current.axis();
 
       k += _ik.getPointJacobianRows(i);
 
-  //    _previous_state[i] = _current;
-  //    std::cout << "orientation" << _error << "\n done" << std::endl;
+      //    _previous_state[i] = _current;
+      //    std::cout << "orientation" << _error << "\n done" << std::endl;
     }
 
     int j = 0;
 
-//    std::cout << "_error" << std::endl;
-//    std::cout << _error << std::endl;
-//    std::cout << "_full_error" << std::endl;
-//    std::cout << _full_error << std::endl;
-//    std::cout << "_selector" << std::endl;
-//    std::cout << _selector << std::endl;
+    //    std::cout << "_error" << std::endl;
+    //    std::cout << _error << std::endl;
+    //    std::cout << "_full_error" << std::endl;
+    //    std::cout << _full_error << std::endl;
+    //    std::cout << "_selector" << std::endl;
+    //    std::cout << _selector << std::endl;
 
+    for (int i = 0; i < _full_error.size(); i++)
+    {
 
-    for(int i = 0; i < _full_error.size(); i++){
-
-      if (_selector[i]) {_error[j] = _full_error[i]; j++;}
+      if (_selector[i])
+      {
+        _error[j] = _full_error[i];
+        j++;
+      }
     }
-
-
   }
 
   //! updates task Jacobian based on the current state of the robot
 
-//  virtual void updateJacobian()
-//  {
-//    OrientationWorldTask::updateJacobian();
+  //  virtual void updateJacobian()
+  //  {
+  //    OrientationWorldTask::updateJacobian();
 
-//    for(int i = 0; i < _jacobian.rows(); i++){
+  //    for(int i = 0; i < _jacobian.rows(); i++){
 
-//      if (_selector[i]) continue;
-//      _jacobian.row(i).setZero();
-//    }
+  //      if (_selector[i]) continue;
+  //      _jacobian.row(i).setZero();
+  //    }
 
-//  }
+  //  }
 
   virtual void updateJacobian()
   {
     _last_jacobian.noalias() = _jacobian;
     _full_jacobian.noalias() = _ik.getFullJacobian();
 
-
     int j = 0;
-    for(int i = 0; i < _full_jacobian.rows(); i++){
-
-      if (_selector[i]) {_jacobian.row(j) = _full_jacobian.row(i); j++;}
+    for (int i = 0; i < _full_jacobian.rows(); i++)
+    {
+      if (_selector[i])
+      {
+        _jacobian.row(j) = _full_jacobian.row(i);
+        j++;
+      } // it removes control over a specific angle
     }
-
   }
 
   void updateSelection(int i, double value)
@@ -124,28 +132,24 @@ public:
       _selector[i] = value;
 
     _resize();
-
   }
 
-
-
-
 protected:
-
   mwoibn::VectorN _selector, _full_error;
   mwoibn::Matrix _full_jacobian;
 
-  void _resize(){
+  void _resize()
+  {
     int size = 0;
-     for (int i = 0; i < _selector.size(); i++)
-       if(_selector[i]) size++;
+    for (int i = 0; i < _selector.size(); i++)
+      if (_selector[i])
+        size++;
 
-     _full_jacobian.setZero(_jacobian.rows(), _jacobian.cols());
-     _full_error.setZero(_error.size());
+    _full_jacobian.setZero(_jacobian.rows(), _jacobian.cols());
+    _full_error.setZero(_error.size());
 
-     _init(size, _ik.getFullJacobianCols());
+    _init(size, _ik.getFullJacobianCols());
   }
-
 };
 } // namespace package
 } // namespace library

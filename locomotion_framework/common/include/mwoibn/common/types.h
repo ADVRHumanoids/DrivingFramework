@@ -23,8 +23,8 @@
 #ifdef DECOMPOSITIONS_EIGEN
   #include "mwoibn/eigen_utils/eigen_utils.h"
 #endif
-#include "float.h"
-
+#include <float.h>
+#include <math.h>
 #define RT_SIZE 50
 #define FS_SIZE 8
 
@@ -35,6 +35,7 @@ typedef RigidBodyDynamics::Math::VectorNd VectorN;
 typedef RigidBodyDynamics::Math::Vector3d Vector3;
 
 typedef Vector3 Point;
+typedef Vector3 Axis;
 
 typedef RigidBodyDynamics::Math::MatrixNd Matrix;
 typedef Eigen::Matrix<double, 6, 6> Matrix6;
@@ -53,6 +54,10 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 typedef eigen_utils::PseudoInverse2<mwoibn::Matrix> PseudoInverse;
 typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited> PseudoInverseLimited;
 typedef mwoibn::eigen_utils::AgumentedNullSpaceProjection<mwoibn::Matrix> Projection;
+
+const double PI= M_PI;
+const double HALF_PI= M_PI_2;
+const double TWO_PI= 2*PI;
 
 const double MAX_DOUBLE= DBL_MAX;
 const double EPS =  std::numeric_limits<double>::epsilon();

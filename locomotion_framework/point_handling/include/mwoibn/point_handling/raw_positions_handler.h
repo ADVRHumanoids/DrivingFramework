@@ -185,6 +185,21 @@ public:
     return _fullState;
   }
 
+  virtual mwoibn::VectorN
+  getFullStateWorld(const mwoibn::VectorN& joint_states, bool update = false) const
+  {
+    mwoibn::VectorN state;
+    state.setZero(_fullState.size());
+    for (int i = 0; i < _points.size(); i++)
+    {
+      state.segment(getStateSize() * i, getStateSize()) =
+          getPointStateWorld(i, joint_states, update);
+      update = false;
+    }
+
+    return state;
+  }
+
   /** @brief Returns a RBDL vector of States for all points. States are returned
    *in the points own frames. State \f$ x \f$ is in the same order as in
    *equation

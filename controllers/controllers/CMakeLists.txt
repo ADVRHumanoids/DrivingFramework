@@ -15,7 +15,7 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers)
+LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers joint_space_controllers)
 LIST( APPEND CATKIN_DEPENDS_SET robot_class hierarchical_control dynamic_models gravity_compensation motor_side_reference)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -29,6 +29,7 @@ catkin_package(
   LIBRARIES
         wheeled_motion
         centralized_controllers
+        joint_space_controllers
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -42,8 +43,10 @@ include_directories(
 
 
 add_library(wheeled_motion
-   src/wheeled_motion.cpp
-   src/wheeled_references.cpp
+   src/steering.cpp                 
+   src/wheeled_motion.cpp     
+   src/wheeled_references.cpp 
+   src/wheeled_motion_full.cpp
  )
 
 add_dependencies(wheeled_motion ${catkin_EXPORTED_TARGETS})
@@ -63,6 +66,21 @@ target_link_libraries(centralized_controllers
    ${catkin_LIBRARIES}
  )
 
+
+add_library(joint_space_controllers
+   src/joint_states.cpp 
+ )
+
+add_dependencies(joint_space_controllers wheeled_motion ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(joint_space_controllers
+   wheeled_motion
+   ${catkin_LIBRARIES}
+ )
+
+#MESSAGE( WARNING "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX} )
+#MESSAGE( WARNING "CMAKE_DEVEL_PREFIX: " ${CMAKE_DEVEL_PREFIX} )
+
 ## Mark executables and/or libraries for installation
  install(TARGETS ${INSTALL_TARGETS}
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -71,8 +89,8 @@ target_link_libraries(centralized_controllers
  )
 
 # Mark cpp header files for installation
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/mgnss/${PROJECT_NAME}
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mgnss/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )

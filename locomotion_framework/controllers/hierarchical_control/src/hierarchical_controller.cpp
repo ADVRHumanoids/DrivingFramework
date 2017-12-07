@@ -97,8 +97,10 @@ void mwoibn::hierarchical_control::HierarchicalController::compute()
     {
             _inversers_ptrs[i]->compute(task->getJacobian(), _P);
             _command.noalias() += _inversers_ptrs[i]->get() * _errors[i];
+//           std::cout << i << "\n" <<  _inversers_ptrs[i]->get() << std::endl;
     }
     ++i;
+
   }
 
   //  _command = q;

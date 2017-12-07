@@ -126,7 +126,7 @@ int main(int argc, char** argv)
   //                    mwoibn::robot_class::INTERFACE::POSITION);
   //    std::cout << "com_point\n" << com_point << std::endl;
 
-  double eps = 0.005;
+//   double eps = 0.005;
   std::cout << "orientation reference\n " << pelvis_orientation.getReference(0)
             << std::endl;
   std::cout << "orientation offset\n " << pelvis_orientation.getOffset(0)

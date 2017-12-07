@@ -173,12 +173,11 @@ LIST(APPEND INSTALL_TARGETS
  )
 
 ## Mark cpp header files for installation
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/mwoibn/robot_class
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
 
 
 if(CATKIN_ENABLE_TESTING)

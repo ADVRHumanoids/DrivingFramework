@@ -28,6 +28,11 @@ public:
       : BasicFeedback(command, map, config)
   {
 
+    _size = 0;
+    for (int i = 0; i < map.reversed().size(); i++){
+      if (map.reversed()[i] != mwoibn::NON_EXISTING)
+        _size++;
+    }
     if (!config["output_angles"])
       throw(std::invalid_argument("Missing required argument output angels."));
     if (!config["output_angles"]["angle_1"])
@@ -176,7 +181,7 @@ protected:
   mwoibn::VectorInt _map_dofs;
   mwoibn::VectorN _full;
 
-  int _size = 6;
+  int _size;
 };
 }
 }

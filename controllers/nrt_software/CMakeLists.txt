@@ -124,6 +124,8 @@ if(WHEELS_MOTION)
   LIST( APPEND INSTALL_TARGETS
 #    wheeled_locomotion_6
     wheels_cut
+    wheels_cut_v2
+    wheels_full
 #    wheeled_motion_run
   )
   LIST( APPEND CATKIN_DEPENDS_SET
@@ -145,6 +147,7 @@ if(TEST_TEMP)
   LIST( APPEND INSTALL_TARGETS
     my_test
     contact_test
+    joint_states
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -275,6 +278,17 @@ target_link_libraries(wheels_cut
     ${catkin_LIBRARIES}
  )
 
+add_executable(wheels_cut_v2 src/wheels_cut_v2.cpp)
+add_dependencies(wheels_cut_v2 ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_cut_v2
+    ${catkin_LIBRARIES}
+ )
+
+add_executable(wheels_full src/wheels_full.cpp)
+add_dependencies(wheels_full ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_full
+    ${catkin_LIBRARIES}
+ )
 #add_executable(wheeled_motion_run src/wheeled_motion_run.cpp)
 #add_dependencies(wheeled_motion_run ${catkin_EXPORTED_TARGETS})
 #target_link_libraries(wheeled_motion_run
@@ -365,8 +379,8 @@ endif(TEST_TEMP)
  )
 
 # Mark cpp header files for installation
- install(DIRECTORY include/mgnss/${PROJECT_NAME}/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/mgnss/${PROJECT_NAME}
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mgnss/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )

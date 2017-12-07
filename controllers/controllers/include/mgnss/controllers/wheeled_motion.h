@@ -32,23 +32,9 @@ public:
 
   void updateSupport(const mwoibn::VectorN& support)
   {
-//    for (int i = 0; i < 4; i++)
-//      _steering_ptr->setReference(i, support.segment<2>(2 * i));
     _steering_ptr->setReference(support);
   }
 
-/*  void updateBase(const mwoibn::Vector3& pose, const double heading)
-  {
-    
-    position.head(2) = pose.head(2);
-    position[2] = heading;
-
-    _pelvis_position_ptr->setReference(0, pose);
-
-    _pelvis_orientation_ptr->setReference(
-        0, _pelvis_orientation_ptr->getOffset(0) *
-               mwoibn::Quaternion::fromAxisAngle(axis, heading));
-  }*/
 
     void updateBase(const mwoibn::Vector3& velocity, const double omega)
   {
@@ -59,14 +45,8 @@ public:
     }
 
     _pelvis_state += velocity*_robot.rate();
-    //_pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0) + 
     _heading += omega * _robot.rate();
     _heading -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
-
-    // limit to -pi:pi
-
-    //_steering_ptr->setPelvisPosition(_pelvis_state);
-    //_steering_ptr->setPelvisHeading(_pelvis_state);
 
     _pelvis_position_ptr->setReference(0, _pelvis_state);
 
@@ -134,7 +114,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
       _leg_z_ptr;
 
-  std::unique_ptr<events::Steering> _steering_ref_ptr;
+  std::unique_ptr<mgnss::events::Steering> _steering_ref_ptr;
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 

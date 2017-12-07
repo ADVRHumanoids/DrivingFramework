@@ -24,7 +24,9 @@ set(SOURCE_FILES "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
+set(INSTALL_TARGETS "")
 
+LIST( APPEND INSTALL_TARGETS  communication_modules_xbot )
 LIST( APPEND CATKIN_DEPENDS_SET robot_class)
 LIST( APPEND SOURCE_FILES src/xbot_lower_level.cpp src/xbot_feedback_online.cpp src/xbot_operational_euler.cpp)
 
@@ -74,19 +76,18 @@ target_link_libraries(communication_modules_xbot
 
 ## Install ##
 #############
+install(TARGETS ${INSTALL_TARGETS}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables and/or libraries for installation
- install(TARGETS communication_modules_xbot
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
-
-
-# Mark cpp header files for installation
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/mwoibn/communication_modules
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
+
+
 

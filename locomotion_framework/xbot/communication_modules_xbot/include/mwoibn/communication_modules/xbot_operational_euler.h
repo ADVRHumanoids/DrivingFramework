@@ -30,7 +30,7 @@ protected:
   mwoibn::Matrix3 _rotation;
   mwoibn::VectorN _base;
   double _rate;
-
+  bool _is_static;
 
 };
 }

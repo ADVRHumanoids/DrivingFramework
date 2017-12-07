@@ -96,9 +96,9 @@ target_link_libraries(communication_modules_ros
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
-# Mark cpp header files for installation
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+## Mark cpp header files for installation
+ install(DIRECTORY include/mwoibn/communication_modules
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )

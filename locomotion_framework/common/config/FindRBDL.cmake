@@ -14,8 +14,6 @@ SET (RBDL_FOUND FALSE)
 SET (RBDL_LuaModel_FOUND FALSE)
 SET (RBDL_URDFReader_FOUND FALSE)
 
-MESSAGE( WARNINIG "SUPERBUILD:         " ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/include )
-
 FIND_PATH (RBDL_INCLUDE_DIR rbdl/rbdl.h
 	HINTS
 	$ENV{HOME}/local/include

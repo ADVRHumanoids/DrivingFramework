@@ -189,7 +189,14 @@ HEADERS += common/include/mwoibn/common/ros.h \
     xbot/communication_modules_xbot/include/mwoibn/communication_modules/xbot_operational_euler_from_nrt.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h \
     ros/communication_modules_ros_extension/include/mwoibn/communication_modules/velocity_controller.h \
-    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v4.h
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v4.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/castor_angle_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/camber_angle_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/steering_angle_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/camber_angle_task_2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v5.h \
+    models/loaders/include/mwoibn/loaders/config.h \
+    models/loaders/include/mwoibn/loaders/robot.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \
@@ -348,4 +355,38 @@ DISTFILES += \
     controllers/hierarchical_control/test/resources/self_collision_controller.backup \
     controllers/hierarchical_control/test/resources/self_collision_controller.txt \
     controllers/hierarchical_control/test/resources/self_collisions_controller.backup \
-    controllers/hierarchical_control/test/resources/self_collisions_controller.txt
+    controllers/hierarchical_control/test/resources/self_collisions_controller.txt \
+    xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf \
+    xbot/robot_class_xbot/include/configs/srdf/centauro_lower_body.srdf \
+    xbot/robot_class_xbot/include/configs/urdf/centauro.urdf \
+    xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf \
+    xbot/robot_class_xbot/include/configs/urdf/centauro_static.urdf \
+    xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml \
+    xbot/robot_class_xbot/include/configs/joint_map/centauro_lower_body.yaml \
+    xbot/robot_class_xbot/include/configs/config_centauro.yaml \
+    ros/collision_model_ros_extension/test/launch/test_collision_model_ros.test \
+    ros/robot_class_ros_extension/test/launch/test_robot_ros_nrt.test \
+    xbot/robot_class_xbot/test/launch/test_robot_ros_nrt.test \
+    configs/mwoibn_v2.yaml \
+    ros/collision_model_ros_extension/package.xml \
+    ros/communication_modules_ros_extension/package.xml \
+    ros/robot_class_ros_extension/package.xml \
+    xbot/robot_class_xbot/package.xml \
+    ros/collision_model_ros_extension/config/FindEigen3.cmake \
+    ros/collision_model_ros_extension/config/FindRBDL.cmake \
+    ros/collision_model_ros_extension/config/Findsch_viewer.cmake \
+    ros/communication_modules_ros_extension/config/FindEigen3.cmake \
+    ros/communication_modules_ros_extension/config/FindRBDL.cmake \
+    xbot/robot_class_xbot/config/FindXBotInterface.cmake \
+    xbot/robot_class_xbot/config/FindXCM.cmake \
+    ros/collision_model_ros_extension/CMakeLists.txt \
+    ros/communication_modules_ros_extension/CMakeLists.txt \
+    ros/robot_class_ros_extension/CMakeLists.txt \
+    xbot/robot_class_xbot/CMakeLists.txt
+
+unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/ -lcentralized_controllers
+unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/ -lsimpe_log
+
+INCLUDEPATH += $$PWD/../../../install_release/include
+DEPENDPATH += $$PWD/../../../install_release/include
+INCLUDEPATH += /usr/include/eigen3

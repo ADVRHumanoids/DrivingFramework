@@ -178,8 +178,8 @@ protected:
 // agumented projection of a matrix
 /**
  * \param[in] J the matrix null-space projection is computed for
- * \param[in] P the null-space projection of a previous step
- * \param[in,out] the new null-space projection matrix
+ * \param[in] P0 the null-space projection of a previous step
+ * \param[in,out] P1 the new null-space projection matrix
  * \return an SVD pseudoinverse of a J*P matirx
  *
  */
@@ -233,6 +233,30 @@ flip(Eigen::Matrix<bool, Eigen::Dynamic, 1> vector);
 
 inline void wrapToPi(double& th){
   th -= 6.28318531 * std::floor((th + 3.14159265) / 6.28318531);
+}
+
+//inline void limitToHalfPi(double& th){
+//  th -= 3.14159265 * std::floor((th + 1.57079632679) / 3.14159265) + 1.57079632679;
+//}
+
+
+//template <typename _Matrix_Type_>
+//inline void limitToHalfPi(_Matrix_Type_& vec){
+//  for(int i = 0; i < std::max(vec.rows(), vec.cols()); i++) // How will it work for matrices?
+//    limitToHalfPi(vec[i]);
+//}
+
+template <typename _Matrix_Type_>
+inline _Matrix_Type_ limitToHalfPi(const _Matrix_Type_ vec){
+  _Matrix_Type_ limited = vec;
+  for(int i = 0; i < std::max(vec.rows(), vec.cols()); i++) // How will it work for matrices?
+    limited[i] = limitToHalfPi(vec[i]);
+  return limited;
+}
+
+template <> inline
+  double limitToHalfPi(const double th){
+  return th - 3.14159265 * std::floor((th + 1.57079632) / 3.14159265);
 }
 
 } // namespace package

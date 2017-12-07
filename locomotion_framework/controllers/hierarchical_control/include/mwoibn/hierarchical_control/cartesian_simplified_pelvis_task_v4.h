@@ -30,10 +30,10 @@ public:
                                 mwoibn::robot_class::Robot& robot)
       : CartesianWorldTask(ik), _robot(robot)
   {
-//    _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
-//        "ROOT", robot, {"pelvis"}));
+    _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
+        "ROOT", robot, robot.getLinks("base")));
     _wheels_ptr.reset(
-          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, {"ankle2_1", "ankle2_2", "ankle2_3", "ankle2_4"}));
+          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, robot.getLinks("wheels")));
 
 //    for (int i = 0; i < ik.size(); i++)
 //      _wheels_ptr->addPoint(ik.point(i));
@@ -67,6 +67,7 @@ public:
     _state.setZero(6);
 
     _reference.setZero(_ik.size() * 2);
+    _directions.setZero(_ik.size() * 2);
     _height.setZero(_ik.size());
 
     _jacobian_3D.setZero(_ik.getPointJacobianRows(0),
@@ -80,32 +81,11 @@ public:
     _rotation.setZero(2, 2);
     _jacobian6.setZero(6, 6);
     _zero.setZero(6);
-    _wheels.setZero(ik.size());
+    //_wheels.setZero(ik.size());
     _point2D.setZero(2);
     _full_error.setZero(ik.size() * 2);
-    _pelvis_reference.setZero(6);
     // init the wheels orientations
 
-    mwoibn::VectorN state =
-        robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
-    mwoibn::VectorN test = mwoibn::VectorN::Zero(robot.getDofs());
-
-    robot.state.set(test, mwoibn::robot_class::INTERFACE::POSITION);
-    robot.updateKinematics();
-
-    mwoibn::Quaternion rotation;
-
-    for (int i = 0; i < ik.size(); i++)
-    {
-
-      rotation = _wheels_ptr->getPointStateWorld(i);
-      rotation.w() = -rotation.w();
-
-      _wheels_ptr->setPointStateFixed(i, rotation);
-    }
-
-    robot.state.set(state, mwoibn::robot_class::INTERFACE::POSITION);
-    robot.updateKinematics();
 
     init();
   }
@@ -130,7 +110,7 @@ public:
   virtual void updateError()
   {
     _last_error.noalias() = _error; // save previous state
-    //    updateState(); // this will be updated by steering call
+    //updateState(); // this will be updated by steering call
 
     //std::cout << "state\n" <<  _state << std::endl;
 
@@ -138,80 +118,32 @@ public:
     {
       _point_flat = getPointStateReference(i);
 
-      _rotation << std::cos(_wheels[i] - _state[2]),
-          -std::sin(_wheels[i] - _state[2]), std::sin(_wheels[i] - _state[2]),
-          std::cos(_wheels[i] - _state[2]);
+      _rotation << std::cos( _state[2]), -std::sin( _state[2]),
+          std::sin( _state[2]), std::cos( _state[2]);
 
       _full_error.segment(2 * i, 2).noalias() =
           _reference.segment(2 * i, 2) - _point_flat.head(2);
 
       _point2D.noalias() = _rotation * _full_error.segment(2 * i, 2);
 
-      _error[i] = _point2D[0];
-  //    std::cout << i << " reference\n" <<  _reference.segment(2 * i, 2) << std::endl;
-  //    std::cout << i << " feet placement \n" <<  _point_flat.head(2) << std::endl;
+      _error[i] = _directions[2*i] * _point2D[0] + _directions[2*i + 1] * _point2D[1];
 
     }
-  //  std::cout << "error\n" << _error << std::endl;
 
-  }
-
-  void setPelvisPosition(const mwoibn::Vector3& position){
-    _pelvis_reference.head(3) = position;
-  }
-  void setPelvisOrientation(const mwoibn::Quaternion& quaternion){
-
-    setPelvisOrientation(quaternion.toMatrix());
-  }
-
-  void setPelvisOrientation(const mwoibn::Matrix3& rotation){
-    _pelvis_reference.tail(3) = rotation.transpose().eulerAngles(2, 1, 0);
-  }
-
-  void setPelvisHeading(double heading){
-    _pelvis_reference[3] = heading;
   }
 
   void updateState()
   {
     // update state
 
-   // _temp_point = _pelvis_ptr->getPointStateWorld(0);
-    _temp_point = _pelvis_reference.head(3);
+    _temp_point = _pelvis_ptr->getPointStateWorld(0);
     _state[0] = _temp_point[0];
     _state[1] = _temp_point[1];
     _state[3] = _temp_point[2];
 
-    //_temp_point = _pelvis_ptr->point(0)
-    //                  .getRotationWorld(_robot.state.get(
-    //                      mwoibn::robot_class::INTERFACE::POSITION))
-    //                  .transpose()
-    //                  .eulerAngles(2, 1, 0);
-    _temp_point = _pelvis_reference.tail(3);
-
-    //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
-    //    -pi:pi)
-    _temp_point[0] -=
-        6.28318531 * std::floor((_temp_point[0] + 3.14159265) / 6.28318531);
-    _temp_point[1] -=
-        6.28318531 * std::floor((_temp_point[1] + 3.14159265) / 6.28318531);
-    _temp_point[2] -=
-        6.28318531 * std::floor((_temp_point[2] + 3.14159265) / 6.28318531);
-
-    if (std::fabs(_temp_point[0] - _state[2]) > 1.57079633 &&
-        std::fabs(_temp_point[0] - _state[2]) < 4.71238898)
-    {
-      _temp_point[0] -= 3.14159265;
-      _temp_point[1] = -_temp_point[1];
-      _temp_point[2] -= 3.14159265;
-    }
-
-    _temp_point[0] -=
-        6.28318531 * std::floor((_temp_point[0] + 3.14159265) / 6.28318531);
-    _temp_point[1] -=
-        6.28318531 * std::floor((_temp_point[1] + 3.14159265) / 6.28318531);
-    _temp_point[2] -=
-        6.28318531 * std::floor((_temp_point[2] + 3.14159265) / 6.28318531);
+    getAngles(_pelvis_ptr->point(0)
+                      .getRotationWorld(_robot.state.get(
+                          mwoibn::robot_class::INTERFACE::POSITION)));
 
     _state[2] = _temp_point[0];
     _state[4] = _temp_point[1];
@@ -221,12 +153,19 @@ public:
 
 //    std::cout << "wheels" << std::endl;
 
-    for (int i = 0; i < _wheels.size(); i++)
+    for (int i = 0; i <  _ik.size(); i++)
     {
-      getAngles(_wheels_ptr->point(i).getRotationWorld(
-          _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)));
-      _wheels[i] = _temp_point[0];
-//      std::cout << _wheels[i] << std::endl;
+      mwoibn::Vector3 axis, direction;
+      axis << 0, 0, 1;
+      direction = _wheels_ptr->point(i)
+                           .getRotationWorld(_robot.state.get(
+                               mwoibn::robot_class::INTERFACE::POSITION))
+                           .row(2); // z axis
+
+      direction = direction.cross(axis); //?
+      direction.normalize();
+
+      _directions.segment<2>(2*i) = direction.head(2);
     }
   }
 
@@ -299,13 +238,7 @@ public:
 
     for (int i = 0; i < _ik.size(); i++)
     {
-      _rotation << std::cos(_wheels[i]), -std::sin(_wheels[i]),
-          std::sin(_wheels[i]), std::cos(_wheels[i]);
-
-      _jacobian_2D_bis.noalias() =
-          _rotation * _jacobian_2D.block(2 * i, 0, 2, _robot.getDofs());
-
-      _jacobian.row(i).noalias() = -_jacobian_2D_bis.row(0);
+      _jacobian.row(i).noalias() = - _directions.segment<2>(2*i).transpose() * _jacobian_2D.block(2 * i, 0, 2, _robot.getDofs());
     }
 
  //   std::cout << "_jacobian" << std::endl;
@@ -360,13 +293,14 @@ public:
   const mwoibn::VectorN& getWorldError() const { return _full_error; }
 
 protected:
-  mwoibn::VectorN _state, _height, _zero, _wheels, _point2D, _full_error, _pelvis_reference;
-//  std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
+  mwoibn::VectorN _state, _height, _zero, _wheels, _point2D, _full_error, _directions;
+  std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
   mwoibn::robot_class::Robot& _robot;
   RigidBodyDynamics::Model _flat_model;
   mwoibn::Vector3 _point_flat, _temp_point;
   std::vector<int> _ids;
+
   mwoibn::Matrix _jacobian_3D, _jacobian_flat_3D, _jacobian_flat_2D, _rotation,
       _jacobian6, _jacobian_2D, _jacobian_2D_bis;
   mwoibn::PseudoInverse _inverser;

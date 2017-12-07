@@ -99,8 +99,8 @@ if(VISUALIZATION_MODULE)
 endif(VISUALIZATION_MODULE)
 
 ## Mark cpp header files for installation
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/mwoibn/collision_model
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )

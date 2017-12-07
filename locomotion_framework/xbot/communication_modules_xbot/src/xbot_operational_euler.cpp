@@ -8,6 +8,9 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 
   std::map<std::string, XBot::ImuSensor::ConstPtr> imus = robot.getImu();
 
+  if(!map.reversed().size()) _is_static = false;
+  else _is_static = true;
+
   if (!config["sensor"] && imus.size() == 1)
   {
     _imu = imus.begin()->second;
@@ -55,13 +58,10 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 bool mwoibn::communication_modules::XBotOperationalEuler::get()
 {
 
-  _imu->getOrientation(_rotation);
-//  _imu->getLinearAcceleration(_linear_state);
-//  _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
-//  std::cout << "velocity\n" << _base << std::endl;
-//  _linear_state[2] -= 9.81;
+  if(!_size) return true;
 
-//  _linear_state = _rotation*_linear_state;
+  _imu->getOrientation(_rotation);
+
   getPosition(_rotation, _linear_state);
   return true;
 
@@ -70,11 +70,6 @@ bool mwoibn::communication_modules::XBotOperationalEuler::get()
 void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Matrix3 orientation,
                            mwoibn::Vector3 velocity)
   {
-
-//    _command.get(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
-
-//    _base.head(3) -= velocity*(_rate*_rate/2);
-//    _base.head(3) += velocity*_rate;
 
     _base.tail(3) =
         (_offset_orientation * orientation)

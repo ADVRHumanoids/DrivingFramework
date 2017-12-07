@@ -100,6 +100,11 @@ public:
     return rawHandler::getFullStateWorld(_positions, false);
   }
 
+  virtual mwoibn::VectorN getFullStateWorld() const
+  {
+    return rawHandler::getFullStateWorld(_positions, false);
+  }
+
   virtual const mwoibn::Matrix&
   getPointJacobian(unsigned int id) const
   {

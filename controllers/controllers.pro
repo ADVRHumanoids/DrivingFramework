@@ -26,7 +26,10 @@ HEADERS += rt_plugins/include/rt_plugins/all.h \
     rt_plugins/include/mgnss/rt_plugins/wheeled_controller.h \
     rt_plugins/include/mgnss/rt_plugins/combined_controller.h \
     development/include/cartesian_simplified_pelvis_task.h \
-    development/include/cartesian_simplified_pelvis_task_v3.h
+    development/include/cartesian_simplified_pelvis_task_v3.h \
+    odometry/include/mgnss/odometry/odometry.h \
+    controllers/include/mgnss/controllers/wheeled_motion_full.h \
+    controllers/include/mgnss/controllers/joint_states.h
 SOURCES += communication/src/basic_handler.cpp \
            communication/src/events_handler.cpp \
            communication/src/gazebo_base_to_RT.cpp \
@@ -62,4 +65,34 @@ SOURCES += communication/src/basic_handler.cpp \
     rt_plugins/src/online_centralized_controller_plugin.cpp \
     controllers/src/online_centralized_controller.cpp \
     nrt_software/src/online_centralized_controller.cpp \
-    rt_plugins/src/combined_controller.cpp
+    rt_plugins/src/combined_controller.cpp \
+    nrt_software/src/odometry.cpp \
+    odometry/src/odometry.cpp \
+    controllers/src/wheeled_motion_full.cpp \
+    controllers/src/steering.cpp \
+    nrt_software/src/wheels_full.cpp \
+    nrt_software/src/joint_states.cpp \
+    controllers/src/joint_states.cpp \
+    nrt_software/src/wheels_cut_v2.cpp \
+    nrt_software/src/contact_test.cpp
+
+unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/
+
+INCLUDEPATH += /opt/ros/kinetic/include
+INCLUDEPATH += /usr/include/eigen3
+
+INCLUDEPATH += $$PWD/../../../install_release/include
+DEPENDPATH += $$PWD/../../../install_release/include
+INCLUDEPATH += $$PWD/../../../install_debug/include
+DEPENDPATH += $$PWD/../../../install_debug/include
+
+DISTFILES += \
+    utils/nodes/__init__.py \
+    utils/nodes/collision_test \
+    utils/nodes/inertia_error_generator \
+    utils/nodes/load_fixed_transforms \
+    utils/launch/centauro_world.launch \
+    utils/launch/centauro_world_no_head.launch \
+    utils/launch/rrbot_rviz.launch \
+    utils/launch/tasks.launch \
+    utils/nodes/circular_reference_wheels

@@ -1,0 +1,164 @@
+#ifndef PROGRAMS_WHEELED_MOTION_H
+#define PROGRAMS_WHEELED_MOTION_H
+
+#include <mwoibn/robot_class/robot.h>
+
+#include <mwoibn/hierarchical_control/hierarchical_controller.h>
+#include <mwoibn/hierarchical_control/constraints_task.h>
+
+#include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h>
+#include <mgnss/controllers/steering.h>
+
+#include <mwoibn/hierarchical_control/cartesian_selective_task.h>
+#include <mwoibn/hierarchical_control/orientation_selective_task.h>
+#include <mwoibn/hierarchical_control/castor_angle_task.h>
+#include <mwoibn/hierarchical_control/camber_angle_task_2.h>
+#include <mwoibn/hierarchical_control/steering_angle_task.h>
+
+namespace mwoibn
+{
+
+class WheeledMotionFull
+{
+
+public:
+  WheeledMotionFull(mwoibn::robot_class::Robot& robot);
+
+  ~WheeledMotionFull() {}
+
+  void init() { _steering_ptr->init(); }
+  void resetSteering();
+
+  void setSteering(int i, double th)
+  {
+    _leg_steer_ptr->setReference(i, th);
+  }
+//  void setCastor(int i, double th)
+//  {
+//    _leg_castor_ptr->setReference(i, th);
+//  }
+  void setCamber(int i, double th)
+  {
+    _leg_camber_ptr->setReference(i, th);
+  }
+  mwoibn::VectorN getSteering() { return steerings; }
+
+  void updateSupport(const mwoibn::VectorN& support)
+  {
+    _steering_ptr->setReference(support);
+  }
+
+  void updateBase(const mwoibn::Vector3& velocity, const double omega)
+  {
+
+    //    for (int i = 0; i < _pelvis_state.size(); i++)
+    //    {
+    //      if (_previous_command[i] != velocity[i])
+    //        _pelvis_state[i] =
+    //            _pelvis_position_ptr->points().getPointStateWorld(0)[i];
+    //      _previous_command[i] = velocity[i];
+    //    }
+
+    _pelvis_state += velocity * _robot.rate();
+    _heading += omega * _robot.rate();
+    _heading -= 6.28318531 * std::floor((_heading + 3.14159265) /
+                                        6.28318531); // limit -pi:pi
+
+    _pelvis_position_ptr->setReference(0, _pelvis_state);
+
+    _pelvis_orientation_ptr->setReference(
+        0, _pelvis_orientation_ptr->getOffset(0) *
+               mwoibn::Quaternion::fromAxisAngle(axis, _heading));
+  }
+
+  void steering();
+
+  void fullUpdate(const mwoibn::VectorN& support,
+                  const mwoibn::Vector3& velocity, const double omega);
+  void compute();
+
+  void nextStep(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity,
+                const double omega);
+
+  void update(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity,
+              const double omega);
+
+  double limit(const double th);
+
+  bool isRunning() { return _robot.isRunning(); }
+
+  bool isDonePosition(const double eps)
+  {
+    return _isDone(*_pelvis_position_ptr, eps);
+  }
+  bool isDoneOrientation(const double eps)
+  {
+    return _isDone(*_pelvis_orientation_ptr, eps);
+  }
+  bool isDoneSteering(const double eps) const
+  {
+    return _isDone(*_leg_steer_ptr, eps);
+  }
+  bool isDonePlanar(const double eps) const
+  {
+    return _isDone(*_steering_ptr, eps);
+  }
+//  bool isDoneWheels(const double eps) const
+//  {
+//    return _isDone(*_leg_castor_ptr, eps);
+//  }
+
+  const mwoibn::VectorN& getSupportReference()
+  {
+    return _steering_ptr->getReference();
+  }
+  const mwoibn::VectorN& getBodyPosition()
+  {
+    return _pelvis_position_ptr->getReference();
+  }
+
+protected:
+  bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,
+               const double eps) const
+  {
+    return task.getError().cwiseAbs().maxCoeff() < eps;
+  }
+  mwoibn::robot_class::Robot& _robot;
+
+  std::unique_ptr<mwoibn::hierarchical_control::ConstraintsTask>
+      _constraints_ptr;
+
+  std::unique_ptr<mwoibn::hierarchical_control::CartesianSelectiveTask>
+      _pelvis_position_ptr;
+  std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
+      _pelvis_orientation_ptr;
+
+  std::unique_ptr<mwoibn::hierarchical_control::CartesianSimplifiedPelvisTask>
+      _steering_ptr;
+
+//  std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
+//      _leg_z_ptr;
+
+  std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
+      _leg_camber_ptr;
+//  std::unique_ptr<mwoibn::hierarchical_control::CastorAngleTask>
+//      _leg_castor_ptr;
+  std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
+      _leg_steer_ptr;
+
+  std::unique_ptr<mgnss::events::Steering> _steering_ref_ptr;
+
+  mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
+
+  double rate = 200;
+  double _dt, orientation = 0, _heading;
+  mwoibn::VectorN steerings, _command, _previous_command;
+  mwoibn::Vector3 axis, _next_step, _pelvis_state;
+  bool _reference = false;
+  mwoibn::VectorInt _select_steer;
+  mwoibn::VectorN _l_limits, _u_limits, _test_limits, _velocities;
+  int count = 0;
+};
+}
+
+#endif // WHEELED_MOTION_H

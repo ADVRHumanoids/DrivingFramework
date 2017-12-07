@@ -112,12 +112,12 @@
 		    <arg name="controller" value="$(arg controller)"/>
 	  	</include>
   	</group>
-  	<group unless="$(arg rviz)">
+  	<!-- <group unless="$(arg rviz)">
 	        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
 			<param name="publish_frequency" type="double" value="250.0"/>
                         <remap from="/joint_states" to="/centauro/joint_states"/>
 	        </node>
-  	</group>
+  	</group> -->
   </group>
 
 

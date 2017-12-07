@@ -136,8 +136,12 @@ install(TARGETS ${INSTALL_TARGETS}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 # Mark cpp header files for installation
-install(DIRECTORY include
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.h"
-        PATTERN ".svn" EXCLUDE
-)
+ install(DIRECTORY include/mwoibn/robot_class
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
+   FILES_MATCHING PATTERN "*.h"
+   PATTERN ".svn" EXCLUDE
+ )
+
+install(DIRECTORY include/configs
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/include
+  PATTERN ".svn" EXCLUDE)

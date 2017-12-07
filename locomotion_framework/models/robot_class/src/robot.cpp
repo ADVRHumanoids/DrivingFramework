@@ -872,14 +872,14 @@ void mwoibn::robot_class::Robot::_getDefaultPosition(YAML::Node config,
   mwoibn::Vector3 offset_position = mwoibn::Vector3::Zero();
   mwoibn::Matrix3 offset_orientation = mwoibn::Matrix3::Identity();
 
-  for (int i = 0;
-       i < _model.GetBodyId(config["dofs"]["name"].as<std::string>().c_str());
-       i++)
-  {
+  int ref = _model.GetBodyId(config["dofs"]["name"].as<std::string>().c_str());
 
-    offset_position += _model.GetJointFrame(i).r;
+  while (ref != 0)
+  {
+    offset_position += _model.GetJointFrame(ref).r;
     offset_orientation =
-        offset_orientation * _model.GetJointFrame(i).E.transpose();
+        offset_orientation * _model.GetJointFrame(ref).E.transpose();
+    ref = _model.GetParentBodyId(ref);
   }
   if (orientation)
   {

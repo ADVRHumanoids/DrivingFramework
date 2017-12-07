@@ -189,6 +189,20 @@ public:
     return _fullState;
   }
 
+  mwoibn::VectorN getFullStateWorld(const mwoibn::VectorN& joint_states,
+                                            bool update = false) const
+  {
+    mwoibn::VectorN state;
+    state.setZero(_fullState.size());
+
+    for (int i = 0; i < _points.size(); i++)
+    {
+      mwoibn::Quaternion::toVector(getPointStateWorld(i, joint_states, update), state, getStateSize() * i);
+      update = false;
+    }
+    return state;
+  }
+
   virtual const mwoibn::VectorN& getFullStateFixed()
   {
 
