@@ -55,7 +55,7 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
   gain << 25 * ratio;
   _hierarchical_controller.addTask(_leg_z_ptr.get(), gain, task, damp);
   task++;
-  gain << 30 * ratio;
+  gain << 20 * ratio;
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
@@ -66,17 +66,17 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 30 * ratio;
-  _hierarchical_controller.addTask(_leg_xy_ptr.get(), gain, task, 1e-3);
+  gain << 50 * ratio;
+  _hierarchical_controller.addTask(_leg_xy_ptr.get(), gain, task, 0.1);
   task++;
 
   _dt = _robot.rate();
 
-  mwoibn::Vector3 init_steerings;
+  mwoibn::VectorN init_steerings;
   init_steerings.setZero(4);
 
   _steering_ref_ptr.reset(
-      new mgnss::events::Steering(_robot, *_steering_ptr, init_steerings, 0.7, 0.3, _dt));
+      new mgnss::events::Steering(_robot, *_steering_ptr, init_steerings, 0.7, 0.3, _dt, 0.1));
 
   steerings.resize(_leg_z_ptr->points().size());
   axis << 0, 0, 1;
@@ -88,6 +88,15 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
                               _leg_xy_ptr->getOffset(i) *
                                   mwoibn::Quaternion::fromAxisAngle(axis, 0.0));
   }
+
+
+  _select_steer = robot.getDof(robot.getLinks("camber"));
+  _l_limits.setZero(_select_steer.size());
+  _u_limits.setZero(_select_steer.size());
+//  _test_limits.setZero(_leg_steer_ptr->size());
+  robot.lower_limits.get(_l_limits, _select_steer);
+  robot.upper_limits.get(_u_limits, _select_steer);
+
 
   _pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0);
   _pelvis_position_ptr->setReference(_pelvis_state);
@@ -175,11 +184,16 @@ void mwoibn::WheeledMotion::steering()
   _steering_ref_ptr->compute(_next_step);
 
   steerings.noalias() = _steering_ref_ptr->get();
-
+  std::cout << "steerings\t";
+  std::cout << steerings.transpose();
   for (int i = 0; i < 4; i++)
   {
+    steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
+    steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
     _leg_z_ptr->setReference(
         i, _leg_z_ptr->getOffset(i) *
                mwoibn::Quaternion::fromAxisAngle(axis, steerings[i]));
   }
+  _steering_ref_ptr->set(steerings);
+  std::cout << steerings.transpose() << std::endl;
 }

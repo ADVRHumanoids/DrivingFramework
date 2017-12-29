@@ -32,7 +32,7 @@
   <arg name="imu" default="true"/>
 
   <arg name="middleware" default="ros_control"/>
-  <arg name="xbot_config_file"  default="../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml" />
+  <arg name="xbot_config_file"  default="../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml" />
 
   <arg name="collision_model" default="primitives"/>
   <arg name="visual_model" default="mesh"/>

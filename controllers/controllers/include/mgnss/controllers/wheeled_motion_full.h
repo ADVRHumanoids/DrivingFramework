@@ -41,6 +41,50 @@ public:
   {
     _leg_camber_ptr->setReference(i, th);
   }
+
+  void rotateBaseX(double th)
+  {
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_x, th)*_orientation;
+  }
+
+  void rotateBaseY(double th)
+  {
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_y, th)*_orientation;
+  }
+
+  void setBaseRotVelX(double dth){
+    _angular_vel[0] = dth;
+  }
+  void setBaseRotVelY(double dth){
+    _angular_vel[1] = dth;
+  }
+
+  void setBaseX(double x){
+    _position[0] = x;
+  }
+  void setBaseY(double y){
+    _position[1] = y;
+  }
+  void setBaseZ(double z){
+    _position[2] = z;
+  }
+  void setBaseHeading(double th){
+    _heading = th;
+  }
+
+  void setBaseDotX(double dx){
+    _linear_vel[0] = dx;
+  }
+  void setBaseDotY(double dy){
+    _linear_vel[1] = dy;
+  }
+  void setBaseDotZ(double dz){
+    _linear_vel[2] = dz;
+  }
+  void setBaseDotHeading(double th){
+    _angular_vel[2] = th;
+  }
+
   mwoibn::VectorN getSteering() { return steerings; }
 
   void updateSupport(const mwoibn::VectorN& support)
@@ -48,8 +92,11 @@ public:
     _steering_ptr->setReference(support);
   }
 
-  void updateBase(const mwoibn::Vector3& velocity, const double omega)
-  {
+//  void updateBase(const mwoibn::Vector3& velocity, const double omega)
+//  {
+//      _linear_vel = velocity;
+//      _angular_vel[2] = omega;
+//  }
 
     //    for (int i = 0; i < _pelvis_state.size(); i++)
     //    {
@@ -58,30 +105,31 @@ public:
     //            _pelvis_position_ptr->points().getPointStateWorld(0)[i];
     //      _previous_command[i] = velocity[i];
     //    }
+  void updateBase(){
 
-    _pelvis_state += velocity * _robot.rate();
-    _heading += omega * _robot.rate();
+    _position += _linear_vel * _robot.rate();
+    _heading += _angular_vel[2] * _robot.rate();
     _heading -= 6.28318531 * std::floor((_heading + 3.14159265) /
                                         6.28318531); // limit -pi:pi
 
-    _pelvis_position_ptr->setReference(0, _pelvis_state);
+//    std::cout << "_heading\t" << _heading << std::endl;
+
+    _pelvis_position_ptr->setReference(0, _position);
+
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate())*_orientation;
 
     _pelvis_orientation_ptr->setReference(
-        0, _pelvis_orientation_ptr->getOffset(0) *
-               mwoibn::Quaternion::fromAxisAngle(axis, _heading));
+        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading) * _orientation);
   }
 
   void steering();
 
-  void fullUpdate(const mwoibn::VectorN& support,
-                  const mwoibn::Vector3& velocity, const double omega);
+  void fullUpdate(const mwoibn::VectorN& support);
   void compute();
 
-  void nextStep(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity,
-                const double omega);
+  void nextStep(const mwoibn::VectorN& support);
 
-  void update(const mwoibn::VectorN& support, const mwoibn::Vector3& velocity,
-              const double omega);
+  void update(const mwoibn::VectorN& support);
 
   double limit(const double th);
 
@@ -136,13 +184,9 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::CartesianSimplifiedPelvisTask>
       _steering_ptr;
 
-//  std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
-//      _leg_z_ptr;
-
   std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
       _leg_camber_ptr;
-//  std::unique_ptr<mwoibn::hierarchical_control::CastorAngleTask>
-//      _leg_castor_ptr;
+
   std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
       _leg_steer_ptr;
 
@@ -153,11 +197,14 @@ protected:
   double rate = 200;
   double _dt, orientation = 0, _heading;
   mwoibn::VectorN steerings, _command, _previous_command;
-  mwoibn::Vector3 axis, _next_step, _pelvis_state;
+  mwoibn::Vector3 _next_step, _position, _angular_vel, _linear_vel;
+  mwoibn::Axis _x, _y, _z;
+  mwoibn::Quaternion _orientation;
   bool _reference = false;
   mwoibn::VectorInt _select_steer;
-  mwoibn::VectorN _l_limits, _u_limits, _test_limits, _velocities;
+  mwoibn::VectorN _l_limits, _u_limits, _test_limits;
   int count = 0;
+
 };
 }
 

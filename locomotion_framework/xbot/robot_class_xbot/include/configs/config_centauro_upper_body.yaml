@@ -1,68 +1,4 @@
-# CENTAURO config
-XBotInterface:
-#  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
-#  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
-#  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
-  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
-  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_lower_body.srdf"
-  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
-#  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_upperbody.urdf"
-#  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_xbot_cut.srdf"
-#  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_upperbody.yaml"
-
-RobotInterface:
-  framework_name: "ROS"
-
-ModelInterface:
-  model_type: "RBDL"
-  is_model_floating_base: "false"
-
-RobotInterfaceROS:
-  subclass_name: "RobotInterfaceROS"
-  path_to_shared_lib: "libRobotInterfaceROS.so"
-  subclass_factory_name: "robot_interface_ros"
-  control_message_type: "AdvrCommandMessage"
-  jointstate_message_type: "AdvrJointStateMessage"
-  ft_topic_names: []
-  imu_topic_names: ["/xbotcore/centauro/imu/imu_link"]
-
-RobotInterfaceXBotRT:
-  subclass_name: "RobotInterfaceXBotRT"
-  path_to_shared_lib: "libRobotInterfaceXBotRT.so"
-  subclass_factory_name: "robot_interface_xbot_rt"
-
-XBotRTPlugins:
-  plugins: ["HomingExample"]
-#  plugins: ["HomingExample", "RtMyTest", "CombinedController", "OnlineCentralizedControllerPlugin"]
-
-MasterCommunicationInterface:
-  framework_name: "ROS"
-
-NRTPlugins:
-  plugins: [] 
-
-AdvrCommandMessage:
-  subclass_name: "CommandAdvr"
-  path_to_shared_lib: "libAdvrCommandMessage.so"
-  subclass_factory_name: "advrcommandmessage_control_message"
-  joint_service_name: "/centauro/position_controller/get_joint_names"
-  command_topic_name: "/xbotcore/centauro/command"
-
-AdvrJointStateMessage:
-  subclass_name: "AdvrJointState"
-  path_to_shared_lib: "libAdvrJointStateMessage.so"
-  subclass_factory_name: "advrjointstate_jointstate_message"
-  joint_state_topic_name: "/xbotcore/centauro/joint_states"
-
-RobotInterfaceDUMMY:
-  subclass_name: "RobotInterfaceDUMMY"
-  path_to_shared_lib: "libRobotInterfaceDUMMY.so"
-  subclass_factory_name: "robot_interface_dummy"
-
-ModelInterfaceRBDL:
-  subclass_name: "ModelInterfaceRBDL"
-  path_to_shared_lib: "libModelInterfaceRBDL.so"
-  subclass_factory_name: "model_interface_rbdl"
+RobotName: "centauro"
 
 GazeboXBotPlugin:
   gains:
@@ -77,56 +13,6 @@ GazeboXBotPlugin:
     j_arm2_4: {p: 5000, d: 30}
     j_arm2_6: {p: 2000, d: 5}
     torso_yaw: {p: 5000, d: 30}
-    hip_yaw_1:  &hip_yaw {p: 5000, d: 20}
-    hip_yaw_2: *hip_yaw
-    hip_yaw_3: *hip_yaw
-    hip_yaw_4: *hip_yaw
-    hip_pitch_1: &hip_pitch {p: 5000, d: 20}
-    hip_pitch_2: *hip_pitch
-    hip_pitch_3: *hip_pitch
-    hip_pitch_4: *hip_pitch
-    knee_pitch_1: &knee_pitch {p: 5000, d: 20}
-    knee_pitch_2: *knee_pitch
-    knee_pitch_3: *knee_pitch
-    knee_pitch_4: *knee_pitch
-    ankle_yaw_1: &ankle_yaw {p: 5000, d: 20}
-    ankle_yaw_2: *ankle_yaw
-    ankle_yaw_3: *ankle_yaw
-    ankle_yaw_4: *ankle_yaw
-    ankle_pitch_1: &ankle_pitch {p: 5000, d: 20}
-    ankle_pitch_2: *ankle_pitch
-    ankle_pitch_3: *ankle_pitch
-    ankle_pitch_4: *ankle_pitch
-    j_wheel_1: &wheel {p: 0, d: 5}
-    j_wheel_2: *wheel
-    j_wheel_3: *wheel
-    j_wheel_4: *wheel
-
-mwoibnRobot:
-  robot1:
-        config_file: &config /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
-        config_name: default
-        secondary_file: &confg_centralized /home/malgorzata/catkin_ws/src/DrivingFramework/controllers/rt_plugins/include/configs/centralized_controller.yaml
-  robot2:
-        config_file: *config
-        config_name: reference
-        secondary_file: *confg_centralized
-  robot3:
-        config_file: *config
-        config_name: my_test
-        secondary_file: *confg_centralized
-  higher_scheme:
-        config_file: *config
-        config_name: higher_scheme
-  default:
-        config_file: *config
-        config_name: default
-
-
-x_bot_core:
-  urdf_path: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/urdf/centauro_bonn_review.urdf
-  srdf_path: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/srdf/centauro_bonn_review.srdf
-  joint_map_config: /home/embedded/robotology-superbuild/configs/ADVR_shared/centauro/joint_map/centauro_bonn_review.yaml
 
 x_bot_ecat:
   name: XBotCore
@@ -211,7 +97,7 @@ CentAcESC_1:
   control_mode: pos_3b
   sign: 1
   pos_offset: 0
-  max_current_A: 10.0
+  max_current_A: 15.0
   pid :
     position:   [180.0 , 0.0 , 1.0]
     # pos_Kp pos_Kd tor_Kp tor_Kd tor_Ki
@@ -363,4 +249,5 @@ CentAcESC_15:
   pid :
     position: [150.0 , 0.0 , 5.0]
     #  .... tor_K divided by 10000 to respect the int range [0..65536]
-impedance: [100.0, 3.0, 1.0, 0.001, 0.0]
+    impedance:  [100.0, 3.0, 1.0, 0.001, 0.0]
+

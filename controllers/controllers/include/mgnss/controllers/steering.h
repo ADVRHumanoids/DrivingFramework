@@ -26,6 +26,7 @@ public:
   ~Steering() {}
 
   const mwoibn::VectorN& get() { return _b_st; }
+  void set(mwoibn::VectorN last) {_b_st = last;}
 
   void compute(const mwoibn::Vector3 next_step);
 

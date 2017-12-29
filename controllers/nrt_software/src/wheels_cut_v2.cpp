@@ -6,7 +6,7 @@
 
 bool evenstHandler ( custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res,
-                     mwoibn::SupportPolygon* support, mwoibn::Base* base, mwoibn::WheeledMotionFull* controller );
+                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionFull* controller );
 
 int main ( int argc, char** argv )
 {
@@ -32,7 +32,7 @@ int main ( int argc, char** argv )
         support.setStep ( 0.0005 );
         
         
-        mwoibn::Base base;
+//        mwoibn::Base base;
 
 //  base.heading.setUpperLimit(2 * 3.1416 / 180);
 //  base.heading.setLowerLimit(-2 * 3.1416 / 180);
@@ -40,7 +40,7 @@ int main ( int argc, char** argv )
         ros::ServiceServer service =
                 n.advertiseService<custom_services::updatePDGains::Request, custom_services::updatePDGains::Response> (
                         "wheels_command",
-                        boost::bind ( &evenstHandler, _1, _2, &support, &base, &wheeld_controller ) );
+                        boost::bind ( &evenstHandler, _1, _2, &support, &wheeld_controller ) );
 
 // starting
 
@@ -49,41 +49,71 @@ int main ( int argc, char** argv )
 
         while ( ros::ok() ) {
                 support.update();
-                wheeld_controller.fullUpdate ( support.get(), base.getPosition(),
-                                               base.getHeading() );
+                wheeld_controller.fullUpdate ( support.get() );
         }
 
 }
 
 bool evenstHandler ( custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res,
-                     mwoibn::SupportPolygon* support, mwoibn::Base* base, mwoibn::WheeledMotionFull *controller )
+                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionFull *controller )
 {
-//        std::cout << "Event!\n" << "req.p\t" << req.p << "\n req.d\t" << req.d << "\n req.nr\t" << req.nr << std::endl;
+//  std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr << std::endl;
 
-        bool correct = true;
-        if ( req.p == 1 ) { // base
+  if ( req.p == 1 ) { // base
                 if ( req.d == 1 )
-                        base->setX ( req.nr/100.0 );
+                        controller->setBaseDotX ( req.nr/100.0 );
                 else if ( req.d == 2 )
-                        base->setY ( req.nr/100.0 );
+                        controller->setBaseDotY ( req.nr/100.0 );
                 else if ( req.d == 3 )
-                        base->setZ ( req.nr/100.0 );
+                        controller->setBaseDotZ ( req.nr/100.0 );
+                else if ( req.d == 4 ){
+                        controller->setBaseDotHeading ( req.nr/100.0 );
+                }
+                else if ( req.d == 5)
+                        controller->setBaseRotVelX ( req.nr/100.0 );
+                else if ( req.d == 6)
+                        controller->setBaseRotVelY ( req.nr/100.0 );
+                else{
+                  res.success = false;
+                  return false;
+                }
+                res.success = true;
+                return true;
+        }
+        if ( req.p == 2 ) { // base
+                if ( req.d == 1 )
+                        controller->setBaseX ( req.nr/100.0 );
+                else if ( req.d == 2 )
+                        controller->setBaseY ( req.nr/100.0 );
+                else if ( req.d == 3 )
+                        controller->setBaseZ ( req.nr/100.0 );
                 else if ( req.d == 4 )
-                        base->setHeading ( req.nr/100.0 );
-        } else if ( req.p == 2 ) { // support
+                        controller->setBaseHeading ( req.nr/100.0 );
+                else if ( req.d == 5)
+                        controller->rotateBaseX ( req.nr/100.0 );
+                else if ( req.d == 6)
+                        controller->rotateBaseY ( req.nr/100.0 );
+                else{
+                  res.success = false;
+                  return false;
+                }
+                res.success = true;
+                return true;
+        }
+        if ( req.p == 3 ) { // support
                 mwoibn::SUPPORT_MOTION motion;
                 mwoibn::SUPPORT_STATE state;
 
                 if ( req.d > 0 && req.d < 3 ) {
                         motion = static_cast<mwoibn::SUPPORT_MOTION> ( req.d );
 
-                        if ( req.nr > 2 || req.nr < 0 )
-                                correct = false;
-                        else
-                                state = static_cast<mwoibn::SUPPORT_STATE> ( req.nr );
-                        if ( correct )
-                                support->initMotion ( motion, state );
+                        if ( req.nr > 2 || req.nr < 0 ){
+                          res.success = false;
+                          return false;
+                        }
+                        state = static_cast<mwoibn::SUPPORT_STATE> ( req.nr );
+                        support->initMotion ( motion, state );
                 } else if ( req.d == 3 ) {
                         support->setStep ( req.nr/10000.0 );
                 } else if ( req.d == 4 ) {
@@ -92,16 +122,29 @@ bool evenstHandler ( custom_services::updatePDGains::Request& req,
                         support->setLowerLimit ( req.nr/100.0 );
                 } else if ( req.d == 6 ) {
                         support->setRadious ( req.nr/100.0 );
-                } else correct = false;
-        } else if ( req.p == 3 ) { // base
+                } else{
+                  res.success = false;
+                  return false;
+                }
+                res.success = true;
+                return true;
+        } else if ( req.p == 4 ) { // base
+                if(req.d > 3 || req.d < 0){
+                  res.success = false;
+                  return false;
+                }
                 controller->setSteering ( req.d, req.nr*3.14/180 );
-//        } else if ( req.p == 4 ) { // base
-//                controller->setCastor ( req.d, req.nr*3.14/180 );
         } else if ( req.p == 5 ) { // base
-                controller->setCamber ( req.d, req.nr*3.14/180 );
-        } else
-                correct = false;
+                if(req.d > 3 || req.d < 0){
+                  res.success = false;
+                  return false;
+                }
+                controller->setCamber ( req.d, req.nr*3.14/180/10 );
+        } else{
+          res.success = false;
+          return false;
+        }
 
-        res.success = correct;
-        return correct;
+        res.success = true;
+        return true;
 }

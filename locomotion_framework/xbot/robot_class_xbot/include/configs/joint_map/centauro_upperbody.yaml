@@ -1,0 +1,22 @@
+joint_map:
+  1: torso_yaw
+  2: j_arm2_1
+  3: j_arm2_2
+  4: j_arm2_3
+  5: j_arm2_4
+  6: j_arm2_5
+  7: j_arm2_6
+  8: j_arm2_7
+  9: j_arm1_1
+  10: j_arm1_2
+  11: j_arm1_3
+  12: j_arm1_4
+  13: j_arm1_5
+  14: j_arm1_6
+  15: j_arm1_7
+  53: j_ft_arm2
+  54: j_ft_arm1
+#  98: j_fl_foot_ft
+#  97: j_fr_foot_ft
+#  96: j_hl_foot_ft
+#  95: j_hr_foot_ft

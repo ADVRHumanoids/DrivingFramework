@@ -2,22 +2,22 @@
 
 void mgnss::events::limit(double b_ref, double& b)
 {
+//  b -= mwoibn::PI * std::floor((b + mwoibn::HALF_PI) /
+//                               mwoibn::PI); // this should normalize to -pi;pi
+//  b_ref -= mwoibn::PI * std::floor((b_ref + mwoibn::HALF_PI) / mwoibn::PI);
 
-  b -= mwoibn::PI * std::floor((b + mwoibn::HALF_PI) /
-                               mwoibn::PI); // this should normalize to -pi;pi
-  b_ref -= mwoibn::PI * std::floor((b_ref + mwoibn::HALF_PI) / mwoibn::PI);
-//  std::cout << "b \t" << b  << "\t";
-//  std::cout << "b_ref \t" << b_ref  << "\t";
+  mwoibn::eigen_utils::wrapToPi(b);
+  mwoibn::eigen_utils::wrapToPi(b_ref);
 
-//  std::cout << "std::fabs(b - b_ref)\t" << (std::fabs(b - b_ref)) << "\t";
+  if((std::fabs(b - b_ref) > mwoibn::HALF_PI) &&
+     (std::fabs(b - b_ref) < 3 * mwoibn::HALF_PI))
+    std::cout << b - b_ref << std::endl;
 
-//  std::cout << "std::fabs(b - b_ref) < mwoibn::HALF_PI\t" << (std::fabs(b - b_ref) < mwoibn::HALF_PI)  << "\t";
-//  std::cout << "std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI\t" << (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI) << std::endl;
-
-  b = ((std::fabs(b - b_ref) < mwoibn::HALF_PI) ||
-       (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI))
+  b = ((std::fabs(b - b_ref) < mwoibn::HALF_PI + 0.1) ||
+       (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI - 0.1))
           ? b
           : (b - b_ref < 0) ? b + mwoibn::PI : b - mwoibn::PI;
+
 }
 
 void mgnss::events::limit(const mwoibn::VectorN& b_ref, mwoibn::VectorN& b)
@@ -146,7 +146,7 @@ void mgnss::events::Steering::compute(const mwoibn::Vector3 next_step)
 //  bool slow = false;
   for (int i = 0; i < _size; i++)
   {
-    double vel = std::fabs(_v_icm[i] + _v_sp[i]);
+    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_icm[i]));
     //      std::cout << _plane.getReference(i)[0] << "\t";
     //      std::cout << _plane.getReference(i)[1] << "\t";
 
@@ -160,7 +160,7 @@ void mgnss::events::Steering::compute(const mwoibn::Vector3 next_step)
                          _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
                              _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
 
-      limit(_b_st[i] - _heading, _b[i]); // do I need it?
+      limit(_b_st[i] - _heading, _b[i]);
       _temp[i] = _b[i] - (_b_st[i] - _heading);
 
       _b[i] = _b_st[i] - _heading;
@@ -176,6 +176,7 @@ void mgnss::events::Steering::compute(const mwoibn::Vector3 next_step)
                              _K_sp * _v_sp[i] * std::sin(_b_sp[i]),
                          _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
                              _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
+      limit(_b_st[i] - _heading, _b[i]);
     }
     _b_st[i] = _b[i] + _heading; // do give the result in the world frame
 

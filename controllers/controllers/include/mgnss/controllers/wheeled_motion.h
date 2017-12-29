@@ -122,6 +122,8 @@ protected:
   double _dt, orientation = 0, _heading;
   mwoibn::VectorN steerings, _command, _previous_command;
   mwoibn::Vector3 axis, _next_step, _pelvis_state;
+  mwoibn::VectorInt _select_steer;
+  mwoibn::VectorN _l_limits, _u_limits;//, _test_limits;
   bool _reference = false;
 
 };

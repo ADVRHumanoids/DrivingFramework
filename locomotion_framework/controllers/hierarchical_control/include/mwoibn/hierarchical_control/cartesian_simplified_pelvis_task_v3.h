@@ -202,26 +202,20 @@ public:
 
     //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
     //    -pi:pi)
-    _temp_point[0] -= 6.28318531 * std::floor((_temp_point[0] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[1] -= 6.28318531 * std::floor((_temp_point[1] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[2] -= 6.28318531 * std::floor((_temp_point[2] + 3.14159265) /
-                                              6.28318531); //-pi:pi
+    mwoibn::eigen_utils::wrapToPi(_temp_point[0]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[1]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[2]);
 
-    if (std::fabs(_temp_point[1]) > 1.57079633)
+    if (std::fabs(_temp_point[1]) > mwoibn::HALF_PI)
     {
-      _temp_point[0] -= 3.14159265;
-      _temp_point[1] = -_temp_point[1];
-      _temp_point[2] -= 3.14159265;
+      _temp_point[0] -= mwoibn::PI;
+      _temp_point[1] = -_temp_point[1] - mwoibn::PI;
+      _temp_point[2] -= mwoibn::PI;
     }
 
-    _temp_point[0] -= 6.28318531 * std::floor((_temp_point[0] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[1] -= 6.28318531 * std::floor((_temp_point[1] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[2] -= 6.28318531 * std::floor((_temp_point[2] + 3.14159265) /
-                                              6.28318531); //-pi:pi
+    mwoibn::eigen_utils::wrapToPi(_temp_point[0]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[1]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[2]);
 
 //    _state[2] = _temp_point[0];
 //    _state[4] = _temp_point[1];
@@ -256,10 +250,6 @@ public:
 
     _jacobian_flat_2D.leftCols(3).setZero();
 
-    //    _rotation << std::cos(_state[2]), std::sin(_state[2]),
-    //    -std::sin(_state[2]),
-    //        std::cos(_state[2]);
-
     _jacobian_2D.leftCols(6).noalias() = (_jacobian_flat_2D)*_jacobian6;
 
     for (int i = 0; i < _ik.size(); i++)
@@ -267,8 +257,6 @@ public:
       _jacobian.row(i).noalias() = - _directions.segment<2>(2*i).transpose() * _jacobian_2D.block(2 * i, 0, 2, _robot.getDofs());
     }
 
- //   std::cout << "_jacobian" << std::endl;
- //   std::cout << _jacobian << std::endl;
   }
 
   using CartesianWorldTask::getReference;

@@ -3,6 +3,9 @@
 mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
     : _robot(robot)
 {
+  _x << 1, 0, 0;
+  _y << 0, 1, 0;
+  _z << 0, 0, 1;
 
   _robot.wait();
   _robot.get();
@@ -116,6 +119,7 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
 
   _leg_steer_ptr->updateError();
   _leg_camber_ptr->updateError();
+  _steering_ptr->updateState();
 
   steerings = _leg_steer_ptr->getCurrent();
 
@@ -127,29 +131,45 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   _leg_steer_ptr->setReference(steerings);
   _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
 
-  _pelvis_orientation_ptr->setReference(0, _pelvis_orientation_ptr->points().getPointStateWorld(0));
+  _orientation = mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4])*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]);
 
-  axis << 0, 0, 1;
+  _pelvis_orientation_ptr->setReference(0, _orientation);
 
-  _pelvis_state = _pelvis_position_ptr->points().getPointStateWorld(0);
-  _pelvis_position_ptr->setReference(_pelvis_state);
+  _position = _pelvis_position_ptr->points().getPointStateWorld(0);
+  _pelvis_position_ptr->setReference(_position);
   _heading = _steering_ptr->getState()[2];
+
+  _linear_vel.setZero();
+
+  _angular_vel.setZero();
+
+//  std::cout << "current state\t" << _steering_ptr->getState() << std::endl;
+//  std::cout << "-PI" << _steering_ptr->getState()[4]-mwoibn::PI << std::endl;
+//  std::cout << "current orientation\t" << _pelvis_orientation_ptr->points().getPointStateWorld(0) << std::endl;
+//  std::cout << "orientation x\t" << mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]) << std::endl;
+//  std::cout << "orientation y\t" << mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]-mwoibn::PI) << std::endl;
+//  std::cout << "orientation z\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading) << std::endl;
+//  std::cout << "orientation\t" << _orientation << std::endl;
+//  std::cout << "orientation xy\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading)*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]) << std::endl;
+
+//  std::cout << "my computation\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading)*_orientation << std::endl;
+
   _previous_command = mwoibn::VectorN::Zero(3);
   _command.setZero(_robot.getDofs());
 }
 
-void mwoibn::WheeledMotionFull::nextStep(const mwoibn::VectorN& support,
-                                         const mwoibn::Vector3& velocity,
-                                         const double omega)
+void mwoibn::WheeledMotionFull::nextStep(const mwoibn::VectorN& support)
 {
 
-  updateBase(velocity, omega);
+//  updateBase(velocity, omega);
+
   updateSupport(support);
+  updateBase();
 
   _next_step[0] =
-      (_pelvis_state[0] - _steering_ptr->getState()[0]) / _robot.rate();
+      (_position[0] - _steering_ptr->getState()[0]) / _robot.rate();
   _next_step[1] =
-      (_pelvis_state[1] - _steering_ptr->getState()[1]) / _robot.rate();
+      (_position[1] - _steering_ptr->getState()[1]) / _robot.rate();
   _next_step[2] =
       (_heading - _steering_ptr->getState()[2]); // just limit the difference
 
@@ -175,23 +195,19 @@ double mwoibn::WheeledMotionFull::limit(const double th)
   return th - 6.28318531 * std::floor((th + 3.14159265) / 6.28318531);
 }
 
-void mwoibn::WheeledMotionFull::update(const mwoibn::VectorN& support,
-                                       const mwoibn::Vector3& velocity,
-                                       const double omega)
+void mwoibn::WheeledMotionFull::update(const mwoibn::VectorN& support)
 {
 
-  nextStep(support, velocity, omega);
+  nextStep(support);
   compute();
 }
 
-void mwoibn::WheeledMotionFull::fullUpdate(const mwoibn::VectorN& support,
-                                           const mwoibn::Vector3& velocity,
-                                           const double omega)
+void mwoibn::WheeledMotionFull::fullUpdate(const mwoibn::VectorN& support)
 {
   _robot.get();
   _robot.updateKinematics();
 
-  update(support, velocity, omega);
+  update(support);
 
   _robot.send();
   _robot.wait();
