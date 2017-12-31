@@ -184,8 +184,8 @@ void mwoibn::WheeledMotion::steering()
   _steering_ref_ptr->compute(_next_step);
 
   steerings.noalias() = _steering_ref_ptr->get();
-  std::cout << "steerings\t";
-  std::cout << steerings.transpose();
+//  std::cout << "steerings\t";
+//  std::cout << steerings.transpose();
   for (int i = 0; i < 4; i++)
   {
     steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
@@ -195,5 +195,5 @@ void mwoibn::WheeledMotion::steering()
                mwoibn::Quaternion::fromAxisAngle(axis, steerings[i]));
   }
   _steering_ref_ptr->set(steerings);
-  std::cout << steerings.transpose() << std::endl;
+//  std::cout << steerings.transpose() << std::endl;
 }

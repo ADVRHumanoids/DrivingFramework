@@ -11,6 +11,7 @@ enum class SUPPORT_STATE
   DEFAULT = 0,
   MAMMAL = 1,
   SPIDER = 2,
+  TO_CIRCLE = 3
 };
 enum class SUPPORT_MOTION
 {
@@ -279,26 +280,41 @@ public:
       {
 //        std::cout << "support MAMMAL" << std::endl;
 
-        setAngle(-0.17453333);
+//        setAngle(-0.17453333);
         setDesired(-0.17453333);
+        return true;
+      }
+      if (_state == SUPPORT_STATE::TO_CIRCLE)
+      {
+        resetAngle();
+        std::cout << _t << std::endl;
+//        std::cout << "current" << _current.transpose() << std::endl;
+        for (int i = 0; i < 4; i++)
+        {
+          _desired.segment<2>(2 * i) << _scale[2 * i] * _r * std::cos(_t),
+              -_scale[2 * i + 1] * _r * std::sin(_t);
+        }
+
+        _desired += _base;
+//        std::cout << "desired" << _desired.transpose() << std::endl;
+//        std::cout << "base" << _base.transpose() << std::endl;
         return true;
       }
     }
     if (_motion == SUPPORT_MOTION::CIRCULAR)
     {
 //      std::cout << "support CIRCULAR" << std::endl;
+      resetAngle();
 
       if (_state == SUPPORT_STATE::SPIDER)
       {
 //        std::cout << "support SPIDER" << std::endl;
-
         setNegative();
         return true;
       }
       if (_state == SUPPORT_STATE::MAMMAL)
       {
 //        std::cout << "support MAMMAL" << std::endl;
-
         setPositive();
         return true;
       }
@@ -315,6 +331,7 @@ public:
   using Reference::setBase;
   using Reference::setDesired;
   using Reference::get;
+  void resetAngle() {_t = std::atan2(-_current[1] + _base[1], _current[0] - _base[0]);}
 
   mwoibn::VectorN get(int i) { return _current.segment<2>(2 * i); }
 
@@ -322,6 +339,7 @@ public:
 
   bool moveToStart(double t, double step);
   bool moveToStart(double step);
+
 
 protected:
   SUPPORT_MOTION _motion = SUPPORT_MOTION::STOP;

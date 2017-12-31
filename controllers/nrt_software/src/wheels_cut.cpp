@@ -93,7 +93,7 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
     {
       motion = static_cast<mwoibn::SUPPORT_MOTION>(req.d);
 
-      if (req.nr > 2 || req.nr < 0)
+      if (req.nr > 3 || req.nr < 0)
         correct = false;
       else
         state = static_cast<mwoibn::SUPPORT_STATE>(req.nr);

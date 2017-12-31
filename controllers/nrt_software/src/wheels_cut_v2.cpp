@@ -108,7 +108,7 @@ bool evenstHandler ( custom_services::updatePDGains::Request& req,
                 if ( req.d > 0 && req.d < 3 ) {
                         motion = static_cast<mwoibn::SUPPORT_MOTION> ( req.d );
 
-                        if ( req.nr > 2 || req.nr < 0 ){
+                        if ( req.nr > 3 || req.nr < 0 ){
                           res.success = false;
                           return false;
                         }
@@ -140,7 +140,14 @@ bool evenstHandler ( custom_services::updatePDGains::Request& req,
                   return false;
                 }
                 controller->setCamber ( req.d, req.nr*3.14/180/10 );
-        } else{
+        } else if ( req.p == 6 ) { // base
+          if(req.d > 3 || req.d < 0){
+            res.success = false;
+            return false;
+          }
+          controller->setCastor ( req.d, req.nr*3.14/180/10 );
+        }
+        else{
           res.success = false;
           return false;
         }

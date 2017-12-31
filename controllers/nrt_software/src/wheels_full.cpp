@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
   mwoibn::hierarchical_control::CastorAngle castor1(
       robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
-      z);
+      z, ax);
   mwoibn::hierarchical_control::CamberAngle camber1(
       robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
       z, ax);
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   x << 1,  0,  0;
   mwoibn::hierarchical_control::CastorAngle castor2(
       robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
-      z);
+      z, ax);
   mwoibn::hierarchical_control::CamberAngle camber2(
       robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
       z, ax);
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
   x << 1,  0,  0;
   mwoibn::hierarchical_control::CastorAngle castor3(
       robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
-      z);
+      z, ax);
   mwoibn::hierarchical_control::CamberAngle camber3(
       robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
       z, ax);
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
   x << -1,  0,  0;
   mwoibn::hierarchical_control::CastorAngle castor4(
       robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
-      z);
+      z, ax);
   mwoibn::hierarchical_control::CamberAngle camber4(
       robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
       z, ax);

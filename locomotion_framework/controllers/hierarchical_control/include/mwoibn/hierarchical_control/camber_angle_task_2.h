@@ -38,36 +38,21 @@ public:
     _y = _point.getRotationWorld(_robot.state.get()).transpose() *
         _axis;
 
-//    std::cout << "_y\t" << _y.transpose() << std::endl;
     _n = _y.cross(_z_world);
-//    std::cout << "_n\t" << _n.transpose() << std::endl;
+
     double b = 1/_n.norm();
 
     _n.normalize();
-//    std::cout << "_n norm\t" << _n.transpose() << std::endl;
 
     _v1 = _z_world - _y * _z_world.transpose() * _y;
-//    std::cout << "_v1\t" << _v1.transpose() << std::endl;
-
-//    std::cout << "b\t" << b << std::endl;
-
     _v1.normalize();
 
-//    std::cout << "_v1 norm\t" << _v1.transpose() << std::endl;
-
     _v2 = _z_world;
-//    std::cout << "_v2\t" << _v2.transpose() << std::endl;
-
-//    double b = 1/_v2.norm();
-//    _v2.normalize();
 
     double cross = (_v1.cross(_v2)).transpose() * _n;
     double dot = _v1.transpose() * _v2;
     _camber = std::atan2(cross, dot);
-//    std::cout << "cross\t" << cross << std::endl;
-//    std::cout << "dot\t" << dot<< std::endl;
 
-//    std::cout << "_camber\t" << _camber*180/3.14 << std::endl;
 // DERIVATIVE
 
     double H = cross*cross + dot * dot;
@@ -85,16 +70,7 @@ public:
     mwoibn::Matrix L = _v2.transpose()*C;
     mwoibn::Matrix M = -_n.transpose()*_skew(_v2)*C - (_skew(_v2)*_v1).transpose()*K;
 
-    mwoibn::Matrix3 R;
-    R.col(0) = _x_body;
-    R.col(1) = _y_body;
-    R.col(2) = _z_body;
-
     _J = (H*L + I*M) * _point.getOrientationJacobian(_robot.state.get());
-//    std::cout << "(H*L + I*M)\n" << (H*L + I*M) << std::endl;
-////    std::cout << "J point\n" <<  _point.getOrientationJacobian(_robot.state.get()) << std::endl;
-//    std::cout << "J\n" <<  _J << std::endl;
-
   }
 
   double get(){

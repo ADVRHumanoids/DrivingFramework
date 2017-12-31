@@ -21,8 +21,8 @@ class CastorAngle
 public:
   CastorAngle(mwoibn::robot_class::Robot& robot,
               mwoibn::point_handling::Point point, mwoibn::Axis x,
-              mwoibn::Axis y, mwoibn::Axis z)
-      : _x_body(x), _y_body(y), _z_body(z), _point(point), _robot(robot)
+              mwoibn::Axis y, mwoibn::Axis z, mwoibn::Axis axis)
+      : _x_body(x), _y_body(y), _z_body(z), _point(point), _robot(robot), _axis(axis)
   {
     _x_world << 1,0,0;
     _y_world << 0,1,0;
@@ -34,64 +34,43 @@ public:
 
   void update()
   {
-    _v1 = _point.getRotationWorld(_robot.state.get()) * _z_world;
+    // axis - z
+    _v1 = _point.getRotationWorld(_robot.state.get()).transpose() * _z_world;
 
-    _n = _point.getRotationWorld(_robot.state.get()) *
-         _y_world; // this could be optimized
+//    std::cout << "_v1\t" << _v1.transpose();
+
+    _n = _point.getRotationWorld(_robot.state.get()).transpose() *
+         _axis; // this could be optimized
+
+//    std::cout << "_n\t" << _n.transpose();
 
     _v2 = _z_world - _n * _z_world.transpose() * _n;
 
     double b = 1/_v2.norm();
     _v2.normalize();
+//    std::cout << "_v2\t" << _v2.transpose();
 
     double cross = (_v1.cross(_v2)).transpose() * _n;
     double dot = _v1.transpose() * _v2;
     _castor = std::atan2(cross, dot);
-//    std::cout << "_castor\t" << _castor*180/3.14 << std::endl;
-//    _n = _point.getRotationWorld(_robot.state.get()) *
-//         _y_world;
+
 // DERIVATIVE
 
-//    std::cout << "derivative" << std::endl;
-//    std::cout << "_v1\t" << _v1 <<  std::endl;
-//    std::cout << "_v2_a\t" << _n * _z_world.transpose() * _n <<  std::endl;
-//    std::cout << "_v2_b\t" << _z_world <<  std::endl;
-
-//    std::cout << "_n\t" << _n <<  std::endl;
-
-//    std::cout << "cross\t" << cross <<  std::endl;
-//    std::cout << "dot\t" << dot <<  std::endl;
     double A = cross*cross + dot * dot;
 
     double B = dot / A;
-    A = cross / A;
-//    std::cout << "A\t" << A << std::endl;
-//    std::cout << "B\t" << B << std::endl;
+    A = -cross / A;
 
     mwoibn::Matrix C = (0.5*b*b*_z_world*_z_world.transpose() - mwoibn::Matrix::Identity(3,3) - 0.5*b*b*_n*_n.transpose()*_z_world*_z_world.transpose())*b;
-//    std::cout << "C\t" << C << std::endl;
 
     C = -C*(_skew(_n*_z_world.transpose()*_n) + _n*_z_world.transpose()*_skew(_n));
 
     mwoibn::Matrix E = _v1.transpose()*C - _v2.transpose()*_skew(_v1);
 
-//    std::cout << "E1\t" <<  _v1.transpose()*C << std::endl;
-//    std::cout << "E2\t" <<  _v2.transpose()*_skew(_v1) << std::endl;
-
     mwoibn::Matrix F = _n.transpose()*_skew(_v2)*_skew(_v1) + _n.transpose()*_skew(_v1)*C - (_skew(_v1)*_v2).transpose()*_skew(_n);
-//    std::cout << "F1\t" << _n.transpose()*_skew(_v2)*_skew(_v1) << std::endl;
-//    std::cout << "F2\t" << _n.transpose()*_skew(_v1)*C << std::endl;
-//    std::cout << "F3\t" << (_skew(_v1)*_v2).transpose()*_skew(_n) << std::endl;
 
-    mwoibn::Matrix3 R;
-    R.col(0) = _x_body;
-    R.col(1) = _y_body;
-    R.col(2) = _z_body;
+    _J = (A*E + B*F) * _point.getOrientationJacobian(_robot.state.get());
 
-    _J = (A*E + B*F) * R * _point.getOrientationJacobian(_robot.state.get());
-//    std::cout << "(A*E + B*F)\n" << (A*E + B*F) << std::endl;
-//    std::cout << "J point\n" <<  _point.getOrientationJacobian(_robot.state.get()) << std::endl;
-    std::cout << "J\n" <<  _J << std::endl;
 
   }
 
@@ -100,7 +79,7 @@ public:
   const mwoibn::Matrix& getJacobian(){return _J;}
 
 protected:
-  mwoibn::Axis _x_body, _y_body, _z_body;
+  mwoibn::Axis _x_body, _y_body, _z_body, _axis;
   mwoibn::Axis _v2, _n, _v1;
 
   mwoibn::Axis _x_world, _y_world,
@@ -134,25 +113,30 @@ protected:
 
   virtual void updateError()
   {
+//    std::cout << "update" << std::endl;
     _last_error.noalias() = _error;
 
     for(int i = 0; i < _angels.size(); i++){
       _angels[i].update();
       _error[i] = _ref[i] - _angels[i].get();
-//      std::cout << "value: " << _angels[i].get()*180/3.14 << std::endl;
-//      std::cout << "castor\t" << _error[i]*180/3.14 << std::endl;
-
+//      std::cout << "\t" << _angels[i].get()*180/3.14;// << std::endl;
+//      std::cout << "\t" << _error[i]*180/3.14;// << std::endl;
     }
-    _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
-    std::cout << std::fixed << "error\t" << _error.transpose() * 180 / 3.14 << "\n";
 
+//    std::cout << "\t" << _angels[1].get()*180/3.14;// << std::endl;
+//    std::cout << "\t" << _error[1]*180/3.14;
+    _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
+//    std::cout << "\t" << _error[1]*180/3.14;// << std::endl;
+
+//    std::cout << std::fixed << "error\t" << _error.transpose() * 180 / 3.14 << "\n";
+//    std::cout << std::endl;
   }
 
   virtual void updateJacobian() {
     _last_jacobian.noalias() = _jacobian;
 
     for(int i = 0; i < _angels.size(); i++){
-      _jacobian.row(i) = _angels[i].getJacobian();
+      _jacobian.row(i) = -_angels[i].getJacobian();
     }
   }
 

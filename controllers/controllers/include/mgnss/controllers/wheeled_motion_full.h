@@ -33,10 +33,10 @@ public:
   {
     _leg_steer_ptr->setReference(i, th);
   }
-//  void setCastor(int i, double th)
-//  {
-//    _leg_castor_ptr->setReference(i, th);
-//  }
+  void setCastor(int i, double th)
+  {
+    _leg_castor_ptr->setReference(i, th);
+  }
   void setCamber(int i, double th)
   {
     _leg_camber_ptr->setReference(i, th);
@@ -186,7 +186,8 @@ protected:
 
   std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
       _leg_camber_ptr;
-
+  std::unique_ptr<mwoibn::hierarchical_control::CastorAngleTask>
+      _leg_castor_ptr;
   std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
       _leg_steer_ptr;
 

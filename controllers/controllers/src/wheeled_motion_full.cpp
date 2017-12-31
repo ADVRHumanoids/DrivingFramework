@@ -37,6 +37,10 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   y <<   0,  0, -1;
   x <<   1,  0,  0;
 //  mwoibn::hierarchical_control::CastorAngle castor1(
+  ax << 0, 1, 0;
+  mwoibn::hierarchical_control::CastorAngle castor1(
+      robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
+      z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::CamberAngle camber1(
       robot, mwoibn::point_handling::Point("wheel_1", robot.getModel()), x, y,
@@ -44,6 +48,10 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::SteeringAngle steer1(
       robot, mwoibn::point_handling::Point("wheel_1", robot.getModel()), x, y,
+      z, ax);
+  ax << 0, 1, 0;
+  mwoibn::hierarchical_control::CastorAngle castor3(
+      robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::CamberAngle camber3(
@@ -58,6 +66,10 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   y <<  0,  0, -1;
   x << -1,  0,  0;
 
+  ax << 0, -1, 0;
+  mwoibn::hierarchical_control::CastorAngle castor2(
+      robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
+      z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::CamberAngle camber2(
       robot, mwoibn::point_handling::Point("wheel_2", robot.getModel()), x, y,
@@ -65,6 +77,10 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::SteeringAngle steer2(
       robot, mwoibn::point_handling::Point("wheel_2", robot.getModel()), x, y,
+      z, ax);
+  ax << 0, -1, 0;
+  mwoibn::hierarchical_control::CastorAngle castor4(
+      robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::CamberAngle camber4(
@@ -78,17 +94,10 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   _leg_steer_ptr.reset(new mwoibn::hierarchical_control::SteeringAngleTask(
       {steer1, steer2, steer3, steer4}, robot));
 
-//  _l_limits.setZero(_leg_steer_ptr->size());
-//  _u_limits.setZero(_leg_steer_ptr->size());
-//  _test_limits.setZero(_leg_steer_ptr->size());
-//  _select_steer = robot.getDof(robot.getLinks("camber"));
-
-//  robot.lower_limits.get(_l_limits, _select_steer);
-//  robot.upper_limits.get(_u_limits, _select_steer);
-
   _leg_camber_ptr.reset(new mwoibn::hierarchical_control::CamberAngleTask(
       {camber1, camber2, camber3, camber4}, robot));
-
+  _leg_castor_ptr.reset(new mwoibn::hierarchical_control::CastorAngleTask(
+      {castor1, castor2, castor3, castor4}, robot));
   int task = 0;
   int ratio = 1;
   double damp = 1e-4;
@@ -97,7 +106,7 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   gain << 1;
   _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
-  gain << 25 * ratio;
+  gain << 15 * ratio;
   _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
   gain << 20 * ratio;
@@ -111,14 +120,18 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 30 * ratio;
-  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.1);
+  gain << 15 * ratio;
+  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.04);
+  task++;
+  gain << 10 * ratio;
+  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
 
   _dt = _robot.rate();
 
   _leg_steer_ptr->updateError();
   _leg_camber_ptr->updateError();
+  _leg_castor_ptr->updateError();
   _steering_ptr->updateState();
 
   steerings = _leg_steer_ptr->getCurrent();
@@ -126,10 +139,11 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   mwoibn::VectorN init;
   init.setZero(4);
   _steering_ref_ptr.reset(new mgnss::events::Steering(
-      _robot, *_steering_ptr, init, 0.7, 0.3, _dt));
+      _robot, *_steering_ptr, init, 0.7, 0.3, _dt, 0.1));
 
   _leg_steer_ptr->setReference(steerings);
   _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
+  _leg_castor_ptr->setReference(_leg_castor_ptr->getCurrent());
 
   _orientation = mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4])*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]);
 
@@ -142,6 +156,13 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
   _linear_vel.setZero();
 
   _angular_vel.setZero();
+
+  _select_steer = robot.getDof(robot.getLinks("camber"));
+  _l_limits.setZero(_select_steer.size());
+  _u_limits.setZero(_select_steer.size());
+//  _test_limits.setZero(_leg_steer_ptr->size());
+  robot.lower_limits.get(_l_limits, _select_steer);
+  robot.upper_limits.get(_u_limits, _select_steer);
 
 //  std::cout << "current state\t" << _steering_ptr->getState() << std::endl;
 //  std::cout << "-PI" << _steering_ptr->getState()[4]-mwoibn::PI << std::endl;
@@ -214,7 +235,7 @@ void mwoibn::WheeledMotionFull::fullUpdate(const mwoibn::VectorN& support)
 }
 void mwoibn::WheeledMotionFull::compute()
 {
-
+//_leg_castor_ptr->updateError();
 //  _leg_steer_ptr->updateError();
   _command.noalias() = _hierarchical_controller.update();
 
@@ -267,6 +288,8 @@ void mwoibn::WheeledMotionFull::steering()
 
   for (int i = 0; i < 4; i++)
   {
+    steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
+    steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
     setSteering(i, steerings[i]);
 //    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
   }

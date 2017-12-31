@@ -9,9 +9,9 @@ void mgnss::events::limit(double b_ref, double& b)
   mwoibn::eigen_utils::wrapToPi(b);
   mwoibn::eigen_utils::wrapToPi(b_ref);
 
-  if((std::fabs(b - b_ref) > mwoibn::HALF_PI) &&
-     (std::fabs(b - b_ref) < 3 * mwoibn::HALF_PI))
-    std::cout << b - b_ref << std::endl;
+//  if((std::fabs(b - b_ref) > mwoibn::HALF_PI) &&
+//     (std::fabs(b - b_ref) < 3 * mwoibn::HALF_PI))
+//    std::cout << b - b_ref << std::endl;
 
   b = ((std::fabs(b - b_ref) < mwoibn::HALF_PI + 0.1) ||
        (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI - 0.1))
