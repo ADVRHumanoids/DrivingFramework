@@ -87,7 +87,8 @@ endif(CENTRALIZED_CONTROLLER)
 if(CENTER_OF_MASS_CONTROLLER)
 
 LIST( APPEND INSTALL_TARGETS
-  hierarchical_controller_with_events
+#  hierarchical_controller_with_events
+  com_test
 )
 LIST( APPEND CATKIN_DEPENDS_SET 
   roscpp
@@ -245,11 +246,18 @@ endif(CENTRALIZED_CONTROLLER)
 
 if(CENTER_OF_MASS_CONTROLLER)
 
-add_executable(hierarchical_controller_with_events src/hierarchical_controller_with_events.cpp)
-add_dependencies(hierarchical_controller_with_events ${catkin_EXPORTED_TARGETS})
-target_link_libraries(hierarchical_controller_with_events
+#add_executable(hierarchical_controller_with_events src/hierarchical_controller_with_events.cpp)
+#add_dependencies(hierarchical_controller_with_events ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(hierarchical_controller_with_events
+#    ${catkin_LIBRARIES}
+# )
+
+add_executable(com_test src/com_test.cpp)
+add_dependencies(com_test ${catkin_EXPORTED_TARGETS})
+target_link_libraries(com_test
     ${catkin_LIBRARIES}
  )
+
 endif(CENTER_OF_MASS_CONTROLLER)#############
 
 if(GRAVITY_TEST)

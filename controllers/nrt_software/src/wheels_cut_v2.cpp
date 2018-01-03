@@ -1,12 +1,13 @@
 ﻿#include <mwoibn/loaders/robot.h>
-
 #include <mgnss/controllers/wheeled_motion_full.h>
+
+#include <mgnss/controllers/wheeled_motion_com.h>
 #include <mgnss/controllers/wheeled_references.h>
 #include <custom_services/updatePDGains.h>
 
 bool evenstHandler ( custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res,
-                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionFull* controller );
+                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionCom* controller );
 
 int main ( int argc, char** argv )
 {
@@ -19,7 +20,7 @@ int main ( int argc, char** argv )
 
         mwoibn::robot_class::Robot& robot = loader.init ( "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default" );
 
-        mwoibn::WheeledMotionFull wheeld_controller ( robot );
+        mwoibn::WheeledMotionCom wheeld_controller ( robot );
 
         mwoibn::SupportPolygon support ( 0.45, 0.22 );
  
@@ -54,9 +55,9 @@ int main ( int argc, char** argv )
 
 }
 
-bool evenstHandler ( custom_services::updatePDGains::Request& req,
+bool evenstHandler (custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res,
-                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionFull *controller )
+                     mwoibn::SupportPolygon* support, mwoibn::WheeledMotionCom *controller )
 {
 //  std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr << std::endl;
 

@@ -1,30 +1,31 @@
-#ifndef PROGRAMS_WHEELED_MOTION_FULL_H
-#define PROGRAMS_WHEELED_MOTION_FULL_H
+#ifndef PROGRAMS_WHEELED_MOTION_COM_H
+#define PROGRAMS_WHEELED_MOTION_COM_H
 
 #include <mwoibn/robot_class/robot.h>
 
 #include <mwoibn/hierarchical_control/hierarchical_controller.h>
 #include <mwoibn/hierarchical_control/constraints_task.h>
 
-#include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h>
-#include <mgnss/controllers/steering.h>
+#include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v4.h>
+#include <mgnss/controllers/steering_v2.h>
 
 #include <mwoibn/hierarchical_control/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
 #include <mwoibn/hierarchical_control/castor_angle_task.h>
 #include <mwoibn/hierarchical_control/camber_angle_task_2.h>
 #include <mwoibn/hierarchical_control/steering_angle_task.h>
+#include <mwoibn/hierarchical_control/center_of_mass_task.h>
 
 namespace mwoibn
 {
 
-class WheeledMotionFull
+class WheeledMotionCom
 {
 
 public:
-  WheeledMotionFull(mwoibn::robot_class::Robot& robot);
+  WheeledMotionCom(mwoibn::robot_class::Robot& robot);
 
-  ~WheeledMotionFull() {}
+  ~WheeledMotionCom() {}
 
   void init() { _steering_ptr->init(); }
   void resetSteering();
@@ -115,7 +116,7 @@ public:
 //    std::cout << "_heading\t" << _heading << std::endl;
 
     _pelvis_position_ptr->setReference(0, _position);
-
+    _com_ptr->setReference(_position.head(2));
     _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate())*_orientation;
 
     _pelvis_orientation_ptr->setReference(
@@ -180,8 +181,9 @@ protected:
       _pelvis_position_ptr;
   std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
       _pelvis_orientation_ptr;
-
-  std::unique_ptr<mwoibn::hierarchical_control::CartesianSimplifiedPelvisTask>
+  std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
+      _com_ptr;
+  std::unique_ptr<mwoibn::hierarchical_control::CartesianFlatReferenceTask>
       _steering_ptr;
 
   std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
@@ -191,7 +193,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
       _leg_steer_ptr;
 
-  std::unique_ptr<mgnss::events::Steering> _steering_ref_ptr;
+  std::unique_ptr<mgnss::events::Steering2> _steering_ref_ptr;
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 

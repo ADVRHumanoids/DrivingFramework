@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 {
 
   ros::init(argc, argv,
-            "gravity_test"); // initalize node needed for the service
+            "com_test"); // initalize node needed for the service
 
   ros::NodeHandle n;
 
@@ -48,6 +48,12 @@ int main(int argc, char** argv)
       std::string(DRIVING_FRAMEWORK_WORKSPACE) +
           "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
       "default");
+
+  std::cout <<std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+              "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" << std::endl;
+  // mwoibn::robot_class::RobotXBotNRT
+  // robot(std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+  // "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" ,"default");
 
   robot.wait();
   robot.get();
@@ -58,8 +64,10 @@ int main(int argc, char** argv)
 
   mwoibn::hierarchical_control::ConstraintsTask constraints_task(robot);
 
+  mwoibn::hierarchical_control::CenterOfMassTask com_task(robot);
+
   Eigen::Vector3d pelvis;
-  pelvis << 1, 1, 1;
+  pelvis << 0, 0, 1;
 
   mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", robot,
                                                      robot.getLinks("base"));
@@ -100,29 +108,12 @@ int main(int argc, char** argv)
   gain << 1;
   hierarchical_controller.addTask(&constraints_task, gain, 0, 1e-6);
   gain << 50;
+  hierarchical_controller.addTask(&com_task, gain, 1, 1e-6);
+  gain << 50;
   hierarchical_controller.addTask(&pelvis_hight, gain, 1, 1e-6);
   gain << 50;
   hierarchical_controller.addTask(&pelvis_orientation, gain, 2, 1e-6);
 
-  //#ifdef VISUALIZATION_TOOLS
-  // create trackers
-  //  mwoibn::visualization_tools::RvizTrackPoint tracker("rviz/com_tracker");
-  //  tracker.initMarker(mwoibn::visualization_tools::Utils::TYPE::POINT,
-  //  "world",
-  //                     0.002, 0.002,
-  //                     0.002); // nr.0 - Pelvis reference trajectory
-  //  tracker.initMarker(mwoibn::visualization_tools::Utils::TYPE::POINT,
-  //  "world",
-  //                     0.004, 0.004,
-  //                     0.004); // nr.1 - actual pelvis position
-
-  //#endif
-  //#ifdef VISUALIZATION_TOOLS
-  //  robot.command.set(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-  //                    mwoibn::robot_class::INTERFACE::POSITION);
-  //    std::cout << "com_point\n" << com_point << std::endl;
-
-//   double eps = 0.005;
   std::cout << "orientation reference\n " << pelvis_orientation.getReference(0)
             << std::endl;
   std::cout << "orientation offset\n " << pelvis_orientation.getOffset(0)
@@ -131,18 +122,13 @@ int main(int argc, char** argv)
   while (ros::ok())
   {
 
-    //    std::cout << "com_point" << std::endl;
-    //    std::cout << com_point << std::endl;
-
     com_point[0] += x * robot.rate();
     com_point[1] += y * robot.rate();
     com_point[2] += z * robot.rate();
 
-//    if (reset)
-//    {
-//      com_point = pelvis_ph.getPointStateWorld(0);
-//      reset = false;
-//    }
+    com_task.setReference(com_point.head(2));
+    pelvis_hight.setReference(com_point);
+
     pelvis_hight.setReference(com_point);
 
     pelvis_orientation.setReference(
@@ -156,10 +142,6 @@ int main(int argc, char** argv)
     command = command * robot.rate() +
               robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
-    //    std::cout << "base" << std::endl;
-    //    std::cout <<
-    //    robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) <<
-    //    std::endl;
 
     robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
 
