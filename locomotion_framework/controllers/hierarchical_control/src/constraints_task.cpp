@@ -4,7 +4,7 @@ void mwoibn::hierarchical_control::ConstraintsTask::updateError() {}
 
 void mwoibn::hierarchical_control::ConstraintsTask::updateJacobian()
 {
-//  std::cout << "update" << std::endl;
+
   _last_jacobian.noalias() = _jacobian;
   _jacobian.noalias() = -_robot.contacts().getJacobian();
 
@@ -13,8 +13,6 @@ void mwoibn::hierarchical_control::ConstraintsTask::updateJacobian()
   for (int i = 0; i < _selector.size(); i++)
   {
     size = _robot.contacts().contact(i).jacobianSize();
-//    if (_robot.contacts().contact(i).isActive())
-//    if (!_selector.at(i) && _robot.contacts().contact(i).isActive())
 
     if (!_selector[i])
     {
@@ -28,11 +26,5 @@ void mwoibn::hierarchical_control::ConstraintsTask::updateJacobian()
     }
 
     row += size;
-
-
   }
-
-//  std::cout << "constraint jacobian" << std::endl;
-//  std::cout << _jacobian << std::endl;
-
 }

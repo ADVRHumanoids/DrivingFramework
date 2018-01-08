@@ -1,5 +1,5 @@
-#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_H
-#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_H
+#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_5_H
+#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_5_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/cartesian_world_task.h"
@@ -16,7 +16,7 @@ namespace hierarchical_control
  *to control the position of a point defined in one of a robot reference frames
  *
  */
-class CartesianSimplifiedPelvisTask : public CartesianWorldTask
+class CartesianFlatReferenceTask2 : public CartesianWorldTask
 {
 
 public:
@@ -26,14 +26,14 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  CartesianSimplifiedPelvisTask(point_handling::PositionsHandler ik,
+  CartesianFlatReferenceTask2(point_handling::PositionsHandler ik,
                                 mwoibn::robot_class::Robot& robot)
       : CartesianWorldTask(ik), _robot(robot)
   {
     _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
-        "ROOT", robot, {"pelvis"}));
+        "ROOT", robot, robot.getLinks("base")));
     _wheels_ptr.reset(
-          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, {"ankle2_1", "ankle2_2", "ankle2_3", "ankle2_4"}));
+          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, robot.getLinks("wheels")));
 
 //    for (int i = 0; i < ik.size(); i++)
 //      _wheels_ptr->addPoint(ik.point(i));
@@ -63,53 +63,24 @@ public:
         _ids.back(), RigidBodyDynamics::Math::Xtrans(
                          RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
         joint_b, body_b));
-    _init(_ik.size(), _ik.getFullJacobianCols());
+    _init(3*_ik.size(), _ik.getFullJacobianCols());
     _state.setZero(6);
 
-    _reference.setZero(_ik.size() * 2);
-    _height.setZero(_ik.size());
+    _reference.setZero(_ik.size() * 3);
+    _directions.setZero(_ik.size() * 2);
 
-    _jacobian_3D.setZero(_ik.getPointJacobianRows(0),
-                         _ik.getFullPointJacobianCols(0));
-
-    _jacobian_flat_3D.setZero(3, 6);
-    _jacobian_2D.setZero(2 * ik.size(), _robot.getDofs());
-    _jacobian_2D_bis.setZero(2, _robot.getDofs());
-    _jacobian_flat_2D.setZero(_ik.size() * 2, 6);
-    _inverser.init(_jacobian_flat_2D, 1e-6);
-    _rotation.setZero(2, 2);
-    _jacobian6.setZero(6, 6);
+    _rotation.setZero(3, 3);
     _zero.setZero(6);
-    _wheels.setZero(ik.size());
-    _point2D.setZero(2);
-    _full_error.setZero(ik.size() * 2);
-    // init the wheels orientations
 
-    mwoibn::VectorN state =
-        robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
-    mwoibn::VectorN test = mwoibn::VectorN::Zero(robot.getDofs());
+    _full_error.setZero(ik.size() * 3);
+//    _error.setZero(ik.size());
 
-    robot.state.set(test, mwoibn::robot_class::INTERFACE::POSITION);
-    robot.updateKinematics();
-
-    mwoibn::Quaternion rotation;
-
-    for (int i = 0; i < ik.size(); i++)
-    {
-
-      rotation = _wheels_ptr->getPointStateWorld(i);
-      rotation.w() = -rotation.w();
-
-      _wheels_ptr->setPointStateFixed(i, rotation);
-    }
-
-    robot.state.set(state, mwoibn::robot_class::INTERFACE::POSITION);
-    robot.updateKinematics();
+    _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true); // on init assume all constacts should be considered in a task
 
     init();
   }
 
-  virtual ~CartesianSimplifiedPelvisTask() {}
+  virtual ~CartesianFlatReferenceTask2() {}
 
   void init()
   {
@@ -120,38 +91,39 @@ public:
     {
       _temp_point = _ik.getPointStateWorld(i);
       setReferenceWorld(i, _temp_point, false);
-      _height[i] = _temp_point[2];
     }
   }
 
   //! updates task error based on the current state of the robot and task
-  // reference position
+
   virtual void updateError()
   {
     _last_error.noalias() = _error; // save previous state
-    //    updateState(); // this will be updated by steering call
-
-    //std::cout << "state\n" <<  _state << std::endl;
+    //updateState(); // this will be updated by steering call
 
     for (int i = 0; i < _ik.size(); i++)
     {
-      _point_flat = getPointStateReference(i);
 
-      _rotation << std::cos(_wheels[i] + _state[2]),
-          -std::sin(_wheels[i] + _state[2]), std::sin(_wheels[i] + _state[2]),
-          std::cos(_wheels[i] + _state[2]);
+      _rotation << std::cos( _state[2]), -std::sin( _state[2]), 0,
+                   std::sin( _state[2]),  std::cos( _state[2]), 0,
+                   0,                     0,                    1;
 
-      _full_error.segment(2 * i, 2).noalias() =
-          _reference.segment(2 * i, 2) - _point_flat.head(2);
+      _full_error.segment<3>(3 * i).noalias() =  _rotation*_reference.segment(3 * i, 3) - _ik.getPointStateWorld(i);
+      _full_error.segment<2>(3*i) = _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3*i);
 
-      _point2D.noalias() = _rotation * _full_error.segment(2 * i, 2);
+      if(_selector[i]){
+        _error[i] = _directions[2*i] * _full_error[3*i] + _directions[2*i + 1] * _full_error[3*i + 1];
+        _error[3*i + 1] = 0;
+        _error[3*i + 2] = 0;
+      }
+      else{
+        _error.segment<3>(3 * i) = _full_error.segment<3>(3 * i);
+        std::cout << _full_error.transpose() << std::endl;
+//        _error[3*i + 2] = 0;
 
-      _error[i] = _point2D[0];
-  //    std::cout << i << " reference\n" <<  _reference.segment(2 * i, 2) << std::endl;
-  //    std::cout << i << " feet placement \n" <<  _point_flat.head(2) << std::endl;
-
+      }
     }
-  //  std::cout << "error\n" << _error << std::endl;
+
 
   }
 
@@ -164,35 +136,9 @@ public:
     _state[1] = _temp_point[1];
     _state[3] = _temp_point[2];
 
-    _temp_point = _pelvis_ptr->point(0)
+    getAngles(_pelvis_ptr->point(0)
                       .getRotationWorld(_robot.state.get(
-                          mwoibn::robot_class::INTERFACE::POSITION))
-                      .transpose()
-                      .eulerAngles(2, 1, 0);
-
-    //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
-    //    -pi:pi)
-    _temp_point[0] -=
-        6.28318531 * std::floor((_temp_point[0] + 3.14159265) / 6.28318531);
-    _temp_point[1] -=
-        6.28318531 * std::floor((_temp_point[1] + 3.14159265) / 6.28318531);
-    _temp_point[2] -=
-        6.28318531 * std::floor((_temp_point[2] + 3.14159265) / 6.28318531);
-
-    if (std::fabs(_temp_point[0] - _state[2]) > 1.57079633 &&
-        std::fabs(_temp_point[0] - _state[2]) < 4.71238898)
-    {
-      _temp_point[0] -= 3.14159265;
-      _temp_point[1] = -_temp_point[1];
-      _temp_point[2] -= 3.14159265;
-    }
-
-    _temp_point[0] -=
-        6.28318531 * std::floor((_temp_point[0] + 3.14159265) / 6.28318531);
-    _temp_point[1] -=
-        6.28318531 * std::floor((_temp_point[1] + 3.14159265) / 6.28318531);
-    _temp_point[2] -=
-        6.28318531 * std::floor((_temp_point[2] + 3.14159265) / 6.28318531);
+                          mwoibn::robot_class::INTERFACE::POSITION)));
 
     _state[2] = _temp_point[0];
     _state[4] = _temp_point[1];
@@ -200,14 +146,19 @@ public:
 
     RigidBodyDynamics::UpdateKinematics(_flat_model, _state, _zero, _zero);
 
-//    std::cout << "wheels" << std::endl;
-
-    for (int i = 0; i < _wheels.size(); i++)
+    for (int i = 0; i <  _ik.size(); i++)
     {
-      getAngles(_wheels_ptr->point(i).getRotationWorld(
-          _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)));
-      _wheels[i] = _temp_point[0];
-//      std::cout << _wheels[i] << std::endl;
+      mwoibn::Vector3 axis, direction;
+      axis << 0, 0, 1;
+      direction = _wheels_ptr->point(i)
+                           .getRotationWorld(_robot.state.get(
+                               mwoibn::robot_class::INTERFACE::POSITION))
+                           .row(2); // z axis, for our kinematics wheel axis in general
+
+      direction = direction.cross(axis); //?
+      direction.normalize();
+
+      _directions.segment<2>(2*i) = direction.head(2);
     }
   }
 
@@ -218,79 +169,43 @@ public:
 
     //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
     //    -pi:pi)
-    _temp_point[0] -= 6.28318531 * std::floor((_temp_point[0] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[1] -= 6.28318531 * std::floor((_temp_point[1] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[2] -= 6.28318531 * std::floor((_temp_point[2] + 3.14159265) /
-                                              6.28318531); //-pi:pi
+    mwoibn::eigen_utils::wrapToPi(_temp_point[0]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[1]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[2]);
 
-    if (std::fabs(_temp_point[1]) > 1.57079633)
+    if (std::fabs(_temp_point[1]) > mwoibn::HALF_PI)
     {
-      _temp_point[0] -= 3.14159265;
-      _temp_point[1] = -_temp_point[1];
-      _temp_point[2] -= 3.14159265;
+      _temp_point[0] -= mwoibn::PI;
+      _temp_point[1] = -_temp_point[1] - mwoibn::PI;
+      _temp_point[2] -= mwoibn::PI;
     }
 
-    _temp_point[0] -= 6.28318531 * std::floor((_temp_point[0] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[1] -= 6.28318531 * std::floor((_temp_point[1] + 3.14159265) /
-                                              6.28318531); //-pi:pi
-    _temp_point[2] -= 6.28318531 * std::floor((_temp_point[2] + 3.14159265) /
-                                              6.28318531); //-pi:pi
+    mwoibn::eigen_utils::wrapToPi(_temp_point[0]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[1]);
+    mwoibn::eigen_utils::wrapToPi(_temp_point[2]);
 
-//    _state[2] = _temp_point[0];
-//    _state[4] = _temp_point[1];
-//    _state[5] = _temp_point[2];
   }
 
   virtual void updateJacobian()
   {
     _last_jacobian.noalias() = _jacobian;
-    //    _jacobian_new_state.setZero();
 
     for (int i = 0; i < _ik.size(); i++)
     {
-      _jacobian_3D.noalias() = _ik.getFullPointJacobian(i);
-
-      _jacobian_2D.block(2 * i, 0, 2, _robot.getDofs()) =
-          _jacobian_3D.topRows<2>();
-
-      _point_flat = RigidBodyDynamics::CalcBaseToBodyCoordinates(
-          _flat_model, _state, _ids[1], _ik.getPointStateWorld(i), false);
-
-      _jacobian_flat_3D.setZero();
-      RigidBodyDynamics::CalcPointJacobian(
-          _flat_model, _state, _ids[1], _point_flat, _jacobian_flat_3D, false);
-
-      _jacobian_flat_2D.block<2, 6>(2 * i, 0) = _jacobian_flat_3D.topRows(2);
+      if(_selector[i]){
+      _jacobian.row(i).noalias() = _directions.segment<2>(2*i).transpose() * ( _robot.centerOfMass().getJacobian().topRows<2>() - _ik.getFullPointJacobian(i).topRows<2>());
+      _jacobian.row(3*i + 1).setZero();
+      _jacobian.row(3*i + 2).setZero();
+      }
+      else{
+        _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = -_ik.getFullPointJacobian(i);
+        _jacobian.block(3 * i, 0, 2, _robot.getDofs()) = _robot.centerOfMass().getJacobian().topRows<2>() + _jacobian.block(3 * i, 0, 2, _robot.getDofs());
+//        _jacobian.row(3*i + 2).setZero();
+      }
     }
 
-    _inverser.compute(_jacobian_flat_2D);
 
-    _jacobian6.noalias() = _inverser.get() * _jacobian_2D.leftCols(6);
 
-    _jacobian_flat_2D.leftCols(3).setZero();
-
-    //    _rotation << std::cos(_state[2]), std::sin(_state[2]),
-    //    -std::sin(_state[2]),
-    //        std::cos(_state[2]);
-
-    _jacobian_2D.leftCols(6).noalias() = (_jacobian_flat_2D)*_jacobian6;
-
-    for (int i = 0; i < _ik.size(); i++)
-    {
-      _rotation << std::cos(_wheels[i]), -std::sin(_wheels[i]),
-          std::sin(_wheels[i]), std::cos(_wheels[i]);
-
-      _jacobian_2D_bis.noalias() =
-          _rotation * _jacobian_2D.block(2 * i, 0, 2, _robot.getDofs());
-
-      _jacobian.row(i).noalias() = -_jacobian_2D_bis.row(0);
-    }
-
- //   std::cout << "_jacobian" << std::endl;
- //   std::cout << _jacobian << std::endl;
   }
 
   using CartesianWorldTask::getReference;
@@ -298,12 +213,12 @@ public:
 
   virtual mwoibn::VectorN getReference(int i) const
   {
-    return _reference.segment(i * 2, 2);
+    return _reference.segment<3>(i * 3);
   }
 
-  virtual void setReference(int i, const mwoibn::VectorN& reference)
+  virtual void setReference(int i, const mwoibn::Vector3& reference)
   {
-    _reference.segment(i * 2, 2) = reference;
+    _reference.segment(i * 3, 3) = reference;
   }
 
   virtual void setReferenceWorld(int i, const mwoibn::Vector3 reference,
@@ -312,9 +227,9 @@ public:
     if (update)
       updateState();
 
-    _reference.segment(i * 2, 2) =
+    _reference.segment(i * 3, 3) =
         RigidBodyDynamics::CalcBaseToBodyCoordinates(
-            _flat_model, _state, _ids[0], reference, false).head(2);
+            _flat_model, _state, _ids[0], reference, false);
   }
 
   virtual mwoibn::Vector3
@@ -325,32 +240,53 @@ public:
       updateState();
 
     mwoibn::Vector3 reference;
-    reference.head(2) = _reference.segment(i * 2, 2);
-    reference[2] = _height[i];
+    reference = _reference.segment(i * 3, 3);
+
     return RigidBodyDynamics::CalcBodyToBaseCoordinates(
         _flat_model, _state, _ids[0], reference, false);
   }
 
-  virtual const mwoibn::Vector3 getPointStateReference(int i)
+  virtual const mwoibn::VectorN getPointStateReference(int i)
   {
-    return RigidBodyDynamics::CalcBaseToBodyCoordinates(
-        _flat_model, _state, _ids[0], _ik.getPointStateWorld(i), false);
+    _rotation << std::cos( _state[2]), std::sin( _state[2]), 0,
+                -std::sin( _state[2]), std::cos( _state[2]), 0,
+                 0,                    0,                    1;
+
+    mwoibn::Vector3 ref = _robot.centerOfMass().get();
+    ref[2] = 0;
+//    mwoibn::Matrix rot(2,2);
+
+//    rot << std::cos( _state[2]), std::sin( _state[2]),
+//            -std::sin( _state[2]), std::cos( _state[2]);
+
+//    std::cout << "2" << std::endl;
+//    std::cout << rot * (_ik.getPointStateWorld(i).head(2) - _robot.centerOfMass().get().head(2)) << std::endl;
+
+//    //    return  rot * (_ik.getPointStateWorld(i).head(2) - _robot.centerOfMass().get().head(2));
+//    std::cout << "3" << std::endl;
+//    std::cout << _rotation * (_ik.getPointStateWorld(i) - ref) << std::endl;
+
+    return  (_rotation * (_ik.getPointStateWorld(i) - ref)) ;
+
   }
 
   const mwoibn::VectorN& getState() const { return _state; }
   const mwoibn::VectorN& getWorldError() const { return _full_error; }
 
+  virtual void releaseContact(int i){_selector[i] = true;}
+  virtual void claimContact(int i){_selector[i] = false;}
+
 protected:
-  mwoibn::VectorN _state, _height, _zero, _wheels, _point2D, _full_error;
+  mwoibn::VectorN _state, _zero, _wheels, _full_error, _directions;
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
   mwoibn::robot_class::Robot& _robot;
   RigidBodyDynamics::Model _flat_model;
   mwoibn::Vector3 _point_flat, _temp_point;
   std::vector<int> _ids;
-  mwoibn::Matrix _jacobian_3D, _jacobian_flat_3D, _jacobian_flat_2D, _rotation,
-      _jacobian6, _jacobian_2D, _jacobian_2D_bis;
-  mwoibn::PseudoInverse _inverser;
+  mwoibn::Matrix _rotation;
+  mwoibn::VectorBool _selector;
+
 };
 } // namespace package
 } // namespace library

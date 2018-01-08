@@ -126,6 +126,7 @@ if(WHEELS_MOTION)
 #    wheeled_locomotion_6
     wheels_cut
     wheels_cut_v2
+    wheels_event
     wheels_full
 #    wheeled_motion_run
   )
@@ -297,45 +298,13 @@ add_dependencies(wheels_full ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wheels_full
     ${catkin_LIBRARIES}
  )
-#add_executable(wheeled_motion_run src/wheeled_motion_run.cpp)
-#add_dependencies(wheeled_motion_run ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_motion_run
-#    ${catkin_LIBRARIES}
-# )
-#add_executable(wheeled_locomotion_7 src/wheeled_locomotion_v7.cpp)
-#add_dependencies(wheeled_locomotion_7 ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_7
-#    ${catkin_LIBRARIES}
-# )
 
-#add_executable(wheeled_locomotion_8 src/wheeled_locomotion_v8.cpp)
-#add_dependencies(wheeled_locomotion_8 ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_8
-#    ${catkin_LIBRARIES}
-# )
+add_executable(wheels_event src/wheels_event.cpp)
+add_dependencies(wheels_event ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_event
+    ${catkin_LIBRARIES}
+ )
 
-#add_executable(wheeled_locomotion_6a src/wheeled_locomotion_v6_a.cpp)
-#add_dependencies(wheeled_locomotion_6a ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_6a
-#    ${catkin_LIBRARIES}
-# )
-
-#add_executable(wheeled_locomotion_7a src/wheeled_locomotion_v7_a.cpp)
-#add_dependencies(wheeled_locomotion_7a ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_7a
-#    ${catkin_LIBRARIES}
-# )
-
-#add_executable(wheeled_locomotion_8a src/wheeled_locomotion_v8_a.cpp)
-#add_dependencies(wheeled_locomotion_8a ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_8a
-#    ${catkin_LIBRARIES}
-# )
-#add_executable(test_flat_reference src/test_flat_reference.cpp)
-#add_dependencies(test_flat_reference ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(test_flat_reference
-#    ${catkin_LIBRARIES}
-# )
 endif(WHEELS_MOTION)#############
 
 if(ODOMETRY)

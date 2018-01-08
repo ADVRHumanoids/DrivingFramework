@@ -45,10 +45,14 @@ include_directories(
 add_library(wheeled_motion
    src/steering.cpp                 
    src/steering_v2.cpp                 
+   src/steering_v3.cpp                 
    src/wheeled_motion.cpp     
    src/wheeled_references.cpp 
+   src/wheeled_references_v2.cpp
+   src/wheeled_references_v3.cpp
    src/wheeled_motion_full.cpp
    src/wheeled_motion_com.cpp
+   src/wheeled_motion_event.cpp
  )
 
 add_dependencies(wheeled_motion ${catkin_EXPORTED_TARGETS})

@@ -1,10 +1,10 @@
-#include <mgnss/controllers/steering_v2.h>
+#include <mgnss/controllers/steering_v3.h>
 #include <mgnss/controllers/steering.h>
 
 
-mgnss::events::Steering2::Steering2(
+mgnss::events::Steering3::Steering3(
     mwoibn::robot_class::Robot& robot,
-    mwoibn::hierarchical_control::CartesianFlatReferenceTask& plane,
+    mwoibn::hierarchical_control::CartesianFlatReferenceTask2& plane,
     mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
     double margin, double max)
     : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt), _margin(margin),
@@ -78,7 +78,7 @@ mgnss::events::Steering2::Steering2(
   //              << std::endl;
 }
 
-void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
+void mgnss::events::Steering3::compute(const mwoibn::Vector3 next_step)
 {
   int pow = 4;
   //      std::cout << next_step << std::endl;
@@ -144,14 +144,15 @@ void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
 
 }
 
-void mgnss::events::Steering2::_ICM(mwoibn::Vector3 next_step)
+void mgnss::events::Steering3::_ICM(mwoibn::Vector3 next_step)
 {
 
   for (int i = 0; i < _size; i++)
   {
 //    _plane.getPointStateReference(i);
-    _plane_ref.noalias() = _plane.getPointStateReference(i);
+    _plane_ref.noalias() = _plane.getPointStateReference(i).head(2);
 
+//    std::cout << "plane i" << _plane_ref.transpose() << std::endl;
     _x = std::cos(_heading) * next_step[0];
     _x += std::sin(_heading) * next_step[1];
     _x -= _plane_ref[1] * next_step[2];
@@ -167,18 +168,18 @@ void mgnss::events::Steering2::_ICM(mwoibn::Vector3 next_step)
   }
 }
 
-void mgnss::events::Steering2::_SPT()
+void mgnss::events::Steering3::_SPT()
 {
   for (int i = 0; i < _size; i++)
     _PT(i);
 }
 
-void mgnss::events::Steering2::_PT(int i)
+void mgnss::events::Steering3::_PT(int i)
 {
   // Desired state
 
-  _plane_ref[0] = _plane.getWorldError()[2 * i]; // size 2
-  _plane_ref[1] = _plane.getWorldError()[2 * i + 1];
+  _plane_ref[0] = _plane.getWorldError()[3 * i]; // size 2
+  _plane_ref[1] = _plane.getWorldError()[3 * i + 1];
 
   _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]);
 

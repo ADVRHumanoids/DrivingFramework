@@ -19,6 +19,11 @@ enum class SUPPORT_MOTION
   DIRECT = 1,
   CIRCULAR = 2,
 };
+enum class SUPPORT_INTERFACE
+{
+  POSITION,
+  VELOCITY,
+};
 
 /*
 enum class BASE_DIRECTION
@@ -39,7 +44,7 @@ class Reference
 {
 
 public:
-  Reference(int size): _size(size)
+  Reference(int size) : _size(size)
   {
     _current = mwoibn::VectorN::Zero(size);
     _base = mwoibn::VectorN::Zero(size);
@@ -48,10 +53,21 @@ public:
 
   ~Reference() {}
 
-  virtual void setCurrent(const VectorN& current) { _current.noalias() = current.head(_size); }
-  virtual void setBase(const VectorN& base) { _base.noalias() = base.head(_size); }
-  virtual void setDesired(const VectorN& desired) { _desired.noalias() = desired.head(_size); }
+  virtual void setCurrent(const VectorN& current)
+  {
+    _current.noalias() = current.head(_size);
+  }
+  virtual void setBase(const VectorN& base)
+  {
+    _base.noalias() = base.head(_size);
+  }
+  virtual void setDesired(const VectorN& desired)
+  {
+    _desired.noalias() = desired.head(_size);
+  }
 
+  const mwoibn::VectorN& getDesired(){ return _desired; }
+  const mwoibn::VectorN& getBase(){ return _base; }
   const mwoibn::VectorN& get() { return _current; }
 
   void setLowerLimit(double t)
@@ -73,7 +89,7 @@ public:
 
   void setRadious(double r) { _r = r; }
 
-  virtual void nextStep() = 0;
+  virtual void nextStep(){}
 
   void changeDirection()
   {
@@ -103,14 +119,18 @@ public:
       _t += _direction * _step;
       return false;
     }
-    else if (_direction == 1){
+    else if (_direction == 1)
+    {
       _t = _t_max;
- //   std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
-	}
-    else{
+      //   std::cout << "current\t" << _t << ",\t limit\t" << _limit <<
+      //   std::endl;
+    }
+    else
+    {
       _t = _t_min;
- //   std::cout << "current\t" << _t << ",\t limit\t" << _limit << std::endl;
-	}
+      //   std::cout << "current\t" << _t << ",\t limit\t" << _limit <<
+      //   std::endl;
+    }
 
     return true;
   }
@@ -129,6 +149,7 @@ class Pose : public Reference
 public:
   Pose() : Reference(2) {}
   ~Pose() {}
+
   void nextStep()
   {
     _current << _r* std::cos(_t - _offset) + _base[0],
@@ -160,7 +181,11 @@ class Base
 {
 
 public:
-  Base() {_state << 0,0,0; _omega = 0;}
+  Base()
+  {
+    _state << 0, 0, 0;
+    _omega = 0;
+  }
   ~Base() {}
 
   void set(mwoibn::Vector3 velocity, double omega)
@@ -168,45 +193,24 @@ public:
 
     _state = velocity;
     _omega = omega;
+  }
 
- }
- 
-  void setX(double v_x)
-  {
-    _state[0] = v_x;
-  }
-  void setY(double v_y)
-  {
-    _state[1] = v_y;
-  }
-  void setZ(double v_z)
-  {
-    _state[2] = v_z;
-  }
-    void setHeading(double omega)
-  {
-    _omega = omega;
-  }
- 
- void setPose(double v_x, double v_y, double omega)
-  {
+  void setX(double v_x) { _state[0] = v_x; }
+  void setY(double v_y) { _state[1] = v_y; }
+  void setZ(double v_z) { _state[2] = v_z; }
+  void setHeading(double omega) { _omega = omega; }
 
+  void setPose(double v_x, double v_y, double omega)
+  {
     _state[0] = v_x;
     _state[1] = v_y;
     _omega = omega;
-
- }
-
-    const double& getHeading()
-  {
-    return _omega;
   }
- 
-   const mwoibn::Vector3& getPosition()
-  {
-    return _state;
-  }
- 
+
+  const double& getHeading() { return _omega; }
+
+  const mwoibn::Vector3& getPosition() { return _state; }
+
   const mwoibn::Vector3& get()
   {
 
@@ -219,33 +223,39 @@ public:
 protected:
   mwoibn::Vector3 _state, _returner;
   double _omega;
-
 };
 
 class SupportPolygon : public Reference
 {
 
 public:
-  SupportPolygon(double x, double y) : Reference(8) { setCurrent(x, y); _error.setZero(8);}
-  SupportPolygon() : Reference(8) {_error.setZero(8);}
+  SupportPolygon(double x, double y) : Reference(8)
+  {
+    setCurrent(x, y);
+    _error.setZero(8);
+  }
+  SupportPolygon() : Reference(8) { _error.setZero(8); }
   ~SupportPolygon() {}
 
   bool update()
   {
     bool done = false;
 
-    if (_motion == SUPPORT_MOTION::STOP){
-//      std::cout << "support STOP" << std::endl;
+    if (_motion == SUPPORT_MOTION::STOP)
+    {
+      //      std::cout << "support STOP" << std::endl;
 
       done = true;
     }
-    else if (_motion == SUPPORT_MOTION::DIRECT){
-//      std::cout << "support DIRECT" << std::endl;
+    else if (_motion == SUPPORT_MOTION::DIRECT)
+    {
+      //      std::cout << "support DIRECT" << std::endl;
 
       done = moveToStart(0.0005);
     }
-    else if (_motion == SUPPORT_MOTION::CIRCULAR){
-//      std::cout << "support CIRCULAR" << std::endl;
+    else if (_motion == SUPPORT_MOTION::CIRCULAR)
+    {
+      //      std::cout << "support CIRCULAR" << std::endl;
 
       done = limitedStep();
       nextStep();
@@ -266,11 +276,11 @@ public:
   {
     if (_motion == SUPPORT_MOTION::DIRECT)
     {
-//      std::cout << "support DIRECT" << std::endl;
+      //      std::cout << "support DIRECT" << std::endl;
 
       if (_state == SUPPORT_STATE::DEFAULT)
       {
-//        std::cout << "support DEFAULT" << std::endl;
+        //        std::cout << "support DEFAULT" << std::endl;
 
         setDesired(0.50, 0.22);
         // support.setAngle(-0.17453333);
@@ -278,9 +288,9 @@ public:
       }
       if (_state == SUPPORT_STATE::MAMMAL)
       {
-//        std::cout << "support MAMMAL" << std::endl;
+        //        std::cout << "support MAMMAL" << std::endl;
 
-//        setAngle(-0.17453333);
+        //        setAngle(-0.17453333);
         setDesired(-0.17453333);
         return true;
       }
@@ -288,7 +298,7 @@ public:
       {
         resetAngle();
         std::cout << _t << std::endl;
-//        std::cout << "current" << _current.transpose() << std::endl;
+        //        std::cout << "current" << _current.transpose() << std::endl;
         for (int i = 0; i < 4; i++)
         {
           _desired.segment<2>(2 * i) << _scale[2 * i] * _r * std::cos(_t),
@@ -296,25 +306,25 @@ public:
         }
 
         _desired += _base;
-//        std::cout << "desired" << _desired.transpose() << std::endl;
-//        std::cout << "base" << _base.transpose() << std::endl;
+        //        std::cout << "desired" << _desired.transpose() << std::endl;
+        //        std::cout << "base" << _base.transpose() << std::endl;
         return true;
       }
     }
     if (_motion == SUPPORT_MOTION::CIRCULAR)
     {
-//      std::cout << "support CIRCULAR" << std::endl;
+      //      std::cout << "support CIRCULAR" << std::endl;
       resetAngle();
 
       if (_state == SUPPORT_STATE::SPIDER)
       {
-//        std::cout << "support SPIDER" << std::endl;
+        //        std::cout << "support SPIDER" << std::endl;
         setNegative();
         return true;
       }
       if (_state == SUPPORT_STATE::MAMMAL)
       {
-//        std::cout << "support MAMMAL" << std::endl;
+        //        std::cout << "support MAMMAL" << std::endl;
         setPositive();
         return true;
       }
@@ -331,7 +341,10 @@ public:
   using Reference::setBase;
   using Reference::setDesired;
   using Reference::get;
-  void resetAngle() {_t = std::atan2(-_current[1] + _base[1], _current[0] - _base[0]);}
+  void resetAngle()
+  {
+    _t = std::atan2(-_current[1] + _base[1], _current[0] - _base[0]);
+  }
 
   mwoibn::VectorN get(int i) { return _current.segment<2>(2 * i); }
 
@@ -339,7 +352,6 @@ public:
 
   bool moveToStart(double t, double step);
   bool moveToStart(double step);
-
 
 protected:
   SUPPORT_MOTION _motion = SUPPORT_MOTION::STOP;
