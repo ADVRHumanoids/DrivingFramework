@@ -125,11 +125,11 @@ bool mwoibn::SupportPolygon3::moveToStart(double step)
         done = false;
       }
     }
-    std::cout << "\t" << i<< "\t" << _contacts[i].get().transpose();
+//    std::cout << "\t" << i<< "\t" << _contacts[i].get().transpose();
 
     _contacts[i].setCurrent(move[0], move[1]);
 
-    std::cout << "\t" << i<< "\t" << _contacts[i].getDesired().transpose() << std::endl;
+//    std::cout << "\t" << i<< "\t" << _contacts[i].getDesired().transpose() << std::endl;
 
   }
 

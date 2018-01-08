@@ -12,7 +12,6 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
   _robot.updateKinematics();
   _robot.centerOfMass().update();
   // Set-up hierachical controller
-  //  mwoibn::hierarchical_control::CenterOfMassTask com_task(robot);
   _constraints_ptr.reset(
       new mwoibn::hierarchical_control::ConstraintsTask(_robot));
   mwoibn::Vector3 pelvis;
@@ -33,7 +32,7 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
       new mwoibn::hierarchical_control::CartesianFlatReferenceTask(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                    robot.getLinks("wheels")),
-          _robot, _robot.centerOfMass().get().head(2)));
+          _robot));
 
   mwoibn::Axis x, y, z, ax;
   z <<   0,  1,  0;
@@ -196,7 +195,7 @@ void mwoibn::WheeledMotionCom::nextStep(const mwoibn::VectorN& support)
   updateSupport(support);
   updateBase();
   mwoibn::Vector3 com = _robot.centerOfMass().get();
-  _steering_ptr->setRef(_position.head(2));
+//  _steering_ptr->setRef(_position.head(2));
 
   _next_step[0] =
       (_position[0] - com[0]) / _robot.rate();

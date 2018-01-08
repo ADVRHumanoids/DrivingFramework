@@ -73,7 +73,6 @@ public:
     _zero.setZero(6);
 
     _full_error.setZero(ik.size() * 3);
-//    _error.setZero(ik.size());
 
     _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true); // on init assume all constacts should be considered in a task
 
@@ -112,16 +111,18 @@ public:
       _full_error.segment<2>(3*i) = _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3*i);
 
       if(_selector[i]){
-        _error[i] = _directions[2*i] * _full_error[3*i] + _directions[2*i + 1] * _full_error[3*i + 1];
+        _error[3*i] = _directions[2*i] * _full_error[3*i] + _directions[2*i + 1] * _full_error[3*i + 1];
         _error[3*i + 1] = 0;
         _error[3*i + 2] = 0;
       }
       else{
         _error.segment<3>(3 * i) = _full_error.segment<3>(3 * i);
-        std::cout << _full_error.transpose() << std::endl;
-//        _error[3*i + 2] = 0;
+//        std::cout << "contact\t" << i << "\t" << _full_error.segment<3>(3 * i).transpose() << "\t" << _reference.segment<3>(3 * i).transpose() <<  std::endl;
+        //        _error[3*i + 2] = 0;
 
       }
+      std::cout << "contact\t" << i << "\t" << _full_error.transpose() << "\t ref \t" << _reference.transpose() <<  std::endl;
+
     }
 
 
@@ -193,7 +194,7 @@ public:
     for (int i = 0; i < _ik.size(); i++)
     {
       if(_selector[i]){
-      _jacobian.row(i).noalias() = _directions.segment<2>(2*i).transpose() * ( _robot.centerOfMass().getJacobian().topRows<2>() - _ik.getFullPointJacobian(i).topRows<2>());
+      _jacobian.row(3*i).noalias() = _directions.segment<2>(2*i).transpose() * ( _robot.centerOfMass().getJacobian().topRows<2>() - _ik.getFullPointJacobian(i).topRows<2>());
       _jacobian.row(3*i + 1).setZero();
       _jacobian.row(3*i + 2).setZero();
       }
@@ -254,20 +255,8 @@ public:
 
     mwoibn::Vector3 ref = _robot.centerOfMass().get();
     ref[2] = 0;
-//    mwoibn::Matrix rot(2,2);
 
-//    rot << std::cos( _state[2]), std::sin( _state[2]),
-//            -std::sin( _state[2]), std::cos( _state[2]);
-
-//    std::cout << "2" << std::endl;
-//    std::cout << rot * (_ik.getPointStateWorld(i).head(2) - _robot.centerOfMass().get().head(2)) << std::endl;
-
-//    //    return  rot * (_ik.getPointStateWorld(i).head(2) - _robot.centerOfMass().get().head(2));
-//    std::cout << "3" << std::endl;
-//    std::cout << _rotation * (_ik.getPointStateWorld(i) - ref) << std::endl;
-
-    return  (_rotation * (_ik.getPointStateWorld(i) - ref)) ;
-
+    return  (_rotation * (_ik.getPointStateWorld(i) - ref));
   }
 
   const mwoibn::VectorN& getState() const { return _state; }

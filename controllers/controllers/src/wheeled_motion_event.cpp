@@ -116,11 +116,11 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 10 * ratio;
+  gain << 20 * ratio;
   _hierarchical_controller.addTask(_com_ptr.get(), gain, task, damp);
   task++;
   gain << 10 * ratio;
-  gain_full << 10, 1, 1, 10, 1, 1, 10, 1, 1, 10, 1, 1;
+//  gain_full << 10, 1, 1, 10, 1, 1, 10, 1, 1, 10, 1, 1;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << 15 * ratio;
@@ -129,7 +129,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
-  gain << 20 * ratio;
+  gain << 10 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;

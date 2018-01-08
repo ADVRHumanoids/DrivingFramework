@@ -6,6 +6,7 @@ void mwoibn::hierarchical_control::CenterOfMassTask::updateError()
   _error = _reference - _robot.centerOfMass().get().head(2);
 //  std::cout << _error << std::endl
   //  _error = _error.cwiseProduct(_selector); // that is not needed?
+//  std::cout << "com\t" << _reference.transpose() << "\t" << _error.transpose() << std::endl;
 }
 
 void mwoibn::hierarchical_control::CenterOfMassTask::updateJacobian()

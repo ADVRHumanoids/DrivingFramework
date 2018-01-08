@@ -155,12 +155,12 @@ public:
 
   void claim(int i){
     _steering_ptr->claimContact(i);
-    _com_ptr->claimContact(i);
+    _constraints_ptr->claimContact(i);
   }
 
   void release(int i){
     _steering_ptr->releaseContact(i);
-    _com_ptr->releaseContact(i);
+    _constraints_ptr->releaseContact(i);
   }
 
 

@@ -72,6 +72,20 @@ public:
     _y.setDesired(y);
   }
 
+  void setDesX(double x)
+  {
+    _x.setDesired(x);
+  }
+
+  void setDesY(double y)
+  {
+    _y.setDesired(y);
+  }
+
+  void setDesZ(double z)
+  {
+    _z.setDesired(z);
+  }
   void setBase(double x, double y, double z)
   {
     setBase(x, y);
@@ -158,6 +172,10 @@ public:
   virtual void setCurrent(mwoibn::VectorN current);
   virtual void setBase(mwoibn::VectorN base);
   virtual void setDesired(mwoibn::VectorN desired);
+
+  virtual void setDesX(int i, double x){ _contacts[i].setDesX(x);}
+  virtual void setDesY(int i, double y){ _contacts[i].setDesY(y);}
+  virtual void setDesZ(int i, double z){ _contacts[i].setDesZ(z);}
 
   virtual void setVelX(int i, double vx) { _contacts[i].setVelX(vx); }
   virtual void setVelY(int i, double vy) { _contacts[i].setVelY(vy); }
