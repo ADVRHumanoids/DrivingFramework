@@ -1,7 +1,7 @@
-driving_apth: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
+driving_apth: &driving  "/home/centauro/src/catkin_malgorzata/src/"
+simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
 mwoibn:
-        middleware: "ROS"
+        middleware: "XBOT"
         robot:
                 name: "centauro"
                 default:
@@ -341,7 +341,7 @@ mwoibn:
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
                         urdf: 
                                 path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
                         srdf:
                                 path: *driving

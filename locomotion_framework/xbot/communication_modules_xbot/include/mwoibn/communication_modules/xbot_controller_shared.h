@@ -28,7 +28,7 @@ public:
 
     if (_position)
     {
-      _pub_position = shared_memory->advertise<mwoibn::VectorRT>(
+      _pub_position = shared_memory->getSharedObject<mwoibn::VectorRT>(
           config["sink"].as<std::string>() + "/position");
       std::cout << "\tInitialized position interface in "
                 << config["sink"].as<std::string>() << "/position\n";
@@ -37,14 +37,14 @@ public:
     {
       std::cout << "\tInitialized velocity interface in "
                 << config["sink"].as<std::string>() << "/velocity\n";
-      _pub_velocity = shared_memory->advertise<mwoibn::VectorRT>(
+      _pub_velocity = shared_memory->getSharedObject<mwoibn::VectorRT>(
           config["sink"].as<std::string>() + "/velocity");
     }
     if (_torque)
     {
       std::cout << "\tInitialized torque interface in "
                 << config["sink"].as<std::string>() << "/torque\n";
-      _pub_torque = shared_memory->advertise<mwoibn::VectorRT>(
+      _pub_torque = shared_memory->getSharedObject<mwoibn::VectorRT>(
           config["sink"].as<std::string>() + "/torque");
     }
     std::cout << "\tSuccess" << std::endl;
@@ -52,41 +52,56 @@ public:
 
   virtual ~XBotControllerShared()
   {
-    if (_position)
-      (*_pub_position)[check] = mwoibn::INVALID;
-    if (_velocity)
-      (*_pub_velocity)[check] = mwoibn::INVALID;
-    if (_torque)
-      (*_pub_torque)[check] = mwoibn::INVALID;
+      
+    if (_position){
+      _positions[check] = mwoibn::INVALID;
+      _pub_position.set(_positions);
+    }
+    if (_velocity){
+      _velocities[check] = mwoibn::INVALID;
+      _pub_velocity.set(_velocities);
+    }
+    if (_torque){
+      _torques[check] = mwoibn::INVALID;
+      _pub_torque.set(_torques);
+    }
   }
 
   virtual void initialize()
   {
-    if (_position)
-      (*_pub_position)[check] = mwoibn::IS_VALID;
+    if (_position){
+      _positions[check] = mwoibn::IS_VALID;
+    }
     if (_velocity)
-      (*_pub_velocity)[check] = mwoibn::IS_VALID;
+      _velocities[check] = mwoibn::IS_VALID;
     if (_torque)
-      (*_pub_torque)[check] = mwoibn::IS_VALID;
+      _torques[check] = mwoibn::IS_VALID;
   }
 
   virtual bool send()
   {
     initialize();
 
-    if (_position)
+    if (_position){
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
-            *_pub_position);
-    if (_velocity)
+            _positions);
+      _pub_position.set(_positions);
+    }
+    if (_velocity){
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY),
-            *_pub_velocity);
-    if (_torque)
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), *_pub_torque);
-
+            _velocities);
+      _pub_velocity.set(_velocities);
+    }
+    if (_torque){
+      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _torques);
+      _pub_torque.set(_torques);
+    }
     return true;
   }
 
 protected:
+  mwoibn::VectorRT _positions, _velocities, _torques;
+
   XBot::SharedObject<mwoibn::VectorRT> _pub_position;
   XBot::SharedObject<mwoibn::VectorRT> _pub_velocity;
   XBot::SharedObject<mwoibn::VectorRT> _pub_torque;

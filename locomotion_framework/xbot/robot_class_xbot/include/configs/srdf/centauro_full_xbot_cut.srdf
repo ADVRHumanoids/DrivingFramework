@@ -9,15 +9,53 @@
       <chain base_link="torso_2" tip_link="arm2_7"/>
    </group>
 
+   <group name="front_left_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_1"/>
+   </group>
+
+   <group name="front_right_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_2"/>
+   </group>
+
+   <group name="rear_right_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_4"/>
+   </group>
+
+   <group name="rear_left_leg_no_wheel">
+      <chain base_link="pelvis" tip_link="ankle2_3"/>
+   </group>
+
    <group name="upper_body">
       <link name="torso_2">
       <group name="left_arm"/>
       <group name="right_arm"/>
    </group>
 
+   <group name="lower_body">
+      <group name="front_left_leg"/>
+      <group name="front_right_leg"/>
+      <group name="rear_right_leg"/>
+      <group name="rear_left_leg"/>
+      <link name="pelvis"/>
+   </group>
+
    <group name="chains">
+      <group name="lower_body"/>
       <group name="upper_body"/>
    </group>
+
+   <group name="legs">
+      <group name="front_left_leg"/>
+      <group name="front_right_leg"/>
+      <group name="rear_right_leg"/>
+      <group name="rear_left_leg"/>
+   </group>
+
+   <group name="imu_sensors">
+      <link name="imu_link"/>
+   </group>
+
+
 
     <group_state name="home" group="chains">
         

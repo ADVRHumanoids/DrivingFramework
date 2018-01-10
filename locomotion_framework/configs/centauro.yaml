@@ -1,0 +1,34 @@
+XBotCore:
+  config_path: "configs/ADVR_shared/centauro/configs/centauro.yaml"
+
+XBotInterface:
+  urdf_path: "external/mpc-locomotion/config/urdf/centauro.urdf"
+  srdf_path: "external/mpc-locomotion/config/srdf/centauro.srdf"
+  joint_map_path: "external/mpc-locomotion/config/joint_map/centauro_joint_map.yaml"
+
+RobotInterface:
+  framework_name: "ROS"
+
+ModelInterface:
+  model_type: "RBDL"
+  is_model_floating_base: "true"
+  
+MasterCommunicationInterface:
+  framework_name: "ROS"
+
+XBotRTPlugins:
+  plugins: 
+    - HomingExample
+    - ForceAccExample
+    
+  io_plugins: 
+    #- MplIo
+  
+NRTPlugins:
+  plugins: ["HomingExample"]
+  
+WebServer:
+  enable: "true"
+  address: "127.0.0.1"
+  port: "8081"
+  

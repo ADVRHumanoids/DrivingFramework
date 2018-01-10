@@ -22,6 +22,7 @@ int main(int argc, char** argv)
   std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
 
   mwoibn::loaders::Robot loader;
+  
   mwoibn::robot_class::Robot& robot = loader.init(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "joint_space");
 
   mgnss::controllers::JointStates controller(robot);

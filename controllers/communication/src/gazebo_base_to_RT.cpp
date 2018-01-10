@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <gazebo_msgs/LinkStates.h>
-#include <XBotCore-interfaces/XDomainCommunication.h>
 #include <mwoibn/robot_class/robot_class.h>
+#include <XBotCore-interfaces/XDomainCommunication.h>
+#include <XBotInterface/Logger.hpp>
 
 void poseCallback(const gazebo_msgs::LinkStates::ConstPtr& msg,
                   XBot::PublisherNRT<mwoibn::VectorFS>* pub_com)

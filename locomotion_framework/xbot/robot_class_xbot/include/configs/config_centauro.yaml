@@ -1,21 +1,22 @@
 # CENTAURO config
+
 XBotInterface:
 #  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
 #  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
 #  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
-  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
-  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_lower_body.srdf"
-  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
-#  urdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_upperbody.urdf"
-#  srdf_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_xbot_cut.srdf"
-#  joint_map_path: "../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_upperbody.yaml"
+  urdf_path: "../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+  srdf_path: "../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro.srdf"
+  joint_map_path: "../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro.yaml"
+#  urdf_path: "../../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_upperbody.urdf"
+#  srdf_path: "../../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_xbot_cut.srdf"
+#  joint_map_path: "../../src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_upperbody.yaml"
 
 RobotInterface:
   framework_name: "ROS"
 
 ModelInterface:
   model_type: "RBDL"
-  is_model_floating_base: "false"
+  is_model_floating_base: "true"
 
 RobotInterfaceROS:
   subclass_name: "RobotInterfaceROS"

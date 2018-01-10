@@ -33,7 +33,12 @@
   bool mgnss::controllers::JointStates::setFullPosition(std::string name)
   {
     if (!_robot.groupStates().isDefined(name)) return false;
-    _pos_ref = _robot.groupStates().get(name).get();
+
+    for(int i = 0; i < _pos_ref.size(); i++){
+        if(_robot.groupStates().get(name).get()[i] != mwoibn::NON_EXISTING)
+            _pos_ref[i] = _robot.groupStates().get(name).get()[i];
+    }
+
     _init = false;
     return true;
 
@@ -44,7 +49,10 @@
     if (!_robot.groupStates().isDefined(name)) return false;
     _init = true;
 
-    _pos_ref = _robot.groupStates().get(name).get();
+    for(int i = 0; i < _pos_ref.size(); i++){
+        if(_robot.groupStates().get(name).get()[i] != mwoibn::NON_EXISTING)
+            _pos_ref[i] = _robot.groupStates().get(name).get()[i];
+    }
 
     _wheels_positions = _wheels.getFullStatesReference();
 
