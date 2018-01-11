@@ -35,7 +35,7 @@ public:
 
   std::string getName() const { return _name; }
   VectorInt get() const { return _map; }
-  double getDofs() const { return _map.size(); }
+  int getDofs() const { return _map.size(); }
 
 protected:
   std::string _name;
@@ -57,7 +57,8 @@ protected:
 class BiMap : public Map
 {
 public:
-  BiMap(std::string name, VectorInt map) : Map(name, map)
+  BiMap(std::string name, VectorInt map, std::vector<std::string> names = {})
+      : Map(name, map), _names(names)
   {
     int max = 0;
 
@@ -183,14 +184,16 @@ public:
     }
   }
 
-  double getDofsReversed() const { return _reversed.size(); }
+  int getDofsReversed() const { return _reversed.size(); }
 
+  const std::vector<std::string>& getNames() const { return _names; }
   // I need selectors here
 
   // VectorBool find();
 
 protected:
   VectorInt _reversed;
+  std::vector<std::string> _names;
 };
 
 class SelectorMap : public Map
@@ -206,20 +209,29 @@ public:
 
     _active.setZero(k);
 
+    _bool.setConstant(map.size(), false);
+
     k = 0;
     for (int i = 0; i < map.size(); i++)
+    {
       if (map[i] != 0)
       {
         _active[k] = i;
         k++;
+        _bool[i] = true;
       }
+    }
   }
+
   virtual ~SelectorMap() {}
 
   const mwoibn::VectorInt& which() const { return _active; }
+  const mwoibn::VectorBool& getBool() const { return _bool; }
 
+  int activeSize(){return _active.size();}
 protected:
   mwoibn::VectorInt _active;
+  mwoibn::VectorBool _bool;
 };
 
 class MapState

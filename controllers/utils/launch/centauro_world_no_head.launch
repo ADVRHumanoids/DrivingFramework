@@ -104,8 +104,8 @@
   		<!-- ros_control centauro launch file -->
 	  	<include file="$(find centauro_control)/launch/centauro_control.launch">
 		    <arg name="torso_actuators" value="$(arg torso_actuators)" if="$(arg torso)"/>
-		    <arg name="left_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in ['true', 'left'])"/>
-		    <arg name="right_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in ['true', 'right'])"/>
+		    <arg name="left_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in [true, 'left'])"/>
+		    <arg name="right_arm_actuators" value="$(arg arm_actuators)"  if="$(eval arms in [true, 'right'])"/>
 		    <arg name="leg_actuators" value="$(arg leg_actuators)" if="$(arg legs)"/>
 		    <arg name="wheels_actuators" value="$(arg wheels_actuators)" if="$(arg wheels)"/>
 		    <arg name="head_actuators" value="$(arg head_actuators)" if="$(arg head)"/>

@@ -1,5 +1,5 @@
-#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_5_H
-#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_5_H
+#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_6_H
+#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_6_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/cartesian_world_task.h"
@@ -16,7 +16,7 @@ namespace hierarchical_control
  *to control the position of a point defined in one of a robot reference frames
  *
  */
-class CartesianFlatReferenceTask2 : public CartesianWorldTask
+class CartesianFlatReferenceTask3 : public CartesianWorldTask
 {
 
 public:
@@ -26,9 +26,10 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  CartesianFlatReferenceTask2(point_handling::PositionsHandler ik,
-                              mwoibn::robot_class::Robot& robot)
-      : CartesianWorldTask(ik), _robot(robot)
+  CartesianFlatReferenceTask3(point_handling::PositionsHandler ik,
+                              mwoibn::robot_class::Robot& robot,
+                              mwoibn::robot_class::Robot& full_robot)
+      : CartesianWorldTask(ik), _robot(robot), _full_robot(full_robot)
   {
     _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
         "ROOT", robot, robot.getLinks("base")));
@@ -74,14 +75,14 @@ public:
     _jacobian_com.setZero(2, _robot.getDofs());
     _full_error.setZero(ik.size() * 3);
 
-//    _map = _robot.biMaps().get("full_body").get();
+    _map = _robot.biMaps().get("full_body").get();
 
     _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true); // on init assume all constacts should be considered in a task
 
     init();
   }
 
-  virtual ~CartesianFlatReferenceTask2() {}
+  virtual ~CartesianFlatReferenceTask3() {}
 
   void init()
   {
@@ -111,7 +112,7 @@ public:
                    0,                     0,                    1;
 
       _full_error.segment<3>(3 * i).noalias() =  _rotation*_reference.segment(3 * i, 3) - _ik.getPointStateWorld(i);
-      _full_error.segment<2>(3*i) = _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3*i);
+      _full_error.segment<2>(3*i) = _full_robot.centerOfMass().get().head(2) + _full_error.segment<2>(3*i);
 
       if(_selector[i]){
         _error[3*i] = _directions[2*i] * _full_error[3*i] + _directions[2*i + 1] * _full_error[3*i + 1];
@@ -124,9 +125,9 @@ public:
         //        _error[3*i + 2] = 0;
 
       }
+//      std::cout << "contact\t" << i << "\t" << _full_error.transpose() << "\t ref \t" << _reference.transpose() <<  std::endl;
 
     }
-//    std::cout << "contact\t" << "\t" << _full_error.transpose() << "\t ref \t" << _reference.transpose() <<  std::endl;
 
 
   }
@@ -197,14 +198,22 @@ public:
     for (int i = 0; i < _ik.size(); i++)
     {
 
+      _jacobian_com.setZero();
+
+      for (int k = 0; k < _map.size(); k++)
+      {
+        if (_map[k] != mwoibn::NON_EXISTING)
+          _jacobian_com.col(k) =  _full_robot.centerOfMass().getJacobian().col(_map[k]).topRows<2>();
+      }
+
       if(_selector[i]){
-      _jacobian.row(3*i).noalias() = _directions.segment<2>(2*i).transpose() * (_robot.centerOfMass().getJacobian().topRows<2>() - _ik.getFullPointJacobian(i).topRows<2>());
+      _jacobian.row(3*i).noalias() = _directions.segment<2>(2*i).transpose() * ( _jacobian_com - _ik.getFullPointJacobian(i).topRows<2>());
       _jacobian.row(3*i + 1).setZero();
       _jacobian.row(3*i + 2).setZero();
       }
       else{
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = -_ik.getFullPointJacobian(i);
-        _jacobian.block(3 * i, 0, 2, _robot.getDofs()) = _robot.centerOfMass().getJacobian().topRows<2>() + _jacobian.block(3 * i, 0, 2, _robot.getDofs());
+        _jacobian.block(3 * i, 0, 2, _robot.getDofs()) = _jacobian_com + _jacobian.block(3 * i, 0, 2, _robot.getDofs());
 //        _jacobian.row(3*i + 2).setZero();
       }
     }
@@ -229,8 +238,6 @@ public:
   virtual void setReferenceWorld(int i, const mwoibn::Vector3 reference,
                                  bool update)
   {
-    std::cout << "CartesianFlatReferenceTask2::setReferenceWorld" << std::endl;
-
     if (update)
       updateState();
 
@@ -259,7 +266,7 @@ public:
                 -std::sin( _state[2]), std::cos( _state[2]), 0,
                  0,                    0,                    1;
 
-    mwoibn::Vector3 ref = _robot.centerOfMass().get();
+    mwoibn::Vector3 ref = _full_robot.centerOfMass().get();
     ref[2] = 0;
 
     return  (_rotation * (_ik.getPointStateWorld(i) - ref));
@@ -276,11 +283,13 @@ protected:
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
   mwoibn::robot_class::Robot& _robot;
+  mwoibn::robot_class::Robot& _full_robot;
   RigidBodyDynamics::Model _flat_model;
   mwoibn::Vector3 _point_flat, _temp_point;
   std::vector<int> _ids;
   mwoibn::Matrix _rotation, _jacobian_com;
   mwoibn::VectorBool _selector;
+  mwoibn::VectorInt _map;
 
 };
 } // namespace package

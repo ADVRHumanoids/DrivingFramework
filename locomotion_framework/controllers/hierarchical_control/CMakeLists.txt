@@ -66,6 +66,7 @@ include_directories(
 #     src/self_collisions_task.cpp
      src/joint_positions_task.cpp
      src/center_of_mass_task.cpp
+     src/center_of_mass_task_v2.cpp
      src/constraints_task.cpp
 )
 ## Add cmake target dependencies of the library

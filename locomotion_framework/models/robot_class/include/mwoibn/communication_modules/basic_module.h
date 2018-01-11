@@ -84,6 +84,25 @@ public:
 
   int getDofs() const { return _dofs; }
 
+  bool is(mwoibn::robot_class::INTERFACE interface){
+
+    if(interface == mwoibn::robot_class::INTERFACE::POSITION)
+      return _position;
+    if(interface == mwoibn::robot_class::INTERFACE::VELOCITY)
+      return _velocity;
+    if(interface == mwoibn::robot_class::INTERFACE::TORQUE)
+      return _torque;
+
+    return false;
+  }
+
+  virtual bool raw(mwoibn::VectorN& _raw, mwoibn::robot_class::INTERFACE interface)
+  {
+      return false;
+  }
+
+  std::string getMapName(){ return _map.getName();}
+
 protected:
   mwoibn::robot_class::BiMap _map;
   mwoibn::robot_class::State& _command;

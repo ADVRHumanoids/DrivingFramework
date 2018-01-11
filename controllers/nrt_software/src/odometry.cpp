@@ -9,8 +9,7 @@
 int main(int argc, char** argv)
 {
 
-  ros::init(argc, argv,
-            "odometry"); // initalize node needed for the service
+  ros::init(argc, argv, "odometry"); // initalize node needed for the service
 
   ros::NodeHandle n;
   ros::Publisher pub;
@@ -19,16 +18,23 @@ int main(int argc, char** argv)
 
   std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
   mwoibn::loaders::Robot loader;
-  mwoibn::robot_class::Robot& robot = loader.init(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "odometry");
-   //mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "odometry");
+  mwoibn::robot_class::Robot& robot = loader.init(
+      path + "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
+      "odometry",
+      path + "DrivingFramework/locomotion_framework/configs/lower_body.yaml");
+  // mwoibn::robot_class::RobotXBotNRT
+  // robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
+  // "odometry");
 
-   mgnss::odometry::Odometry odometry(robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078);
+  mgnss::odometry::Odometry odometry(
+      robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078);
 
   while (ros::ok())
   {
     odometry.update();
-//    robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
-//    robot.command.set(velocities, mwoibn::robot_class::INTERFACE::VELOCITY);
+    //    robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+    //    robot.command.set(velocities,
+    //    mwoibn::robot_class::INTERFACE::VELOCITY);
     robot.update();
   }
 }

@@ -65,8 +65,6 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
     selectors().add(SelectorMap(group.name_, map));
   }
 
-
-
   state.restart(getDofs());
   command.restart(getDofs());
   lower_limits.restart(getDofs());
@@ -121,7 +119,8 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 }
 void mwoibn::robot_class::Robot::_readGroupStates(srdf::Model& srdf)
 {
-  mwoibn::VectorN state = mwoibn::VectorN::Constant(getDofs(), mwoibn::NON_EXISTING);
+  mwoibn::VectorN state =
+      mwoibn::VectorN::Constant(getDofs(), mwoibn::NON_EXISTING);
   mwoibn::VectorInt dofs;
   bool update;
   std::cout << "read group states " << std::endl;
@@ -130,38 +129,39 @@ void mwoibn::robot_class::Robot::_readGroupStates(srdf::Model& srdf)
   {
     std::cout << "\t" << group.name_;
 
-    if(groupStates().isDefined(group.name_)){
+    if (groupStates().isDefined(group.name_))
+    {
       std::cout << "\tUPDATE" << std::endl;
 
       state = groupStates().get(group.name_).get();
       update = true;
     }
-    else{
+    else
+    {
       std::cout << std::endl;
 
       state.setConstant(mwoibn::NON_EXISTING);
       update = false;
     }
 
-    for(auto& joint : group.joint_values_){
-      dofs =  getDof(getLink(joint.first));
+    for (auto& joint : group.joint_values_)
+    {
+      dofs = getDof(getLink(joint.first));
 
-     if(dofs.size() == 0)
-        std::cout << "WARNING: unknow joint while reading a group state " << group.name_ << std::endl;
+      if (dofs.size() == 0)
+        std::cout << "WARNING: unknow joint while reading a group state "
+                  << group.name_ << std::endl;
 
-     for(int i = 0; i < dofs.size(); i++)
-      state[dofs[i]] = joint.second[i];
-
+      for (int i = 0; i < dofs.size(); i++)
+        state[dofs[i]] = joint.second[i];
     }
 
-    if(update)
+    if (update)
       groupStates().update(MapState(group.name_, state));
     else
       groupStates().add(MapState(group.name_, state));
-
   }
 }
-
 
 void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
 {
@@ -199,23 +199,26 @@ void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
       limits.setConstant(dof.size(), joint->limits->lower);
       lower_limits.set(limits, dof, INTERFACE::POSITION);
     }
-    if(joint->limits->upper){
+    if (joint->limits->upper)
+    {
       limits.setConstant(dof.size(), joint->limits->upper);
       upper_limits.set(limits, dof, INTERFACE::POSITION);
     }
-    if (joint->limits->velocity){
+    if (joint->limits->velocity)
+    {
       limits.setConstant(dof.size(), joint->limits->velocity);
       upper_limits.set(limits, dof, INTERFACE::VELOCITY);
       limits.setConstant(dof.size(), -joint->limits->velocity);
       lower_limits.set(limits, dof, INTERFACE::VELOCITY);
     }
-    if (joint->limits->effort){
-        limits.setConstant(dof.size(), joint->limits->effort);
-        upper_limits.set(limits, dof, INTERFACE::TORQUE);
-        limits.setConstant(dof.size(), -joint->limits->effort);
-        lower_limits.set(limits, dof, INTERFACE::TORQUE);
-      }
-}
+    if (joint->limits->effort)
+    {
+      limits.setConstant(dof.size(), joint->limits->effort);
+      upper_limits.set(limits, dof, INTERFACE::TORQUE);
+      limits.setConstant(dof.size(), -joint->limits->effort);
+      lower_limits.set(limits, dof, INTERFACE::TORQUE);
+    }
+  }
 }
 
 void mwoibn::robot_class::Robot::_loadGroup(
@@ -664,7 +667,7 @@ void mwoibn::robot_class::Robot::_loadActuators(YAML::Node actuators_config)
 
 mwoibn::robot_class::BiMap
 mwoibn::robot_class::Robot::makeBiMap(std::vector<std::string> link_names,
-                                      std::string map_name)
+                                      std::string map_name, std::vector<std::string> names)
 {
 
   mwoibn::VectorInt map = mwoibn::VectorInt::Constant(getDofs(), NON_EXISTING);
@@ -689,7 +692,41 @@ mwoibn::robot_class::Robot::makeBiMap(std::vector<std::string> link_names,
   }
 
   //      std::cout << "new\n" << map << std::endl;
-  return mwoibn::robot_class::BiMap(map_name, map);
+  return mwoibn::robot_class::BiMap(map_name, map, names);
+}
+
+void mwoibn::robot_class::Robot::addBiMap(robot_class::Robot& other,
+                                          std::string map_name, std::vector<std::string> names)
+{
+
+  mwoibn::VectorInt map = mwoibn::VectorInt::Constant(getDofs(), NON_EXISTING);
+
+  std::cout << "Robot Handshake: " << map_name << std::endl;
+
+  mwoibn::VectorInt my_dofs, other_dofs;
+
+  for (auto& link: other.getLinks(other.biMaps().get("RBDL").get(), true)){
+
+    try
+    {
+      my_dofs = getDof(link);
+      other_dofs = other.getDof(link);
+
+      if (my_dofs.size() && my_dofs.size() != other_dofs.size())
+        throw(std::invalid_argument("size of " + link + " is different for two models unique mapping is not defined"));
+
+    }
+    catch (const std::out_of_range& e)
+    {
+      //        map[i] = robot_class::NON_EXISTING;
+    }
+
+    for (int k = 0; k < my_dofs.size(); k++)
+      map[my_dofs[k]] = other_dofs[k];
+  }
+
+  std::cout << map.transpose() << std::endl;
+  biMaps().add(BiMap(map_name, map, names));
 }
 
 mwoibn::robot_class::BiMap

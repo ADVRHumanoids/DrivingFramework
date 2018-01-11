@@ -158,7 +158,7 @@
 //    }
     for (int i = 0; i < _position.size(); i++)
     {
-
+      if(_pos_ref[i] == mwoibn::NON_EXISTING) continue;
       if (std::fabs(_pos_ref[i] - _position[i]) > _step)
       {
         if (_pos_ref[i] - _position[i] > 0)

@@ -41,6 +41,18 @@ mwoibn:
                                 read: "true"
                         contacts: 
                                 read: "true"
+                                feedback: false
+                full_model:
+                        rate: 200
+                        type: "NRT"
+                        controller: 
+                                list: []
+                        feedback: 
+                                layer: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
                                 feedback: false  
                 simulated:
                         rate: 1000
@@ -89,7 +101,9 @@ mwoibn:
                                 read: true
                         contacts: 
                                 read: false
-                                feedback: false  
+                                feedback: false
+
+
         feedback:
                 link_side_online: 
                         space: JOINT
@@ -213,6 +227,7 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: true
+                        initialize: "link_side_online"
                 velocity_controller:
                         dofs: 
                                 chain: wheels
