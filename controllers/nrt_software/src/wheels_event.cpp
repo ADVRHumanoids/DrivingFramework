@@ -1,15 +1,30 @@
-﻿#include <config.h>
+﻿#define FULL_ROBOT
+//#define TWO_ROBOTS
+
+#include <config.h>
 #include <mwoibn/loaders/robot.h>
 
-#include <mgnss/controllers/wheeled_motion_event_v2.h>
-//#include <mgnss/controllers/wheeled_motion_event.h>
+#ifdef FULL_ROBOT
+  #include <mgnss/controllers/wheeled_motion_event.h>
+#endif
+#ifdef TWO_ROBOTS
+  #include <mgnss/controllers/wheeled_motion_event_v2.h>
+#endif
 #include <mgnss/controllers/wheeled_references_v3.h>
 #include <custom_services/updatePDGains.h>
 
-bool evenstHandler(custom_services::updatePDGains::Request& req,
+#ifdef TWO_ROBOTS
+  bool evenstHandler(custom_services::updatePDGains::Request& req,
                    custom_services::updatePDGains::Response& res,
                    mwoibn::SupportPolygon3* support,
                    mwoibn::WheeledMotionEvent2* controller);
+#endif
+#ifdef FULL_ROBOT
+  bool evenstHandler(custom_services::updatePDGains::Request& req,
+                   custom_services::updatePDGains::Response& res,
+                   mwoibn::SupportPolygon3* support,
+                   mwoibn::WheeledMotionEvent* controller);
+#endif
 
 int main(int argc, char** argv)
 {
@@ -18,25 +33,33 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
 
   // init wheels_controller
-  mwoibn::loaders::Robot loader, loader_2;
 
-//  mwoibn::loaders::Robot loader;
+#ifdef FULL_ROBOT
+  mwoibn::loaders::Robot loader;
+#endif
+#ifdef TWO_ROBOTS
+  mwoibn::loaders::Robot loader, loader_2;
+#endif
+
   mwoibn::robot_class::Robot& robot =
       loader.init(std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/"
                   "locomotion_framework/configs/mwoibn_v2.yaml",
                   "default", std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/"
                   "locomotion_framework/configs/lower_body.yaml");
-
+#ifdef FULL_ROBOT
+  mwoibn::WheeledMotionEvent wheeld_controller(robot);
+#endif
+#ifdef TWO_ROBOTS
   mwoibn::robot_class::Robot& full_robot = loader_2.init(
       std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/"
       "locomotion_framework/configs/mwoibn_v2.yaml",
       "full_model");
 
 //  mwoibn::robot_class::Robot& full_robot = robot;
-
   robot.addBiMap(full_robot, "full_body");
+
   mwoibn::WheeledMotionEvent2 wheeld_controller(robot, full_robot);
-//  mwoibn::WheeledMotionEvent wheeld_controller(robot);
+#endif
 
   mwoibn::SupportPolygon3 support(0.45, 0.22, 0.078, robot.rate());
 
@@ -70,10 +93,18 @@ int main(int argc, char** argv)
   }
 }
 
+#ifdef FULL_ROBOT
+bool evenstHandler(custom_services::updatePDGains::Request& req,
+                   custom_services::updatePDGains::Response& res,
+                   mwoibn::SupportPolygon3* support,
+                   mwoibn::WheeledMotionEvent* controller)
+#endif
+#ifdef TWO_ROBOTS
 bool evenstHandler(custom_services::updatePDGains::Request& req,
                    custom_services::updatePDGains::Response& res,
                    mwoibn::SupportPolygon3* support,
                    mwoibn::WheeledMotionEvent2* controller)
+#endif
 {
   //  std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr <<
   //  std::endl;
