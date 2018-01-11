@@ -49,7 +49,7 @@ int main(int argc, char** argv)
           "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
       "default");
 
-  std::cout <<std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+  std::cout << std::string(DRIVING_FRAMEWORK_WORKSPACE) +
               "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml" << std::endl;
   // mwoibn::robot_class::RobotXBotNRT
   // robot(std::string(DRIVING_FRAMEWORK_WORKSPACE) +

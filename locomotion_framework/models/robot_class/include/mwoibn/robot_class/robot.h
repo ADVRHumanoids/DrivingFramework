@@ -162,7 +162,11 @@ public:
    */
   robot_class::BiMap makeBiMap(
       std::vector<std::string> link_names,
-      std::string map_name); // for making a map from joints I can use getDof
+      std::string map_name, std::vector<std::string> names = {}); // for making a map from joints I can use getDof
+
+  void addBiMap(
+      robot_class::Robot& other,
+      std::string map_name, std::vector<std::string> names = {}); // for making a map from joints I can use getDof
 
   static YAML::Node getConfig(const std::string config_file,
                         const std::string secondary_file);

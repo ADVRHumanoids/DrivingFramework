@@ -37,6 +37,9 @@ public:
 
 
   void update(Map map){
+    if(!isDefined(map.getName()))
+      add(map);
+    else
     _mappings[getId(map.getName())] = map;
   }
 
@@ -51,7 +54,9 @@ public:
    * @see isDefined
    */
   const Map& get(std::string name) const {
-      return _mappings[getId(name)];
+    if(!isDefined(name))
+        throw(std::invalid_argument("Map " + name + " is not deinfed"));
+    return _mappings[getId(name)];
   }
 
   bool isDefined(std::string name) const{

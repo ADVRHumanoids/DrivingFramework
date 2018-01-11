@@ -5,29 +5,37 @@
 
 #include <rbdl/rbdl.h>
 
-namespace mwoibn {
+namespace mwoibn
+{
 
-namespace communication_modules {
+namespace communication_modules
+{
 
-class BasicFeedback : public BasicModule {
+class BasicFeedback : public BasicModule
+{
 
 public:
-  BasicFeedback(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, bool position, bool velocity, bool torque): BasicModule(command, map, position, velocity, torque, true){}
+  BasicFeedback(mwoibn::robot_class::State& command,
+                mwoibn::robot_class::BiMap map, bool position, bool velocity,
+                bool torque)
+      : BasicModule(command, map, position, velocity, torque, true)
+  {  }
 
-  BasicFeedback(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, YAML::Node config): BasicModule(command, map, true, config){}
+  BasicFeedback(mwoibn::robot_class::State& command,
+                mwoibn::robot_class::BiMap map, YAML::Node config)
+      : BasicModule(command, map, true, config)
+  {  }
 
-  virtual ~BasicFeedback(){}
+  virtual ~BasicFeedback() {}
 
-  mwoibn::VectorInt getSelector() const {return _map.get();}
+  mwoibn::VectorInt getSelector() const { return _map.get(); }
   virtual bool initialized() = 0;
   virtual bool get() = 0;
-  virtual bool update() {get();}
 
+
+  virtual bool update() { get(); }
 };
-
-
 }
-
 }
 
 #endif // BASIC_CONTROLLER_H

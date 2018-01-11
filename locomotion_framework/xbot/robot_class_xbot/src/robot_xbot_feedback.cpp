@@ -85,7 +85,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
               new mwoibn::communication_modules::XBotFeedbackOnline(
-                  state, map, entry.second, *_robot)));
+                  state, map, entry.second, *_robot)), entry.first.as<std::string>());
       _sense = true;
       std::cout << "Loaded feedback " << entry.second["name"] << std::endl;
       continue;
@@ -99,7 +99,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
               new mwoibn::communication_modules::XBotOperationalEuler(
-                  state, map, entry.second, *_robot, rate())));
+                  state, map, entry.second, *_robot, rate())), entry.first.as<std::string>());
 
       _sense = true;
 
@@ -133,7 +133,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     controllers.add(
         std::unique_ptr<mwoibn::communication_modules::BasicController>(
             new mwoibn::communication_modules::XBotLowerLevel(
-                command, lower_limits, upper_limits, map, entry.second, *_robot)));
+                command, lower_limits, upper_limits, map, entry.second, *_robot)), entry.first.as<std::string>());
 
     _move = true;
 

@@ -62,7 +62,7 @@ bool mwoibn::robot_class::RobotRosNRT::loadJointSpaceFeedback(
         std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
             new mwoibn::communication_modules::RosFeedback<
                 sensor_msgs::JointState, sensor_msgs::JointState::ConstPtr>(
-                external_state, external_map, config)));
+                external_state, external_map, config)), config["name"].as<std::string>());
 
     return true;
   }
@@ -73,7 +73,7 @@ bool mwoibn::robot_class::RobotRosNRT::loadJointSpaceFeedback(
             new mwoibn::communication_modules::RosFeedback<
                 custom_messages::CustomCmnd,
                 custom_messages::CustomCmnd::ConstPtr>(external_state,
-                                                       external_map, config)));
+                                                       external_map, config)), config["name"].as<std::string>());
 
     return true;
   }
@@ -91,7 +91,7 @@ bool mwoibn::robot_class::RobotRosNRT::loadOperationalSpaceFeedback(
         std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
             new mwoibn::communication_modules::RosOperationalEuler<
                 gazebo_msgs::LinkStates, gazebo_msgs::LinkStates::ConstPtr>(
-                external_state, external_map, config)));
+                external_state, external_map, config)), config["name"].as<std::string>());
     return true;
   }
 
@@ -108,7 +108,7 @@ bool mwoibn::robot_class::RobotRosNRT::loadRosControllers(
     external_controllers.add(
         std::unique_ptr<mwoibn::communication_modules::BasicController>(
             new mwoibn::communication_modules::RosController(
-                external_state, external_map, config)));
+                external_state, external_map, config)), config["name"].as<std::string>());
     return true;
   }
   return false;
@@ -179,10 +179,35 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
         "custom_controller/ActuatorPositionControllerClasses")
     {
 
-      controllers.add(
-          std::unique_ptr<mwoibn::communication_modules::BasicController>(
-              new mwoibn::communication_modules::CustomController(
-                  command, map, entry.second)));
+      mwoibn::communication_modules::BasicFeedback* feedback = nullptr;
+
+     // if (entry.second["initialize"] && entry.second["initialize"].as<std::string>() != "")
+        feedback = &feedbacks.feedback(entry.second["initialize"].as<std::string>());
+
+        if(feedback != nullptr){
+
+          std::vector<std::string> controller_map = biMaps().get(entry.second["dofs"]["mapping"].as<std::string>()).getNames();
+          std::vector<std::string> feedback_map = biMaps().get(feedback->getMapName()).getNames(); // HARDCODED
+          mwoibn::VectorInt common;
+          common.setConstant(controller_map.size(), mwoibn::NON_EXISTING);
+          for(int i = 0; i < controller_map.size(); i++){
+            for(int j = 0; j < feedback_map.size(); j++){
+              if(controller_map[i] == feedback_map[j])
+                common[i] = j;
+              continue;
+            }
+          }
+          BiMap temp_map("temp", common);
+          controllers.add(
+              std::unique_ptr<mwoibn::communication_modules::BasicController>(
+                  new mwoibn::communication_modules::CustomController(
+                      command, map, entry.second, feedback, &temp_map)),  entry.first.as<std::string>());
+        }
+        else
+          controllers.add(
+              std::unique_ptr<mwoibn::communication_modules::BasicController>(
+                  new mwoibn::communication_modules::CustomController(
+                      command, map, entry.second, feedback)),  entry.first.as<std::string>());
       continue;
     }
     if (entry.second["type"].as<std::string>() ==
@@ -192,7 +217,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
       controllers.add(
           std::unique_ptr<mwoibn::communication_modules::BasicController>(
               new mwoibn::communication_modules::VelocityController(
-                  command, map, entry.second)));
+                  command, map, entry.second)),  entry.first.as<std::string>());
       continue;
     }
 

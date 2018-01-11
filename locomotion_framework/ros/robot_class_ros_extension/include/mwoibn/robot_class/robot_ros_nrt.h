@@ -61,7 +61,10 @@ public:
   void _initMappingCallback(const MessagePtr& msg, bool* valid,
                             std::string name)
   {
-    biMaps().add(makeBiMap(getLinks(msg->name), name));
+
+    std::vector<std::string> names = msg->name;
+
+    biMaps().add(makeBiMap(getLinks(msg->name), name, names));
     *valid = true;
   }
 
@@ -95,6 +98,8 @@ public:
 
     return valid;
   }
+
+
 
   static bool loadJointSpaceFeedback(YAML::Node config,
                                      Feedbacks& external_feedbacks,

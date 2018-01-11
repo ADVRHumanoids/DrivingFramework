@@ -1,5 +1,5 @@
-#ifndef HIERARCHICAL_CONTROL_CENTER_OF_MASS_TASK_H
-#define HIERARCHICAL_CONTROL_CENTER_OF_MASS_TASK_H
+#ifndef HIERARCHICAL_CONTROL_CENTER_OF_MASS_TASK_2_H
+#define HIERARCHICAL_CONTROL_CENTER_OF_MASS_TASK_2_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/controller_task.h"
@@ -11,7 +11,7 @@ namespace hierarchical_control
 {
 
 //! Provides a task for controlling robots center of mass
-class CenterOfMassTask : public ControllerTask
+class CenterOfMassTask2 : public ControllerTask
 {
 
 public:
@@ -19,12 +19,12 @@ public:
    * @param[in] ik_ptr pointer to the point handler mamber that defines which
    * point is controlled by this task instance
    */
-  CenterOfMassTask(mwoibn::robot_class::Robot& robot,
+  CenterOfMassTask2(mwoibn::robot_class::Robot& robot, mwoibn::VectorInt map,
                    mwoibn::VectorN reference =
                        mwoibn::VectorN::Zero(2))
-      : ControllerTask(), _robot(robot), _reference(reference)
+      : ControllerTask(), _robot(robot), _reference(reference), _map(map)
   {
-    _init(2, robot.getDofs());
+    _init(2, map.size());
     _robot.centerOfMass().update(true);
     _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true);
     _selector_dof = mwoibn::VectorBool::Constant(_robot.getDofs(), true);
@@ -34,7 +34,7 @@ public:
     //    _updateSelection();
   }
 
-  ~CenterOfMassTask() {}
+  ~CenterOfMassTask2() {}
 
   //! updates task error based on the current state of the robot and task
   // reference position
@@ -67,10 +67,6 @@ public:
     _updateSelection();
   }
 
-  virtual void setDofs(const mwoibn::VectorBool& dofs){
-    _selector_dof = dofs;
-  }
-
 protected:
   //!pointer to the point handler mamber for point controlled by this task
   // instance
@@ -79,6 +75,7 @@ protected:
   mwoibn::VectorN _reference;
   mwoibn::VectorBool _selector;
   mwoibn::VectorBool _selector_dof;
+  mwoibn::VectorInt _map;
 
   void _updateSelection()
   {

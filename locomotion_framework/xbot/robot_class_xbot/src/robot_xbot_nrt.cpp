@@ -67,6 +67,7 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
       {
 
         _getDefaultPosition(entry.second, true, true, true);
+
        if(RobotRosNRT::loadOperationalSpaceFeedback(entry.second, feedbacks, state, map)){
           _spin = true;
        }
@@ -81,7 +82,7 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
         feedbacks.add(
             std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
                 new mwoibn::communication_modules::XBotFeedbackFromRT(
-                    state, map, entry.second)));
+                    state, map, entry.second)), entry.first.as<std::string>());
       }
     }
   }
@@ -121,7 +122,7 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(
       controllers.add(
             std::unique_ptr<mwoibn::communication_modules::BasicController>(
                 new mwoibn::communication_modules::XBotControllerToRT(
-                    command, map,  entry.second)));
+                    command, map,  entry.second)), entry.first.as<std::string>());
         continue;
     }
   }

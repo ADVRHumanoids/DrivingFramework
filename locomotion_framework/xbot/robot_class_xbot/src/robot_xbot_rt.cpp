@@ -108,7 +108,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
         feedbacks.add(
             std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
                 new mwoibn::communication_modules::XBotFeedbackShared(
-                    state, map, entry.second, shared_memory)));
+                    state, map, entry.second, shared_memory)), entry.first.as<std::string>());
         continue;
       }
     }
@@ -119,7 +119,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
         feedbacks.add(
             std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
                 new mwoibn::communication_modules::XBotFeedbackFromNRT(
-                    state, map, entry.second)));
+                    state, map, entry.second)), entry.first.as<std::string>());
 
         continue;
       }
@@ -129,7 +129,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
         feedbacks.add(
             std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
                 new mwoibn::communication_modules::XBotOperationalEulerFromNRT(
-                    state, map, entry.second)));
+                    state, map, entry.second)), entry.first.as<std::string>());
         continue;
       }
 
@@ -155,7 +155,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadControllers(
       controllers.add(
           std::unique_ptr<mwoibn::communication_modules::BasicController>(
               new mwoibn::communication_modules::XBotControllerShared(
-                  command, map,  entry.second, shared_memory)));
+                  command, map,  entry.second, shared_memory)), entry.first.as<std::string>());
       continue;
     }
     if (entry.second["layer"].as<std::string>() == "NRT")
@@ -164,7 +164,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadControllers(
       controllers.add(
           std::unique_ptr<mwoibn::communication_modules::BasicController>(
               new mwoibn::communication_modules::XBotControllerToNRT(
-                  command, map,  entry.second)));
+                  command, map,  entry.second)), entry.first.as<std::string>());
       continue;
     }
   }

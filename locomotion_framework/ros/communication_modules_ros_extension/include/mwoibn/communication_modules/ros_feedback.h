@@ -72,13 +72,77 @@ public:
       _command.set(msg->effort, _map.reversed(),
                    robot_class::INTERFACE::TORQUE);
 
+    if (_is_raw)
+    {
+
+      if (_raw_interface == robot_class::INTERFACE::POSITION){
+        _raw_keep.setZero(msg->position.size());
+        for(int i = 0; i < msg->position.size(); i++)
+          _raw_keep[i] = msg->position[i];
+      }
+      else if (_raw_interface == robot_class::INTERFACE::VELOCITY){
+        _raw_keep.setZero(msg->velocity.size());
+        for(int i = 0; i < msg->velocity.size(); i++)
+          _raw_keep[i] = msg->velocity[i];
+      }
+      else if (_raw_interface == robot_class::INTERFACE::TORQUE){
+        _raw_keep.setZero(msg->effort.size());
+        for(int i = 0; i < msg->effort.size(); i++)
+          _raw_keep[i] = msg->effort[i];
+      }
+
+      _is_raw = false;
+    }
+
     _initialized = true;
+  }
+
+  virtual bool raw(mwoibn::VectorN& _raw,
+                   mwoibn::robot_class::INTERFACE interface)
+  {
+
+    _is_raw = true;
+
+    if (!_initialized)
+      return false;
+    if (!is(interface))
+      return false;
+
+    _raw_interface = interface;
+
+    int tries = 0, max_tries = 10;
+    ros::Rate rate(10);
+
+    while (ros::ok() && _is_raw && tries < max_tries)
+    {
+      ros::spinOnce();
+      std::cout << "Waiting for raw feedback. Try " << std::to_string(tries + 1)
+                << "/" << max_tries << std::endl;
+      tries++;
+      rate.sleep();
+    }
+    if (!_is_raw)
+    {
+      _raw = _raw_keep;
+      std::cout << "Received raw feedback." << std::endl;
+      _is_raw = false;
+      return true;
+    }
+    else
+    {
+      std::cout << "Couldn't return raw feedback." << std::endl;
+      _is_raw = false;
+      return false;
+    }
   }
 
 protected:
   ros::NodeHandle _node;
   ros::Subscriber _state_sub;
 
+  mwoibn::VectorN _raw_keep;
+  mwoibn::robot_class::INTERFACE _raw_interface;
+  bool _is_raw;
   bool _initialized = false;
 };
 }
