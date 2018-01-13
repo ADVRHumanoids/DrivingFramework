@@ -196,7 +196,9 @@ HEADERS += common/include/mwoibn/common/ros.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/camber_angle_task_2.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v5.h \
     models/loaders/include/mwoibn/loaders/config.h \
-    models/loaders/include/mwoibn/loaders/robot.h
+    models/loaders/include/mwoibn/loaders/robot.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/center_of_mass_task_v2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v6.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \
@@ -341,7 +343,8 @@ SOURCES += point_handling/devel_tests/simple_test.cpp \
     xbot/robot_class_xbot/src/robot_xbot_nrt.cpp \
     xbot/robot_class_xbot/src/robot_xbot_rt.cpp \
     xbot/robot_class_xbot/src/contact_ros.cpp \
-    ros/communication_modules_ros_extension/src/velocity_controller.cpp
+    ros/communication_modules_ros_extension/src/velocity_controller.cpp \
+    controllers/hierarchical_control/src/center_of_mass_task_v2.cpp
 
 DISTFILES += \
     controllers/motor_side_reference/test/launch/test_motor_side_reference.test \
@@ -389,4 +392,5 @@ unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/ -lsimpe_log
 
 INCLUDEPATH += $$PWD/../../../install_release/include
 DEPENDPATH += $$PWD/../../../install_release/include
+INCLUDEPATH += /home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/include
 INCLUDEPATH += /usr/include/eigen3

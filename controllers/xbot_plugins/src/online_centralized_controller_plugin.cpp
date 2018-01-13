@@ -1,9 +1,9 @@
-#include <mgnss/rt_plugins/online_centralized_controller_plugin.h>
+#include <mgnss/xbot_plugins/online_centralized_controller_plugin.h>
 
 REGISTER_XBOT_PLUGIN(OnlineCentralizedControllerPlugin,
-                     mgnss::rt_plugins::OnlineCentralizedControllerPlugin)
+                     mgnss::xbot_plugins::OnlineCentralizedControllerPlugin)
 
-bool mgnss::rt_plugins::OnlineCentralizedControllerPlugin::init_control_plugin(
+bool mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::init_control_plugin(
     std::string path_to_config_file, XBot::SharedMemory::Ptr shared_memory,
     XBot::RobotInterface::Ptr robot)
 {
@@ -20,16 +20,16 @@ bool mgnss::rt_plugins::OnlineCentralizedControllerPlugin::init_control_plugin(
   return true;
 }
 
-void mgnss::rt_plugins::OnlineCentralizedControllerPlugin::on_start(double time)
+void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::on_start(double time)
 {
   //  _start_time = time;
 }
 
-void mgnss::rt_plugins::OnlineCentralizedControllerPlugin::on_stop(double time)
+void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::on_stop(double time)
 {
 }
 
-void mgnss::rt_plugins::OnlineCentralizedControllerPlugin::control_loop(
+void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::control_loop(
     double time, double period)
 {
   if (!_robot_ptr->get())
@@ -48,7 +48,7 @@ void mgnss::rt_plugins::OnlineCentralizedControllerPlugin::control_loop(
   _robot_ptr->send();
 }
 
-bool mgnss::rt_plugins::OnlineCentralizedControllerPlugin::close()
+bool mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::close()
 {
   return true;
 }

@@ -1,11 +1,8 @@
-#include <rt_plugins/centralized_controller.h>
+#include <mgnss/xbot_plugins/centralized_controller.h>
 
-REGISTER_XBOT_PLUGIN(CentralizedController, mwoibn::CentralizedController)
+REGISTER_XBOT_PLUGIN(CentralizedController, mgnss::xbot_plugins::CentralizedController)
 
-namespace mwoibn
-{
-
-bool CentralizedController::init_control_plugin(
+bool mgnss::xbot_plugins::CentralizedController::init_control_plugin(
     std::string path_to_config_file, XBot::SharedMemory::Ptr shared_memory,
     XBot::RobotInterface::Ptr robot)
 {
@@ -42,7 +39,7 @@ bool CentralizedController::init_control_plugin(
   return true;
 }
 
-void CentralizedController::on_start(double time)
+void mgnss::xbot_plugins::CentralizedController::on_start(double time)
 {
   _start_time = time;
 
@@ -57,9 +54,9 @@ void CentralizedController::on_start(double time)
 
 }
 
-void CentralizedController::on_stop(double time) {}
+void mgnss::xbot_plugins::CentralizedController::on_stop(double time) {}
 
-void CentralizedController::control_loop(double time, double period)
+void mgnss::xbot_plugins::CentralizedController::control_loop(double time, double period)
 {
   if(!_robot_ptr->get()) return;
 
@@ -85,5 +82,4 @@ void CentralizedController::control_loop(double time, double period)
   _robot_ptr->send();
 }
 
-bool CentralizedController::close() { return true; }
-}
+bool mgnss::xbot_plugins::CentralizedController::close() { return true; }

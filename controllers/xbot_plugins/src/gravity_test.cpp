@@ -1,11 +1,8 @@
-#include <rt_plugins/gravity_test.h>
+#include <mgnss/xbot_plugins/gravity_test.h>
 
-REGISTER_XBOT_PLUGIN(GravityTest, mwoibn::GravityTest)
+REGISTER_XBOT_PLUGIN(GravityTest, mgnss::xbot_plugins::GravityTest)
 
-namespace mwoibn
-{
-
-bool GravityTest::init_control_plugin(std::string path_to_config_file,
+bool mgnss::xbot_plugins::GravityTest::init_control_plugin(std::string path_to_config_file,
                                  XBot::SharedMemory::Ptr shared_memory,
                                  XBot::RobotInterface::Ptr robot)
 {
@@ -23,8 +20,8 @@ bool GravityTest::init_control_plugin(std::string path_to_config_file,
   Eigen::Vector3d pelvis;
   pelvis << 1, 1, 1;
 
-  mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", *_robot_ptr, {"pelvis"});
-  mwoibn::point_handling::OrientationsHandler pelvis_orn("ROOT", *_robot_ptr, {"pelvis"});
+  mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", *_robot_ptr, _robot_ptr->getLinks("base"));
+  mwoibn::point_handling::OrientationsHandler pelvis_orn("ROOT", *_robot_ptr, _robot_ptr->getLinks("base"));
 
   _pelvis_hight_ptr.reset(new
       mwoibn::hierarchical_control::CartesianSelectiveTask(pelvis_ph, pelvis));
@@ -49,7 +46,7 @@ bool GravityTest::init_control_plugin(std::string path_to_config_file,
   return true;
 }
 
-void GravityTest::on_start(double time)
+void mgnss::xbot_plugins::GravityTest::on_start(double time)
 {
   _start_time = time;
 
@@ -60,7 +57,7 @@ void GravityTest::on_start(double time)
     _init();}
 }
 
-void GravityTest::_init() {
+void mgnss::xbot_plugins::GravityTest::_init() {
 
   Eigen::Vector3d axis;
 
@@ -78,7 +75,7 @@ void GravityTest::_init() {
   _initialized = true;
 
 }
-void GravityTest::_getReference() {
+void mgnss::xbot_plugins::GravityTest::_getReference() {
 
   _sub_com_final.read(_com_final);
 
@@ -100,9 +97,9 @@ void GravityTest::_getReference() {
   _pelvis_hight_ptr->setReference(_com_ref);
 }
 
-void GravityTest::on_stop(double time) {}
+void mgnss::xbot_plugins::GravityTest::on_stop(double time) {}
 
-void GravityTest::control_loop(double time, double period)
+void mgnss::xbot_plugins::GravityTest::control_loop(double time, double period)
 {
   _valid = _robot_ptr->get();
 
@@ -126,5 +123,5 @@ void GravityTest::control_loop(double time, double period)
   _robot_ptr->send();
 }
 
-bool GravityTest::close() { return true; }
-}
+bool mgnss::xbot_plugins::GravityTest::close() { return true; }
+

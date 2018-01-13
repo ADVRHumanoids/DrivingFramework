@@ -1,10 +1,8 @@
-#include <rt_plugins/rt_my_test.h>
+#include <mgnss/xbot_plugins/rt_my_test.h>
 
-REGISTER_XBOT_PLUGIN(RtMyTest, mwoibn::MyTest)
+REGISTER_XBOT_PLUGIN(RtMyTest, mgnss::xbot_plugins::MyTest)
 
-namespace mwoibn {
-
-bool MyTest::init_control_plugin(std::string path_to_config_file,
+bool mgnss::xbot_plugins::MyTest::init_control_plugin(std::string path_to_config_file,
         XBot::SharedMemory::Ptr shared_memory,
         XBot::RobotInterface::Ptr robot)
 {
@@ -42,25 +40,24 @@ bool MyTest::init_control_plugin(std::string path_to_config_file,
 
 }
 
-void MyTest::on_start(double time)
+void mgnss::xbot_plugins::MyTest::on_start(double time)
 {
    _start_time = time;
    _robot_ptr->update();
 }
 
-void MyTest::on_stop(double time)
+void mgnss::xbot_plugins::MyTest::on_stop(double time)
 {
 }
 
 
-void MyTest::control_loop(double time, double period)
+void mgnss::xbot_plugins::MyTest::control_loop(double time, double period)
 {
   _robot_ptr->update();
 }
 
-bool MyTest::close()
+bool mgnss::xbot_plugins::MyTest::close()
 {
   return true;
 }
 
-}

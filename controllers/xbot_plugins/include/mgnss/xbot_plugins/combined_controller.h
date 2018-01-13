@@ -1,5 +1,5 @@
-#ifndef PROGRAM_RT_ALL_H
-#define PROGRAM_RT_ALL_H
+#ifndef __MGNSS_XBOT_PLUGINS_RT_COMBINED_CONTROLLER_H
+#define __MGNSS_XBOT_PLUGINS_RT_COMBINED_CONTROLLER_H
 
 #include <XCM/XBotControlPlugin.h>
 
@@ -9,7 +9,7 @@
 
 namespace mgnss
 {
-namespace rt_plugins
+namespace xbot_plugins
 {
 class CombinedController : public XBot::XBotControlPlugin
 {
