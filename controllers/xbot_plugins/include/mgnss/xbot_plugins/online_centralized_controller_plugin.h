@@ -1,12 +1,13 @@
-#ifndef __MGNSS_RT_PLUGINS_ONLINE_CENTRALIZED_CONTROLLER_PLUGIN_H
-#define __MGNSS_RT_PLUGINS_ONLINE_CENTRALIZED_CONTROLLER_PLUGIN_H
+#ifndef __MGNSS_XBOT_PLUGINS_ONLINE_CENTRALIZED_CONTROLLER_PLUGIN_H
+#define __MGNSS_XBOT_PLUGINS_ONLINE_CENTRALIZED_CONTROLLER_PLUGIN_H
 
 #include <XCM/XBotControlPlugin.h>
 #include <mwoibn/robot_class/robot_xbot_rt.h>
 #include <mgnss/controllers/online_centralized_controller.h>
 
 namespace mgnss{
-namespace rt_plugins{
+
+namespace xbot_plugins{
 
 class OnlineCentralizedControllerPlugin : public XBot::XBotControlPlugin{
 

@@ -4,7 +4,9 @@
 #include <XCM/XBotControlPlugin.h>
 #include <mwoibn/robot_class/robot_xbot_rt.h>
 
-namespace mwoibn {
+namespace mgnss {
+
+namespace xbot_plugins{
 
 class MyTest : public XBot::XBotControlPlugin{
 
@@ -34,6 +36,6 @@ private:
   mwoibn::VectorN command;
 
 };
-
+}
 }
 #endif // RT_MY_TEST_H

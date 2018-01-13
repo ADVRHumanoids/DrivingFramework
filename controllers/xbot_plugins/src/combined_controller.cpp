@@ -1,9 +1,9 @@
-#include <mgnss/rt_plugins/combined_controller.h>
+#include <mgnss/xbot_plugins/combined_controller.h>
 
-REGISTER_XBOT_PLUGIN(CombinedController, mgnss::rt_plugins::CombinedController)
+REGISTER_XBOT_PLUGIN(CombinedController, mgnss::xbot_plugins::CombinedController)
 
 
-bool mgnss::rt_plugins::CombinedController::init_control_plugin(
+bool mgnss::xbot_plugins::CombinedController::init_control_plugin(
     std::string path_to_config_file, XBot::SharedMemory::Ptr shared_memory,
     XBot::RobotInterface::Ptr robot)
 {
@@ -21,7 +21,7 @@ bool mgnss::rt_plugins::CombinedController::init_control_plugin(
   return true;
 }
 
-void mgnss::rt_plugins::CombinedController::on_start(double time)
+void mgnss::xbot_plugins::CombinedController::on_start(double time)
 {
   _readReference();
 
@@ -34,9 +34,9 @@ void mgnss::rt_plugins::CombinedController::on_start(double time)
 
 }
 
-void mgnss::rt_plugins::CombinedController::on_stop(double time) {}
+void mgnss::xbot_plugins::CombinedController::on_stop(double time) {}
 
-void mgnss::rt_plugins::CombinedController::_readReference() {
+void mgnss::xbot_plugins::CombinedController::_readReference() {
 
   Eigen::Matrix<double, 13, 1> references;
 
@@ -46,7 +46,7 @@ void mgnss::rt_plugins::CombinedController::_readReference() {
 
 }
 
-void mgnss::rt_plugins::CombinedController::control_loop(double time, double period)
+void mgnss::xbot_plugins::CombinedController::control_loop(double time, double period)
 {
 
   if(!_robot_ptr->get()) return;
@@ -69,4 +69,4 @@ void mgnss::rt_plugins::CombinedController::control_loop(double time, double per
   _robot_ptr->send();
 }
 
-bool mgnss::rt_plugins::CombinedController::close() { return true; }
+bool mgnss::xbot_plugins::CombinedController::close() { return true; }

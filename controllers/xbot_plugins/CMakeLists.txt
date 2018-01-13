@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rt_plugins)
+project(xbot_plugins)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
@@ -115,3 +115,17 @@ add_library(CombinedController SHARED
 )
 target_link_libraries(CombinedController ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 ycm_library_install(CombinedController 1 0 0)
+
+## Mark executables and/or libraries for installation
+ install(TARGETS ${INSTALL_TARGETS}
+   ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
+   LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
+   RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/bin/
+ )
+
+# Mark cpp header files for installation
+ install(DIRECTORY ${ADVR_SUPERBUILD_DIR}/build/install/include/
+   DESTINATION ${ADVR_GLOBAL_INCLUDE_DESTINATION}/mgnss/
+   FILES_MATCHING PATTERN "*.h"
+   PATTERN ".svn" EXCLUDE
+ )

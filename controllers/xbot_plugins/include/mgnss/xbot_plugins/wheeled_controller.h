@@ -6,9 +6,10 @@
 #include <mwoibn/robot_class/robot_xbot_rt.h>
 #include <mgnss/controllers/wheeled_motion.h>
 
-namespace mwoibn
+namespace mgnss
 {
-
+namespace xbot_plugins
+{
 class WheeledController : public XBot::XBotControlPlugin
 {
 
@@ -34,7 +35,7 @@ private:
 
   Eigen::Matrix<double, 12, 1> _references;
   XBot::SubscriberRT<Eigen::Matrix<double, 13, 1>> _sub_references;
-
 };
+}
 }
 #endif // RT_MY_TEST_H
