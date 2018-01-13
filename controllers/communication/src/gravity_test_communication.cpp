@@ -1,9 +1,8 @@
-#include <mwoibn/loaders/robot.h>
+#include <mwoibn/robot_class/robot.h>
 
 #include <custom_services/updatePDGains.h>
 #include <ros/ros.h>
 #include <XBotCore-interfaces/XDomainCommunication.h>
-#include <XBotInterface/Logger.hpp>
 
 bool wheelHandler(custom_services::updatePDGains::Request& req,
                   custom_services::updatePDGains::Response& res,
@@ -33,8 +32,6 @@ int main(int argc, char** argv)
     ros::spinOnce();
     rate.sleep();
   }
-
-
 }
 
 bool wheelHandler(custom_services::updatePDGains::Request& req,

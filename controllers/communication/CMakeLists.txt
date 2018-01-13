@@ -23,8 +23,11 @@ if(HANDLERS)
 endif(HANDLERS)
 
 if(XBOT)
-#  find_package(XBotCore-interfaces REQUIRED)
-#  find_package(XBotInterface REQUIRED)
+  find_package(XBotCore-interfaces REQUIRED)
+  find_package(XBotInterface REQUIRED)
+
+  LIST( APPEND INSTALL_TARGETS gravity_test_communication)
+  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services)
 
 #  LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt)
 #  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services)
@@ -70,11 +73,13 @@ target_link_libraries(events_handler
 endif(HANDLERS)
 
 if(XBOT)
-#add_executable(gravity_test_communication src/gravity_test_communication.cpp)
-#add_dependencies(gravity_test_communication ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
-#target_link_libraries(gravity_test_communication
-#    ${catkin_LIBRARIES}
-# )
+add_executable(gravity_test_communication src/gravity_test_communication.cpp)
+add_dependencies(gravity_test_communication ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
+target_link_libraries(gravity_test_communication
+    ${catkin_LIBRARIES}
+    ${XBotCore-interfaces_LIBRARIES} 
+    ${XBotInterface_LIBRARIES}
+ )
 #
 #add_executable(base_to_rt src/gazebo_base_to_RT.cpp)
 #add_dependencies(base_to_rt ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
