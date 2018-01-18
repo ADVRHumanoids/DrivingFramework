@@ -84,5 +84,5 @@ install(DIRECTORY launch/
 prepend_paths(PYTHON_INSTALL nodes)
 
 catkin_install_python(PROGRAMS ${PYTHON_INSTALL}
-                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+                      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 

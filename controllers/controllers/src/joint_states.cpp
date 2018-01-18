@@ -11,6 +11,7 @@
     _ankle_map = _robot.selectors().get("camber").which();
     _yaw_map = _robot.selectors().get("yaws").which();
 
+
     _velocity.setZero(_vel_map.size());
     _vel_sign.setOnes(_vel_map.size());
     _last_ankle.setZero(_ankle_map.size());
@@ -23,6 +24,7 @@
     _vel_ref = _velocity;
 
     _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+
     for (auto link : _robot.getLinks("wheels"))
       _wheels.addPoint(link);
 
@@ -112,7 +114,7 @@
   {
     _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
 
-    if(_init){
+    if(_init && _ankle_map.size()){
 
       for (int k = 0; k < _ankle_map.size(); k++)
       {
