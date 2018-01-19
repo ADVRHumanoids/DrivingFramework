@@ -127,6 +127,7 @@ protected:
       : ControllerTask(), _robot(robot), _angels(angels)
   {
     _init(_angels.size(), _robot.getDofs());
+
     _ref.setZero(_angels.size());
   }
 
@@ -141,12 +142,9 @@ protected:
        _angels[i].update(false);
 
       _error[i] = _ref[i] - _angels[i].get();
-//      std::cout << "\t" << _angels[i].get();// << std::endl;
     }
-//      std::cout << "\t" << _ref.transpose();// << std::endl;
-//      std::cout << "\t" << _error.transpose();//<< std::endl;
+
       _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
-//      std::cout << "\t" << _error.transpose() << std::endl;
 
   }
 

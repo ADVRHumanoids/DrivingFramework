@@ -52,7 +52,7 @@
   <depend>gazebo_msgs</depend> <!--TRAJECTORY_GENERATION -->
   <depend>tf</depend> <!--TRAJECTORY_GENERATION -->
   <depend>custom_services</depend>
-
+  <depend>custom_messages</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

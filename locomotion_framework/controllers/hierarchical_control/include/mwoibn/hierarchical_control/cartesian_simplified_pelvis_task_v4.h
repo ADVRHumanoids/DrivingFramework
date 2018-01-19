@@ -122,6 +122,10 @@ public:
       _error[i] = _directions[2*i] * _full_error[2*i] + _directions[2*i + 1] * _full_error[2*i+1];
     }
 
+//    std::cout << "_full_error\t" << _full_error.transpose() << std::endl;
+//    std::cout << "_x_error\t" << _error.transpose() << std::endl;
+//    std::cout << "_directions\t" << _directions.transpose() << std::endl;
+
   }
 
   void updateState()
@@ -241,6 +245,12 @@ public:
     _rotation << std::cos( _state[2]), std::sin( _state[2]),
             -std::sin( _state[2]), std::cos( _state[2]);
     return  _rotation * (_ik.getPointStateWorld(i).head(2) - _robot.centerOfMass().get().head(2));
+  }
+  virtual const mwoibn::VectorN getReferenceError(int i)
+  {
+    _rotation << std::cos( _state[2]), std::sin( _state[2]),
+            -std::sin( _state[2]), std::cos( _state[2]);
+    return  _rotation * (_full_error.segment<2>(2*i));
   }
 
   const mwoibn::VectorN& getState() const { return _state; }

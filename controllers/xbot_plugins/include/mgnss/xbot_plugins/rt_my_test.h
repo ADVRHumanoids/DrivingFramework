@@ -1,5 +1,5 @@
-#ifndef PROGRAM_RT_MY_TEST_H
-#define PROGRAM_RT_MY_TEST_H
+#ifndef __MGNSS_XBOT_MY_TEST_H
+#define __MGNSS_XBOT_MY_TEST_H
 
 #include <XCM/XBotControlPlugin.h>
 #include <mwoibn/robot_class/robot_xbot_rt.h>
@@ -13,9 +13,7 @@ class MyTest : public XBot::XBotControlPlugin{
 
 public:
 
-virtual bool init_control_plugin(std::string path_to_config_file,
-                             XBot::SharedMemory::Ptr shared_memory,
-                             XBot::RobotInterface::Ptr robot);
+virtual bool init_control_plugin(XBot::Handle::Ptr handle);
 
 virtual bool close();
 
@@ -30,7 +28,6 @@ protected:
 private:
 
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
-
 
   double _start_time;
   mwoibn::VectorN command;

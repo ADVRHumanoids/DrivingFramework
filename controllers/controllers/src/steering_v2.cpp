@@ -83,6 +83,8 @@ void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
   int pow = 4;
   //      std::cout << next_step << std::endl;
   _plane.updateState();
+  _plane.updateError();
+
   _heading = _plane.getState()[2];
 
   _ICM(next_step); // returns a velue in a robot space
@@ -104,7 +106,7 @@ void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
 //  bool slow = false;
   for (int i = 0; i < _size; i++)
   {
-    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_icm[i]));
+    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_sp[i]));
     //      std::cout << _plane.getReference(i)[0] << "\t";
     //      std::cout << _plane.getReference(i)[1] << "\t";
 
@@ -124,7 +126,6 @@ void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
       _b[i] = _b_st[i] - _heading;
 
       _b[i] += std::pow(vel,pow) / l * _temp[i];
-
 //      std::cout << i << ": " << std::pow(vel,pow) / l << std::endl;
 
     }
@@ -139,6 +140,12 @@ void mgnss::events::Steering2::compute(const mwoibn::Vector3 next_step)
     _b_st[i] = _b[i] + _heading; // do give the result in the world frame
 
   }
+
+//  std::cout << "_v_sp\t" << _v_sp.transpose() << std::endl;
+//  std::cout << "_v_icm\t" << _v_icm.transpose() << std::endl;
+//  std::cout << "_b_sp\t" << _b_sp.transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << "_b_icm\t" << _b_icm.transpose()*180/mwoibn::PI << std::endl;
+
 //  if(slow)
 //    std::cout << "slow down" << std::endl;
 
@@ -150,7 +157,7 @@ void mgnss::events::Steering2::_ICM(mwoibn::Vector3 next_step)
   for (int i = 0; i < _size; i++)
   {
 //    _plane.getPointStateReference(i);
-    _plane_ref.noalias() = _plane.getPointStateReference(i);
+    _plane_ref.noalias() = _plane.getPointStateReference(i).head(2);
 
     _x = std::cos(_heading) * next_step[0];
     _x += std::sin(_heading) * next_step[1];
@@ -177,10 +184,11 @@ void mgnss::events::Steering2::_PT(int i)
 {
   // Desired state
 
-  _plane_ref[0] = _plane.getWorldError()[2 * i]; // size 2
-  _plane_ref[1] = _plane.getWorldError()[2 * i + 1];
+  _plane_ref.noalias() = _plane.getReferenceError(i).head(2); // size 2
 
   _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]);
 
   _v_sp[i] = _plane_ref.norm() / _dt;
+
+
 }

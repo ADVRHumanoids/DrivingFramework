@@ -732,7 +732,6 @@ void mwoibn::robot_class::Robot::addBiMap(robot_class::Robot& other,
 mwoibn::robot_class::BiMap
 mwoibn::robot_class::Robot::readBiMap(YAML::Node config)
 {
-
   if (!config["chain"])
     throw(
         std::invalid_argument("Required element chain has not been defined."));
@@ -1018,6 +1017,7 @@ std::string mwoibn::robot_class::Robot::_readUrdf(YAML::Node config)
   if (!config["urdf"]["file"])
     throw(std::invalid_argument(
         "Please define an urdf source in the yaml file.\n"));
+
 
   std::string file = "";
   if (config["urdf"]["path"])

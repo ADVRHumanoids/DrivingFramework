@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>xbot_plugins</name>
   <version>0.0.0</version>
   <description>The xbot_plugins package</description>
@@ -39,9 +39,15 @@
   <!--   <run_depend>message_runtime</run_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
+
   <buildtool_depend>catkin</buildtool_depend>
-
-
+  <depend>robot_class_xbot</depend> <!-- all programs -->
+  <depend>hierarchical_control</depend> 
+  <depend>motor_side_reference</depend> 
+  <depend>gravity_compensation</depend> 
+  <depend>dynamic_models</depend> 
+  <depend>controllers</depend> 
+  <depend>custom_services</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

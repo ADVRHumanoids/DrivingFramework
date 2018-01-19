@@ -268,6 +268,15 @@ public:
   const mwoibn::VectorN& getState() const { return _state; }
   const mwoibn::VectorN& getWorldError() const { return _full_error; }
 
+  virtual const mwoibn::VectorN getReferenceError(int i)
+  {
+    _rotation << std::cos( _state[2]), std::sin( _state[2]), 0,
+            -std::sin( _state[2]), std::cos( _state[2]), 0,
+            0,                    0,                    1;
+
+    return  _rotation * (_full_error.segment<3>(3*i));
+  }
+
   virtual void releaseContact(int i){_selector[i] = true;}
   virtual void claimContact(int i){_selector[i] = false;}
 

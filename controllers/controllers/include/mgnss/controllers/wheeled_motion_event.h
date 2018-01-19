@@ -27,7 +27,12 @@ public:
 
   ~WheeledMotionEvent() {}
 
-  void init() { _steering_ptr->init(); }
+  void init();
+
+  void stop();
+
+  void setRate(){ _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);}
+
   void resetSteering();
 
   void setSteering(int i, double th)
@@ -94,6 +99,10 @@ public:
   }
 
   void updateBase(){
+
+//    std::cout << "_linear_vel\t" << _linear_vel << std::endl;
+//    std::cout << "_rate\t" << _robot.rate() << std::endl;
+//    std::cout << "_angular_vel\t" << _angular_vel << std::endl;
 
     _position += _linear_vel * _robot.rate();
     _heading += _angular_vel[2] * _robot.rate();

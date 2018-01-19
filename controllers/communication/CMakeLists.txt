@@ -26,11 +26,9 @@ if(XBOT)
   find_package(XBotCore-interfaces REQUIRED)
   find_package(XBotInterface REQUIRED)
 
-  LIST( APPEND INSTALL_TARGETS gravity_test_communication)
-  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services)
+  LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt odometry_to_rt)
+  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services custom_messages)
 
-#  LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt)
-#  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services)
 endif(XBOT)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -81,11 +79,21 @@ target_link_libraries(gravity_test_communication
     ${XBotInterface_LIBRARIES}
  )
 #
-#add_executable(base_to_rt src/gazebo_base_to_RT.cpp)
-#add_dependencies(base_to_rt ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
-#target_link_libraries(base_to_rt
-#    ${catkin_LIBRARIES}
-# )
+add_executable(base_to_rt src/gazebo_base_to_RT.cpp)
+add_dependencies(base_to_rt ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
+target_link_libraries(base_to_rt
+    ${catkin_LIBRARIES}
+    ${XBotCore-interfaces_LIBRARIES} 
+    ${XBotInterface_LIBRARIES}
+ )
+
+add_executable(odometry_to_rt src/odometry_to_RT.cpp)
+add_dependencies(odometry_to_rt ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS} ${XBotInterface_EXPORTED_TARGETS})
+target_link_libraries(odometry_to_rt
+    ${catkin_LIBRARIES}
+    ${XBotCore-interfaces_LIBRARIES} 
+    ${XBotInterface_LIBRARIES}
+ )
 #
 ##add_executable(wheels_references src/wheels_refs.cpp)
 ##add_dependencies(wheels_references ${catkin_EXPORTED_TARGETS} ${XBotCore-interfaces_EXPORTED_TARGETS})

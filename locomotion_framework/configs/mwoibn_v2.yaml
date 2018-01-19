@@ -1,4 +1,4 @@
-driving_apth: &driving  "/home/centauro/src/catkin_malgorzata/src/"
+driving_path: &driving  "/home/centauro/src/catkin_malgorzata/src/"
 simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
 mwoibn:
         middleware: "XBOT"
@@ -353,7 +353,7 @@ mwoibn:
                 source:
                         config: 
                                 path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml"
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
                         urdf: 
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
@@ -370,7 +370,6 @@ mwoibn:
                         controller: 
                                 path: *driving
                                 file: "" 
-
                 mapping:
                         RBDL_LOWER:
                                 loading: model

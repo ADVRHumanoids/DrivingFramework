@@ -115,8 +115,12 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 10 * ratio;
+  gain << 20 * ratio;
   _hierarchical_controller.addTask(_com_ptr.get(), gain, task,
+                                   damp);
+  task++;
+  gain << 20 * ratio;
+  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
   gain << 10 * ratio;
@@ -128,10 +132,7 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
-  gain << 20 * ratio;
-  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
-                                   damp);
-  task++;
+
   _dt = _robot.rate();
 
   _leg_steer_ptr->updateError();
@@ -144,7 +145,7 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
   mwoibn::VectorN init;
   init.setZero(4);
   _steering_ref_ptr.reset(new mgnss::events::Steering2(
-      _robot, *_steering_ptr, init, 0.7, 0.3, _dt, 0.1));
+      _robot, *_steering_ptr, init, 0.7, 0.3, _dt, 0.05));
 
   _leg_steer_ptr->setReference(steerings);
   _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
@@ -257,6 +258,21 @@ void mwoibn::WheeledMotionCom::compute()
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
 
+
+  mwoibn::VectorN test(4);
+  _robot.command.get(test,_select_steer);
+
+
+  std::cout << "original\t" << test.transpose() << std::endl;
+  for (int i = 0; i < 4; i++)
+  {
+    test[i] = (test[i] < _l_limits[i]) ? test[i] + mwoibn::PI : test[i];
+    test[i] = (test[i] > _u_limits[i]) ? test[i] - mwoibn::PI : test[i];
+  }
+  std::cout << "limitied\t" << test.transpose() << std::endl;
+  _robot.command.set(test,_select_steer);
+
+
   if (count == 30)
   {
 //    std::cout << "com\t";
@@ -284,16 +300,6 @@ void mwoibn::WheeledMotionCom::compute()
   }
   else
     count++;
-  //  _robot.command.get(_test_limits, _select_steer);
-  //  bool retry = false;
-
-  //  for(int i = 0; i < _l_limits.size(); i++)
-  //    retry = retry && _l_limits[i] < _test_limits[i] && _u_limits[i] >
-  //    _test_limits[i];
-
-  //  std::cout << "limit\t" << _test_limits.transpose() << std::endl;
-
-  //  std::cout << "on limit\t" << retry << std::endl;
 }
 
 void mwoibn::WheeledMotionCom::steering()
@@ -308,6 +314,7 @@ void mwoibn::WheeledMotionCom::steering()
     steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
     steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
     setSteering(i, steerings[i]);
-//    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
   }
+    std::cout << "reference\t" << steerings.transpose()*180/mwoibn::PI << std::endl;
+
 }

@@ -1,4 +1,6 @@
-﻿#include <mwoibn/loaders/robot.h>
+﻿#include <config.h>
+
+#include <mwoibn/loaders/robot.h>
 #include <mgnss/controllers/wheeled_motion_full.h>
 
 #include <mgnss/controllers/wheeled_motion_com.h>
@@ -18,7 +20,8 @@ int main ( int argc, char** argv )
         // init wheels_controller
         mwoibn::loaders::Robot loader;
 
-        mwoibn::robot_class::Robot& robot = loader.init ( "/home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default" );
+        mwoibn::robot_class::Robot& robot = loader.init ( std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml", "default", std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/"
+                                                                                                                                                                                                                         "locomotion_framework/configs/lower_body.yaml" );
 
         mwoibn::WheeledMotionCom wheeld_controller ( robot );
 

@@ -65,6 +65,8 @@ protected:
   //  virtual void _updateFeedbackOnline();
 
   virtual void _loadControllers(YAML::Node config);
+
+  void _initStates();
   //  virtual void _initControllersLowerLevel(YAML::Node config);
 
   //  virtual void _initFloatingBase(YAML::Node config);

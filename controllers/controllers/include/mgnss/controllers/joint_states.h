@@ -21,7 +21,7 @@ public:
   bool setFullPosition(std::string name);
 
   void step(double step) { _step = step; }
-
+  void init();
   void update();
   void send();
 

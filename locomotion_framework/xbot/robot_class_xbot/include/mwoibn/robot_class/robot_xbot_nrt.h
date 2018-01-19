@@ -39,7 +39,7 @@ public:
   virtual bool isRunning() { _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
-
+  virtual void _init(YAML::Node config, YAML::Node robot);
   virtual void _loadControllers(YAML::Node config);
   bool _spin = false;
   std::unique_ptr<ros::Rate> _rate_ptr;

@@ -29,23 +29,6 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
                                                    YAML::Node robot)
 {
 
-  if (!config["source"])
-    throw(std::invalid_argument("Please define sources for XBot.\n"));
-
-  if (!config["source"]["config"])
-    throw(std::invalid_argument(
-        "Please define path to XBot configuration file for feedback.\n"));
-
-  if (!config["source"]["config"]["file"])
-    throw(std::invalid_argument(
-        "Please define path to XBot configuration file for feedback.\n"));
-
-  std::string file = "";
-  if (config["source"]["config"]["path"]) file = config["source"]["config"]["path"].as<std::string>();
-
-  file += config["source"]["config"]["file"].as<std::string>();
-
-  _robot = XBot::RobotInterface::getRobot(file);
 
   biMaps().add(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
 
@@ -53,13 +36,23 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
   _loadFeedbacks(robot["feedback"]);
   _loadControllers(robot["controller"]);
 
-  _robot->sense();
-  
-  mwoibn::VectorN reference(_robot->getJointNum());
+  _initStates();
 
-  _robot->getMotorPosition(reference);
-  _robot->setPositionReference(reference);
   
+}
+
+void mwoibn::robot_class::RobotXBotFeedback::_initStates(){
+    _robot->sense();
+
+    mwoibn::VectorN reference(_robot->getJointNum());
+
+    _robot->getMotorPosition(reference);
+    _robot->setPositionReference(reference);
+
+    reference.setZero();
+
+    _robot->setVelocityReference(reference);
+
 }
 
 void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)

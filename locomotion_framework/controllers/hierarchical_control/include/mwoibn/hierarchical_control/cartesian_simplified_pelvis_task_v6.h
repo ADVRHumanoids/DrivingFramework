@@ -278,6 +278,13 @@ public:
   virtual void releaseContact(int i){_selector[i] = true;}
   virtual void claimContact(int i){_selector[i] = false;}
 
+  virtual const mwoibn::VectorN getReferenceError(int i)
+  {
+    _rotation << std::cos( _state[2]), std::sin( _state[2]),
+            -std::sin( _state[2]), std::cos( _state[2]);
+    return  _rotation * (_full_error.segment<2>(2*i));
+  }
+
 protected:
   mwoibn::VectorN _state, _zero, _wheels, _full_error, _directions;
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;

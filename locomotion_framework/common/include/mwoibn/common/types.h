@@ -67,6 +67,7 @@ const unsigned int RBDL_NON_EXISTING = UINT_MAX;
 const int IS_VALID = INT_MAX;
 const int INVALID = 0;
 
+const int rt_size = RT_SIZE;
 }
 #endif
 

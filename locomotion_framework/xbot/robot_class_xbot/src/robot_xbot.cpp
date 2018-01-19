@@ -19,7 +19,7 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
   // retrive specific robot configuration to be loaded
   YAML::Node config_robot = _readRobotConfig(config, config_name);
 
-  // read ROS specific configuration
+//  // read ROS specific configuration
   config = config["xbot"];
 
   mwoibn::robot_class::Robot::_init(_readUrdf(config["source"]),

@@ -29,7 +29,23 @@ HEADERS += rt_plugins/include/rt_plugins/all.h \
     development/include/cartesian_simplified_pelvis_task_v3.h \
     odometry/include/mgnss/odometry/odometry.h \
     controllers/include/mgnss/controllers/wheeled_motion_full.h \
-    controllers/include/mgnss/controllers/joint_states.h
+    controllers/include/mgnss/controllers/joint_states.h \
+    controllers/include/mgnss/controllers/steering_v2.h \
+    controllers/include/mgnss/controllers/steering_v3.h \
+    controllers/include/mgnss/controllers/steering_v4.h \
+    controllers/include/mgnss/controllers/wheeled_motion_com.h \
+    controllers/include/mgnss/controllers/wheeled_motion_event.h \
+    controllers/include/mgnss/controllers/wheeled_motion_event_v2.h \
+    controllers/include/mgnss/controllers/wheeled_references_v2.h \
+    controllers/include/mgnss/controllers/wheeled_references_v3.h \
+    xbot_plugins/include/mgnss/xbot_plugins/centralized_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/combined_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/gravity_test.h \
+    xbot_plugins/include/mgnss/xbot_plugins/online_centralized_controller_plugin.h \
+    xbot_plugins/include/mgnss/xbot_plugins/rt_my_test.h \
+    xbot_plugins/include/mgnss/xbot_plugins/wheeled_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/joint_states.h \
+    xbot_plugins/include/mgnss/xbot_plugins/wheeled_controller_v2.h
 SOURCES += communication/src/basic_handler.cpp \
            communication/src/events_handler.cpp \
            communication/src/gazebo_base_to_RT.cpp \
@@ -74,7 +90,26 @@ SOURCES += communication/src/basic_handler.cpp \
     nrt_software/src/joint_states.cpp \
     controllers/src/joint_states.cpp \
     nrt_software/src/wheels_cut_v2.cpp \
-    nrt_software/src/contact_test.cpp
+    nrt_software/src/contact_test.cpp \
+    controllers/src/steering_v2.cpp \
+    controllers/src/steering_v3.cpp \
+    controllers/src/steering_v4.cpp \
+    controllers/src/wheeled_motion_com.cpp \
+    controllers/src/wheeled_motion_event.cpp \
+    controllers/src/wheeled_motion_event_v2.cpp \
+    controllers/src/wheeled_references_v2.cpp \
+    controllers/src/wheeled_references_v3.cpp \
+    nrt_software/src/com_test.cpp \
+    nrt_software/src/wheels_event.cpp \
+    xbot_plugins/src/centralized_controller.cpp \
+    xbot_plugins/src/combined_controller.cpp \
+    xbot_plugins/src/gravity_test.cpp \
+    xbot_plugins/src/online_centralized_controller_plugin.cpp \
+    xbot_plugins/src/rt_my_test.cpp \
+    xbot_plugins/src/wheeled_controller.cpp \
+    xbot_plugins/src/joint_states.cpp \
+    xbot_plugins/src/wheeled_controller_v2.cpp \
+    communication/src/odometry_to_RT.cpp
 
 unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/
 
@@ -85,6 +120,7 @@ INCLUDEPATH += $$PWD/../../../install_release/include
 DEPENDPATH += $$PWD/../../../install_release/include
 INCLUDEPATH += $$PWD/../../../install_debug/include
 DEPENDPATH += $$PWD/../../../install_debug/include
+DEPENDPATH += /home/centauro/devel-superbuild/build/install/include
 
 DISTFILES += \
     utils/nodes/__init__.py \
@@ -95,4 +131,6 @@ DISTFILES += \
     utils/launch/centauro_world_no_head.launch \
     utils/launch/rrbot_rviz.launch \
     utils/launch/tasks.launch \
-    utils/nodes/circular_reference_wheels
+    utils/nodes/circular_reference_wheels \
+    rt_plugins/CMakeLists.txt \
+    xbot_plugins/CMakeLists.txt

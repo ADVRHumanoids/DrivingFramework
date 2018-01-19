@@ -48,6 +48,7 @@ int main(int argc, char** argv)
                   "locomotion_framework/configs/lower_body.yaml");
 #ifdef FULL_ROBOT
   mwoibn::WheeledMotionEvent wheeld_controller(robot);
+  wheeld_controller.init();
 #endif
 #ifdef TWO_ROBOTS
   mwoibn::robot_class::Robot& full_robot = loader_2.init(
@@ -91,6 +92,10 @@ int main(int argc, char** argv)
     support.update();
     wheeld_controller.fullUpdate(support.get());
   }
+#ifdef FULL_ROBOT
+  wheeld_controller.stop();
+#endif
+
 }
 
 #ifdef FULL_ROBOT

@@ -93,6 +93,30 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
     
 }
 
+
+
+void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_init(YAML::Node config, YAML::Node robot){
+  if (!config["source"])
+    throw(std::invalid_argument("Please define sources for XBot.\n"));
+
+  if (!config["source"]["config"])
+    throw(std::invalid_argument(
+      "Please define path to XBot configuration file for feedback.\n"));
+
+  if (!config["source"]["config"]["file"])
+    throw(std::invalid_argument(
+      "Please define path to XBot configuration file for feedback.\n"));
+
+  std::string file = "";
+  if (config["source"]["config"]["path"]) file = config["source"]["config"]["path"].as<std::string>();
+
+  file += config["source"]["config"]["file"].as<std::string>();
+
+  _robot = XBot::RobotInterface::getRobot(file);
+
+  mwoibn::robot_class::RobotXBotFeedback::_init(config, robot);
+}
+
 void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(
     YAML::Node config)
 {

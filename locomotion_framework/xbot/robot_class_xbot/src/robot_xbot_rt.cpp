@@ -1,12 +1,17 @@
 #include "mwoibn/robot_class/robot_xbot_rt.h"
 
 mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
-    std::string config_file, std::string robot_reference,
+    XBot::RobotInterface::Ptr robot, std::string config_file, std::string robot_reference,
     XBot::SharedMemory::Ptr shared_memory)
     : RobotXBotFeedback()
 {
 
+  std::string xbot_file = config_file;
+
   YAML::Node config = YAML::LoadFile(config_file);
+
+  std::cout << "robot start" << std::endl;
+  _robot = robot;
 
   if (!config["mwoibnRobot"])
     throw(std::invalid_argument(
@@ -39,6 +44,23 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   config = getConfig(config_file,
                       secondary_file); // this is done twice with this robot
 
+//  std::string file_path = "";
+//  if(config["xbot"] && config["xbot"]["source"] && config["xbot"]["source"]["config"]){
+//      if(config["xbot"]["source"]["config"]["path"])
+//        file_path = config["xbot"]["source"]["config"]["path"].as<std::string>();
+//      if(config["xbot"]["source"]["config"]["path"])
+//        file_path += config["xbot"]["source"]["config"]["file"].as<std::string>();
+//  }
+
+//  if(file_path.compare(xbot_file)){
+//    std::cout << "WARNING: Different XBot config file has been received from constructor and config file. Proceed with the constructor file.\n";
+//    std::cout << "\tconstructor:\t" << xbot_file << "\n";
+//    std::cout << "\tfile:\t" << file_path << std::endl;
+//    }
+
+//  config["xbot"]["source"]["config"]["path"] = "";
+//  config["xbot"]["source"]["config"]["file"] = xbot_file;
+
   try
   {
     YAML::Node robot =
@@ -61,27 +83,15 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
 void mwoibn::robot_class::RobotXBotRT::_init(
     YAML::Node config, YAML::Node robot, XBot::SharedMemory::Ptr shared_memory)
 {
-  if (!config["source"])
-    throw(std::invalid_argument("Please define sources for XBot.\n"));
-
-  if (!config["source"]["config"]["file"])
-    throw(std::invalid_argument(
-        "Please define path to XBot configuration file for feedback.\n"));
-
-  std::string file = "";
-  if (config["source"]["config"]["path"]) file = config["source"]["config"]["path"].as<std::string>();
-
-  file += config["source"]["config"]["file"].as<std::string>();
-
-  _robot = XBot::RobotInterface::getRobot(file);
 
   biMaps().add(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
   //  _xbot_map = biMaps().getId("XBOT");
+  _loadMappings(robot["mapping"]);
 
   _loadFeedbacks(robot["feedback"], shared_memory);
   _loadControllers(robot["controller"], shared_memory);
 
-  update();
+  mwoibn::robot_class::RobotXBotFeedback::_initStates();
 }
 
 void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
@@ -145,6 +155,8 @@ void mwoibn::robot_class::RobotXBotRT::_loadControllers(
 
   for (auto entry : config)
   {
+    if (entry.first.as<std::string>() == "source") continue;
+
     entry.second["name"] = entry.first.as<std::string>();
 
     BiMap map = readBiMap(entry.second["dofs"]);

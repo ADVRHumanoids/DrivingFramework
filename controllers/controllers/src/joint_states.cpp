@@ -5,7 +5,6 @@
       : _robot(robot), _wheels("pelvis", robot)
   {
 
-    _position = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
     _vel_map = _robot.selectors().get("wheels").which();
     _ankle_map = _robot.selectors().get("camber").which();
@@ -15,18 +14,27 @@
     _vel_sign.setOnes(_vel_map.size());
     _last_ankle.setZero(_ankle_map.size());
     _des_ankle.setZero(_ankle_map.size());
-    _robot.state.get(_des_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+
     _init_ankle.setZero(_ankle_map.size());
-    _robot.state.get(_init_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
 
-    _pos_ref = _position;
-    _vel_ref = _velocity;
-
-    _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
     for (auto link : _robot.getLinks("wheels"))
       _wheels.addPoint(link);
 
-    _wheels_positions = _wheels.getFullStatesReference();
+  }
+
+  void mgnss::controllers::JointStates::init(){
+      _position = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+
+      _robot.state.get(_des_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+      _robot.state.get(_init_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+
+      _pos_ref = _position;
+      _vel_ref = _velocity;
+
+      _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+      _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
+
+      _wheels_positions = _wheels.getFullStatesReference();
 
   }
 
@@ -112,7 +120,7 @@
   {
     _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
 
-    if(_init){
+    if(_init && _ankle_map.size()){
 
       for (int k = 0; k < _ankle_map.size(); k++)
       {
@@ -126,8 +134,6 @@
         }
         else
           _position[i] = _pos_ref[i];
-
-//        std::cout << _position[i] << std::endl;
 
       }
 
@@ -188,6 +194,7 @@
       _velocity[i] = _vel_sign[i] * _error.norm() / _robot.rate();
 
     }
+//    std::cout << _velocity.transpose() << std::endl;
   }
 
   void mgnss::controllers::JointStates::send()

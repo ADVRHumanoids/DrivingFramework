@@ -27,6 +27,7 @@ int main(int argc, char** argv)
 
   mgnss::controllers::JointStates controller(robot);
 
+  controller.init();
   ros::ServiceServer trajectory_service =
       n.advertiseService<custom_services::jointStateCmnd::Request,
                          custom_services::jointStateCmnd::Response>(

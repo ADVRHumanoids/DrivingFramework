@@ -58,7 +58,9 @@ public:
   //! Returns number of actuated(?) DOFs
   int getDofs() { return _model.dof_count; }
   
-  virtual double rate() {}
+  virtual double rate() {return _rate;}
+
+  virtual void setRate(double rate){_rate = rate;}
 
   //! Returns pointer to the robot model
   RigidBodyDynamics::Model& getModel() { return _model; }
@@ -188,6 +190,7 @@ protected:
   //! Keeps information whether the robot is static or not
   bool _is_static;
 
+  double _rate = 0;
   //! Keeps data about considered contacts
   std::unique_ptr<Contacts> _contacts;
 

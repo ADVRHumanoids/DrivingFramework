@@ -17,7 +17,7 @@ MasterCommunicationInterface:
   framework_name: "ROS"
 
 XBotRTPlugins:
-  plugins: ["HomingExample", "GcompPlugin"]
+  plugins: ["HomingExample", "JointStates", "WheelsV2" ]
   io_plugins: []
   
 NRTPlugins:
@@ -69,3 +69,23 @@ GazeboXBotPlugin:
     j_wheel_2: *wheel
     j_wheel_3: *wheel
     j_wheel_4: *wheel
+
+mwoibnRobot:
+  robot:
+        config_file: &config /home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
+        config_name: default
+        secondary_file: &config_lower /home/centauro/src/catkin_malgorzata/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
+  robot2:
+        config_file: *config
+        config_name: reference
+        secondary_file: *config_lower
+  robot3:
+        config_file: *config
+        config_name: joint_space
+  higher_scheme:
+        config_file: *config
+        config_name: higher_scheme
+  default:
+        config_file: *config
+        config_name: default
+

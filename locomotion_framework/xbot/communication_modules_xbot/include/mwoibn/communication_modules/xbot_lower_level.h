@@ -65,6 +65,8 @@ public:
     _robot.setStiffness(stiffness);
     _robot.setDamping(damping);
 
+
+
     pub.setZero(_dofs);
   }
 
