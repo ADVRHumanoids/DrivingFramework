@@ -29,7 +29,27 @@ HEADERS += rt_plugins/include/rt_plugins/all.h \
     development/include/cartesian_simplified_pelvis_task_v3.h \
     odometry/include/mgnss/odometry/odometry.h \
     controllers/include/mgnss/controllers/wheeled_motion_full.h \
-    controllers/include/mgnss/controllers/joint_states.h
+    controllers/include/mgnss/controllers/joint_states.h \
+    controllers/include/mgnss/controllers/wheeled_motion_com.h \
+    controllers/include/mgnss/controllers/steering_v2.h \
+    controllers/include/mgnss/controllers/wheeled_motion_event.h \
+    controllers/include/mgnss/controllers/steering_v3.h \
+    controllers/include/mgnss/controllers/wheeled_references_v2.h \
+    controllers/include/mgnss/controllers/wheeled_references_v3.h \
+    controllers/include/mgnss/controllers/wheeled_motion_event_v2.h \
+    controllers/include/mgnss/controllers/steering_v4.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/centralized_controller.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/combined_controller.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/gravity_test.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/online_centralized_controller_plugin.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/rt_my_test.h \
+    rt_plugins (copy)/include/mgnss/rt_plugins/wheeled_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/centralized_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/combined_controller.h \
+    xbot_plugins/include/mgnss/xbot_plugins/gravity_test.h \
+    xbot_plugins/include/mgnss/xbot_plugins/online_centralized_controller_plugin.h \
+    xbot_plugins/include/mgnss/xbot_plugins/rt_my_test.h \
+    xbot_plugins/include/mgnss/xbot_plugins/wheeled_controller.h
 SOURCES += communication/src/basic_handler.cpp \
            communication/src/events_handler.cpp \
            communication/src/gazebo_base_to_RT.cpp \
@@ -74,12 +94,39 @@ SOURCES += communication/src/basic_handler.cpp \
     nrt_software/src/joint_states.cpp \
     controllers/src/joint_states.cpp \
     nrt_software/src/wheels_cut_v2.cpp \
-    nrt_software/src/contact_test.cpp
+    nrt_software/src/contact_test.cpp \
+    nrt_software/src/com_test.cpp \
+    controllers/src/wheeled_motion_com.cpp \
+    controllers/src/steering_v2.cpp \
+    controllers/src/wheeled_motion_event.cpp \
+    controllers/src/steering_v3.cpp \
+    nrt_software/src/wheels_event.cpp \
+    controllers/src/wheeled_references_v2.cpp \
+    controllers/src/wheeled_references_v3.cpp \
+    controllers/src/wheeled_motion_event_v2.cpp \
+    controllers/src/steering_v4.cpp \
+    rt_plugins (copy)/build/CMakeFiles/3.5.1/CompilerIdCXX/CMakeCXXCompilerId.cpp \
+    rt_plugins (copy)/build/CMakeFiles/feature_tests.cxx \
+    rt_plugins (copy)/src/centralized_controller.cpp \
+    rt_plugins (copy)/src/combined_controller.cpp \
+    rt_plugins (copy)/src/gravity_test.cpp \
+    rt_plugins (copy)/src/online_centralized_controller_plugin.cpp \
+    rt_plugins (copy)/src/rt_my_test.cpp \
+    rt_plugins (copy)/src/wheeled_controller.cpp \
+    xbot_plugins/src/centralized_controller.cpp \
+    xbot_plugins/src/combined_controller.cpp \
+    xbot_plugins/src/gravity_test.cpp \
+    xbot_plugins/src/online_centralized_controller_plugin.cpp \
+    xbot_plugins/src/rt_my_test.cpp \
+    xbot_plugins/src/wheeled_controller.cpp \
+    rt_plugins (copy)/build/CMakeFiles/3.5.1/CompilerIdC/CMakeCCompilerId.c \
+    rt_plugins (copy)/build/CMakeFiles/feature_tests.c
 
 unix:!macx: LIBS += -L$$PWD/../../../install_release/lib/
 
 INCLUDEPATH += /opt/ros/kinetic/include
 INCLUDEPATH += /usr/include/eigen3
+INCLUDEPATH += /home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/include
 
 INCLUDEPATH += $$PWD/../../../install_release/include
 DEPENDPATH += $$PWD/../../../install_release/include
@@ -95,4 +142,12 @@ DISTFILES += \
     utils/launch/centauro_world_no_head.launch \
     utils/launch/rrbot_rviz.launch \
     utils/launch/tasks.launch \
-    utils/nodes/circular_reference_wheels
+    utils/nodes/circular_reference_wheels \
+    xbot_plugins/CMakeLists.txt \
+    rt_plugins (copy)/CMakeLists.txt \
+    xbot_plugins/include/configs/centralized_controller.yaml \
+    xbot_plugins/package.xml \
+    xbot_plugins/config/FindEigen3.cmake \
+    xbot_plugins/config/FindXBotInterface.cmake \
+    xbot_plugins/config/FindXenomai.cmake \
+    xbot_plugins/config/MacroYCMInstallLibrary.cmake

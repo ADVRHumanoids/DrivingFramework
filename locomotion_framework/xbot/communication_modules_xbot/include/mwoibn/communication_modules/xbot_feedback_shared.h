@@ -27,7 +27,7 @@ public:
 
     if (_position)
     {
-      _sub_position = shared_memory->getSharedObject<mwoibn::VectorRT>(
+      _sub_position = shared_memory->get<mwoibn::VectorRT>(
           config["source"].as<std::string>() + "/position");
 
       std::cout << "\tInitialized position interface in "
@@ -35,35 +35,29 @@ public:
     }
     if (_velocity)
     {
-      _sub_velocity = shared_memory->getSharedObject<mwoibn::VectorRT>(
+      _sub_velocity = shared_memory->get<mwoibn::VectorRT>(
           config["source"].as<std::string>() + "/velocity");
       std::cout << "\tInitialized velocity interface in "
                 << config["source"].as<std::string>() << "/velocity\n";
     }
     if (_torque)
     {
-      _sub_torque = shared_memory->getSharedObject<mwoibn::VectorRT>(
+      _sub_torque = shared_memory->get<mwoibn::VectorRT>(
           config["source"].as<std::string>() + "/torque");
       std::cout << "\tInitialized torque interface in "
                 << config["source"].as<std::string>() << "/torque\n";
     }
-    
 
     std::cout << "\tSuccess" << std::endl;
   }
 
   virtual bool initialized()
   {
-    _sub_position.get(_positions);
-    if (_position && _positions[check] != mwoibn::IS_VALID)
+    if (_position && (*_sub_position)[check] != mwoibn::IS_VALID)
       return false;
-    
-    _sub_velocity.get(_velocities);
-    if (_velocity && _velocities[check] != mwoibn::IS_VALID)
+    if (_velocity && (*_sub_velocity)[check] != mwoibn::IS_VALID)
       return false;
-    
-    _sub_torque.get(_torques);
-    if (_torque && _torques[check] != mwoibn::IS_VALID)
+    if (_torque && (*_sub_torque)[check] != mwoibn::IS_VALID)
       return false;
 
     return true;
@@ -77,20 +71,17 @@ public:
 
     if (_position)
     {
-       _sub_position.get(_positions);
-      _command.set(_positions, _map.reversed(),
+      _command.set(*_sub_position, _map.reversed(),
                    robot_class::INTERFACE::POSITION);
     }
     if (_velocity)
     {
-      _sub_velocity.get(_velocities);
-      _command.set(_velocities, _map.reversed(),
+      _command.set(*_sub_velocity, _map.reversed(),
                    robot_class::INTERFACE::VELOCITY);
     }
     if (_torque)
     {
-      _sub_torque.get(_torques);
-      _command.set(_torques, _map.reversed(),
+      _command.set(*_sub_torque, _map.reversed(),
                    robot_class::INTERFACE::TORQUE);
     }
 
@@ -98,8 +89,6 @@ public:
   }
 
 protected:
-  mwoibn::VectorRT _positions, _velocities, _torques;
-  
   XBot::SharedObject<mwoibn::VectorRT> _sub_position;
   XBot::SharedObject<mwoibn::VectorRT> _sub_velocity;
   XBot::SharedObject<mwoibn::VectorRT> _sub_torque;

@@ -1,7 +1,7 @@
 driving_apth: &driving  "/home/centauro/src/catkin_malgorzata/src/"
 simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
 mwoibn:
-        middleware: "XBOT"
+        middleware: "ROS"
         robot:
                 name: "centauro"
                 default:
