@@ -34,6 +34,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   hierarchical_control
   controllers
   custom_services
+  odometry
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -93,9 +94,8 @@ ycm_library_install(JointStates 1 0 0)
 
 LIST( APPEND INSTALL_TARGETS JointStates )
 
-
 ################################################
-############## WHEELS NEW #############
+################## WHEELS NEW ##################
 ################################################
 
 if ( Xenomai_FOUND )
@@ -110,6 +110,23 @@ add_dependencies(WheelsV2 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${E
 ycm_library_install(WheelsV2 1 0 0)
 
 LIST( APPEND INSTALL_TARGETS WheelsV2 )
+
+################################################
+################### ODOMETRY ###################
+################################################
+
+if ( Xenomai_FOUND )
+    set_xeno_flags(Odometry)
+endif()
+add_library(Odometry SHARED
+    src/odometry.cpp
+)
+
+target_link_libraries(Odometry ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+add_dependencies(Odometry ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+ycm_library_install(Odometry 1 0 0)
+
+LIST( APPEND INSTALL_TARGETS Odometry )
 
 
 #################################################

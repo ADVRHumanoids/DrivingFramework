@@ -22,13 +22,11 @@ int main(int argc, char** argv)
       path + "DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
       "odometry",
       path + "DrivingFramework/locomotion_framework/configs/lower_body.yaml");
-  // mwoibn::robot_class::RobotXBotNRT
-  // robot(path+"DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml",
-  // "odometry");
 
   mgnss::odometry::Odometry odometry(
       robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078);
 
+  odometry.init();
   while (ros::ok())
   {
     odometry.update();

@@ -19,7 +19,7 @@ public:
 
     const mwoibn::Vector6& get(){return _base;}
     void update();
-
+    void init();
 
 protected:
     mwoibn::robot_class::Robot& _robot; // robot is needed for the joint state and imu feedbacks

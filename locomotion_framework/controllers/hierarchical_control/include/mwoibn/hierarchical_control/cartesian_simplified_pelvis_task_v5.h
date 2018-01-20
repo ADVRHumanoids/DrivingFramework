@@ -3,6 +3,7 @@
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/cartesian_world_task.h"
+#include "mwoibn/hierarchical_control/center_of_mass_task.h"
 #include "mwoibn/point_handling/robot_points_handler.h"
 #include <rbdl/rbdl.h>
 
@@ -27,8 +28,8 @@ public:
    *
    */
   CartesianFlatReferenceTask2(point_handling::PositionsHandler ik,
-                              mwoibn::robot_class::Robot& robot)
-      : CartesianWorldTask(ik), _robot(robot)
+                              mwoibn::robot_class::Robot& robot, mwoibn::hierarchical_control::CenterOfMassTask& com)
+      : CartesianWorldTask(ik), _robot(robot), _com(com)
   {
     _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
         "ROOT", robot, robot.getLinks("base")));
@@ -41,10 +42,10 @@ public:
     _flat_model.gravity = mwoibn::Vector3(0., -9.81, 0.);
     RigidBodyDynamics::Math::Matrix3d inertia =
         RigidBodyDynamics::Math::Matrix3dZero;
-    RigidBodyDynamics::Math::Vector3d com =
+    RigidBodyDynamics::Math::Vector3d l_com =
         RigidBodyDynamics::Math::Vector3dZero;
 
-    RigidBodyDynamics::Body body_a(0, com, inertia);
+    RigidBodyDynamics::Body body_a(0, l_com, inertia);
     RigidBodyDynamics::Joint joint_a(
         RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 1., 0., 0.),
         RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 1., 0.),
@@ -54,7 +55,7 @@ public:
                RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
         joint_a, body_a));
 
-    RigidBodyDynamics::Body body_b(0, com, inertia);
+    RigidBodyDynamics::Body body_b(0, l_com, inertia);
     RigidBodyDynamics::Joint joint_b(
         RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 0., 1.),
         RigidBodyDynamics::Math::SpatialVector(0., 1., 0., 0., 0., 0.),
@@ -128,7 +129,6 @@ public:
     }
 //    std::cout << "contact\t" << "\t" << _full_error.transpose() << "\t ref \t" << _reference.transpose() <<  std::endl;
 
-
   }
 
   void updateState()
@@ -198,13 +198,13 @@ public:
     {
 
       if(_selector[i]){
-      _jacobian.row(3*i).noalias() = _directions.segment<2>(2*i).transpose() * (_robot.centerOfMass().getJacobian().topRows<2>() - _ik.getFullPointJacobian(i).topRows<2>());
+      _jacobian.row(3*i).noalias() = _directions.segment<2>(2*i).transpose() * (-_com.getJacobian() - _ik.getFullPointJacobian(i).topRows<2>());
       _jacobian.row(3*i + 1).setZero();
       _jacobian.row(3*i + 2).setZero();
       }
       else{
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = -_ik.getFullPointJacobian(i);
-        _jacobian.block(3 * i, 0, 2, _robot.getDofs()) = _robot.centerOfMass().getJacobian().topRows<2>() + _jacobian.block(3 * i, 0, 2, _robot.getDofs());
+        _jacobian.block(3 * i, 0, 2, _robot.getDofs()) = -_com.getJacobian() + _jacobian.block(3 * i, 0, 2, _robot.getDofs());
 //        _jacobian.row(3*i + 2).setZero();
       }
     }
@@ -284,6 +284,7 @@ protected:
   mwoibn::VectorN _state, _zero, _wheels, _full_error, _directions;
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
+  mwoibn::hierarchical_control::CenterOfMassTask& _com;
   mwoibn::robot_class::Robot& _robot;
   RigidBodyDynamics::Model _flat_model;
   mwoibn::Vector3 _point_flat, _temp_point;

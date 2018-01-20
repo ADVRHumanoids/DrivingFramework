@@ -45,6 +45,7 @@ void CenterOfMass::computeJacobian()
   for (int i = 0; i < _points.size(); i++)
   {
     _jacobian += _masses.at(i) * temp_jacobians.at(i);
+//    std::cout << "jacobian i\n" << temp_jacobians.at(i) << std::endl;
   }
 
   _jacobian = _jacobian / _mass;

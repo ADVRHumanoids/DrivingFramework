@@ -406,7 +406,7 @@ mwoibn:
                                 layer: NRT
                                 source: "desired_state"
                         odometry: 
-                                layer: NRT
+                                layer: RT
                                 source: "base_odometry"
                 controller:
                         position_controller:
@@ -424,7 +424,7 @@ mwoibn:
                                 layer: NRT
                                 sink: "desired_state"
                         odometry:
-                                layer: NRT
+                                layer: RT
                                 sink: "base_odometry"
                                  
                               

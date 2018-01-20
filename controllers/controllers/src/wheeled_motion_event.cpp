@@ -34,7 +34,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
       new mwoibn::hierarchical_control::CartesianFlatReferenceTask2(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                    robot.getLinks("wheels")),
-          _robot));
+          _robot, *_com_ptr.get()));
 
   mwoibn::Axis x, y, z, ax;
   z <<   0,  1,  0;
@@ -103,7 +103,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
       {castor1, castor2, castor3, castor4}, robot));
 
   int task = 0;
-  int ratio = 1.0;
+  double ratio = 4.0;
   double damp = 1e-4;
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
@@ -124,10 +124,10 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 10 * ratio;
+  gain << 15 * ratio; // 10
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 15 * ratio;
+  gain << 10 * ratio; // 15
   _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.04);
   task++;
   gain << 10 * ratio;
@@ -319,7 +319,7 @@ void mwoibn::WheeledMotionEvent::steering()
     setSteering(i, steerings[i]);
 
   }
-  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
 
 //  std::cout << "next step\t" << _next_step.transpose() << std::endl;
 

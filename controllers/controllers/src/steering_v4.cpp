@@ -178,8 +178,9 @@ void mgnss::events::Steering4::_SPT()
 void mgnss::events::Steering4::_PT(int i)
 {
   // Desired state
-    _plane_ref.noalias() = _plane.getReferenceError(i).head(2); // size 2
-
+//    _plane_ref.noalias() = _plane.getReferenceError(i).head(2); // size 2
+  _plane_ref[0] = _plane.getWorldError()[2*i];
+  _plane_ref[1] = _plane.getWorldError()[2*i+1];
 
   _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]);
 

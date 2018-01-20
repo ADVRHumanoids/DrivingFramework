@@ -280,9 +280,10 @@ public:
 
   virtual const mwoibn::VectorN getReferenceError(int i)
   {
-    _rotation << std::cos( _state[2]), std::sin( _state[2]),
-            -std::sin( _state[2]), std::cos( _state[2]);
-    return  _rotation * (_full_error.segment<2>(2*i));
+      _rotation << std::cos( _state[2]), std::sin( _state[2]), 0,
+                  -std::sin( _state[2]), std::cos( _state[2]), 0,
+                   0,                    0,                    1;
+    return  _rotation * (_full_error.segment<3>(3*i));
   }
 
 protected:

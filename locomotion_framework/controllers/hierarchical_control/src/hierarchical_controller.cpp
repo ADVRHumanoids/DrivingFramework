@@ -88,11 +88,15 @@ void mwoibn::hierarchical_control::HierarchicalController::compute()
 
   int i = 0;
 
+//  std::cout << "new" << std::endl;
+
   for (auto& task : _tasks_ptr)
   {
     _errors[i].noalias() = -(_gains[i].asDiagonal() * task->getError());
     _errors[i].noalias() -= task->getJacobian() * _command;
 
+//    std::cout << "error\t" << task->getError() << "\t" << std::endl;
+//    std::cout << "Jacobian\t" << task->getJacobian() << "\t" << std::endl;
     if (_errors[i].size())
     {
             _inversers_ptrs[i]->compute(task->getJacobian(), _P);

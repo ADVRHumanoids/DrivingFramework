@@ -10,9 +10,9 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   _state.setZero(names.size());
   _error.setZero(names.size());
   _distance.setZero(names.size());
-
   _selector.setOnes(names.size()); // assume all legs in ground contact
   _contacts.setOnes(names.size()); // assume all legs in ground contact
+  _previous_state.setZero(names.size());
 
   for (const auto& name : names)
     _wheels_ph.addPoint(name);
@@ -37,14 +37,24 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
     _ids[i] = dof[0];
   }
 
-  _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
-
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
 
-  _previous_state = _state;
 
-  update();
+}
+
+void mgnss::odometry::Odometry::init(){
+
+    _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
+
+    for(int i = 0; i < _estimated.size(); i++)
+    _estimated[i] =
+        _wheels_ph.getPointStateWorld(i); // start without an error for now
+
+    _previous_state.noalias() = _state;
+
+    update();
+
 }
 
 void mgnss::odometry::Odometry::update()

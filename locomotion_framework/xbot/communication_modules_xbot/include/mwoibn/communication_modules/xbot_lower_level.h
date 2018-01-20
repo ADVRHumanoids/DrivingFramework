@@ -65,6 +65,7 @@ public:
     _robot.setStiffness(stiffness);
     _robot.setDamping(damping);
 
+//    std::cout << stiffness << std::endl;
 
 
     pub.setZero(_dofs);

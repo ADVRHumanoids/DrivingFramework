@@ -106,7 +106,7 @@ void mgnss::events::Steering3::compute(const mwoibn::Vector3 next_step)
 //  bool slow = false;
   for (int i = 0; i < _size; i++)
   {
-    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_st[i]));
+    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_sp[i]));
     //      std::cout << _plane.getReference(i)[0] << "\t";
     //      std::cout << _plane.getReference(i)[1] << "\t";
 
@@ -181,7 +181,8 @@ void mgnss::events::Steering3::_PT(int i)
   // Desired state
 
   _plane_ref.noalias() = _plane.getReferenceError(i).head(2); // size 2
-
+//  _plane_ref[0] = _plane.getWorldError()[3*i];
+//  _plane_ref[1] = _plane.getWorldError()[3*i+1];
 
   _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]);
 
