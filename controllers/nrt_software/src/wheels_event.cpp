@@ -26,6 +26,14 @@
                    mwoibn::WheeledMotionEvent* controller);
 #endif
 
+// LOG
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <ctime>
+#include <chrono>
+// !LOG
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "wheels_reference"); // initalize node
@@ -71,10 +79,6 @@ int main(int argc, char** argv)
   support.setRadious(0.38);
   support.setStep(0.0005);
 
-  //        mwoibn::Base base;
-
-  //  base.heading.setUpperLimit(2 * 3.1416 / 180);
-  //  base.heading.setLowerLimit(-2 * 3.1416 / 180);
   // ros topics/service support
   ros::ServiceServer service =
       n.advertiseService<custom_services::updatePDGains::Request,
@@ -86,11 +90,46 @@ int main(int argc, char** argv)
   support.setCurrent(wheeld_controller.getSupportReference());
   support.setDesired(wheeld_controller.getSupportReference());
 
+  // LOG
+  std::ostringstream oss;
+  std::ofstream file;
+
+  auto t = std::time(nullptr);
+  auto tm = *std::localtime(&t);
+
+  oss << "wheels_log_" << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << ".txt";
+
+  file.open(oss.str(),  std::ios::out);
+
+  file << "com_x\t" << "com_y\t" << "e_com_x\t" << "e_com_y\t" << "z\t" << "e_z\t";
+  file << "cp_1_x\t" << "cp_1_y\t" << "cp_1_z\t";
+  file << "cp_2_x\t" << "cp_2_y\t" << "cp_2_z\t";
+  file << "cp_3_x\t" << "cp_3_y\t" << "cp_3_z\t";
+  file << "cp_4_x\t" << "cp_4_y\t" << "cp_4_z\t";
+  file << "e_cp_1_x\t" << "e_cp_1_y\t" << "e_cp_1_z\t";
+  file << "e_cp_2_x\t" << "e_cp_2_y\t" << "e_cp_2_z\t";
+  file << "e_cp_3_x\t" << "e_cp_3_y\t" << "e_cp_3_z\t";
+  file << "e_cp_4_x\t" << "e_cp_4_y\t" << "e_cp_4_z\t";
+  file << "st_1\t" << "st_2\t" << "st_3\t" << "st_4_x\t";
+  file << "e_st_1\t" << "e_st_2\t" << "e_st_3\t" << "e_st_4_x\n";
+
+  file.flush();
+
   while (ros::ok())
   {
     support.update();
     wheeld_controller.fullUpdate(support.get());
+//    file << wheeld_controller.getCom() << "\t";
+//    file << wheeld_controller.errorCom() << "\t";
+//    file << wheeld_controller.getCp(0) << wheeld_controller.getCp(1) << wheeld_controller.getCp(2) << wheeld_controller.getCp(3) << "\t";
+//    file << wheeld_controller.errorCp() << "\t";
+//    file << wheeld_controller.getSteer() << "\t";
+//    file << wheeld_controller.errorSteer() << "\n";
   }
+
+  file.flush();
+  file.close();
+
 }
 
 #ifdef FULL_ROBOT

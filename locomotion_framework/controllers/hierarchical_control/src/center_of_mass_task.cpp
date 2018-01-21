@@ -20,6 +20,7 @@ void mwoibn::hierarchical_control::CenterOfMassTask::updateJacobian()
     if (!_selector_dof[i])
       _jacobian.col(i).setZero();
   }
+
 //  mwoibn::VectorBool selector = _robot.contacts().getActiveDofs();
 //  for (int i = 0; i < selector.size(); i++)
 //    selector[i] = selector[i] && _selector_dof[i];

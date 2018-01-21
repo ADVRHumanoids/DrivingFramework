@@ -3,10 +3,10 @@ mwoibn:
                 position_controller:
                         dofs: 
                                 chain: position_lower_body
-        ros:
-                source:
-                        urdf: "/robot_lower_body"
-                        srdf: "/robot_srdf"
+#        ros:
+#                source:
+#                        urdf: "/robot_lower_body"
+#                        srdf: "/robot_srdf"
         xbot:
                 source:
                         urdf: 

@@ -80,11 +80,11 @@ mgnss::events::Steering3::Steering3(
 
 void mgnss::events::Steering3::compute(const mwoibn::Vector3 next_step)
 {
-  int pow = 4;
+  int pow = 5;
   //      std::cout << next_step << std::endl;
   _plane.updateState();
   _heading = _plane.getState()[2];
-
+  _plane.updateError();
   _ICM(next_step); // returns a velue in a robot space
 
   _SPT(); // returns a velue in a robot space
@@ -104,7 +104,7 @@ void mgnss::events::Steering3::compute(const mwoibn::Vector3 next_step)
 //  bool slow = false;
   for (int i = 0; i < _size; i++)
   {
-    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_icm[i]));
+    double vel = std::fabs(_v_icm[i]*_v_icm[i] + _v_sp[i]*_v_sp[i] + 2*_v_sp[i]*_v_icm[i]*std::cos(_b_icm[i] - _b_sp[i]));
     //      std::cout << _plane.getReference(i)[0] << "\t";
     //      std::cout << _plane.getReference(i)[1] << "\t";
 
@@ -136,9 +136,13 @@ void mgnss::events::Steering3::compute(const mwoibn::Vector3 next_step)
                              _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
       limit(_b_st[i] - _heading, _b[i]);
     }
+
     _b_st[i] = _b[i] + _heading; // do give the result in the world frame
 
   }
+
+//  std::cout << "icm\t" << _v_icm.transpose() << std::endl;
+//  std::cout << "sp\t" << _v_sp.transpose() << std::endl;
 //  if(slow)
 //    std::cout << "slow down" << std::endl;
 
@@ -163,24 +167,28 @@ void mgnss::events::Steering3::_ICM(mwoibn::Vector3 next_step)
     _b_icm[i] = std::atan2(_y, _x); // this uses atan2 to avoid
                                     // singularities in a atan
                                     // implementation
+
     _v_icm[i] = _x * std::cos(_b_icm[i]);
     _v_icm[i] += _y * std::sin(_b_icm[i]);
   }
+
 }
 
 void mgnss::events::Steering3::_SPT()
 {
   for (int i = 0; i < _size; i++)
     _PT(i);
+
 }
 
 void mgnss::events::Steering3::_PT(int i)
 {
   // Desired state
 
-  _plane_ref[0] = _plane.getWorldError()[3 * i]; // size 2
-  _plane_ref[1] = _plane.getWorldError()[3 * i + 1];
+//  _plane_ref[0] = _plane.getWorldError()[3 * i]; // size 2
+//  _plane_ref[1] = _plane.getWorldError()[3 * i + 1];
 
+  _plane_ref = _plane.getReferenceError(i).head(2);
   _b_sp[i] = std::atan2(_plane_ref[1], _plane_ref[0]);
 
   _v_sp[i] = _plane_ref.norm() / _dt;

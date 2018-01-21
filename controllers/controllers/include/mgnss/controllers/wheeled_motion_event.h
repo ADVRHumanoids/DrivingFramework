@@ -123,22 +123,22 @@ public:
 
   bool isRunning() { return _robot.isRunning(); }
 
-  bool isDonePosition(const double eps)
-  {
-    return _isDone(*_pelvis_position_ptr, eps);
-  }
-  bool isDoneOrientation(const double eps)
-  {
-    return _isDone(*_pelvis_orientation_ptr, eps);
-  }
-  bool isDoneSteering(const double eps) const
-  {
-    return _isDone(*_leg_steer_ptr, eps);
-  }
-  bool isDonePlanar(const double eps) const
-  {
-    return _isDone(*_steering_ptr, eps);
-  }
+//  bool isDonePosition(const double eps)
+//  {
+//    return _isDone(*_pelvis_position_ptr, eps);
+//  }
+//  bool isDoneOrientation(const double eps)
+//  {
+//    return _isDone(*_pelvis_orientation_ptr, eps);
+//  }
+//  bool isDoneSteering(const double eps) const
+//  {
+//    return _isDone(*_leg_steer_ptr, eps);
+//  }
+//  bool isDonePlanar(const double eps) const
+//  {
+//    return _isDone(*_steering_ptr, eps);
+//  }
 //  bool isDoneWheels(const double eps) const
 //  {
 //    return _isDone(*_leg_castor_ptr, eps);
@@ -162,6 +162,13 @@ public:
     _steering_ptr->releaseContact(i);
     _constraints_ptr->releaseContact(i);
   }
+
+  mwoibn::VectorN getCom(){ return _robot.centerOfMass().get();}
+  mwoibn::VectorN errorCom(){return _com_ptr->getError();}
+  mwoibn::VectorN getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+  mwoibn::VectorN errorCp(){ return _steering_ptr->getWorldError();}
+  mwoibn::VectorN getSteer(){ return steerings;}
+  mwoibn::VectorN errorSteer(){ return _leg_steer_ptr->getError();}
 
 
 protected:

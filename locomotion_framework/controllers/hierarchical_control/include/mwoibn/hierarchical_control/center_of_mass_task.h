@@ -69,6 +69,8 @@ public:
 
   virtual void setDofs(const mwoibn::VectorBool& dofs){
     _selector_dof = dofs;
+//    std::cout << "com\t" << _selector_dof.transpose() << std::endl;
+
   }
 
 protected:

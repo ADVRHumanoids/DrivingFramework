@@ -39,7 +39,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
       new mwoibn::hierarchical_control::CartesianFlatReferenceTask2(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                    robot.getLinks("wheels")),
-          _robot));
+          _robot, *_com_ptr.get()));
 
   mwoibn::Axis x, y, z, ax;
   z <<   0,  1,  0;
@@ -125,6 +125,10 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   gain << 20 * ratio;
   _hierarchical_controller.addTask(_com_ptr.get(), gain, task, damp);
   task++;
+  gain << 20 * ratio;
+  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
+                                   damp);
+  task++;
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
@@ -134,12 +138,10 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
-  gain << 10 * ratio;
-  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
-                                   damp);
-  task++;
+
   _dt = _robot.rate();
 
+//  std::cout << "DOFS\t" << _robot.getDofs() << std::endl;
   _leg_steer_ptr->updateError();
   _leg_camber_ptr->updateError();
   _leg_castor_ptr->updateError();
@@ -199,9 +201,6 @@ void mwoibn::WheeledMotionEvent::nextStep(const mwoibn::VectorN& support)
   updateSupport(support);
   updateBase();
   mwoibn::Vector3 com = _robot.centerOfMass().get();
-//  mwoibn::Vector3 ref = _position;
-//  ref[2] = 0;
-//  _steering_ptr->setRef(ref);
 
   _next_step[0] =
       (_position[0] - com[0]) / _robot.rate();
@@ -213,9 +212,7 @@ void mwoibn::WheeledMotionEvent::nextStep(const mwoibn::VectorN& support)
   _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
                                            6.28318531); // limit -pi:pi
   _next_step[2] = _next_step[2] / _robot.rate();
-  //  _next_step[0] = velocity[0];
-  //  _next_step[1] = velocity[1];
-  //  _next_step[2] = omega;
+
   steering();
 }
 
@@ -265,11 +262,17 @@ void mwoibn::WheeledMotionEvent::compute()
 
   if (count == 30)
   {
-//    std::cout << "com\t";
+    mwoibn::VectorN yaws;
+    yaws.setZero(_select_steer.size());
+
+    _robot.state.get(yaws, _select_steer, mwoibn::robot_class::INTERFACE::POSITION );
 //    std::cout << _com_ptr->getError().transpose() << std::endl;
-//    std::cout << "steer\t";
-//    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
-//    std::cout << "error\t";
+//    std::cout << "current ref\t";
+//    std::cout << yaws.transpose()*180/mwoibn::PI << "\n";
+
+//    std::cout << "steering ref\t";
+//    std::cout << steerings.transpose()*180/mwoibn::PI << "\n";
+//    std::cout << "contact point error\t";
 //    std::cout << _steering_ptr->getWorldError().transpose() << std::endl;
 
 //    std::cout.precision(6);
@@ -282,15 +285,17 @@ void mwoibn::WheeledMotionEvent::compute()
 //              << "\t";
 //    std::cout << std::fixed << _leg_steer_ptr->getError().transpose() * 180 / 3.14
 //              << std::endl;
-//    std::cout << std::fixed << (_steering_ptr->getWorldError())[0] * 100
-//              << "\t";
+//    std::cout << std::fixed << "steering error\t" <<  (_leg_steer_ptr->getError()).transpose() * 180/mwoibn::PI
+//              << "\n";
 //    std::cout << std::fixed << (_steering_ptr->getWorldError())[1] * 100
 //              << std::endl;
+//    std::cout << std::endl;
     count = 0;
   }
   else
     count++;
 }
+
 
 
 void mwoibn::WheeledMotionEvent::steering()
@@ -302,9 +307,9 @@ void mwoibn::WheeledMotionEvent::steering()
 
   for (int i = 0; i < 4; i++)
   {
-    steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
-    steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
+//    steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
+//    steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
     setSteering(i, steerings[i]);
-//    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
   }
+
 }
