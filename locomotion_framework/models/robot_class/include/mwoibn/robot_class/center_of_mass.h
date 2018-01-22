@@ -26,7 +26,7 @@ public:
 
   void update(bool jacobian = true);
 
-  mwoibn::Matrix getJacobian() const { return _jacobian; }
+  const mwoibn::Matrix& getJacobian() const { return _jacobian; }
   mwoibn::Vector3 get() const { return _com; }
 
 protected:

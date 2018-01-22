@@ -87,8 +87,10 @@ int main(int argc, char** argv)
   support.setCurrent(wheeld_controller.getSupportReference());
   support.setDesired(wheeld_controller.getSupportReference());
 
-  while (ros::ok())
+  for(int i = 0; i < 2500; i++)
+//  while (ros::ok())
   {
+      std::cout << i << std::endl;
     support.update();
     wheeld_controller.fullUpdate(support.get());
   }

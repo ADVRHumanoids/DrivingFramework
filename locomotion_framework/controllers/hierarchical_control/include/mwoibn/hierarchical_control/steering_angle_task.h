@@ -28,6 +28,7 @@ public:
     _x_world << 1,0,0;
     _y_world << 0,1,0;
     _z_world << 0,0,1;
+    _J.setZero(1, robot.getDofs());
 
   } // for now just support major axes
 
@@ -40,61 +41,52 @@ public:
     _n = _z_world;
 
     _y = _point.getRotationWorld(_robot.state.get()).transpose() * _axis;
-//    std::cout << "_y\t" << _y.transpose() << "\t";
 
     _v2 = _y.cross(_z_world);
-    double b = 1/_v2.norm();
+
+    mwoibn::Scalar b = 1/_v2.norm();
 
     _v2.normalize();
-//    std::cout << "_v2\t" << _v2.transpose() << "\t";
-//    std::cout << "b\t" << b << "\t";
 
-    double cross = (_v1.cross(_v2)).transpose() * _n;
-    double dot = _v1.transpose() * _v2;
+
+    mwoibn::Scalar cross = (_v1.cross(_v2)).transpose() * _n;
+    mwoibn::Scalar dot = _v1.transpose() * _v2;
+
     _steering = std::atan2(cross, dot);
-//    mwoibn::eigen_utils::wrapToPi(_steering);
-
-//    std::cout << _steering*180/mwoibn::PI << "\t";
 
 // DERIVATIVE
 
-    double O = cross*cross + dot * dot;
+    mwoibn::Scalar O = cross*cross + dot * dot;
 
-    double P = dot / O;
+    mwoibn::Scalar P = dot / O;
     O = -cross / O;
 
-    mwoibn::Matrix c = _skew(_y*_n.transpose()*_y) + _y*_n.transpose()*_skew(_y);  // _z_body or world?
-    mwoibn::Matrix J = -0.5*b*b*b * _n.transpose()*c;
+    mwoibn::eigen_utils::skew(_y, _s_y);
+    mwoibn::eigen_utils::skew(_n, _s_n);
+    mwoibn::eigen_utils::skew(_v1, _s_v1);
 
-    mwoibn::Matrix K = _skew(_y)* _n*J + b*_skew(_n)*_skew(_y);
+    _mB = _y*_n.transpose();
+    _vA = _mB*_y;
 
-    mwoibn::Matrix R = _v1.transpose() * K;
-    mwoibn::Matrix S = _n.transpose()*_skew(_v1)*K;
+    mwoibn::eigen_utils::skew(_vA, _mA);
 
-    mwoibn::Matrix3 Rot;
-    Rot.col(0) = _x_body;
-    Rot.col(1) = _y_body;
-    Rot.col(2) = _z_body;
+    _mA += _mB*_s_y;  // _z_body or world?
+    _tA = -0.5*b*b*b * _n.transpose()*_mA;
 
-    _J = (O*R + P*S)  * _point.getOrientationJacobian(_robot.state.get());
+    _mB = _s_y* _n*_tA;
+    _mB += b*_s_n*_s_y;
 
-    if(print){
-      std::cout << std::fixed << "O*R + P*S\t" << (O*R + P*S).norm() << ",\t";
-      std::cout << std::fixed << "|P*S|\t" << (P*S).norm() << ",\t";
-      std::cout << std::fixed << "|O*R|\t" << (O*R).norm() << ",\t";
-      std::cout << std::fixed << "P*S\t" << P*S << ",\t";
-      std::cout << std::fixed << "O*R\t" << O*R << ",\t";
-      std::cout << "0\t" << O << ",\t";
-      std::cout << "P\t" << P << ",\t";
-      std::cout << "|R|\t" << R.norm() << ",\t";
-      std::cout << "|S|\t" << S.norm() << ",\t";
-      std::cout << "R\t" << R << ",\t";
-      std::cout << "S\t" << S << ",\t";
-      std::cout << "th\t" << _steering  << "\n";
-    }
+    _tA = _v1.transpose() * _mB;
+    _tB = _n.transpose()*_s_v1*_mB;
+
+    _tA = O*_tA;
+    _tA += P*_tB;
+
+    _J.noalias() =  _tA * _point.getOrientationJacobian(_robot.state.get());
+
   }
 
-  double get(){
+  mwoibn::Scalar get(){
     return _steering;}
 
   const mwoibn::Matrix& getJacobian(){return _J;}
@@ -105,18 +97,17 @@ protected:
 
   mwoibn::Axis _x_world, _y_world,
       _z_world; // for now assume the basic initialization
-  double _steering, _d_steering;
+  mwoibn::Scalar _steering, _d_steering;
   mwoibn::point_handling::Point _point;
   mwoibn::robot_class::Robot& _robot;
 
+  mwoibn::Vector3 _vA;
+  mwoibn::Vector3T _tA, _tB;
+
+  mwoibn::Matrix3 _mA, _mB, _s_y, _s_n, _s_v1;
+
   mwoibn::Matrix _J;
-  mwoibn::Matrix3 _skew(mwoibn::Vector3 vec){
 
-    mwoibn::Matrix3 mat;
-    mat << 0, -vec[2], vec[1], vec[2], 0, -vec[0], -vec[1], vec[0], 0;
-
-    return mat;
-  }
 };
 
  class SteeringAngleTask : public ControllerTask
@@ -129,6 +120,7 @@ protected:
     _init(_angels.size(), _robot.getDofs());
 
     _ref.setZero(_angels.size());
+    _current.setZero(_angels.size());
   }
 
   virtual ~SteeringAngleTask() {}
@@ -144,18 +136,16 @@ protected:
       _error[i] = _ref[i] - _angels[i].get();
     }
 
-      _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
+     eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
 
   }
 
-  mwoibn::VectorN getCurrent(){
-    mwoibn::VectorN current;
-    current.setZero(4);
+  const mwoibn::VectorN& getCurrent(){
 
     for(int i = 0; i < _angels.size(); i++)
-      current[i] = _angels[i].get();
+      _current[i] = _angels[i].get();
 
-    return current;
+    return _current;
   }
 
   virtual void updateJacobian() {

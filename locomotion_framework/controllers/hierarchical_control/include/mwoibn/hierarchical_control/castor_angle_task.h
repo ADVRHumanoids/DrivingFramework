@@ -125,7 +125,7 @@ protected:
 
 //    std::cout << "\t" << _angels[1].get()*180/3.14;// << std::endl;
 //    std::cout << "\t" << _error[1]*180/3.14;
-    _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
+    eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
 //    std::cout << "\t" << _error[1]*180/3.14;// << std::endl;
 
 //    std::cout << std::fixed << "error\t" << _error.transpose() * 180 / 3.14 << "\n";

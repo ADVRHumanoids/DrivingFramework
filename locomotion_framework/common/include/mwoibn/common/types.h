@@ -33,7 +33,8 @@ namespace mwoibn
 
 typedef RigidBodyDynamics::Math::VectorNd VectorN;
 typedef RigidBodyDynamics::Math::Vector3d Vector3;
-
+typedef Eigen::Matrix<double, 1, 3> Vector3T;
+typedef double Scalar;
 typedef Vector3 Point;
 typedef Vector3 Axis;
 

@@ -142,7 +142,7 @@ protected:
       _angels[i].update();
       _error[i] = _ref[i] - _angels[i].get();
     }
-    _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
+    eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
     std::cout << std::fixed << "camber error\n" << _error.transpose() * 180 / 3.14 << std::endl;
 
   }

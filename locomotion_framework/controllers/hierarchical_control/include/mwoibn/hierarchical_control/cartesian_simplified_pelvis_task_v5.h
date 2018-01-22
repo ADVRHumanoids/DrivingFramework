@@ -253,28 +253,31 @@ public:
         _flat_model, _state, _ids[0], reference, false);
   }
 
-  virtual const mwoibn::VectorN getPointStateReference(int i)
+  virtual const mwoibn::Vector3& getPointStateReference(int i)
   {
     _rotation << std::cos( _state[2]), std::sin( _state[2]), 0,
                 -std::sin( _state[2]), std::cos( _state[2]), 0,
                  0,                    0,                    1;
 
-    mwoibn::Vector3 ref = _robot.centerOfMass().get();
-    ref[2] = 0;
 
-    return  (_rotation * (_ik.getPointStateWorld(i) - ref));
+    _track_point = _ik.getPointStateWorld(i);
+    _track_point.head<2>() -= _robot.centerOfMass().get().head<2>();
+
+    _point = _rotation * _track_point;
+    return  _point;
   }
 
   const mwoibn::VectorN& getState() const { return _state; }
   const mwoibn::VectorN& getWorldError() const { return _full_error; }
 
-  virtual const mwoibn::VectorN getReferenceError(int i)
+  virtual const mwoibn::Vector3& getReferenceError(int i)
   {
     _rotation << std::cos( _state[2]), std::sin( _state[2]), 0,
             -std::sin( _state[2]), std::cos( _state[2]), 0,
             0,                    0,                    1;
 
-    return  _rotation * (_full_error.segment<3>(3*i));
+    _point = _rotation * (_full_error.segment<3>(3*i));
+    return  _point;
   }
 
   virtual void releaseContact(int i){_selector[i] = true;}
@@ -287,7 +290,7 @@ protected:
   mwoibn::hierarchical_control::CenterOfMassTask& _com;
   mwoibn::robot_class::Robot& _robot;
   RigidBodyDynamics::Model _flat_model;
-  mwoibn::Vector3 _point_flat, _temp_point;
+  mwoibn::Vector3 _point_flat, _temp_point, _point, _track_point;
   std::vector<int> _ids;
   mwoibn::Matrix _rotation, _jacobian_com;
   mwoibn::VectorBool _selector;

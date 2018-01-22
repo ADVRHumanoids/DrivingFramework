@@ -27,6 +27,7 @@ int main(int argc, char** argv)
       robot, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078);
 
   odometry.init();
+
   while (ros::ok())
   {
     odometry.update();
@@ -35,4 +36,5 @@ int main(int argc, char** argv)
     //    mwoibn::robot_class::INTERFACE::VELOCITY);
     robot.update();
   }
+
 }

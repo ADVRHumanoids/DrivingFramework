@@ -78,7 +78,8 @@ public:
 //    RigidBodyDynamics::UpdateKinematicsCustom(
 //        _model, &state.state(INTERFACE::POSITION),
 //        &state.state(INTERFACE::VELOCITY), NULL);
-        RigidBodyDynamics::UpdateKinematics(
+
+      RigidBodyDynamics::UpdateKinematics(
             _model, state.state(INTERFACE::POSITION),
             state.state(INTERFACE::VELOCITY), _zeroVec);
 

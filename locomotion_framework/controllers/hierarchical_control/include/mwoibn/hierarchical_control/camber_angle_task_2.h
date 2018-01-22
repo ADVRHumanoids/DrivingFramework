@@ -122,7 +122,7 @@ protected:
     }
 //    std::cout << std::endl;
 
-    _error = eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
+    eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
 //    std::cout << std::fixed << "error\t" << _error.transpose() * 180 / 3.14 << std::endl;
 
   }

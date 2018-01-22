@@ -155,7 +155,7 @@ public:
     _type = (matrix.rows() > matrix.cols()) ? true : false;
     int size = (_type) ? matrix.rows() : matrix.cols();
     int other =  (_type) ? matrix.cols() : matrix.rows();
-    _squared.setZero(size, size);
+    _squared.setZero(other, other);
     _inverse_ptr.reset(new Eigen::LDLT<Dynamic_Matrix>(size));
     _damping = damping * damping;
     _identity.setIdentity(other, other);
@@ -246,17 +246,36 @@ inline void wrapToPi(double& th){
 //    limitToHalfPi(vec[i]);
 //}
 
+//template <typename _Matrix_Type_>
+//inline _Matrix_Type_ limitToHalfPi(const _Matrix_Type_ vec){
+//  _Matrix_Type_ limited = vec;
+//  limitToHalfPi(vec, limited);
+//  return limited;
+//}
+
 template <typename _Matrix_Type_>
-inline _Matrix_Type_ limitToHalfPi(const _Matrix_Type_ vec){
-  _Matrix_Type_ limited = vec;
+inline void limitToHalfPi(const _Matrix_Type_& vec, _Matrix_Type_& limited){
+//  _Matrix_Type_ limited = vec;
   for(int i = 0; i < std::max(vec.rows(), vec.cols()); i++) // How will it work for matrices?
-    limited[i] = limitToHalfPi(vec[i]);
-  return limited;
+    limitToHalfPi(vec[i], limited[i]);
+}
+
+template <typename _Matrix_Type_>
+inline void limitToHalfPi(_Matrix_Type_& vec){
+    limitToHalfPi(vec, vec);
 }
 
 template <> inline
-  double limitToHalfPi(const double th){
-  return th - 3.14159265 * std::floor((th + 1.57079632) / 3.14159265);
+  void limitToHalfPi(const double& th, double& l_th){
+  l_th = th - 3.14159265 * std::floor((th + 1.57079632) / 3.14159265);
+}
+
+template <typename _Vector_Type_, typename _Matrix_Type_>
+
+void skew(const _Vector_Type_& vec, _Matrix_Type_& mat){
+
+  mat << 0, -vec[2], vec[1], vec[2], 0, -vec[0], -vec[1], vec[0], 0;
+
 }
 
 } // namespace package

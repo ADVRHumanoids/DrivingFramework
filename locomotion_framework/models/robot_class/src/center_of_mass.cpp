@@ -24,6 +24,7 @@ CenterOfMass::CenterOfMass(RigidBodyDynamics::Model& model,
     }
   }
   _points.computeChain();
+
 }
 
 void CenterOfMass::compute()
@@ -39,12 +40,13 @@ void CenterOfMass::computeJacobian()
 
   _jacobian = mwoibn::Matrix::Zero(3, _model.dof_count);
 
-  std::vector<mwoibn::Matrix> temp_jacobians =
-      _points.getFullJacobians(_positions);
+//  std::vector<mwoibn::Matrix> temp_jacobians =
+//      _points.getFullJacobians(_positions);
 
   for (int i = 0; i < _points.size(); i++)
   {
-    _jacobian += _masses.at(i) * temp_jacobians.at(i);
+    _jacobian += _masses.at(i) * _points.getPointJacobian(i, _positions, false);
+
 //    std::cout << "jacobian i\n" << temp_jacobians.at(i) << std::endl;
   }
 

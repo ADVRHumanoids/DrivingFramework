@@ -34,7 +34,7 @@ public:
   virtual ~Map() {}
 
   std::string getName() const { return _name; }
-  VectorInt get() const { return _map; }
+  const VectorInt& get() const { return _map; }
   int getDofs() const { return _map.size(); }
 
 protected:
@@ -242,7 +242,7 @@ public:
   virtual ~MapState() {}
 
   std::string getName() const { return _name; }
-  VectorN get() const { return _map; }
+  const VectorN& get() const { return _map; }
   double getDofs() const { return _map.size(); }
 
 protected:
