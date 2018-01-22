@@ -114,8 +114,9 @@ public:
 
 //    std::cout << "_heading\t" << _heading << std::endl;
 
+    _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
-    _com_ptr->setReference(_position.head<2>());
+    _com_ptr->setReference(_com_ref);
     _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate())*_orientation;
 
     _pelvis_orientation_ptr->setReference(
@@ -209,7 +210,7 @@ protected:
 
   double rate = 200;
   double _dt, orientation = 0, _heading;
-  mwoibn::VectorN steerings, _command, _previous_command;
+  mwoibn::VectorN steerings, _command, _previous_command, _com_ref;
   mwoibn::Vector3 _next_step, _position, _angular_vel, _linear_vel;
   mwoibn::Axis _x, _y, _z;
   mwoibn::Quaternion _orientation;

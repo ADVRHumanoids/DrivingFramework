@@ -85,7 +85,7 @@ public:
     _tA = A*_tA;
     _tA += B*_tB;
 
-    _J = _tA * _point.getOrientationJacobian(_robot.state.get());
+    _J.noalias() = _tA * _point.getOrientationJacobian(_robot.state.get());
 
   }
 

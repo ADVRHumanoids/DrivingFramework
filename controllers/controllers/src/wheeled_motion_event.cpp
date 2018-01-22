@@ -151,6 +151,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _test_steer.setZero(_select_steer.size());
   _test_wheel.setZero(_select_wheel.size());
 
+  _com_ref.setZero(2);
   _steering_ref_ptr.reset(new mgnss::events::Steering3(
       _robot, *_steering_ptr, _test_steer, 0.7, 0.3, _robot.rate(), 0.05));
 

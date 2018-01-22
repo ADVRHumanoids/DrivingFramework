@@ -48,7 +48,7 @@ public:
   //! sets task reference
   virtual void setReference(const mwoibn::VectorN& reference)
   {
-    _reference = reference;
+    _reference.noalias() = reference;
   }
   //! returnes task reference
   mwoibn::Matrix getReference() { return _reference; }
