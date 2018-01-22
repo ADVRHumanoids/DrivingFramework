@@ -154,6 +154,8 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
       controller->rotateBaseX(req.nr / 100.0);
     else if (req.d == 6)
       controller->rotateBaseY(req.nr / 100.0);
+    else if (req.d == 7)
+      controller->resteer(req.nr);
     else
     {
       res.success = false;

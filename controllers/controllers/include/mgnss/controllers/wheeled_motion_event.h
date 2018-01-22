@@ -34,6 +34,9 @@ public:
   void setRate(){ _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);}
 
   void resetSteering();
+  void resteer(int i){_resteer[i] = true;
+                     std::cout << "started resteering" << std::endl;}
+
 
   void setSteering(int i, double th)
   {
@@ -211,9 +214,11 @@ protected:
   mwoibn::Axis _x, _y, _z;
   mwoibn::Quaternion _orientation;
   bool _reference = false;
-  mwoibn::VectorInt _select_steer;
-  mwoibn::VectorN _l_limits, _u_limits, _test_limits;
+  mwoibn::VectorInt _select_steer, _select_wheel;
+  mwoibn::VectorN _l_limits, _u_limits, _test_steer, _test_wheel;
   int count = 0;
+
+  mwoibn::VectorBool _resteer;
 
 };
 }

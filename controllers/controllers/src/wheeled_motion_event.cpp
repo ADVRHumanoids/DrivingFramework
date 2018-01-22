@@ -123,7 +123,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
-  task++
+  task++;
   gain << 10 * ratio; // 15
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
@@ -139,15 +139,20 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _angular_vel.setZero();
 
   _select_steer = robot.getDof(robot.getLinks("camber"));
+  _select_wheel = robot.getDof(robot.getLinks("wheels"));
   _l_limits.setZero(_select_steer.size());
   _u_limits.setZero(_select_steer.size());
+
+  _resteer.setConstant(_select_steer.size(), true);
+
   robot.lower_limits.get(_l_limits, _select_steer);
   robot.upper_limits.get(_u_limits, _select_steer);
 
-  mwoibn::VectorN init;
-  init.setZero(4);
+  _test_steer.setZero(_select_steer.size());
+  _test_wheel.setZero(_select_wheel.size());
+
   _steering_ref_ptr.reset(new mgnss::events::Steering3(
-      _robot, *_steering_ptr, init, 0.7, 0.3, _robot.rate(), 0.05));
+      _robot, *_steering_ptr, _test_steer, 0.7, 0.3, _robot.rate(), 0.05));
 
 //  std::cout << "rate\t" << _robot.rate() << std::endl;
 //  std::cout << "current state\t" << _steering_ptr->getState() << std::endl;
@@ -270,12 +275,38 @@ void mwoibn::WheeledMotionEvent::compute()
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
 
   _command.noalias() = _command * _robot.rate();
+
   _command.noalias() +=
       _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
 
-//  if (count == 30)
+  _robot.command.get(_test_steer, _select_steer, mwoibn::robot_class::INTERFACE::POSITION);
+  _robot.command.get(_test_wheel, _select_wheel, mwoibn::robot_class::INTERFACE::VELOCITY);
+
+  // RESTEER AND CHECK FOR LIMITS
+  for(int i = 0; i < _test_steer.size(); i++){
+    if (_resteer[i]){
+      double steer = _test_steer[i];
+      eigen_utils::limitToHalfPi(_test_steer[i]);
+      if(std::fabs(steer - _test_steer[i]) > 0.05)
+          _test_wheel[i] = -_test_wheel[i];
+    }
+    if (_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i])
+      _resteer[i] = true;
+//      std::cout << "WARNING: ankle yaw " << i << " on limit." << std::endl; //NRT
+  }
+
+  _robot.command.set(_test_steer, _select_steer, mwoibn::robot_class::INTERFACE::POSITION);
+  _robot.command.set(_test_wheel, _select_wheel, mwoibn::robot_class::INTERFACE::VELOCITY);
+
+  // TURN OFF RESTEERINGS
+  _robot.state.get(_test_steer, _select_steer, mwoibn::robot_class::INTERFACE::POSITION);
+
+  for(int i = 0; i < _test_steer.size(); i++)
+      _resteer[i] = _resteer[i] && std::fabs(_test_steer[i]) > mwoibn::HALF_PI/2;
+
+  if (count == 30)
   {
     std::cout.precision(6);
 
@@ -291,8 +322,9 @@ void mwoibn::WheeledMotionEvent::compute()
 
     count = 0;
   }
-//  else
-//    count++;
+  else
+    count++;
+
 }
 
 void mwoibn::WheeledMotionEvent::stop(){

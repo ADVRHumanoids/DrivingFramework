@@ -24,9 +24,14 @@ if __name__ == '__main__':
     ref_service = rospy.ServiceProxy(name, updatePDGains)
 
     dth, r, th, magic = -0.2, 0.5, 0.0, 2.05
+
 #    dth, r, th, magic = -0.1, 2.0, 0.0, 2.00
 
-#    dth, r, th, magic = -0.05, 5.0, 0.0, 1.00
+    dth_min, r_max = -0.05, 5.0
+    steps, step = 10000.0, 0
+
+    d_th, r_d = (dth_min - dth)/steps, (r_max-r)/steps
+
     ref_service(1.0, 4.0, dth*100)
 
     while not rospy.is_shutdown():
@@ -35,7 +40,7 @@ if __name__ == '__main__':
       dx = -r*cos(th)*dth*100.0
       dy = -r*sin(th)*dth*100.0
 #      print("th\t", th)
-      print("dx\t", dx, "dy\t", dy, "th\t", th)
+      print("dx\t", dx, "dy\t", dy, "th\t", th, "step\t", step)
       try:
         ref_service(1.0, 1.0, dx)
         ref_service(1.0, 2.0, dy)
@@ -43,6 +48,11 @@ if __name__ == '__main__':
 
       except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))
+
+      if(step < steps):
+        r += r_d
+        dth += d_th
+        step = step + 1
 
 
       rate.sleep()
