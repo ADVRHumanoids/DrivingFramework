@@ -111,7 +111,8 @@ public:
                    std::sin( _state[2]),  std::cos( _state[2]), 0,
                    0,                     0,                    1;
 
-      _full_error.segment<3>(3 * i).noalias() =  _rotation*_reference.segment(3 * i, 3) - _ik.getPointStateWorld(i);
+      _full_error.segment<3>(3 * i).noalias() =  _rotation*_reference.segment(3 * i, 3);
+      _full_error.segment<3>(3 * i) -= _ik.getPointStateWorld(i);
       _full_error.segment<2>(3*i) = _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3*i);
 
       if(_selector[i]){
@@ -263,7 +264,7 @@ public:
     _track_point = _ik.getPointStateWorld(i);
     _track_point.head<2>() -= _robot.centerOfMass().get().head<2>();
 
-    _point = _rotation * _track_point;
+    _point.noalias() = _rotation * _track_point;
     return  _point;
   }
 
@@ -276,7 +277,7 @@ public:
             -std::sin( _state[2]), std::cos( _state[2]), 0,
             0,                    0,                    1;
 
-    _point = _rotation * (_full_error.segment<3>(3*i));
+    _point.noalias() = _rotation * (_full_error.segment<3>(3*i));
     return  _point;
   }
 

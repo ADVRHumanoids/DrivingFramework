@@ -46,7 +46,7 @@ public:
   virtual void update();
 
   //! sets task reference
-  virtual void setReference(mwoibn::VectorN reference)
+  virtual void setReference(const mwoibn::VectorN& reference)
   {
     _reference = reference;
   }

@@ -65,21 +65,21 @@ public:
     mwoibn::eigen_utils::skew(_n, _s_n);
     mwoibn::eigen_utils::skew(_v1, _s_v1);
 
-    _mB = _y*_n.transpose();
-    _vA = _mB*_y;
+    _mB  = _y*_n.transpose();
+    _vA  = _mB*_y;
 
     mwoibn::eigen_utils::skew(_vA, _mA);
 
     _mA += _mB*_s_y;  // _z_body or world?
-    _tA = -0.5*b*b*b * _n.transpose()*_mA;
+    _tA  = -0.5*b*b*b * _n.transpose()*_mA;
 
-    _mB = _s_y* _n*_tA;
+    _mB  = _s_y* _n*_tA;
     _mB += b*_s_n*_s_y;
 
-    _tA = _v1.transpose() * _mB;
-    _tB = _n.transpose()*_s_v1*_mB;
+    _tA  = _v1.transpose() * _mB;
+    _tB  = _n.transpose()*_s_v1*_mB;
 
-    _tA = O*_tA;
+    _tA  = O*_tA;
     _tA += P*_tB;
 
     _J.noalias() =  _tA * _point.getOrientationJacobian(_robot.state.get());

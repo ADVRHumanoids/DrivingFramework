@@ -83,13 +83,13 @@ void mwoibn::SupportPolygon3::setDesired(mwoibn::VectorN desired)
     _contacts[i].setDesired(desired[3 * i], desired[3 * i + 1], desired[3 * i + 2]);
 }
 
-mwoibn::VectorN mwoibn::SupportPolygon3::get()
+const mwoibn::VectorN& mwoibn::SupportPolygon3::get()
 {
 
-  mwoibn::VectorN current(12);
   for (int i = 0; i < 4; i++)
-    current.segment<3>(3 * i) = _contacts[i].get();
-  return current;
+    _full_state.segment<3>(3 * i) = _contacts[i].get();
+
+  return _full_state;
 }
 
 bool mwoibn::SupportPolygon3::moveToStart(double t, double step)

@@ -103,7 +103,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
       {castor1, castor2, castor3, castor4}, robot));
 
   int task = 0;
-  double ratio = 4.0;
+  double ratio = 1.0; // 4
   double damp = 1e-4;
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
@@ -123,11 +123,11 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
-  task++;
-  gain << 15 * ratio; // 10
+  task++
+  gain << 10 * ratio; // 15
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 10 * ratio; // 15
+  gain << 15 * ratio; // 10
   _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.04);
   task++;
   gain << 10 * ratio;

@@ -108,23 +108,20 @@ public:
       _z.setCurrent(_z.get()[0] + _vz * _dt);
   }
 
-  mwoibn::Vector3 get()
+  const mwoibn::Vector3& get()
   {
-    mwoibn::Vector3 state;
-    state << _x.get(), _y.get(), _z.get();
-    return state;
+    _state << _x.get(), _y.get(), _z.get();
+    return _state;
   }
-  mwoibn::Vector3 getBase()
+  const mwoibn::Vector3& getBase()
   {
-    mwoibn::Vector3 state;
-    state << _x.getBase(), _y.getBase(), _z.getBase();
-    return state;
+    _state << _x.getBase(), _y.getBase(), _z.getBase();
+    return _state;
   }
-  mwoibn::Vector3 getDesired()
+  const mwoibn::Vector3& getDesired()
   {
-    mwoibn::Vector3 state;
-    state << _x.getDesired(), _y.getDesired(), _z.getDesired();
-    return state;
+    _state << _x.getDesired(), _y.getDesired(), _z.getDesired();
+    return _state;
   }
 
 
@@ -132,6 +129,7 @@ protected:
   ScalarRef _x, _y, _z;
   double _vx, _vy, _vz, _dt;
   mwoibn::SUPPORT_INTERFACE _ix, _iy, _iz;
+  mwoibn::Vector3 _state;
 };
 
 class SupportPolygon3: public Reference
@@ -144,6 +142,7 @@ public:
 
     setCurrent(x, y, z);
     _error.setZero(2);
+    _full_state.setZero(12);
   }
 
   bool update();
@@ -185,7 +184,7 @@ public:
   void setModeY(int i, mwoibn::SUPPORT_INTERFACE interface){_contacts[i].setModeY(interface);}
   void setModeZ(int i, mwoibn::SUPPORT_INTERFACE interface){_contacts[i].setModeZ(interface);}
 
-  virtual mwoibn::VectorN get();
+  virtual const mwoibn::VectorN& get();
 
   void resetAngle()
   {
@@ -193,7 +192,7 @@ public:
                     _contacts[0].get()[0] - _contacts[0].getBase()[0]);
   }
 
-  mwoibn::VectorN get(int i) { return _contacts[i].get(); }
+  const mwoibn::Vector3& get(int i) { return _contacts[i].get(); }
 
   virtual void nextStep();
 
@@ -205,7 +204,7 @@ protected:
   SUPPORT_MOTION _motion = SUPPORT_MOTION::STOP;
   SUPPORT_STATE _state = SUPPORT_STATE::DEFAULT;
   std::vector<int> _scale = {1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1};
-  mwoibn::VectorN _error;
+  mwoibn::VectorN _error, _full_state;
 };
 }
 #endif // WHEELED_MOTION_H

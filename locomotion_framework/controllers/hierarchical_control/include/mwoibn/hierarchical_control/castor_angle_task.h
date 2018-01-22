@@ -27,6 +27,7 @@ public:
     _x_world << 1,0,0;
     _y_world << 0,1,0;
     _z_world << 0,0,1;
+    _J.setZero(1, robot.getDofs());
 
   } // for now just support major axes
 
@@ -37,18 +38,13 @@ public:
     // axis - z
     _v1 = _point.getRotationWorld(_robot.state.get()).transpose() * _z_world;
 
-//    std::cout << "_v1\t" << _v1.transpose();
-
     _n = _point.getRotationWorld(_robot.state.get()).transpose() *
-         _axis; // this could be optimized
-
-//    std::cout << "_n\t" << _n.transpose();
+         _axis;
 
     _v2 = _z_world - _n * _z_world.transpose() * _n;
 
     double b = 1/_v2.norm();
     _v2.normalize();
-//    std::cout << "_v2\t" << _v2.transpose();
 
     double cross = (_v1.cross(_v2)).transpose() * _n;
     double dot = _v1.transpose() * _v2;
@@ -61,16 +57,35 @@ public:
     double B = dot / A;
     A = -cross / A;
 
-    mwoibn::Matrix C = (0.5*b*b*_z_world*_z_world.transpose() - mwoibn::Matrix::Identity(3,3) - 0.5*b*b*_n*_n.transpose()*_z_world*_z_world.transpose())*b;
+    mwoibn::eigen_utils::skew(_v1, _s_v1);
+    mwoibn::eigen_utils::skew(_v2, _s_v2);
+    mwoibn::eigen_utils::skew(_n, _s_n);
 
-    C = -C*(_skew(_n*_z_world.transpose()*_n) + _n*_z_world.transpose()*_skew(_n));
+    _mB = _n*_z_world.transpose();
+    _vA = _mB*_n;
 
-    mwoibn::Matrix E = _v1.transpose()*C - _v2.transpose()*_skew(_v1);
+    mwoibn::eigen_utils::skew(_vA, _mA);
 
-    mwoibn::Matrix F = _n.transpose()*_skew(_v2)*_skew(_v1) + _n.transpose()*_skew(_v1)*C - (_skew(_v1)*_v2).transpose()*_skew(_n);
+    _mA += _mB*_s_n;
 
-    _J = (A*E + B*F) * _point.getOrientationJacobian(_robot.state.get());
+    _mB = 0.5*b*b*_z_world*_z_world.transpose();
+    _mB -= mwoibn::Matrix3::Identity();
+    _mB -= 0.5*b*b*_n*_n.transpose()*_z_world*_z_world.transpose();
+    _mB = _mB*b;
 
+    _mC = -_mB*_mA ;
+
+    _tA = _v1.transpose()*_mC;
+    _tA -= _v2.transpose()*_s_v1;
+
+    _tB = _n.transpose()*_s_v2*_s_v1;
+    _tB += _n.transpose()*_s_v1*_mC;
+    _tB -= (_s_v1*_v2).transpose()*_s_n;
+
+    _tA = A*_tA;
+    _tA += B*_tB;
+
+    _J = _tA * _point.getOrientationJacobian(_robot.state.get());
 
   }
 
@@ -88,6 +103,11 @@ protected:
   mwoibn::point_handling::Point _point;
   mwoibn::robot_class::Robot& _robot;
 
+  mwoibn::Vector3 _vA;
+  mwoibn::Vector3T _tA, _tB;
+
+  mwoibn::Matrix3 _mA, _mB, _mC,  _s_v1, _s_n, _s_v2;
+
   mwoibn::Matrix _J;
   mwoibn::Matrix3 _skew(mwoibn::Vector3 vec){
 
@@ -103,10 +123,11 @@ protected:
 
  public:
   CastorAngleTask(std::vector<hierarchical_control::CastorAngle> angels, mwoibn::robot_class::Robot& robot)
-      : ControllerTask(), _robot(robot), _angels(angels)
+      : ControllerTask(), _robot(robot), _angles(angels)
   {
-    _init(_angels.size(), _robot.getDofs());
-    _ref.setZero(_angels.size());
+    _init(_angles.size(), _robot.getDofs());
+    _ref.setZero(_angles.size());
+    _current.setZero(_angles.size());
   }
 
   virtual ~CastorAngleTask() {}
@@ -116,9 +137,9 @@ protected:
 //    std::cout << "update" << std::endl;
     _last_error.noalias() = _error;
 
-    for(int i = 0; i < _angels.size(); i++){
-      _angels[i].update();
-      _error[i] = _ref[i] - _angels[i].get();
+    for(int i = 0; i < _angles.size(); i++){
+      _angles[i].update();
+      _error[i] = _ref[i] - _angles[i].get();
 //      std::cout << "\t" << _angels[i].get()*180/3.14;// << std::endl;
 //      std::cout << "\t" << _error[i]*180/3.14;// << std::endl;
     }
@@ -135,19 +156,18 @@ protected:
   virtual void updateJacobian() {
     _last_jacobian.noalias() = _jacobian;
 
-    for(int i = 0; i < _angels.size(); i++){
-      _jacobian.row(i) = -_angels[i].getJacobian();
+    for(int i = 0; i < _angles.size(); i++){
+      _jacobian.row(i) = -_angles[i].getJacobian();
     }
   }
 
-  mwoibn::VectorN getCurrent(){
-    mwoibn::VectorN current;
-    current.setZero(4);
+  const mwoibn::VectorN& getCurrent(){
 
-    for(int i = 0; i < _angels.size(); i++)
-      current[i] = _angels[i].get();
 
-    return current;
+    for(int i = 0; i < _angles.size(); i++)
+      _current[i] = _angles[i].get();
+
+    return _current;
   }
 
   virtual const mwoibn::VectorN& getReference() const { return _ref; }
@@ -159,12 +179,12 @@ protected:
 
   virtual double getReference(int i) const { return _ref[i]; }
   virtual void setReference(int i, double reference) { _ref[i] = reference; }
-  int size(){return _angels.size();}
+  int size(){return _angles.size();}
 
  protected:
   mwoibn::robot_class::Robot& _robot;
   mwoibn::VectorN _ref, _current;
-  std::vector<hierarchical_control::CastorAngle> _angels;
+  std::vector<hierarchical_control::CastorAngle> _angles;
  };
 } // namespace package
 } // namespace library
