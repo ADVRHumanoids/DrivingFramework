@@ -290,7 +290,7 @@ void mwoibn::WheeledMotionEvent::compute()
     if (_resteer[i]){
       double steer = _test_steer[i];
       eigen_utils::limitToHalfPi(_test_steer[i]);
-      if(std::fabs(steer - _test_steer[i]) > 0.05)
+      if(std::fabs(steer - _test_steer[i]) >= mwoibn::HALF_PI/2.0)
           _test_wheel[i] = -_test_wheel[i];
     }
     if (_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i])
@@ -305,7 +305,7 @@ void mwoibn::WheeledMotionEvent::compute()
   _robot.state.get(_test_steer, _select_steer, mwoibn::robot_class::INTERFACE::POSITION);
 
   for(int i = 0; i < _test_steer.size(); i++)
-      _resteer[i] = _resteer[i] && std::fabs(_test_steer[i]) > mwoibn::HALF_PI/2;
+      _resteer[i] = _resteer[i] && std::fabs(_test_steer[i]) > mwoibn::HALF_PI/8;
 
   if (count == 30)
   {

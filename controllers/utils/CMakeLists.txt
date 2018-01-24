@@ -31,6 +31,8 @@ if(VISUALIZATION_TOOLS)
  add_definitions(-DVISUALIZATION_TOOLS)
  LIST( APPEND INSTALL_TARGETS real_robot_tracker)
  LIST( APPEND CATKIN_DEPENDS_SET visualization_tools robot_point_handling roscpp robot_class_ros_extension )
+ LIST( APPEND PYTHON_INSTALL circular square )
+ prepend_paths(PYTHON_INSTALL wheels_references)
  LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 
 endif(VISUALIZATION_TOOLS)
