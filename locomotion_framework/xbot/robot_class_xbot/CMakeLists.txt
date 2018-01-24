@@ -36,6 +36,7 @@ endif(LOGGER)
 
 
 # LOAD BASIC VARIABLES
+
 find_package(catkin REQUIRED robot_class communication_modules_xbot communication_modules_ros_extension robot_class_ros_extension)
 
 find_package(urdf REQUIRED)
@@ -80,7 +81,6 @@ catkin_package(
         	robot_class
         	robot_class_ros_extension
                 communication_modules_xbot
-                communication_modules_ros_extension
 )
 
 ###########

@@ -175,6 +175,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
       throw(std::invalid_argument(std::string("Unknown controller type for " +
                                               entry.first.as<std::string>())));
 
+#ifdef ROS_CONTROL
     if (entry.second["type"].as<std::string>() ==
         "custom_controller/ActuatorPositionControllerClasses")
     {
@@ -220,7 +221,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
                   command, map, entry.second)),  entry.first.as<std::string>());
       continue;
     }
-
+#endif
     loadRosControllers(entry.second, controllers, command, map);
 
   }

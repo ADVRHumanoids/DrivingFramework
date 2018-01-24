@@ -44,7 +44,7 @@
   <depend>robot_class</depend>
   <depend>robot_class_ros_extension</depend>
   <depend>communication_modules_xbot</depend>
-  <depend>communication_modules_ros_extension</depend>
+  <!-- depend>communication_modules_ros_extension</depend> -->
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

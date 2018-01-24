@@ -15,7 +15,7 @@ set (LOG_INFO ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-option(CUSTOM_CONTROLLER ON)
+option(ROS_CONTROL OFF)
 option(LOGGER ON)
 
 ## Find catkin macros and libraries
@@ -28,6 +28,7 @@ set(SOURCE_FILES "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
+set(LIBRARIES "")
 
 LIST( APPEND CATKIN_DEPENDS_SET robot_class)
 
@@ -40,12 +41,17 @@ endif(LOGGER)
 find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-if(CUSTOM_CONTROLLER)
+LIST( APPEND CATKIN_DEPENDS_SET roscpp)
 
-LIST( APPEND CATKIN_DEPENDS_SET roscpp custom_controller)
-LIST( APPEND SOURCE_FILES src/custom_controller.cpp src/ros_controller.cpp src/velocity_controller.cpp)
 
-endif(CUSTOM_CONTROLLER)
+if(ROS_CONTROL)
+	LIST( APPEND CATKIN_DEPENDS_SET custom_controller)
+        LIST( APPEND SOURCE_FILES src/custom_controller.cpp  src/velocity_controller.cpp)
+endif(ROS_CONTROL)
+
+LIST( APPEND SOURCE_FILES src/ros_controller.cpp)
+
+LIST( APPEND LIBRARIES communication_modules_ros)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -57,7 +63,7 @@ catkin_package(
         ${catkin_INCLUDE_DIRS}
         ${RBDL_INCLUDE_DIR}
   LIBRARIES
-        communication_modules_ros
+        ${LIBRARIES}
         ${RBDL_LIBRARY}
   CATKIN_DEPENDS
         roscpp

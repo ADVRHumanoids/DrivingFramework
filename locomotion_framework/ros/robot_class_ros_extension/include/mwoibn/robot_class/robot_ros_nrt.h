@@ -3,17 +3,16 @@
 
 #include "mwoibn/robot_class/robot_ros.h"
 #include <custom_messages/CustomCmnd.h>
-#include <custom_controller/controller_utils.h>
+
 #include <std_srvs/SetBool.h>
 #include <sensor_msgs/JointState.h>
 #include <gazebo_msgs/LinkStates.h>
 #include <climits>
-#include "mwoibn/communication_modules/custom_controller.h"
-#include "mwoibn/communication_modules/velocity_controller.h"
-#include "mwoibn/communication_modules/ros_controller.h"
-#include "mwoibn/communication_modules/ros_feedback.h"
-#include "mwoibn/communication_modules/ros_operational_euler.h"
 
+#include "mwoibn/communication_modules/all.h"
+#ifdef ROS_CONTROL
+    #include <custom_controller/controller_utils.h>
+#endif
 #include "mwoibn/robot_class/contact_ros.h"
 
 namespace mwoibn

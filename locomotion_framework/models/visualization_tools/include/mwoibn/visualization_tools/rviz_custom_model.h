@@ -1,6 +1,7 @@
 #ifndef VISUALIZATION_TOOLS_RVIS_CUSTOM_MODEL_H
 #define VISUALIZATION_TOOLS_RVIS_CUSTOM_MODEL_H
 
+#include <vector>
 #include <ros/ros.h>
 #include "mwoibn/visualization_tools/rviz_track_point.h"
 
