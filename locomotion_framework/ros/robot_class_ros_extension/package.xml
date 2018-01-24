@@ -20,7 +20,7 @@
   <depend>sensor_msgs</depend>
   <depend>gazebo_msgs</depend>
   <depend>custom_messages</depend>
-  <depend>custom_controller</depend>
+  <!-- <depend>custom_controller</depend> -->
   <depend>robot_class</depend>
   <depend>simple_log</depend>
   <depend>std_srvs</depend>

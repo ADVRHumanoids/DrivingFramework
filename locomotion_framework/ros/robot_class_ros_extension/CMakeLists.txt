@@ -83,6 +83,7 @@ LIST(APPEND ROBOT_ROS_EXPORTED_TARGETS
 #endif(ROS)
 
 #if(ROS_NRT)
+
 find_package(communication_modules_ros_extension REQUIRED)
 find_package(custom_messages REQUIRED) 
 find_package(std_srvs REQUIRED) 
@@ -125,9 +126,8 @@ catkin_package(
 	${LOGGER_LIBRARIES}
   CATKIN_DEPENDS
 	robot_class
+        communication_modules_ros_extension
 )
-
-
 
 include_directories(
 include
