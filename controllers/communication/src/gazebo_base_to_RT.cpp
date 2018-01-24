@@ -1,3 +1,4 @@
+#include <vector>
 #include <ros/ros.h>
 #include <gazebo_msgs/LinkStates.h>
 #include <mwoibn/robot_class/robot_class.h>

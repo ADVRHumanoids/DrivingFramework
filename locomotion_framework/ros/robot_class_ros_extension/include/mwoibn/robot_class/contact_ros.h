@@ -1,6 +1,7 @@
 #ifndef ROBOT_CLASS_CONTACT_ROS_H
 #define ROBOT_CLASS_CONTACT_ROS_H
 
+#include <vector>
 #include <ros/ros.h>
 #include <gazebo_msgs/ContactsState.h>
 #include <mwoibn/robot_class/robot_class.h>

@@ -4,6 +4,7 @@
 #include "mwoibn/point_handling/point_handling.h"
 #include "mwoibn/point_handling/point.h"
 #include <memory>
+#include <numeric>
 #include <vector>
 
 namespace mwoibn
