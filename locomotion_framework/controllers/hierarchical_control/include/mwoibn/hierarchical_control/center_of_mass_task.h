@@ -46,9 +46,11 @@ public:
   virtual void update();
 
   //! sets task reference
-  virtual void setReference(const mwoibn::VectorN& reference)
+  template<typename Vector>
+  void setReference(const Vector& reference)
   {
-    _reference.noalias() = reference;
+    _reference[0] = reference[0];
+    _reference[1] = reference[1];
   }
   //! returnes task reference
   mwoibn::Matrix getReference() { return _reference; }

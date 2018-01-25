@@ -1,5 +1,5 @@
-driving_path: &driving  "/home/centauro/src/catkin_malgorzata/src/"
-simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
+driving_path: &driving  "/home/embedded/locomotion_src/workspace/src/"
+simulator_path: &simulator "/home/embedded/locomotion_src/workspace/src/"
 mwoibn:
         middleware: "XBOT"
         robot:
@@ -266,7 +266,7 @@ mwoibn:
                                 velocity: false
                                 effort: false
         feedbacks:
-                online: [link_side_online, motor_side_online, odometry]
+                online: [link_side_online, odometry]
                 offline: [lower_body]
                 simulated: [simulation_base, simulation_state]
         controllers:
@@ -406,7 +406,7 @@ mwoibn:
                                 layer: NRT
                                 source: "desired_state"
                         odometry: 
-                                layer: NRT
+                                layer: RT
                                 source: "base_odometry"
                 controller:
                         position_controller:
@@ -424,7 +424,7 @@ mwoibn:
                                 layer: NRT
                                 sink: "desired_state"
                         odometry:
-                                layer: NRT
+                                layer: RT
                                 sink: "base_odometry"
                                  
                               

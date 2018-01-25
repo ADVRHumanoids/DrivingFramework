@@ -79,13 +79,14 @@ private:
         }
         return false;
     }
-    
-    
+
+
   bool _initialized = false, _valid = false, _rate = false;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
   std::unique_ptr<mwoibn::WheeledMotionEvent> _controller_ptr;
   XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
   Eigen::Matrix<double, 12, 1> _support;
+  mwoibn::VectorN _support_dyn;
 
 };
 }

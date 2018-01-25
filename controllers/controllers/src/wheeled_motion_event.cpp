@@ -134,6 +134,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
 
+  _hierarchical_controller.update();
 
   _linear_vel.setZero();
   _angular_vel.setZero();
@@ -144,7 +145,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
   _u_limits.setZero(_select_steer.size());
 
   _resteer.setConstant(_select_steer.size(), true);
-
+  steerings.setZero(_select_steer.size());
   robot.lower_limits.get(_l_limits, _select_steer);
   robot.upper_limits.get(_u_limits, _select_steer);
 
@@ -172,6 +173,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(mwoibn::robot_class::Robot& robot
 }
 
 void mwoibn::WheeledMotionEvent::init(){
+
       _robot.wait();
       _robot.get();
       _robot.updateKinematics();
@@ -186,7 +188,7 @@ void mwoibn::WheeledMotionEvent::init(){
       _leg_castor_ptr->updateError();
       _steering_ptr->updateState();
 
-      steerings = _leg_steer_ptr->getCurrent();
+      steerings.noalias() = _leg_steer_ptr->getCurrent();
 
       _leg_steer_ptr->setReference(steerings);
       _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
@@ -197,43 +199,32 @@ void mwoibn::WheeledMotionEvent::init(){
       _pelvis_orientation_ptr->setReference(0, _orientation);
 
       _position = _pelvis_position_ptr->points().getPointStateWorld(0);
-      _position.head(2) = _robot.centerOfMass().get().head(2);
-      _pelvis_position_ptr->setReference(_position);
-      _com_ptr->setReference(_position.head(2));
+      _position.head<2>() = _robot.centerOfMass().get().head<2>();
+      _pelvis_position_ptr->setReference(0, _position);
+      _com_ptr->setReference(_position);
       _heading = _steering_ptr->getState()[2];
-
-
-  _previous_command = mwoibn::VectorN::Zero(3);
-  _command.setZero(_robot.getDofs());
 
 }
 
 void mwoibn::WheeledMotionEvent::nextStep(const mwoibn::VectorN& support)
 {
 
-//  updateBase(velocity, omega);
   _robot.centerOfMass().update();
 
   updateSupport(support);
   updateBase();
-  mwoibn::Vector3 com = _robot.centerOfMass().get();
-//  mwoibn::Vector3 ref = _position;
-//  ref[2] = 0;
-//  _steering_ptr->setRef(ref);
 
   _next_step[0] =
-      (_position[0] - com[0]) / _robot.rate();
+      (_position[0] - _robot.centerOfMass().get()[0]) / _robot.rate();
   _next_step[1] =
-      (_position[1] - com[1]) / _robot.rate();
+      (_position[1] - _robot.centerOfMass().get()[1]) / _robot.rate();
   _next_step[2] =
       (_heading - _steering_ptr->getState()[2]); // just limit the difference
 
   _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
                                            6.28318531); // limit -pi:pi
   _next_step[2] = _next_step[2] / _robot.rate();
-  //  _next_step[0] = velocity[0];
-  //  _next_step[1] = velocity[1];
-  //  _next_step[2] = omega;
+
   steering();
 }
 
@@ -269,8 +260,7 @@ void mwoibn::WheeledMotionEvent::fullUpdate(const mwoibn::VectorN& support)
 }
 void mwoibn::WheeledMotionEvent::compute()
 {
-//_leg_castor_ptr->updateError();
-//  _leg_steer_ptr->updateError();
+
   _command.noalias() = _hierarchical_controller.update();
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
@@ -284,6 +274,7 @@ void mwoibn::WheeledMotionEvent::compute()
 
   _robot.command.get(_test_steer, _select_steer, mwoibn::robot_class::INTERFACE::POSITION);
   _robot.command.get(_test_wheel, _select_wheel, mwoibn::robot_class::INTERFACE::VELOCITY);
+
 
   // RESTEER AND CHECK FOR LIMITS
   for(int i = 0; i < _test_steer.size(); i++){
@@ -306,7 +297,7 @@ void mwoibn::WheeledMotionEvent::compute()
 
   for(int i = 0; i < _test_steer.size(); i++)
       _resteer[i] = _resteer[i] && std::fabs(_test_steer[i]) > mwoibn::HALF_PI/2;
-
+/*
   if (count == 30)
   {
     std::cout.precision(6);
@@ -325,7 +316,7 @@ void mwoibn::WheeledMotionEvent::compute()
   }
   else
     count++;
-
+*/
 }
 
 void mwoibn::WheeledMotionEvent::stop(){

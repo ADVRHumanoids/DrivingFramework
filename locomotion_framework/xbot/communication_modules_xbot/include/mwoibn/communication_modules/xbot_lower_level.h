@@ -31,8 +31,8 @@ public:
     if (_torque)
       std::cout << "\tInitialized torque interface\n";
 
-    stiffness.setZero(_dofs);
-    damping.setZero(_dofs);
+    stiffness.setZero(_robot.getJointNum());
+    damping.setZero(_robot.getJointNum());
     _robot.getStiffness(stiffness);
     _robot.getDamping(damping);
 
@@ -68,7 +68,7 @@ public:
 //    std::cout << stiffness << std::endl;
 
 
-    pub.setZero(_dofs);
+    pub.setZero(_robot.getJointNum());
   }
 
   virtual ~XBotLowerLevel() {}
