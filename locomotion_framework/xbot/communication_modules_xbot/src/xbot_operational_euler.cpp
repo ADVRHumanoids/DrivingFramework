@@ -68,7 +68,7 @@ bool mwoibn::communication_modules::XBotOperationalEuler::get()
 }
 
 void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Matrix3 orientation,
-                           mwoibn::Vector3 velocity)
+                           mwoibn::Vector3 position)
   {
 
     _base.tail(3) =

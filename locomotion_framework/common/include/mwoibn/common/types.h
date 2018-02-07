@@ -25,6 +25,9 @@
 #endif
 #include <float.h>
 #include <math.h>
+#include <memory>
+#include <utility>
+
 #define RT_SIZE 50
 #define FS_SIZE 8
 
@@ -34,6 +37,8 @@ namespace mwoibn
 typedef RigidBodyDynamics::Math::VectorNd VectorN;
 typedef RigidBodyDynamics::Math::Vector3d Vector3;
 typedef Eigen::Matrix<double, 1, 3> Vector3T;
+typedef Eigen::Matrix<double, 1, Eigen::Dynamic> VectorNT;
+
 typedef double Scalar;
 typedef Vector3 Point;
 typedef Vector3 Axis;

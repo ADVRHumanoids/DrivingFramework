@@ -11,6 +11,8 @@ namespace events
 
 void limit(double b_ref, double& b);
 void limit(const mwoibn::VectorN& b_ref, mwoibn::VectorN& b);
+void limit2(double b_ref, double& b);
+
 void jointLimits(double& b, double max = 2.79252680);
 void jointLimits(mwoibn::VectorN& b, double max = 2.79252680);
 

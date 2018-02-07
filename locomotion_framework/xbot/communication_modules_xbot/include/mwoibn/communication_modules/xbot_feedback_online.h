@@ -27,7 +27,6 @@ public:
       std::cout << "\tInitialized torque interface\n";
 
     _pub.setZero(_robot.getJointNum());
-    std::cout << "dof size: " << _dofs << std::endl;
     std::cout << "\tSuccess" << std::endl;
   }
 

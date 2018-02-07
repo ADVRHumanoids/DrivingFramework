@@ -1,6 +1,7 @@
 #ifndef EIGEN_UTILS_EIGEN_UTILS_H
 #define EIGEN_UTILS_EIGEN_UTILS_H
 
+#include <Eigen/Dense>
 #include <Eigen/SVD>
 #include <memory>
 #include <iostream>
@@ -271,12 +272,59 @@ template <> inline
 }
 
 template <typename _Vector_Type_, typename _Matrix_Type_>
-
 void skew(const _Vector_Type_& vec, _Matrix_Type_& mat){
 
   mat << 0, -vec[2], vec[1], vec[2], 0, -vec[0], -vec[1], vec[0], 0;
 
 }
+
+
+template <typename _Matrix_Type1_, typename _Matrix_Type2_> inline
+void limitHalfPi(_Matrix_Type1_ b_ref, _Matrix_Type2_& b){
+  //  _Matrix_Type_ limited = vec;
+    for(int i = 0; i < std::max(b_ref.rows(), b_ref.cols()); i++) // How will it work for matrices?
+      limitHalfPi(b_ref[i], b[i]);
+  }
+
+template <> inline
+void limitHalfPi(double b_ref, double& b)
+{
+  b +=   3.14159265 * (std::floor((b_ref + 1.57079632) / 3.14159265) -  std::floor((b + 1.57079632) / 3.14159265));
+}
+
+inline void limit2PI(double ref, double& st){
+  if(st - ref > 1.57079632){
+//    std::cout << "\t" << ref << "\t" << st << "\t";
+
+    st -= 3.14159265;
+//  std::cout << st << std::endl;
+   limit2PI(ref, st);
+  }
+  else if (ref - st > 1.57079632){
+//    std::cout << "\t" << ref << "\t" << st << "\t";
+    st += 3.14159265;
+//    std::cout << st << std::endl;
+    limit2PI(ref, st);
+  }
+}
+
+inline void limitPI(double ref, double& st){
+  if(st - ref > 0.78539816){
+//    std::cout << "\t" << ref << "\t" << st << "\t";
+
+    st -= 1.57079632;
+//  std::cout << st << std::endl;
+   limitPI(ref, st);
+  }
+  else if (ref - st > 0.78539816){
+//    std::cout << "\t" << ref << "\t" << st << "\t";
+    st += 1.57079632;
+//    std::cout << st << std::endl;
+    limitPI(ref, st);
+  }
+}
+
+
 
 } // namespace package
 } // namespace library

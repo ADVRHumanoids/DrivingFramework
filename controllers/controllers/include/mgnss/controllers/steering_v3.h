@@ -30,11 +30,16 @@ public:
 
   void setRate(double dt){_dt = dt;}
   void compute(const mwoibn::Vector3 next_step);
-
+  void compute2(const mwoibn::Vector3 next_step);
+  const mwoibn::VectorN& getICM(){return _b_icm;}
+  const mwoibn::VectorN& getSP(){return _b_sp;}
+  const mwoibn::VectorN& vICM(){return _v_icm;}
+  const mwoibn::VectorN& vSP(){return _v_sp;}
+  const mwoibn::VectorN& getDamping(){return _damping;}
 protected:
   mwoibn::hierarchical_control::CartesianFlatReferenceTask2& _plane;
   double _dt, _margin, _max, _K_icm, _K_sp, _heading, _x, _y;
-  mwoibn::VectorN _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _temp;
+  mwoibn::VectorN _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _temp, _damping;
   const mwoibn::VectorN& _state;
   mwoibn::VectorInt _dofs;
   int _size = 4;

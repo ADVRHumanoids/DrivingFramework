@@ -45,6 +45,7 @@
   <depend>srdfdom</depend>
   <depend>common</depend>
   <depend>eigen_utils</depend>
+  <depend>filters</depend>
   <build_depend>simple_log</build_depend>
   <test_depend>roslib</test_depend>
   <test_depend>centauro</test_depend>

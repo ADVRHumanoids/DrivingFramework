@@ -10,9 +10,6 @@
 #include <climits>
 
 #include "mwoibn/communication_modules/all.h"
-#ifdef ROS_CONTROL
-    #include <custom_controller/controller_utils.h>
-#endif
 #include "mwoibn/robot_class/contact_ros.h"
 
 namespace mwoibn

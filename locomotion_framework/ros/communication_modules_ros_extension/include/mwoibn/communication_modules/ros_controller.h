@@ -22,6 +22,7 @@ public:
       _des_q.position.resize(getDofs(),0);
       _des_q.velocity.resize(getDofs(),0);
       _des_q.effort.resize(getDofs(),0);
+
   }
 
   // for now only full robot is supported for this controller
@@ -36,6 +37,23 @@ public:
     _des_q.velocity.resize(getDofs(),0);
     _des_q.effort.resize(getDofs(),0);
 
+    if (_filter)
+    {
+      if (!config["rate"])
+        throw(std::invalid_argument(
+            "Missing parameter required to initialize filters : rate"));
+
+      _filtered.setZero(getDofs());
+
+      if (_position){
+        _position_filter_ptr->computeCoeffs(config["rate"].as<double>());
+      }
+      if (_velocity)
+        _velocity_filter_ptr->computeCoeffs(config["rate"].as<double>());
+      if (_torque)
+        _torque_filter_ptr->computeCoeffs(config["rate"].as<double>());
+    }
+
     std::cout << "Loaded ROS controller " << config["name"] << std::endl;
 
   }
@@ -47,6 +65,25 @@ protected:
   ros::NodeHandle _node;
   ros::Publisher _command_pub;
   custom_messages::CustomCmnd _des_q;
+  mwoibn::VectorN _filtered;
+  bool _initialized = false;
+
+  void _initFilters(){
+    if(!_filter) return;
+    if(_position){
+      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _filtered);
+      _position_filter_ptr->reset(_filtered);
+    }
+    if(_velocity){
+      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _filtered);
+      _velocity_filter_ptr->reset(_filtered);
+    }
+    if(_torque){
+      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _filtered);
+      _torque_filter_ptr->reset(_filtered);
+    }
+  }
+
 //  std::vector<double> pub_qq;
 
 };

@@ -40,12 +40,16 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
 
+  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 200, 1));
 
 }
 
 void mgnss::odometry::Odometry::init(){
 
+    _filter_ptr->computeCoeffs(_robot.rate());
+
     _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
+//    _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
 
     for(int i = 0; i < _estimated.size(); i++)
     _estimated[i] =
@@ -54,6 +58,8 @@ void mgnss::odometry::Odometry::init(){
     _previous_state.noalias() = _state;
 
     update();
+
+//    _filter_ptr->reset(_base_pos);
 
 }
 
@@ -84,70 +90,21 @@ void mgnss::odometry::Odometry::update()
 
   for (int i = 0; i < _wheels_ph.size(); i++)
     _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);
-  //  _base.head(3) = _estimated[0] - _pelvis[0]; // relay only on the first leg
-
-
 
   _compute2(); // this seems to be the best
 
   _base.tail(3) =
       _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
+
+  _base_pos = _base.head(3);
+
+  _filter_ptr->update(_base_pos);
+
+  _base.head(3) = _base_pos;
+
+
   _robot.command.set(_base, {0, 1, 2, 3, 4, 5},
                      mwoibn::robot_class::INTERFACE::POSITION);
-
-
-  //  std::cout.precision(6);
-
-  //  std::cout << std::fixed << "incoming\n" <<
-  //  _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) <<
-  //  "estimated\n" << _base << std::endl;
-  //  for (int i = 0; i < _wheels_ph.size(); i++)
-  //    std::cout << std::fixed << _estimated[i][0] - _pelvis[i][0] << "\t" <<
-  //    _estimated[i][1] - _pelvis[i][1] << "\t" <<  _estimated[i][2] -
-  //    _pelvis[i][2] << "\t|";
-  //      std::cout << std::fixed << _estimated[0][0] - _pelvis[0][0] << "\t" <<
-  //      _estimated[0][1] - _pelvis[0][1] << "\t" <<  _estimated[0][2] -
-  //      _pelvis[0][2] << "\t|";
-  //      std::cout << std::fixed << _estimated[0][0] << "\t" <<
-  //      _estimated[0][1]<< "\t" <<  _estimated[0][2]  << "\t|";
-  //      std::cout << std::fixed << _pelvis[0][0] << "\t" <<  _pelvis[0][1] <<
-  //      "\t" <<  _pelvis[0][2] << "\t|";
-
-  //  std::cout << "er\t\t es\t\t re\t\t id\t\t|" << std::endl;
-
-  //  for (int i = 0; i < 4; i++)
-  //  {
-  //      std::cout << std::fixed << _error[i]
-  //                << "\t";
-  //      std::cout << std::fixed  << _previous_state[i] << "\t";
-  //      std::cout << std::fixed  << _state[i] << "\t|";
-  //      std::cout << std::fixed  << _ids[i] << "\t|";
-
-  //      std::cout << std::endl;
-  //  }
-
-  //    std::cout << "1\t\t\t\t\t\t|"
-  //              << "2\t\t\t\t\t\t|"
-  //              << "3\t\t\t\t\t\t|"
-  //              << "4\t\t\t\t\t\t" << std::endl;
-  //    std::cout << "er\t\t es\t\t re\t\t| "
-  //              << "er\t\t es\t\t re\t\t|"
-  //              << "er\t\t es\t\t re\t\t|"
-  //              << "er\t\t es\t\t re\t\t|" << std::endl;
-
-  //    for (int j = 0; j < 3; j++)
-  //    {
-  //      for (int i = 0; i < 4; i++)
-  //      {
-  //        std::cout << std::fixed << _estimated[i][j] -
-  //        _wheels_ph.getPointStateWorld(i)[j]
-  //                  << "\t";
-  //        std::cout << std::fixed  << _estimated[i][j] << "\t";
-  //        std::cout << std::fixed  << _wheels_ph.getPointStateWorld(i)[j] <<
-  //        "\t|";
-  //      }
-  //      std::cout << std::endl;
-  //    }
 
   _previous_state.noalias() = _state;
 

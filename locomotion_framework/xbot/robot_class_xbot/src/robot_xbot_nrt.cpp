@@ -58,6 +58,8 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
     {
       if (entry.second["space"].as<std::string>() == "JOINT")
       {
+        entry.second["rate"] = rate();
+
         if(RobotRosNRT::loadJointSpaceFeedback(entry.second, feedbacks, state, map)){
          _spin = true;
         }
@@ -135,6 +137,8 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(
 
     if (entry.second["layer"].as<std::string>() == "NRT")
     {
+      entry.second["rate"] = rate();
+
       if(RobotRosNRT::loadRosControllers(entry.second, controllers, command, map))
       {
          _spin = true;

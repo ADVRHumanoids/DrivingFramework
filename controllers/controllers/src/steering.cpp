@@ -13,12 +13,24 @@ void mgnss::events::limit(double b_ref, double& b)
 //     (std::fabs(b - b_ref) < 3 * mwoibn::HALF_PI))
 //    std::cout << b - b_ref << std::endl;
 
-  b = ((std::fabs(b - b_ref) < mwoibn::HALF_PI + 0.1) ||
-       (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI - 0.1))
+  b = ((std::fabs(b - b_ref) < mwoibn::HALF_PI) ||
+       (std::fabs(b - b_ref) > 3 * mwoibn::HALF_PI))
           ? b
           : (b - b_ref < 0) ? b + mwoibn::PI : b - mwoibn::PI;
 
 }
+
+void mgnss::events::limit2(double b_ref, double& b)
+{
+
+
+//  std::cout << b << "\t" << b_ref << "\t";
+  b +=   3.14159265 * (std::floor((b_ref + 1.57079632) / 3.14159265) -  std::floor((b + 1.57079632) / 3.14159265));
+//  std::cout << b << std::endl;
+
+
+}
+
 
 void mgnss::events::limit(const mwoibn::VectorN& b_ref, mwoibn::VectorN& b)
 {

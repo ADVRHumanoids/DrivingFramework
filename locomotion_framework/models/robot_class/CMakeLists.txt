@@ -18,7 +18,7 @@ set(LOGGER_INCLUDE_DIRS "")
 set(LOGGER_LIBRARIES "")
 set(LOGGER_EXPORTED_TARGETS "")
 
-find_package(catkin REQUIRED point_handling urdf srdfdom common eigen_utils) 
+find_package(catkin REQUIRED point_handling urdf srdfdom common eigen_utils filters) 
 
 if(LOGGER)
 find_package(simple_log REQUIRED)

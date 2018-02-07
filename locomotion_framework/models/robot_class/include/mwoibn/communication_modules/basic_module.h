@@ -4,6 +4,7 @@
 #include "mwoibn/robot_class/robot_class.h"
 #include "mwoibn/robot_class/state.h"
 #include "mwoibn/robot_class/map.h"
+#include "mwoibn/filters/iir_second_order.h"
 
 #include <rbdl/rbdl.h>
 
@@ -43,11 +44,38 @@ public:
     if (!config["interface"]["effort"])
       throw(std::invalid_argument(
           "Missing required parameter: interface:effort"));
+
     _position = config["interface"]["position"].as<bool>();
     _velocity = config["interface"]["velocity"].as<bool>();
     _torque = config["interface"]["effort"].as<bool>();
 
     _resize(direct);
+
+    if(config["filter"]){
+      if(!config["filter"]["run"])
+        throw(std::invalid_argument("Missing required filter parameter: run"));
+
+      _filter = config["filter"]["run"].as<bool>();
+
+      if(_filter){
+        if(!config["filter"]["frequency"])
+          throw(std::invalid_argument("Missing required filter parameter: frequency"));
+        if(!config["filter"]["damping"])
+          throw(std::invalid_argument("Missing required filter parameter: damping"));
+
+        if(_position)
+          _position_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        if(_velocity)
+          _velocity_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        if(_torque)
+          _torque_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+
+        std::cout << "Filter has been enabled. Cut-off frequency " << config["filter"]["frequency"] << ", damping " << config["filter"]["damping"] << "." << std::endl;
+      }
+    }
+    else
+      _filter = false;
+
   }
 
   virtual ~BasicModule() {}
@@ -58,6 +86,7 @@ public:
   {
     _map.mapReversed(q_rbdl, q_controller);
   }
+
   template <typename Vector1, typename Vector2>
   void mapTo(const Vector1& q_rbdl, Vector2& q_controller,
              const Vector3& selector) const
@@ -106,6 +135,10 @@ public:
 protected:
   mwoibn::robot_class::BiMap _map;
   mwoibn::robot_class::State& _command;
+  std::unique_ptr<mwoibn::filters::IirSecondOrder> _position_filter_ptr;
+  std::unique_ptr<mwoibn::filters::IirSecondOrder> _velocity_filter_ptr;
+  std::unique_ptr<mwoibn::filters::IirSecondOrder> _torque_filter_ptr;
+
 
   void _resize(bool direct)
   {
@@ -115,6 +148,7 @@ protected:
   bool _position;
   bool _velocity;
   bool _torque;
+  bool _filter;
 
   int _dofs;
 };

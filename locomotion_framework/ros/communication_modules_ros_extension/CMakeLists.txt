@@ -24,6 +24,12 @@ option(LOGGER ON)
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
+include_directories(${CMAKE_INSTALL_PREFIX})
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config.h.in
+    ${CMAKE_INSTALL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/communication_modules/config.h
+)
+
 set(SOURCE_FILES "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")

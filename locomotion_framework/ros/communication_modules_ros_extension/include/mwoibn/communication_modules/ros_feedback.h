@@ -54,6 +54,23 @@ public:
                        " doesn't need initialization" << std::endl;
     //    std::cout << config["source"].as<std::string>() << std::endl;
 
+    if (_filter)
+    {
+      if (!config["rate"])
+        throw(std::invalid_argument(
+            "Missing parameter required to initialize filters : rate"));
+
+      _filtered.setZero(_dofs);
+      std::cout << _dofs << std::endl;
+
+      if (_position)
+        _position_filter_ptr->computeCoeffs(config["rate"].as<double>());
+      if (_velocity)
+        _velocity_filter_ptr->computeCoeffs(config["rate"].as<double>());
+      if (_torque)
+        _torque_filter_ptr->computeCoeffs(config["rate"].as<double>());
+    }
+
     std::cout << "Loaded ROS feedback " << config["name"] << std::endl;
   }
   virtual ~RosFeedback() {}
@@ -62,6 +79,9 @@ public:
 
   void get(const MessagePtr& msg)
   {
+    if (!_initialized)
+      _initFilters(msg);
+
     if (_position)
       _command.set(msg->position, _map.reversed(),
                    robot_class::INTERFACE::POSITION);
@@ -75,19 +95,22 @@ public:
     if (_is_raw)
     {
 
-      if (_raw_interface == robot_class::INTERFACE::POSITION){
+      if (_raw_interface == robot_class::INTERFACE::POSITION)
+      {
         _raw_keep.setZero(msg->position.size());
-        for(int i = 0; i < msg->position.size(); i++)
+        for (int i = 0; i < msg->position.size(); i++)
           _raw_keep[i] = msg->position[i];
       }
-      else if (_raw_interface == robot_class::INTERFACE::VELOCITY){
+      else if (_raw_interface == robot_class::INTERFACE::VELOCITY)
+      {
         _raw_keep.setZero(msg->velocity.size());
-        for(int i = 0; i < msg->velocity.size(); i++)
+        for (int i = 0; i < msg->velocity.size(); i++)
           _raw_keep[i] = msg->velocity[i];
       }
-      else if (_raw_interface == robot_class::INTERFACE::TORQUE){
+      else if (_raw_interface == robot_class::INTERFACE::TORQUE)
+      {
         _raw_keep.setZero(msg->effort.size());
-        for(int i = 0; i < msg->effort.size(); i++)
+        for (int i = 0; i < msg->effort.size(); i++)
           _raw_keep[i] = msg->effort[i];
       }
 
@@ -140,10 +163,23 @@ protected:
   ros::NodeHandle _node;
   ros::Subscriber _state_sub;
 
-  mwoibn::VectorN _raw_keep;
+  mwoibn::VectorN _raw_keep, _filtered;
   mwoibn::robot_class::INTERFACE _raw_interface;
   bool _is_raw;
   bool _initialized = false;
+
+  void _initFilters(const MessagePtr& msg)
+  {
+    if (!_filter)
+      return;
+
+    if (_position)
+      _position_filter_ptr->reset(msg->position);
+    if (_velocity)
+      _velocity_filter_ptr->reset(msg->velocity);
+    if (_torque)
+      _torque_filter_ptr->reset(msg->effort);
+  }
 };
 }
 }

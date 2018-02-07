@@ -1,0 +1,6 @@
+#ifndef __COMMUNICATION_MODULES_CONFIG_H__
+#define __COMMUNICATION_MODULES_CONFIG_H__
+
+#cmakedefine ROS_CONTROL
+
+#endif
