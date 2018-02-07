@@ -1,7 +1,7 @@
 driving_path: &driving  "/home/centauro/src/catkin_malgorzata/src/"
 simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
 mwoibn:
-        middleware: "XBOT"
+        middleware: "ROS"
         robot:
                 name: "centauro"
                 default:
@@ -265,6 +265,10 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: false
+                        filter:
+                                run: false
+                                frequency: 200.0
+                                damping: 1.0
         feedbacks:
                 online: [link_side_online, motor_side_online, odometry]
                 offline: [lower_body]

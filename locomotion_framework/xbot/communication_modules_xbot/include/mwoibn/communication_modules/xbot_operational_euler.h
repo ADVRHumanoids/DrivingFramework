@@ -18,7 +18,7 @@ public:
                  XBot::RobotInterface& robot, double rate);
 
   virtual bool initialized(){return true;} // not implemented yet
-  virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 velocity);
+  virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 position);
   virtual ~XBotOperationalEuler(){}
 
   virtual bool get();

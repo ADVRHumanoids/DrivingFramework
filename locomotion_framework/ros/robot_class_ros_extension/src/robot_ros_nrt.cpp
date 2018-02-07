@@ -40,6 +40,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadFeedbacks(YAML::Node config)
 
     if (entry.second["space"].as<std::string>() == "JOINT")
     {
+      entry.second["rate"] = rate();
       if(loadJointSpaceFeedback(entry.second, feedbacks, state, map))
         continue;
     }
@@ -179,7 +180,6 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
     if (entry.second["type"].as<std::string>() ==
         "custom_controller/ActuatorPositionControllerClasses")
     {
-
       mwoibn::communication_modules::BasicFeedback* feedback = nullptr;
 
      // if (entry.second["initialize"] && entry.second["initialize"].as<std::string>() != "")
@@ -222,6 +222,8 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
       continue;
     }
 #endif
+    entry.second["rate"] = rate();
+
     loadRosControllers(entry.second, controllers, command, map);
 
   }

@@ -171,11 +171,14 @@ bool mwoibn::SupportPolygon3::initMotion()
     if (_state == SUPPORT_STATE::SPIDER)
     {
       setNegative();
+
       return true;
     }
     if (_state == SUPPORT_STATE::MAMMAL)
     {
+      setDesired(-0.17453333);
       setPositive();
+
       return true;
     }
   }

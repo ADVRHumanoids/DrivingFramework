@@ -25,11 +25,14 @@ if __name__ == '__main__':
 
     dth, r, th, magic = -0.2, 0.5, 0.0, 2.05
 
+    side, slide, v_min = 4.0, 1.0, 0.02
+
     x, y = 0, 0
     
     mode = 0
 
-    vel_max, vel = 0.5, 0.5
+    vel_max, vel, d_vel = 1.0, 0.0, 0.002
+
 #    ref_service(1.0, 4.0, dth*100)
 
     dx, dy =  vel,  0.00
@@ -38,37 +41,39 @@ if __name__ == '__main__':
 #      th = th + dth * dt * magic
 
 #      # square
-      if (mode == 0 and x > 1.5 and x < 2.0):
-        dx, dy =  vel_max/2,  0.00        
+      if mode == 0 and vel < vel_max and x < side-slide:
+        vel += d_vel
+        dx, dy =  vel,  0.00        
+      elif mode == 0 and x > side-slide and vel > v_min:
+        vel -= d_vel
+        dx, dy =  vel,  0.00        
+      elif mode == 0 and x > side:
         mode += 1
-      elif (mode == 1 and x > 2.0):
-        dx, dy = 0.00,  vel_max/2
+      elif mode == 1 and vel < vel_max and  y < side-slide:
+        vel += d_vel
+        dx, dy = 0.00, vel        
+      elif mode == 1 and y > side-slide and vel > v_min:
+        vel -= d_vel
+        dx, dy = 0.00, vel        
+      elif mode == 1 and y > side:
         mode += 1
-      elif (mode == 2 and y > 0.5):
-        dx, dy = 0.00,  vel_max
+      elif mode == 2 and vel > -vel_max and x > slide:
+        vel -= d_vel
+        dx, dy = vel, 0.00        
+      elif mode == 2 and x < slide and vel < -v_min:
+        vel += d_vel
+        dx, dy = vel, 0.00        
+      elif mode == 2 and x < 0.0:
         mode += 1
-      elif (mode == 3 and y > 1.5):
-        dx, dy = 0.00,  vel_max/2
+      elif mode == 3 and vel > -vel_max and y > slide:
+        vel -= d_vel
+        dx, dy = 0.00, vel        
+      elif mode == 3 and y < slide and vel < -v_min:
+        vel += d_vel
+        dx, dy = 0.00, vel        
+      elif mode == 3 and y < 0.0:
+        dx, dy = 0.00, 0.00        
         mode += 1
-      elif (mode == 4 and y > 2.0):
-        dx, dy = -vel_max/2,  0.00
-        mode += 1
-      elif (mode == 5 and x < 1.5):
-        dx, dy = -vel_max,  0.00
-        mode += 1
-      elif (mode == 6 and x < 0.5):
-        dx, dy = -vel_max/2,  0.00
-        mode += 1
-      elif (mode == 7 and x > 0.0):
-        dx, dy = 0.00,  -vel_max/2
-        mode += 1
-      elif (mode == 8 and y < 1.5):
-        dx, dy = 0.00,  -vel_max
-        mode += 1
-      elif (mode == 9 and y < 0.0):
-        dx, dy = 0.00,  0.00
-        mode += 1
-
 #      dx = -r*cos(th)*dth*100.0
 #      dy = -r*sin(th)*dth*100.0
       x += dx*0.005*2

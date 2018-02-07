@@ -7,7 +7,7 @@
 #include <mwoibn/hierarchical_control/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v5.h>
-#include <mgnss/controllers/steering_v3.h>
+#include <mgnss/controllers/steering_v5.h>
 
 #include <mwoibn/hierarchical_control/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
@@ -176,6 +176,26 @@ public:
     _constraints_ptr->releaseContact(i);
   }
 
+  mwoibn::VectorN getCom(){ return _robot.centerOfMass().get().head<2>();}
+  const mwoibn::VectorN& errorCom(){return _com_ptr->getError();}
+  mwoibn::VectorN refCom(){return _com_ptr->getReference();}
+  mwoibn::VectorN getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+  mwoibn::VectorN errorCp(int i){ return _steering_ptr->getReferenceError(i);}
+  const mwoibn::VectorN& refCp(){ return _steering_ptr->getReference();}
+  const mwoibn::VectorN& getSteer(){ return _leg_steer_ptr->getCurrent();}
+  const mwoibn::VectorN& errorSteer(){ return _leg_steer_ptr->getError();}
+  const mwoibn::VectorN& refSteer(){ return steerings;}
+  const mwoibn::Vector3& getLinVel(){ return _linear_vel;}
+  const mwoibn::Vector3& getAngVel(){ return _angular_vel;}
+  const mwoibn::VectorN& getSteerICM(){return _steering_ref_ptr->getICM();}
+  const mwoibn::VectorN& getSteerSP(){return _steering_ref_ptr->getSP();}
+  const mwoibn::VectorN& getVelICM(){return _steering_ref_ptr->vICM();}
+  const mwoibn::VectorN& getVelSP(){return _steering_ref_ptr->vSP();}
+  const mwoibn::VectorN& getDampingICM(){return _steering_ref_ptr->getDampingICM();}
+  const mwoibn::VectorN& getDampingSP(){return _steering_ref_ptr->getDampingSP();}
+  const mwoibn::VectorBool& isResteer(){return _resteer;}
+  const mwoibn::VectorN& getAnkleYaw(){return _test_steer;}
+  mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
 
 protected:
   bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,
@@ -204,7 +224,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
       _leg_steer_ptr;
 
-  std::unique_ptr<mgnss::events::Steering3> _steering_ref_ptr;
+  std::unique_ptr<mgnss::events::Steering5> _steering_ref_ptr;
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 
@@ -216,7 +236,7 @@ protected:
   mwoibn::Quaternion _orientation;
   bool _reference = false;
   mwoibn::VectorInt _select_steer, _select_wheel;
-  mwoibn::VectorN _l_limits, _u_limits, _test_steer, _test_wheel;
+  mwoibn::VectorN _l_limits, _u_limits, _test_steer, _current_steer, _start_steer;
   int count = 0;
 
   mwoibn::VectorBool _resteer;

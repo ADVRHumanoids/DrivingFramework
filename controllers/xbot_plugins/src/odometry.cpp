@@ -38,12 +38,14 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 
     if (!_initialized)
     {
+      if(!_rate){
+          _robot_ptr->setRate(period);
+          _controller_ptr->setRate();
+       _rate = true;
+      }
        if(_valid)
       _controller_ptr->init();
-       if(!_rate){
-           _robot_ptr->setRate(period);
-        _rate = true;
-       }
+
        if(_rate && _valid)
         _initialized = true;
     }

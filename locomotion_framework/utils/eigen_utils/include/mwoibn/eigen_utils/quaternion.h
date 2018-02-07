@@ -2,6 +2,7 @@
 #define EIGEN_UTILS_QUATERNION_H
 
 #include <Eigen/Dense>
+#include <utility>
 
 namespace mwoibn
 {

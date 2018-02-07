@@ -16,7 +16,7 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 LIST( APPEND INSTALL_TARGETS odometry)
-LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_point_handling)
+LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_point_handling filters)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
