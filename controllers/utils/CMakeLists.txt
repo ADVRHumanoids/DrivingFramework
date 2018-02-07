@@ -29,12 +29,14 @@ ENDFUNCTION()
 if(VISUALIZATION_TOOLS)
 
  add_definitions(-DVISUALIZATION_TOOLS)
+if(ROS_CONTROL)
  LIST( APPEND INSTALL_TARGETS real_robot_tracker)
  LIST( APPEND CATKIN_DEPENDS_SET visualization_tools robot_point_handling roscpp robot_class_ros_extension )
- LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 
+endif(ROS_CONTROL)
 endif(VISUALIZATION_TOOLS)
 
+LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
   ${CATKIN_DEPENDS_BUILD}
@@ -55,13 +57,13 @@ include_directories(
 )
 
 if(VISUALIZATION_TOOLS)
-
+if(ROS_CONTROL)
 add_executable(real_robot_tracker src/real_robot_tracker.cpp)
 add_dependencies(real_robot_tracker ${catkin_EXPORTED_TARGETS})
 target_link_libraries(real_robot_tracker
     ${catkin_LIBRARIES}
  )
-
+endif(ROS_CONTROL)
 endif(VISUALIZATION_TOOLS)
 
 ## Mark executables and/or libraries for installation

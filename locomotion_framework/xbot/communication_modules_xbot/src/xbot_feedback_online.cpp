@@ -7,7 +7,9 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::get()
 //     _robot.getJointPosition(_pub);
     _robot.getMotorPosition(_pub);
 //    std::cout << "feedback\t" << _pub.transpose() << std::endl;
+
     _command.set(_pub, _map.reversed(), robot_class::INTERFACE::POSITION);
+
 //    std::cout << _map.reversed().transpose() << std::endl;
 //    std::cout << "position feedback " << _command.get(robot_class::INTERFACE::POSITION).transpose() << std::endl;
 

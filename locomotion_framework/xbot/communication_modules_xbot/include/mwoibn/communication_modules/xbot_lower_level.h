@@ -68,7 +68,7 @@ public:
 //    std::cout << stiffness << std::endl;
 
 
-    pub.setZero(_dofs);
+    pub.setZero(_robot.getJointNum());
   }
 
   virtual ~XBotLowerLevel() {}
