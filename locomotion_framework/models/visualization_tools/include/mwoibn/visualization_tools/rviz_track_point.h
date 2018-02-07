@@ -1,6 +1,7 @@
 #ifndef VISUALIZATION_TOOLS_RVIS_TRACK_POINT_H
 #define VISUALIZATION_TOOLS_RVIS_TRACK_POINT_H
 
+#include <vector>
 #include <ros/ros.h>
 
 #include <visualization_msgs/Marker.h>

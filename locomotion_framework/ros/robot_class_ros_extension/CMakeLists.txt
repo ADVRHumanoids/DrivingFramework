@@ -37,17 +37,17 @@ set(LOGGER_EXPORTED_TARGETS "")
 
 set(INSTALL_TARGETS "")
 
-find_package(catkin REQUIRED robot_class) 
+find_package(catkin REQUIRED robot_class)
 
 if(LOGGER)
 find_package(simple_log REQUIRED)
-LIST(APPEND LOGGER_LIBRARIES 
+LIST(APPEND LOGGER_LIBRARIES
 	${simple_log_LIBRARIES}
 )
-LIST(APPEND LOGGER_INCLUDE_DIRS 
+LIST(APPEND LOGGER_INCLUDE_DIRS
 	${simple_log_INCLUDE_DIRS}
 )
-LIST(APPEND LOGGER_EXPORTED_TARGETS 
+LIST(APPEND LOGGER_EXPORTED_TARGETS
 	${simple_log_EXPORTED_TARGETS}
 )
 endif(LOGGER)
@@ -59,25 +59,25 @@ find_package(roscpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 
-LIST(APPEND ROBOT_ROS_LIBRARIES 
+LIST(APPEND ROBOT_ROS_LIBRARIES
 	${urdf_LIBRARIES}
 	${srdfdom_LIBRARIES}
-	${roscpp_LIBRARIES} 
-	${sensor_msgs_LIBRARIES} 
+	${roscpp_LIBRARIES}
+	${sensor_msgs_LIBRARIES}
 	${gazebo_msgs_LIBRARIES}
 )
-LIST(APPEND ROBOT_ROS_INCLUDE_DIRS 
+LIST(APPEND ROBOT_ROS_INCLUDE_DIRS
 	${urdf_INCLUDE_DIRS}
 	${srdfdom_INCLUDE_DIRS}
-	${roscpp_INCLUDE_DIRS} 
-	${sensor_msgs_INCLUDE_DIRS} 
+	${roscpp_INCLUDE_DIRS}
+	${sensor_msgs_INCLUDE_DIRS}
         ${gazebo_msgs_INCLUDE_DIRS}
 )
-LIST(APPEND ROBOT_ROS_EXPORTED_TARGETS 
+LIST(APPEND ROBOT_ROS_EXPORTED_TARGETS
 	${urdf_EXPORTED_TARGETS}
 	${srdfdom_EXPORTED_TARGETS}
-	${roscpp_EXPORTED_TARGETS} 
-	${sensor_msgs_EXPORTED_TARGETS} 
+	${roscpp_EXPORTED_TARGETS}
+	${sensor_msgs_EXPORTED_TARGETS}
         ${gazebo_msgs_EXPORTED_TARGETS}
 )
 #endif(ROS)
@@ -85,27 +85,23 @@ LIST(APPEND ROBOT_ROS_EXPORTED_TARGETS
 #if(ROS_NRT)
 
 find_package(communication_modules_ros_extension REQUIRED)
-find_package(custom_messages REQUIRED) 
-find_package(std_srvs REQUIRED) 
-find_package(controller_manager_msgs REQUIRED)
+find_package(custom_messages REQUIRED)
+find_package(std_srvs REQUIRED)
 
-LIST(APPEND ROBOT_ROS_NRT_LIBRARIES 
+LIST(APPEND ROBOT_ROS_NRT_LIBRARIES
         ${communication_modules_ros_extension_LIBRARIES}
-	${custom_messages_LIBRARIES} 
-	${std_srvs_LIBRARIES} 
-        ${controller_manager_msgs_LIBRARIES}
+	${custom_messages_LIBRARIES}
+	${std_srvs_LIBRARIES}
 )
-LIST(APPEND ROBOT_ROS_NRT_INCLUDE_DIRS 
+LIST(APPEND ROBOT_ROS_NRT_INCLUDE_DIRS
         ${communication_modules_ros_extension_INCLUDE_DIRS}
-	${custom_messages_INCLUDE_DIRS}  
+	${custom_messages_INCLUDE_DIRS}
 	${std_srvs_INCLUDE_DIRS}
-        ${controller_manager_msgs_INCLUDE_DIRS}
   )
-LIST(APPEND ROBOT_ROS_NRT_EXPORTED_TARGETS 
+LIST(APPEND ROBOT_ROS_NRT_EXPORTED_TARGETS
         ${communication_modules_ros_extension_EXPORTED_TARGETS}
 	${custom_messages_EXPORTED_TARGETS}
 	${std_srvs_EXPORTED_TARGETS}
-        ${controller_manager_msgs_EXPORTED_TARGETS}
 )
 #endif(ROS_NRT)
 
@@ -113,13 +109,13 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
-	include 
-	${catkin_INCLUDE_DIRS} 
+  INCLUDE_DIRS
+	include
+	${catkin_INCLUDE_DIRS}
 	${ROBOT_ROS_INCLUDE_DIRS}
 	${ROBOT_ROS_NRT_INCLUDE_DIRS}
 	${LOGGER_INCLUDE_DIRS}
-  LIBRARIES 
+  LIBRARIES
 	${PROJECT_NAME}
 	${ROBOT_ROS_LIBRARIES}
 	${ROBOT_ROS_NRT_LIBRARIES}
@@ -156,12 +152,12 @@ set(ROBOT_CLASS_SOURCE "")
 
  target_link_libraries(robot_class_ros_extension
    ${catkin_LIBRARIES}
-   ${ROBOT_ROS_LIBRARIES} 
+   ${ROBOT_ROS_LIBRARIES}
    ${ROBOT_ROS_NRT_LIBRARIES}
    ${LOGGER_LIBRARIES}
 )
 
-LIST(APPEND INSTALL_TARGETS 
+LIST(APPEND INSTALL_TARGETS
 	robot_class_ros_extension
 )
 
