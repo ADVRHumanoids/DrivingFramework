@@ -129,6 +129,7 @@ if(WHEELS_MOTION)
     wheels_event
     wheels_full
 #    wheeled_motion_run
+    wheels_support
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -136,6 +137,7 @@ if(WHEELS_MOTION)
     robot_class_xbot
     hierarchical_control
     custom_services
+    custom_messages
 #    reference_generation
     controllers
     communication
@@ -305,6 +307,11 @@ target_link_libraries(wheels_event
     ${catkin_LIBRARIES}
  )
 
+add_executable(wheels_support src/wheels_support.cpp)
+add_dependencies(wheels_support ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_support
+    ${catkin_LIBRARIES}
+ )
 endif(WHEELS_MOTION)#############
 
 if(ODOMETRY)

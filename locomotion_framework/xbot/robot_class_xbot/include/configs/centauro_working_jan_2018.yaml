@@ -17,9 +17,10 @@ MasterCommunicationInterface:
   framework_name: "ROS"
 
 XBotRTPlugins:
-  plugins: ["Odometry", "JointStates", "WheelsV2"]
+#  plugins: ["Odometry", "JointStates", "WheelsV2"]
+  plugins: ["JointStates", "Odometry", "WheelsV2"]
   io_plugins: []
-  
+#  plugins: ["HomingExample"]
 NRTPlugins:
   plugins: ["HomingExample"]
   

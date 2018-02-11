@@ -40,11 +40,12 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
 
-  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 200, 1));
+  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 1000, 1)); //NRT 200, RT 1000
 
 }
 
 void mgnss::odometry::Odometry::init(){
+
 
     _filter_ptr->computeCoeffs(_robot.rate());
 

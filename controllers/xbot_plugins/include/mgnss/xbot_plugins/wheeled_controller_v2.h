@@ -7,6 +7,7 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
 
 #include <custom_services/updatePDGains.h>
+#include <custom_messages/CustomCmnd.h>
 
 namespace mgnss
 {
@@ -28,6 +29,14 @@ protected:
   virtual void control_loop(double time, double period);
 
 private:
+  std::ostringstream oss;
+  std::ofstream file;
+  Eigen::IOFormat fmt;
+
+  std::time_t t;
+  std::tm tm;
+  double start,now;
+  mwoibn::VectorN _print;
   bool evenstHandler(custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res){
 
@@ -80,11 +89,28 @@ private:
         return false;
     }
     
+	void supportHandler(const custom_messages::CustomCmndConstPtr& msg){
+//		std::cout << "got message" << std::endl;
+		if(msg->position[12] == mwoibn::IS_VALID){
+//			std::cout << "is valid" << std::endl;
+			for(int i = 0; i < 12; i++){
+				_support[i] = msg->position[i];
+//				std::cout << msg->position[i] << "\t";
+			}
+//			std::cout << std::endl;
+			}
+//		else
+//				std::cout << "invalid " <<  msg->position[12] << std::endl;
+			
+	}
+
+ 	
     
   bool _initialized = false, _valid = false, _rate = false;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
   std::unique_ptr<mwoibn::WheeledMotionEvent> _controller_ptr;
-  XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
+  XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt, support_rt;
+  XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
   Eigen::Matrix<double, 12, 1> _support;
 
 };

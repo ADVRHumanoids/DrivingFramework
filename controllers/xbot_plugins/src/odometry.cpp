@@ -21,7 +21,7 @@ void mgnss::xbot_plugins::Odometry::on_start(double time)
     if (_valid)
     {
       _robot_ptr->updateKinematics();
-      _controller_ptr->init();
+//      _controller_ptr->init();
     }
 }
 

@@ -142,7 +142,8 @@ public:
       mwoibn::eigen_utils::wrapToPi(_ref[i]);
 
       if ( _error[i] > 0 &&  std::fabs(_error[i] - mwoibn::PI) < 50*mwoibn::PI/180){
-//        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
+		
+        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
 //        if(!_resteer[i]){
 //        std::cout << i << "\t change config" << std::endl;
         _error[i]-= mwoibn::PI;
@@ -154,7 +155,7 @@ public:
       }
 
       else if (_error[i] < 0 &&  std::fabs(_error[i] + mwoibn::PI) < 50*mwoibn::PI/180){
-//        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
+        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
 //        if(!_resteer[i]){
 
 //        std::cout << i << "\t change config" << std::endl;

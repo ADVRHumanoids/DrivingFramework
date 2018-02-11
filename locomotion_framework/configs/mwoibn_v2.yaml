@@ -1,7 +1,7 @@
 driving_path: &driving  "/home/centauro/src/catkin_malgorzata/src/"
 simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
 mwoibn:
-        middleware: "ROS"
+        middleware: "XBOT"
         robot:
                 name: "centauro"
                 default:
@@ -95,6 +95,18 @@ mwoibn:
                         type: "NRT"
                         controller: 
                                 layer: "lower_level"
+                        feedback: 
+                                list: [link_side_online]
+                        actuators: 
+                                read: true
+                        contacts: 
+                                read: false
+                                feedback: false
+                fake:
+                        rate: 200
+                        type: "NRT"
+                        controller: 
+                                layer: ""
                         feedback: 
                                 list: [link_side_online]
                         actuators: 
@@ -360,7 +372,7 @@ mwoibn:
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
                         urdf: 
                                 path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_v2.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
                         srdf:
                                 path: *driving

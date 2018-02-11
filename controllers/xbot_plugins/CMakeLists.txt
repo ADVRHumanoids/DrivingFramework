@@ -34,6 +34,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   hierarchical_control
   controllers
   custom_services
+  custom_messages
   odometry
 )
 

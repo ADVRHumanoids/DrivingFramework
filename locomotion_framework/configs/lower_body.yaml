@@ -7,9 +7,9 @@ mwoibn:
 #                source:
 #                       urdf: "/robot_lower_body"
 #                       srdf: "/robot_srdf"
-#        xbot:
-#                source:
-#                        urdf: 
-#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+        xbot:
+                source:
+                        urdf: 
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
 #                        srdf:
 #                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"

@@ -103,7 +103,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
       {castor1, castor2, castor3, castor4}, robot));
 
   int task = 0;
-  double ratio = 1.0; // 4
+  double ratio = 3.5; // 1.0 NRT, 3.5 RT
 
   double damp = 1e-4;
   // Set initaial HC tasks
@@ -111,22 +111,22 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
   gain << 1;
   _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
-  gain << 15 * ratio;
+  gain << 25 * ratio;
 
   _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
-  gain << 30 * ratio;
+  gain << 60 * ratio;
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 30 * ratio;
+  gain << 45 * ratio;
   _hierarchical_controller.addTask(_com_ptr.get(), gain, task, damp);
   task++;
   gain << 10 * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 10 * ratio; // 15
+  gain << 22 * ratio; // 15
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << 15 * ratio; // 10
@@ -153,7 +153,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
 
   _com_ref.setZero(2);
   _steering_ref_ptr.reset(new mgnss::events::Steering5(
-      _robot, *_steering_ptr, _test_steer, 0.75, 0.25, _robot.rate(), 0.02));
+      _robot, *_steering_ptr, _test_steer, 0.8, 0.2, _robot.rate(), 0.03));
 
   _previous_command = mwoibn::VectorN::Zero(3);
   _command.setZero(_robot.getDofs());
@@ -276,13 +276,15 @@ void mwoibn::WheeledMotionEvent::compute()
   {
     double steer = _test_steer[i];
 
-    if ((_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i]) && !_resteer[i])
+    if ((_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i]) && !_resteer[i])// && std::fabs(_test_steer[i] - _current_steer[i]) < 10*180/mwoibn::PI)
     {
       _start_steer[i] = _test_steer[i];
       _resteer[i] = true;
-//      std::cout << "WARNING: ankle yaw " << i << " on limit."
-//                << std::endl; // NRT
+      std::cout << "WARNING: ankle yaw " << i << " on limit."
+                << std::endl; // NRT
     }
+
+//    std::cout << "\t" << i << "\t" << _resteer[i] << "\t" << _test_steer[i]*180/mwoibn::PI;
 
     if (_resteer[i])
     {
@@ -313,6 +315,9 @@ void mwoibn::WheeledMotionEvent::compute()
     }
 
   }
+
+//  std::cout << std::endl;
+//  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
 
 //  std::cout << _resteer.transpose() << std::endl;
   _robot.command.set(_test_steer, _select_steer,
