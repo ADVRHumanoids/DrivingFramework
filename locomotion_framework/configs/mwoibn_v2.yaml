@@ -1,5 +1,5 @@
-driving_path: &driving  "/home/centauro/src/catkin_malgorzata/src/"
-simulator_path: &simulator "/home/centauro/devel-superbuild/robots/"
+driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
+simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
 mwoibn:
         middleware: "ROS"
         robot:
@@ -303,17 +303,17 @@ mwoibn:
                         simulation_base: 
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
-                                reference: 1
+                                reference: 2
                                 initialize: true
                         floating_base: 
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
-                                reference: 1
+                                reference: centauro::pelvis
                                 initialize: true
                         imu_base: 
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
-                                reference: 1
+                                reference: centauro::pelvis
                                 initialize: true
                         whole_body:
                                 source2: "position_controller/reference"
@@ -410,7 +410,7 @@ mwoibn:
                                 layer: NRT
                                 source: "desired_state"
                         odometry: 
-                                layer: NRT
+                                layer: RT
                                 source: "base_odometry"
                 controller:
                         position_controller:
@@ -428,7 +428,101 @@ mwoibn:
                                 layer: NRT
                                 sink: "desired_state"
                         odometry:
-                                layer: NRT
+                                layer: RT
                                 sink: "base_odometry"
-                                 
-                              
+        modules:
+                wheeled_motion:
+                        robot: default
+                        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
+                        tunning: RT2
+                        tunnings:
+                                NRT: # discontinous both, iit with floating base
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 80
+                                        centre_of_mass_x: 50
+                                        centre_of_mass_y: 65
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                odom_NRT: # circular - odom, 
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 45
+                                        centre_of_mass_x: 45
+                                        centre_of_mass_y: 45
+                                        base_position: 10
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                odom_NRT_iit: # circular - odom, 
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 40
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 5
+                                        contact_point: 22
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                RT:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 25
+                                        base_orinetation: 60
+                                        centre_of_mass_x: 50
+                                        centre_of_mass_y: 50
+                                        base_position: 10
+                                        contact_point: 22
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.04
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                RT2:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 25
+                                        base_orinetation: 50
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 10
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                joint_states:
+                        robot: joint_space
+                odometry:
+                        robot: odometry
+                        secondary_file: *config_lower          

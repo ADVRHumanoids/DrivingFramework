@@ -29,7 +29,7 @@ public:
     if (!config["reference"])
       throw(std::invalid_argument("Couldn't find an argument [reference]"));
 
-    _ref = config["reference"].as<int>();
+    _ref_link = config["reference"].as<std::string>();
 
     if (!config["convention"])
       throw(std::invalid_argument(
@@ -102,9 +102,29 @@ public:
 
   void get(const MessagePtr& msg)
   {
-    _initialized = true;
+    if (!_initialized)
+    {
 
-    if(!_size) return;
+      for (int i = 0; i < msg->name.size(); i++)
+      {
+        if (msg->name[i] != _ref_link)
+          continue;
+
+        _ref = i;
+        std::cout << "Found a floating base link " << _ref_link << " " << _ref << "." << std::endl;
+
+        break;
+      }
+      if(_ref == mwoibn::NON_EXISTING)
+        std::cout << "Reference frame " << _ref_link << " has not been defined in the recieved message." << std::endl;
+      else{
+      _initialized = true;
+      return;
+      }
+    }
+
+    if (!_size)
+      return;
     if (_position)
     {
       // this works for the QUATERNION:HAMILTONIAN CONVENTION
@@ -122,12 +142,11 @@ public:
 
     if (_velocity)
     {
-      _full << msg->twist[_ref].linear.x, msg->twist[_ref].linear.y, msg->twist[_ref].linear.z,
-          msg->twist[_ref].angular.x, msg->twist[_ref].angular.y,
-          msg->twist[_ref].angular.z;
+      _full << msg->twist[_ref].linear.x, msg->twist[_ref].linear.y,
+          msg->twist[_ref].linear.z, msg->twist[_ref].angular.x,
+          msg->twist[_ref].angular.y, msg->twist[_ref].angular.z;
       getVelocity(_full);
     }
-
   }
 
 protected:
@@ -135,9 +154,10 @@ protected:
   ros::Subscriber _state_sub;
   mwoibn::Vector3 _linear_state;
 
+  std::string _ref_link;
   mwoibn::Quaternion _orientation;
   bool _initialized = false, _is_position, _is_orientation;
-  int _ref;
+  int _ref = mwoibn::NON_EXISTING;
 };
 }
 }

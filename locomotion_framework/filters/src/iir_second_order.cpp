@@ -21,6 +21,7 @@ void mwoibn::filters::IirSecondOrder::resize(int size)
 
 void mwoibn::filters::IirSecondOrder::computeCoeffs(double dt)
 {
+  std::cout << dt << "\t" << _omega << "\t" << _damp << std::endl;
   double t_omega = 1 / _omega / dt;
 
   _a[0] = 1 + 4 * _damp * t_omega + 4 * t_omega * t_omega;

@@ -5,7 +5,18 @@ REGISTER_XBOT_PLUGIN(Odometry, mgnss::xbot_plugins::Odometry)
 bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle)
 {
   /* Save robot to a private member. */
-  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), handle->getPathToConfigFile(), "robot2", handle->getSharedMemory()));
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(handle->getPathToConfigFile());
+  std::string config_file = config["config_file"].as<std::string>();
+  config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["odometry"];
+
+  std::string secondary_file = "";
+  if (config["secondary_file"])
+    secondary_file = config["secondary_file"].as<std::string>();
+
+  /* Save robot to a private member. */
+  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config_file, config["robot"].as<std::string>(), secondary_file, handle->getSharedMemory()));
+
+//  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), handle->getPathToConfigFile(), "robot2", handle->getSharedMemory()));
 
   _controller_ptr.reset(new mgnss::odometry::Odometry(*_robot_ptr, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078));
 

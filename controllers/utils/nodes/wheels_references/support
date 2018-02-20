@@ -11,6 +11,9 @@ if __name__ == '__main__':
     #print(1.0/dt)
     name = '/centauro/wheels_command'
     service_ok = False
+    
+    
+    
     while (not rospy.is_shutdown() and not service_ok):
       try:
         print('wait for service: update_links')
@@ -46,6 +49,7 @@ if __name__ == '__main__':
     dir_y = np.array([-1.,  1., -1., 1.])
     p_x = np.array([0.00,  0.00, 0.00, 0.00])
     wait = 0
+    
     while not rospy.is_shutdown():
 #      if mode == 0 and x[0] > 0.01 and x[0] < 0.02:
 #         dx[1] = vel

@@ -89,6 +89,7 @@ const mwoibn::VectorN& mwoibn::SupportPolygon3::get()
   for (int i = 0; i < 4; i++)
     _full_state.segment<3>(3 * i) = _contacts[i].get();
 
+//  std::cout << _full_state.transpose() << std::endl;
   return _full_state;
 }
 
@@ -189,16 +190,23 @@ bool mwoibn::SupportPolygon3::update()
 {
   bool done = false;
 
+//  std::cout << 1 << std::endl;
   if (_motion == SUPPORT_MOTION::STOP){
+//    std::cout << 2 << std::endl;
     done = true;
   }
   else if (_motion == SUPPORT_MOTION::DIRECT){
+//    std::cout << 3 << std::endl;
+
     done = moveToStart(0.0005);
   }
   else if (_motion == SUPPORT_MOTION::CIRCULAR){
+//    std::cout << 4 << std::endl;
+
     done = limitedStep();
     nextStep();
   }
+//  std::cout << 5 << std::endl;
 
   for(int i = 0; i < _contacts.size(); i++)
     _contacts[i].update();

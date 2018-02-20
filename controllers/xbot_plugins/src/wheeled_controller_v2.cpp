@@ -5,10 +5,22 @@ REGISTER_XBOT_PLUGIN(WheelsV2, mgnss::xbot_plugins::WheelsV2)
 bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
     XBot::Handle::Ptr handle)
 {
-  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(
-      handle->getRobotInterface(), handle->getPathToConfigFile(), "robot", handle->getSharedMemory()));
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(handle->getPathToConfigFile());
+  std::string config_file = config["config_file"].as<std::string>();
+  config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
 
-  _controller_ptr.reset(new mwoibn::WheeledMotionEvent(*_robot_ptr));
+  std::string secondary_file = "";
+  if (config["secondary_file"])
+    secondary_file = config["secondary_file"].as<std::string>();
+
+  /* Save robot to a private member. */
+  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config_file, config["robot"].as<std::string>(), secondary_file, handle->getSharedMemory()));
+
+//  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(
+//      handle->getRobotInterface(), handle->getPathToConfigFile(), "robot", handle->getSharedMemory()));
+
+
+  _controller_ptr.reset(new mwoibn::WheeledMotionEvent(*_robot_ptr, config_file));
 
   _srv_rt = handle->getRosHandle()->advertiseService("wheels_command", &mgnss::xbot_plugins::WheelsV2::evenstHandler, this);
 

@@ -1,7 +1,7 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
 
 mwoibn::WheeledMotionEvent::WheeledMotionEvent(
-    mwoibn::robot_class::Robot& robot)
+    mwoibn::robot_class::Robot& robot, std::string config_file)
     : _robot(robot)
 {
   _x << 1, 0, 0;
@@ -102,38 +102,46 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
   _leg_castor_ptr.reset(new mwoibn::hierarchical_control::CastorAngleTask(
       {castor1, castor2, castor3, castor4}, robot));
 
-  int task = 0;
-  double ratio = 1.0; // 4
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
+  std::cout << "Wheeled Motion loaded " << config["tunning"] << " tunning." << std::endl;
 
-  double damp = 1e-4;
+  config = config["tunnings"][config["tunning"].as<std::string>()];
+
+  for(auto entry: config)
+    std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
+
+  int task = 0;
+  double ratio = config["ratio"].as<double>(); // 4
+  mwoibn::VectorN gain_com(2);
+  double damp = config["damping"].as<double>();
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
-  gain << 1;
+  gain << config["constraints"].as<double>();
   _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
-  gain << 15 * ratio;
+  gain << config["leg_steer"].as<double>() * ratio; // 30
 
   _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
-  gain << 30 * ratio;
+  gain << config["base_orinetation"].as<double>() * ratio; // 60
   _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 30 * ratio;
-  _hierarchical_controller.addTask(_com_ptr.get(), gain, task, damp);
+  gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
+  _hierarchical_controller.addTask(_com_ptr.get(), gain_com, task, damp);
   task++;
-  gain << 10 * ratio;
+  gain << config["base_position"].as<double>() * ratio;
   _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
-  gain << 10 * ratio; // 15
+  gain << config["contact_point"].as<double>() * ratio; // 15
   _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
   task++;
-  gain << 15 * ratio; // 10
-  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.04);
+  gain << config["camber"].as<double>() * ratio; // 40
+  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
   task++;
-  gain << 10 * ratio;
-  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.12);
+  gain << config["castor"].as<double>() * ratio; // 18
+  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
   task++;
 
   _linear_vel.setZero();
@@ -153,7 +161,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
 
   _com_ref.setZero(2);
   _steering_ref_ptr.reset(new mgnss::events::Steering5(
-      _robot, *_steering_ptr, _test_steer, 0.75, 0.25, _robot.rate(), 0.02));
+      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
 
   _previous_command = mwoibn::VectorN::Zero(3);
   _command.setZero(_robot.getDofs());
@@ -188,6 +196,7 @@ void mwoibn::WheeledMotionEvent::init()
   _pelvis_orientation_ptr->setReference(0, _orientation);
 
   _position = _pelvis_position_ptr->points().getPointStateWorld(0);
+  std::cout << "init position\t" << _position.transpose() << std::endl;
   _position.head(2) = _robot.centerOfMass().get().head(2);
   _pelvis_position_ptr->setReference(_position);
   _com_ptr->setReference(_position.head(2));
@@ -288,6 +297,7 @@ void mwoibn::WheeledMotionEvent::compute()
     {
       eigen_utils::limitToHalfPi(_test_steer[i]);
 
+      std::cout << i << "b\t" << _test_steer[i] << std::endl;
       if (std::fabs(_test_steer[i]) > 1.0 &&
           std::fabs(_test_steer[i] - _start_steer[i]) < mwoibn::PI)
       {
@@ -307,9 +317,11 @@ void mwoibn::WheeledMotionEvent::compute()
 
     if( _resteer[i] && _start_steer[i] < 0){
         _test_steer[i] = _current_steer[i] + 1*mwoibn::PI/180;
+//        std::cout << i << "a\t" << _test_steer[i] << std::endl;
     }
     else if ( _resteer[i] &&  _start_steer[i] > 0){
         _test_steer[i] = _current_steer[i] - 1*mwoibn::PI/180;
+//        std::cout << i << "a\t" << _test_steer[i] << std::endl;
     }
 
   }
@@ -318,6 +330,7 @@ void mwoibn::WheeledMotionEvent::compute()
   _robot.command.set(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
 
+//  std::cout << "constraints\n" << _constraints_ptr->getJacobian() << std::endl;
 
 }
 

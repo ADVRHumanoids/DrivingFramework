@@ -18,10 +18,10 @@ public:
     Odometry(mwoibn::robot_class::Robot& robot, std::vector<std::string> names, double r);
     ~Odometry(){}
 
-//    void setRate(){ _filter_ptr->computeCoeffs(_robot.rate()); }
+    void setRate(){ _filter_ptr->computeCoeffs(_robot.rate()); }
 
-//    const mwoibn::Vector6& getRaw(){return _base_raw;}
-//    const mwoibn::Vector6& getFiltered(){return _base_filtered;}
+    const mwoibn::Vector6& getRaw(){return _base_raw;}
+    const mwoibn::Vector6& getFiltered(){return _base_filtered;}
 
     const mwoibn::Vector6& get(){return _base;}
     void update();
@@ -56,6 +56,7 @@ protected:
     int _max();
     int _min();
 
+    mwoibn::Vector6 _base_raw, _base_filtered;
 //    mwoibn::point_handling::FullStatesHandler _wheels_ph;
 //    mwoibn::point_handling::OrientationsHandler _directions_ph;
 

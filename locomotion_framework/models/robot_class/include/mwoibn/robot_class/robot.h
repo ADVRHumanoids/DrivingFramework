@@ -172,7 +172,7 @@ public:
       std::string map_name, std::vector<std::string> names = {}); // for making a map from joints I can use getDof
 
   static YAML::Node getConfig(const std::string config_file,
-                        const std::string secondary_file);
+                        const std::string secondary_file = "");
   static void compareEntry(YAML::Node entry_main, YAML::Node entry_second);
 
 

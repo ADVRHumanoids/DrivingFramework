@@ -50,15 +50,20 @@ int main(int argc, char** argv)
   mwoibn::loaders::Robot loader, loader_2;
 #endif
 
-  mwoibn::robot_class::Robot& robot = loader.init(
-      std::string(DRIVING_FRAMEWORK_WORKSPACE) +
-          "DrivingFramework/"
-          "locomotion_framework/configs/mwoibn_v2.yaml",
-      "default", std::string(DRIVING_FRAMEWORK_WORKSPACE) +
-                     "DrivingFramework/"
-                     "locomotion_framework/configs/lower_body.yaml");
+  std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+      "DrivingFramework/"
+      "locomotion_framework/configs/mwoibn_v2.yaml";
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
+
+  config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
+
+  std::string secondary_file = "";
+  if (config["secondary_file"])
+    secondary_file = config["secondary_file"].as<std::string>();
+
+  mwoibn::robot_class::Robot& robot = loader.init(config_file, config["robot"].as<std::string>(), secondary_file);
 #ifdef FULL_ROBOT
-  mwoibn::WheeledMotionEvent wheeld_controller(robot);
+  mwoibn::WheeledMotionEvent wheeld_controller(robot, config_file);
   wheeld_controller.init();
 #endif
 #ifdef TWO_ROBOTS
@@ -157,6 +162,7 @@ int main(int argc, char** argv)
     //      std::cout << i << std::endl;
     support.update();
     wheeld_controller.fullUpdate(support.get());
+
     now = ros::Time::now().toSec();
     print.setZero();
     print[0] =  now - start;
@@ -218,8 +224,8 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
                        mwoibn::WheeledMotionEvent2* controller)
 #endif
 {
-  //  std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr <<
-  //  std::endl;
+//    std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr <<
+//    std::endl;
 
   if (req.p == 1)
   { // base
@@ -413,13 +419,16 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
   }
   else if (req.p == 13)
   {
+//    std::cout << req.p << "\t" << req.d << "\t" << req.nr << "\t" << req.nr/100.0 << std::endl;
+
     if (req.d > 3 || req.d < 0)
     {
       res.success = false;
       return false;
     }
-    support->setDesX(req.d, req.nr / 100.0);
     support->setModeX(req.d, mwoibn::SUPPORT_INTERFACE::POSITION);
+    support->setDesX(req.d, req.nr / 100.0);
+
   }
   else if (req.p == 14)
   {
@@ -428,8 +437,9 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
       res.success = false;
       return false;
     }
-    support->setDesY(req.d, req.nr / 100.0);
     support->setModeY(req.d, mwoibn::SUPPORT_INTERFACE::POSITION);
+    support->setDesY(req.d, req.nr / 100.0);
+
   }
   else if (req.p == 15)
   {
@@ -438,8 +448,29 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
       res.success = false;
       return false;
     }
-    support->setDesZ(req.d, req.nr / 100.0);
     support->setModeZ(req.d, mwoibn::SUPPORT_INTERFACE::POSITION);
+    support->setDesZ(req.d, req.nr / 100.0);
+
+  }
+  else if (req.p == 16)
+  {
+    if (req.d > 3 || req.d < 0)
+    {
+      res.success = false;
+      return false;
+    }
+    controller->resteer(req.d);
+
+  }
+  else if (req.p == 17)
+  {
+    if (req.d > 3 || req.d < 0)
+    {
+      res.success = false;
+      return false;
+    }
+    controller->stopResteer(req.d);
+
   }
   else
   {

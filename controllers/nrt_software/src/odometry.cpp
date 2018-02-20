@@ -36,31 +36,28 @@ int main(int argc, char** argv)
 
   odometry.init();
 
-//  std::ostringstream oss;
-//  std::ofstream file;
+  std::ostringstream oss;
+  std::ofstream file;
 
-//  auto t = std::time(nullptr);
-//  auto tm = *std::localtime(&t);
+  auto t = std::time(nullptr);
+  auto tm = *std::localtime(&t);
 
-//  oss << "odometry_log_" << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << ".txt";
+  oss << "odometry_log_" << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << ".txt";
 
-//  file.open(oss.str(),  std::ios::out);
+  file.open(oss.str(),  std::ios::out);
+  file << "time,"
+       << "raw_x,"      << "raw_y,"     << "raw_z,"
+       << "raw_tx,"     << "raw_ty,"    << "raw_tz,"
+       << "fil_x,"      << "fil_y,"     << "fil_z,"
+       << "fil_tx,"     << "fil_ty,"    << "fil_tz,"
+       << "\n";
 
-//  file << "time,"
-//       << "raw_x,"      << "raw_y,"     << "raw_z,"
-//       << "raw_tx,"     << "raw_ty,"    << "raw_tz,"
-//       << "fil_x,"      << "fil_y,"     << "fil_z,"
-//       << "fil_tx,"     << "fil_ty,"    << "fil_tz,"
-//       << "cmd_x,"      << "cmd_y,"     << "cmd_z,"
-//       << "cmd_tx,"     << "cmd_ty,"    << "cmd_tz"
-//       << "\n";
+  Eigen::IOFormat fmt(6, 0, ", ", ", ", "", "", "", "");
+  file.flush();
 
-//  Eigen::IOFormat fmt(6, 0, ", ", ", ", "", "", "", "");
-//  file.flush();
-
-//  mwoibn::VectorN print(19);
-//  double start = ros::Time::now().toSec();
-//  double now = ros::Time::now().toSec();
+  mwoibn::VectorN print(13);
+  double start = ros::Time::now().toSec();
+  double now = ros::Time::now().toSec();
 
 
 
@@ -70,20 +67,19 @@ int main(int argc, char** argv)
     //    robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
     //    robot.command.set(velocities,
     //    mwoibn::robot_class::INTERFACE::VELOCITY);
-//    now = ros::Time::now().toSec();
-//    print.setZero();
-//    print[0] =  now - start;
-//    print.segment<6>(1) =  odometry.getRaw();
+    now = ros::Time::now().toSec();
+    print.setZero();
+    print[0] =  now - start;
+    print.segment<6>(1) =  odometry.getRaw();
 
     robot.update();
 
-//    print.segment<6>(7) =  odometry.getFiltered();
-//    print.segment<6>(13) =  robot.command.get().head<6>();
+    print.segment<6>(7) =  odometry.getFiltered();
 
-//    file << print.transpose().format(fmt) << "\n";
+    file << print.transpose().format(fmt) << "\n";
   }
 
-//  file.flush();
-//  file.close();
+  file.flush();
+  file.close();
 
 }

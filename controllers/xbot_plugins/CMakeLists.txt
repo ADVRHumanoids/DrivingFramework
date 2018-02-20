@@ -65,17 +65,17 @@ include_directories(
 ############## CONSTANT REFERENCE  #############
 ################################################
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(MyTest)
-endif()
-add_library(MyTest SHARED
-    src/rt_my_test.cpp
-)
-target_link_libraries(MyTest ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
-add_dependencies(MyTest ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(MyTest 1 0 0)
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(MyTest)
+#endif()
+#add_library(MyTest SHARED
+#    src/rt_my_test.cpp
+#)
+#target_link_libraries(MyTest ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+#add_dependencies(MyTest ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(MyTest 1 0 0)
 
-LIST( APPEND INSTALL_TARGETS MyTest )
+#LIST( APPEND INSTALL_TARGETS MyTest )
 
 ################################################
 ############## CONSTANT REFERENCES #############

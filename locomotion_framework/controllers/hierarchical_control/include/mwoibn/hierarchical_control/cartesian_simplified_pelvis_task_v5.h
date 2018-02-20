@@ -200,11 +200,12 @@ public:
 
   virtual void updateJacobian()
   {
+//    std::cout << "contact point only\n";
     _last_jacobian.noalias() = _jacobian;
 
     for (int i = 0; i < _ik.size(); i++)
     {
-
+//      std::cout << _ik.getFullPointJacobian(i) << "\n";
       if (_selector[i])
       {
         _jacobian_th.noalias() =
@@ -220,14 +221,20 @@ public:
       }
       else
       {
+        std::cout << "no contact " << i << "\n";
+        std::cout << _ik.getFullPointJacobian(i) << std::endl;
+
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) =
             -_ik.getFullPointJacobian(i);
         _jacobian.block(3 * i, 0, 2, _robot.getDofs()) =
             -_com.getJacobian() +
             _jacobian.block(3 * i, 0, 2, _robot.getDofs());
         //        _jacobian.row(3*i + 2).setZero();
+//        std::cout << _jacobian.block(3 * i, 0, 2, _robot.getDofs()) << std::endl;
+
       }
     }
+//    std::cout << std::endl;
   }
 
   using CartesianWorldTask::getReference;

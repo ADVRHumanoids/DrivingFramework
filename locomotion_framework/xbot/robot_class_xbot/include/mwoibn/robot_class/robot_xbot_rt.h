@@ -17,7 +17,9 @@ class RobotXBotRT : public RobotXBotFeedback
 
 {
 public:
-  RobotXBotRT(XBot::RobotInterface::Ptr robot, std::string config_file, std::string robot_reference, XBot::SharedMemory::Ptr shared_memory);
+  RobotXBotRT(XBot::RobotInterface::Ptr robot, std::string config_file,
+              std::string config_name,
+              std::string secondary_file, XBot::SharedMemory::Ptr shared_memory);
 
   virtual ~RobotXBotRT() {}
 

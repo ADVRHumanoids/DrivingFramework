@@ -86,6 +86,22 @@ public:
   {
     _z.setDesired(z);
   }
+
+  void setCurrentX(double x)
+  {
+//    std::cout << "set x\t" << x << std::endl;
+    _x.setCurrent(x);
+  }
+
+  void setCurrentY(double y)
+  {
+    _y.setCurrent(y);
+  }
+
+  void setCurrentZ(double z)
+  {
+    _z.setCurrent(z);
+  }
   void setBase(double x, double y, double z)
   {
     setBase(x, y);
@@ -100,16 +116,25 @@ public:
 
   void update()
   {
-    if (_ix == mwoibn::SUPPORT_INTERFACE::VELOCITY)
+
+    if (_ix == mwoibn::SUPPORT_INTERFACE::VELOCITY){
+//      std::cout << "x vel" << std::endl;
       _x.setCurrent(_x.get()[0] + _vx * _dt);
-    if (_iy == mwoibn::SUPPORT_INTERFACE::VELOCITY)
+
+    }
+    if (_iy == mwoibn::SUPPORT_INTERFACE::VELOCITY){
+//      std::cout << "y vel" << std::endl;
       _y.setCurrent(_y.get()[0] + _vy * _dt);
-    if (_iz == mwoibn::SUPPORT_INTERFACE::VELOCITY)
+    }
+    if (_iz == mwoibn::SUPPORT_INTERFACE::VELOCITY){
+//      std::cout << "z vel" << std::endl;
       _z.setCurrent(_z.get()[0] + _vz * _dt);
+    }
   }
 
   const mwoibn::Vector3& get()
   {
+//    std::cout << "get contact\t" << _state.transpose() << std::endl;
     _state << _x.get(), _y.get(), _z.get();
     return _state;
   }
@@ -172,9 +197,9 @@ public:
   virtual void setBase(mwoibn::VectorN base);
   virtual void setDesired(mwoibn::VectorN desired);
 
-  virtual void setDesX(int i, double x){ _contacts[i].setDesX(x);}
-  virtual void setDesY(int i, double y){ _contacts[i].setDesY(y);}
-  virtual void setDesZ(int i, double z){ _contacts[i].setDesZ(z);}
+  virtual void setDesX(int i, double x){ _contacts[i].setCurrentX(x);}
+  virtual void setDesY(int i, double y){ _contacts[i].setCurrentY(y);}
+  virtual void setDesZ(int i, double z){ _contacts[i].setCurrentZ(z);}
 
   virtual void setVelX(int i, double vx) { _contacts[i].setVelX(vx); }
   virtual void setVelY(int i, double vy) { _contacts[i].setVelY(vy); }

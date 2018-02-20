@@ -4,8 +4,17 @@ REGISTER_XBOT_PLUGIN(JointStates, mgnss::xbot_plugins::JointStates)
 
 bool mgnss::xbot_plugins::JointStates::init_control_plugin(XBot::Handle::Ptr handle)
 {
+
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(handle->getPathToConfigFile());
+  std::string config_file = config["config_file"].as<std::string>();
+  config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["joint_states"];
+
+  std::string secondary_file = "";
+  if (config["secondary_file"])
+    secondary_file = config["secondary_file"].as<std::string>();
+
   /* Save robot to a private member. */
-  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), handle->getPathToConfigFile(), "robot3", handle->getSharedMemory()));
+  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config_file, config["robot"].as<std::string>(), secondary_file, handle->getSharedMemory()));
 
   _controller_ptr.reset(new mgnss::controllers::JointStates(*_robot_ptr));
 

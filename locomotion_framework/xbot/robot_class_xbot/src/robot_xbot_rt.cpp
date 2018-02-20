@@ -1,17 +1,20 @@
 #include "mwoibn/robot_class/robot_xbot_rt.h"
 
 mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
-    XBot::RobotInterface::Ptr robot, std::string config_file, std::string robot_reference,
+    XBot::RobotInterface::Ptr robot, std::string config_file,
+    std::string config_name,
+    std::string secondary_file,
     XBot::SharedMemory::Ptr shared_memory)
     : RobotXBotFeedback()
 {
+  _robot = robot;
 
+  /*
   std::string xbot_file = config_file;
 
   YAML::Node config = YAML::LoadFile(config_file);
 
   std::cout << "robot start" << std::endl;
-  _robot = robot;
 
   if (!config["mwoibnRobot"])
     throw(std::invalid_argument(
@@ -40,8 +43,8 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   if (config["secondary_file"])
   {
     secondary_file = config["secondary_file"].as<std::string>();
-  }
-  config = getConfig(config_file,
+  } */
+  YAML::Node config = getConfig(config_file,
                       secondary_file); // this is done twice with this robot
 
 //  std::string file_path = "";

@@ -40,7 +40,7 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
 
-  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 200, 1));
+  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 1000, 1));
 
 }
 
@@ -49,7 +49,10 @@ void mgnss::odometry::Odometry::init(){
     _filter_ptr->computeCoeffs(_robot.rate());
 
     _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
-//    _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+    _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+    _filter_ptr->reset(_base_pos);
+
+    std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
 
     for(int i = 0; i < _estimated.size(); i++)
     _estimated[i] =
@@ -59,7 +62,6 @@ void mgnss::odometry::Odometry::init(){
 
     update();
 
-//    _filter_ptr->reset(_base_pos);
 
 }
 
@@ -88,25 +90,38 @@ void mgnss::odometry::Odometry::update()
 
   }
 
-  for (int i = 0; i < _wheels_ph.size(); i++)
+// std::cout << "new" << std::endl;
+  for (int i = 0; i < _wheels_ph.size(); i++){
+
     _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);
+//    std::cout << _pelvis[i].transpose() << std::endl;
+
+  }
 
   _compute2(); // this seems to be the best
 
   _base.tail(3) =
       _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
 
+  for(int i = 0; i < _wheels_ph.size(); i++)
+    _estimated[i] = _base.head<3>() + _wheels_ph.getPointStateWorld(i);
+
   _base_pos = _base.head(3);
+
+  _base_raw = _base;
 
   _filter_ptr->update(_base_pos);
 
   _base.head(3) = _base_pos;
 
-
+  _base_filtered = _base;
+  //std::cout << _base << std::endl;
   _robot.command.set(_base, {0, 1, 2, 3, 4, 5},
                      mwoibn::robot_class::INTERFACE::POSITION);
 
   _previous_state.noalias() = _state;
+
+
 
   //  return _base;
 }
@@ -205,27 +220,29 @@ void mgnss::odometry::Odometry::_average()
   }
 
   _base.head(3).noalias() = _base.head(3) / _selector.sum();
+
 }
 
 // compute MAD - remove and average
 
 void mgnss::odometry::Odometry::_distances()
 {
-
   for (int i = 0; i < _distance.size(); i++)
     _distance[i] = (_selector[i]) ? 0 : mwoibn::MAX_DOUBLE;
 
   for (int i = 0; i < _distance.size(); i++)
   {
+
     if (!_selector[i])
       continue;
     for (int j = i; j < _distance.size(); j++)
     {
+//      std::cout << i << "\t" << j << "\t";
       if (!_selector[j])
         continue;
       _distance[i] += (_pelvis[i] - _pelvis[j]).norm();
-
-      _distance[j] += _distance[i];
+ //     _distance[j] += _distance[i];
+      _distance[j] += (_pelvis[i] - _pelvis[j]).norm();
     }
   }
 }
@@ -259,5 +276,9 @@ int mgnss::odometry::Odometry::_min()
       value = _distance[i];
     }
   }
+//  std::cout << "min\t" << _distance.transpose() << std::endl;
+
+//  std::cout << "min\t" << id << std::endl;
+
   return id;
 }

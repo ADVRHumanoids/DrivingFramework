@@ -23,7 +23,7 @@ class WheeledMotionEvent
 {
 
 public:
-  WheeledMotionEvent(mwoibn::robot_class::Robot& robot);
+  WheeledMotionEvent(mwoibn::robot_class::Robot& robot, std::string config_file);
 
   ~WheeledMotionEvent() {}
 
@@ -35,8 +35,13 @@ public:
 
   void resetSteering();
   void resteer(int i){_resteer[i] = true;
-                     std::cout << "started resteering" << std::endl;}
+                      _start_steer[i] = _test_steer[i];
 
+                     std::cout << "started resteering" << std::endl;}
+  void stopResteer(int i){_resteer[i] = false;
+                      _start_steer[i] = _test_steer[i];
+
+                     std::cout << "stoped resteering" << std::endl;}
 
   void setSteering(int i, double th)
   {
@@ -167,6 +172,7 @@ public:
   }
 
   void claim(int i){
+    std::cout << "claim\t" << i << std::endl;
     _steering_ptr->claimContact(i);
     _constraints_ptr->claimContact(i);
   }
