@@ -14,6 +14,7 @@ bool mwoibn::communication_modules::RosController::send()
     }
     */
     mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _des_q.position);
+    //des_q.position = pub_qq;
   }
   if (_velocity)
   {
@@ -25,6 +26,7 @@ bool mwoibn::communication_modules::RosController::send()
     }
     */
     mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _des_q.velocity);
+    //des_q.velocity = pub_qq;
   }
 
   if (_torque)
@@ -37,9 +39,10 @@ bool mwoibn::communication_modules::RosController::send()
     }
     */
     mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _des_q.effort);
-
+    //des_q.effort = pub_qq;
   }
 
+  // des_q.header.stamp = ros::Time::now();
   _command_pub.publish(_des_q);
 
   return true;

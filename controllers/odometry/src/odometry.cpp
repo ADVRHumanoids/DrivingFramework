@@ -90,12 +90,9 @@ void mgnss::odometry::Odometry::update()
 
   }
 
-// std::cout << "new" << std::endl;
   for (int i = 0; i < _wheels_ph.size(); i++){
 
     _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);
-//    std::cout << _pelvis[i].transpose() << std::endl;
-
   }
 
   _compute2(); // this seems to be the best
@@ -120,8 +117,6 @@ void mgnss::odometry::Odometry::update()
                      mwoibn::robot_class::INTERFACE::POSITION);
 
   _previous_state.noalias() = _state;
-
-
 
   //  return _base;
 }
@@ -220,24 +215,22 @@ void mgnss::odometry::Odometry::_average()
   }
 
   _base.head(3).noalias() = _base.head(3) / _selector.sum();
-
 }
 
 // compute MAD - remove and average
 
 void mgnss::odometry::Odometry::_distances()
 {
+
   for (int i = 0; i < _distance.size(); i++)
     _distance[i] = (_selector[i]) ? 0 : mwoibn::MAX_DOUBLE;
 
   for (int i = 0; i < _distance.size(); i++)
   {
-
     if (!_selector[i])
       continue;
     for (int j = i; j < _distance.size(); j++)
     {
-//      std::cout << i << "\t" << j << "\t";
       if (!_selector[j])
         continue;
       _distance[i] += (_pelvis[i] - _pelvis[j]).norm();
@@ -276,9 +269,5 @@ int mgnss::odometry::Odometry::_min()
       value = _distance[i];
     }
   }
-//  std::cout << "min\t" << _distance.transpose() << std::endl;
-
-//  std::cout << "min\t" << id << std::endl;
-
   return id;
 }

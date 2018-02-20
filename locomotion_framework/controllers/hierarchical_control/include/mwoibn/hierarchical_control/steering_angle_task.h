@@ -105,6 +105,7 @@ protected:
   mwoibn::Matrix3 _mA, _mB, _s_y, _s_n, _s_v1;
 
   mwoibn::Matrix _J;
+
 };
 
 class SteeringAngleTask : public ControllerTask
@@ -142,19 +143,12 @@ public:
       mwoibn::eigen_utils::wrapToPi(_ref[i]);
 
       if ( _error[i] > 0 &&  std::fabs(_error[i] - mwoibn::PI) < 50*mwoibn::PI/180){
-//        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
-//        if(!_resteer[i]){
-//        std::cout << i << "\t change config" << std::endl;
         _error[i]-= mwoibn::PI;
-//        _ref[i] -= mwoibn::PI;
         _resteer[i] = true;
-//        }
-//        std::cout << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
 
       }
 
       else if (_error[i] < 0 &&  std::fabs(_error[i] + mwoibn::PI) < 50*mwoibn::PI/180){
-//        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
 //        if(!_resteer[i]){
 
 //        std::cout << i << "\t change config" << std::endl;

@@ -5,22 +5,22 @@
 #include <mwoibn/loaders/robot.h>
 
 #ifdef FULL_ROBOT
-#include <mgnss/controllers/wheeled_motion_event.h>
+  #include <mgnss/controllers/wheeled_motion_event.h>
 #endif
 #ifdef TWO_ROBOTS
-#include <mgnss/controllers/wheeled_motion_event_v2.h>
+  #include <mgnss/controllers/wheeled_motion_event_v2.h>
 #endif
 #include <mgnss/controllers/wheeled_references_v3.h>
 #include <custom_services/updatePDGains.h>
 
 #ifdef TWO_ROBOTS
-bool evenstHandler(custom_services::updatePDGains::Request& req,
+  bool evenstHandler(custom_services::updatePDGains::Request& req,
                    custom_services::updatePDGains::Response& res,
                    mwoibn::SupportPolygon3* support,
                    mwoibn::WheeledMotionEvent2* controller);
 #endif
 #ifdef FULL_ROBOT
-bool evenstHandler(custom_services::updatePDGains::Request& req,
+  bool evenstHandler(custom_services::updatePDGains::Request& req,
                    custom_services::updatePDGains::Response& res,
                    mwoibn::SupportPolygon3* support,
                    mwoibn::WheeledMotionEvent* controller);
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
   //  for(int i = 0; i < 2500; i++)
   while (ros::ok())
   {
-    //      std::cout << i << std::endl;
+//      std::cout << i << std::endl;
     support.update();
     wheeld_controller.fullUpdate(support.get());
 
@@ -203,7 +203,6 @@ int main(int argc, char** argv)
     file << print.transpose().format(fmt) << "\n";
 
   }
-
 #ifdef FULL_ROBOT
   wheeld_controller.stop();
 #endif
@@ -218,14 +217,14 @@ bool evenstHandler(custom_services::updatePDGains::Request& req,
                    mwoibn::WheeledMotionEvent* controller)
 #endif
 #ifdef TWO_ROBOTS
-    bool evenstHandler(custom_services::updatePDGains::Request& req,
-                       custom_services::updatePDGains::Response& res,
-                       mwoibn::SupportPolygon3* support,
-                       mwoibn::WheeledMotionEvent2* controller)
+bool evenstHandler(custom_services::updatePDGains::Request& req,
+                   custom_services::updatePDGains::Response& res,
+                   mwoibn::SupportPolygon3* support,
+                   mwoibn::WheeledMotionEvent2* controller)
 #endif
 {
-//    std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr <<
-//    std::endl;
+  //  std::cout << "req\t" << req.p << "\t" << req.d << "\t" << req.nr <<
+  //  std::endl;
 
   if (req.p == 1)
   { // base

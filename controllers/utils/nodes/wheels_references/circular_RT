@@ -25,25 +25,25 @@ if __name__ == '__main__':
     ref_service = rospy.ServiceProxy(name, updatePDGains)
 
     dth, r, th = -0.0, 2.0, 0.0
-#    m_d, m_v, vel = 3.05, 2.75, 0.05
-    m_d, m_2d, m_v, vel, d_th = 3.0, 2.75, 2.75, 1.00, 0.5*0.5
+#    m_d, m_v = 3.05, 2.75
+    m_d, m_2d, m_v, d_th = 1.0, 1.0, 1.0, 0.5*0.5
     x, y = 0, 0
     
     mode = 0
 
 
 #    ref_service(1.0, 4.0, dth*100)
-    vel_max, d_vel = 0.5, 0.002
+    vel_max, d_vel = 0.5, 0.0005
     vel = 0.2
     dx, dy, dth =  vel,  0.00, 0.00
 
 #    mode, dth = 1, -0.25
     while not rospy.is_shutdown():
 #      # square
-      if (mode == 0 and vel < vel_max and x < r-0.3 and x > 0.5):
+      if (mode == 0 and vel < vel_max and x < r and x > 0.5):
         vel += d_vel
         dx, dy, dth =  vel,  0.00, 0.00
-      elif (mode == 0 and x > r-0.3):
+      elif (mode == 0 and x > r):
         vel = vel_max
         th, dth = 0, -d_th
         mode += 1
@@ -54,12 +54,13 @@ if __name__ == '__main__':
       elif (mode == 1 and th < -4.62):
         dx, dy, dth = 0.00,  vel, 0.00
         mode += 1
-      elif (mode == 2 and vel < 2*vel_max and y < 2*r+0.3):
+
+      elif (mode == 2 and vel < 2*vel_max and y < 2*r):
         vel += d_vel        
         dx, dy, dth = 0.00,  vel, 0.00
       elif (mode == 2):
         mode += 1
-      elif (mode == 3 and y > 2*r+0.3):
+      elif (mode == 3 and y > 2*r):
         dth = d_th
         mode += 1
       elif (mode == 4 and th < -0.05):
@@ -70,7 +71,7 @@ if __name__ == '__main__':
         vel = dx
         dx, dy, dth = vel,  0.00, 0.0
         mode += 1
-      elif (mode == 5 and vel > 0.3 and x < 0.0):
+      elif (mode == 5 and vel > 0.2 and x < 0.0 and x > -1.5):
         vel -= d_vel        
         dx, dy, dth = vel,  0.00, 0.0
       elif (mode == 5 and x > 0.0):
@@ -83,7 +84,7 @@ if __name__ == '__main__':
       x += dx*dt*m_v
       y += dy*dt*m_v
       
-      print("mode\t", mode, "vel\t", sqrt(dx*dx+dy*dy), "th\t", th, "dth\t", dth)
+      print("mode\t", mode, "vel\t", sqrt(dx*dx+dy*dy), "th\t", th, "dth\t", dth, "x\t", x)
 
       try:
         ref_service(1.0, 1.0, dx*100.0)

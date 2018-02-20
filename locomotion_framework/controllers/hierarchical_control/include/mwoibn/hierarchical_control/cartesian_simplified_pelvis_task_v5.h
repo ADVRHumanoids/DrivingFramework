@@ -27,18 +27,17 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  CartesianFlatReferenceTask2(
-      point_handling::PositionsHandler ik, mwoibn::robot_class::Robot& robot,
-      mwoibn::hierarchical_control::CenterOfMassTask& com)
+  CartesianFlatReferenceTask2(point_handling::PositionsHandler ik,
+                              mwoibn::robot_class::Robot& robot, mwoibn::hierarchical_control::CenterOfMassTask& com)
       : CartesianWorldTask(ik), _robot(robot), _com(com)
   {
     _pelvis_ptr.reset(new mwoibn::point_handling::PositionsHandler(
         "ROOT", robot, robot.getLinks("base")));
-    _wheels_ptr.reset(new mwoibn::point_handling::OrientationsHandler(
-        "ROOT", robot, robot.getLinks("wheels")));
+    _wheels_ptr.reset(
+          new mwoibn::point_handling::OrientationsHandler("ROOT", robot, robot.getLinks("wheels")));
 
-    //    for (int i = 0; i < ik.size(); i++)
-    //      _wheels_ptr->addPoint(ik.point(i));
+//    for (int i = 0; i < ik.size(); i++)
+//      _wheels_ptr->addPoint(ik.point(i));
 
     _flat_model.gravity = mwoibn::Vector3(0., -9.81, 0.);
     RigidBodyDynamics::Math::Matrix3d inertia =
@@ -65,7 +64,7 @@ public:
         _ids.back(), RigidBodyDynamics::Math::Xtrans(
                          RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
         joint_b, body_b));
-    _init(3 * _ik.size(), _ik.getFullJacobianCols());
+    _init(3*_ik.size(), _ik.getFullJacobianCols());
     _state.setZero(6);
 
     _reference.setZero(_ik.size() * 3);
@@ -200,12 +199,10 @@ public:
 
   virtual void updateJacobian()
   {
-//    std::cout << "contact point only\n";
     _last_jacobian.noalias() = _jacobian;
 
     for (int i = 0; i < _ik.size(); i++)
     {
-//      std::cout << _ik.getFullPointJacobian(i) << "\n";
       if (_selector[i])
       {
         _jacobian_th.noalias() =
@@ -221,20 +218,15 @@ public:
       }
       else
       {
-        std::cout << "no contact " << i << "\n";
-        std::cout << _ik.getFullPointJacobian(i) << std::endl;
-
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) =
             -_ik.getFullPointJacobian(i);
         _jacobian.block(3 * i, 0, 2, _robot.getDofs()) =
             -_com.getJacobian() +
             _jacobian.block(3 * i, 0, 2, _robot.getDofs());
         //        _jacobian.row(3*i + 2).setZero();
-//        std::cout << _jacobian.block(3 * i, 0, 2, _robot.getDofs()) << std::endl;
 
       }
     }
-//    std::cout << std::endl;
   }
 
   using CartesianWorldTask::getReference;

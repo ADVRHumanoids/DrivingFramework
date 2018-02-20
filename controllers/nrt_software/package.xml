@@ -63,6 +63,7 @@
   <!--<depend>hierarchical_control</depend>--> <!-- CENTER_OF_MASS_CONTROLLER -->
   <depend>robot_point_handling</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>custom_services</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>custom_messages</depend>
   <depend>controllers</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>communication</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>odometry</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->

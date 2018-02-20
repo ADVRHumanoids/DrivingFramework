@@ -6,7 +6,6 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::get()
   if (_position){
     _robot.getMotorPosition(_pub);
     _command.set(_pub, _map.reversed(), robot_class::INTERFACE::POSITION);
-
   }
   if (_velocity){
     _robot.getJointVelocity(_pub);
