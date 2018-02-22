@@ -72,6 +72,7 @@ void mgnss::xbot_plugins::Odometry::on_stop(double time) {}
 
 void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 {
+
     _valid = _robot_ptr->get();
 
     if (!_valid)
@@ -87,7 +88,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
        _rate = true;
       }
        if(_valid)
-      _controller_ptr->init();
+        _controller_ptr->init();
 
        if(_rate && _valid)
         _initialized = true;
@@ -95,6 +96,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 
     _controller_ptr->update();
     _robot_ptr->send();
+
 /*
     now = time;
     _print.setZero();

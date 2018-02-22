@@ -88,7 +88,7 @@ private:
         }
         return false;
     }
-    
+
 	void supportHandler(const custom_messages::CustomCmndConstPtr& msg){
 //		std::cout << "got message" << std::endl;
 		if(msg->position[12] == mwoibn::IS_VALID){
@@ -101,18 +101,18 @@ private:
 			}
 //		else
 //				std::cout << "invalid " <<  msg->position[12] << std::endl;
-			
+
 	}
 
- 	
-    
+
+
   bool _initialized = false, _valid = false, _rate = false;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
   std::unique_ptr<mwoibn::WheeledMotionEvent> _controller_ptr;
   XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt, support_rt;
   XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
-  Eigen::Matrix<double, 12, 1> _support;
-
+  //Eigen::Matrix<double, 12, 1> _support;
+  mwoibn::VectorN _support;
 };
 }
 }

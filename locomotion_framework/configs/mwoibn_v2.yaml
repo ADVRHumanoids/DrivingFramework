@@ -445,7 +445,7 @@ mwoibn:
         modules:
                 wheeled_motion:
                         robot: default
-                        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
+                        secondary_file: &config_lower /home/embedded/locomotion_src/workspace/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
                         tunning: RT9
                         tunnings:
                                 NRT: # discontinous both, iit with floating base

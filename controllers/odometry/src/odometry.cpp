@@ -52,7 +52,7 @@ void mgnss::odometry::Odometry::init(){
     _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
     _filter_ptr->reset(_base_pos);
 
-    std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
+    //std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
 
     for(int i = 0; i < _estimated.size(); i++)
     _estimated[i] =

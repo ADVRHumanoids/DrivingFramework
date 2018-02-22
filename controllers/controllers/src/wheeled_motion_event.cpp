@@ -210,7 +210,7 @@ void mwoibn::WheeledMotionEvent::nextStep(const mwoibn::VectorN& support)
 
   updateSupport(support);
   updateBase();
- 
+
   _next_step[0] =
       (_position[0] - _robot.centerOfMass().get()[0]) / _robot.rate();
   _next_step[1] =
@@ -240,8 +240,8 @@ double mwoibn::WheeledMotionEvent::limit(const double th)
 void mwoibn::WheeledMotionEvent::update(const mwoibn::VectorN& support)
 {
 
-  nextStep(support);
-  compute();
+    nextStep(support);
+    compute();
 }
 
 void mwoibn::WheeledMotionEvent::fullUpdate(const mwoibn::VectorN& support)
@@ -282,8 +282,8 @@ void mwoibn::WheeledMotionEvent::compute()
     {
       _start_steer[i] = _test_steer[i];
       _resteer[i] = true;
-      std::cout << "WARNING: ankle yaw " << i << " on limit."
-                << std::endl; // NRT
+//      std::cout << "WARNING: ankle yaw " << i << " on limit."
+//                << std::endl; // NRT
     }
 
     if (_resteer[i])

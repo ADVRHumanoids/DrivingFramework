@@ -30,9 +30,12 @@ private:
                     custom_services::jointStateCmnd::Response& res,
                     mgnss::controllers::JointStates* controller)
   {
+
       if(!controller->setFullPosition(req.position)){
-////          res.message = "Position " + req.position + " has not been defined in the robot";
+          res.message = "Position " + req.position + " has not been defined in the robot";
       }
+      else
+          res.message = "Found requested position " + req.position;
       //controller->setVelocity(req.velocity);
 
       if(req.pos_step)

@@ -18,6 +18,7 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 
   _controller_ptr.reset(new mwoibn::WheeledMotionEvent(*_robot_ptr, config_file));
 
+  _support = _controller_ptr->getSupportReference(); // to allocate the memory
   _srv_rt = handle->getRosHandle()->advertiseService("wheels_command", &mgnss::xbot_plugins::WheelsV2::evenstHandler, this);
   _sub_rt = handle->getRosHandle()->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, &mgnss::xbot_plugins::WheelsV2::supportHandler, this);
 
@@ -34,11 +35,11 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 //	std::cout << "opened log file " << oss.str() << std::endl;
 //  else
 //	std::cout << "couldn't open log file " << oss.str() << std::endl;
-  
+
 //  char cwd[1024];
 //  if(getcwd(cwd, sizeof(cwd)) != NULL)
 //    std::cout << "working directory\t" << cwd << std::endl;
-//  
+//
 /*  file << "time,"
        << "com_x,"      << "com_y,"
        << "e_com_x,"    << "e_com_y,"
@@ -76,7 +77,7 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   fmt.precision = 6;
   fmt.coeffSeparator = ", ";
   fmt.rowSeparator = ", ";
-  
+
   _print.setZero(96);
 */
 
@@ -94,7 +95,7 @@ void mgnss::xbot_plugins::WheelsV2::on_start(double time)
     {
       _robot_ptr->updateKinematics();
       _controller_ptr->init();
-      _support = _controller_ptr->getSupportReference();
+      _support.noalias() = _controller_ptr->getSupportReference();
     }
 }
 
@@ -107,6 +108,7 @@ void mgnss::xbot_plugins::WheelsV2::on_stop(double time) {
 void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
                                                           double period)
 {
+
     _valid = _robot_ptr->get();
 
     if (!_valid)
@@ -118,8 +120,8 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
     if (!_initialized)
     {
        if(_valid){
-      _controller_ptr->init();
-      _support = _controller_ptr->getSupportReference();
+        _controller_ptr->init();
+        _support.noalias() = _controller_ptr->getSupportReference();
        }
        if(!_rate){
            _robot_ptr->setRate(period);
@@ -134,6 +136,7 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
 
     _controller_ptr->update(_support);
     _robot_ptr->send();
+
   /*
 	now = time;
     _print.setZero();
@@ -176,10 +179,10 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
 */
 }
 
-bool mgnss::xbot_plugins::WheelsV2::close() { 
-	
+bool mgnss::xbot_plugins::WheelsV2::close() {
+
 //    file.flush();
 //    file.close();
-	
+
 //	std::cout << "file closed" << std::endl;
 	return true; }
