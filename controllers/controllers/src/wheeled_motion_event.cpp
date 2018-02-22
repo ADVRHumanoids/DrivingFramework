@@ -160,7 +160,6 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
   robot.upper_limits.get(_u_limits, _select_steer);
 
   _test_steer.setZero(_select_steer.size());
-  _test_wheel.setZero(_select_wheel.size());
 
   _com_ref.setZero(2);
   _steering_ref_ptr.reset(new mgnss::events::Steering5(
@@ -296,14 +295,15 @@ void mwoibn::WheeledMotionEvent::compute()
 
     if ((_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i]) && !_resteer[i])
     {
-      _start_steer[i] = _test_steer[i];
-      _resteer[i] = true;
-//      std::cout << "WARNING: ankle yaw " << i << " on limit."
-//                << std::endl; // NRT
+//      _start_steer[i] = _test_steer[i];
+//      _resteer[i] = true;
+      std::cout << "WARNING: ankle yaw " << i << " on limit."
+                << std::endl; // NRT
     }
 
     if (_resteer[i])
     {
+//      std::cout << "dsgnkjhlfsymetljhmgdbfc" << std::endl;
       eigen_utils::limitToHalfPi(_test_steer[i]);
 
       if (std::fabs(_test_steer[i]) > 1.0 &&
@@ -335,12 +335,6 @@ void mwoibn::WheeledMotionEvent::compute()
 //  std::cout << _resteer.transpose() << std::endl;
   _robot.command.set(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
-
-void mwoibn::WheeledMotionEvent::stop(){
-    _command.setZero();
-    _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
-    _robot.send();
-
 }
 
 void mwoibn::WheeledMotionEvent::stop()

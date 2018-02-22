@@ -446,7 +446,7 @@ mwoibn:
                 wheeled_motion:
                         robot: default
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: RT2
+                        tunning: RT9
                         tunnings:
                                 NRT: # discontinous both, iit with floating base
                                         ratio: 1.0
@@ -504,10 +504,10 @@ mwoibn:
                                         damping: 0.0001
                                         constraints: 1
                                         leg_steer: 25
-                                        base_orinetation: 60
-                                        centre_of_mass_x: 50
-                                        centre_of_mass_y: 50
-                                        base_position: 10
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
                                         contact_point: 22
                                         camber: 15
                                         castor: 10
@@ -521,11 +521,11 @@ mwoibn:
                                         damping: 0.0001
                                         constraints: 1
                                         leg_steer: 25
-                                        base_orinetation: 50
+                                        base_orinetation: 40
                                         centre_of_mass_x: 35
                                         centre_of_mass_y: 35
                                         base_position: 10
-                                        contact_point: 20
+                                        contact_point: 30
                                         camber: 100
                                         castor: 60
                                         camber_damp: 0.08
@@ -533,8 +533,130 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.01
+                                RT3:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                RT4:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 8
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
+                                        contact_point: 12
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.01
+                                RT5: # worked once
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 14 # 20
+                                        base_orinetation: 125
+                                        centre_of_mass_x: 125
+                                        centre_of_mass_y: 125
+                                        base_position: 12
+                                        contact_point: 70 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.015                                        
+                                RT6: # works but sharp
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 14 # 20
+                                        base_orinetation: 125
+                                        centre_of_mass_x: 125
+                                        centre_of_mass_y: 125
+                                        base_position: 12
+                                        contact_point: 70 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.017  
+                                RT7: # semi working for circular
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15 # 20
+                                        base_orinetation: 160
+                                        centre_of_mass_x: 120
+                                        centre_of_mass_y: 120
+                                        base_position: 12
+                                        contact_point: 85 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.025
+                                RT8: # try support
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 40 # 20
+                                        base_orinetation: 250
+                                        centre_of_mass_x: 250
+                                        centre_of_mass_y: 250
+                                        base_position: 20
+                                        contact_point: 300 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.02
+                                RT9: # semi working for circular
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 40 # 20
+                                        base_orinetation: 240
+                                        centre_of_mass_x: 240
+                                        centre_of_mass_y: 240
+                                        base_position: 20
+                                        contact_point: 120 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01                                                                                                                           
                 joint_states:
                         robot: joint_space
                 odometry:
                         robot: odometry
                         secondary_file: *config_lower          
+                wheels_support:
+                        robot: fake
+                        secondary_file: *config_lower

@@ -9,7 +9,7 @@ if __name__ == '__main__':
     dt = 0.005
     rate = rospy.Rate(1.0/dt)
     #print(1.0/dt)
-    name = '/centauro/wheels_command'
+    name = 'wheels_command'
     service_ok = False
     while (not rospy.is_shutdown() and not service_ok):
       try:
@@ -29,43 +29,79 @@ if __name__ == '__main__':
     m_d, m_2d, m_v, vel, d_th = 2.0, 2.75, 2.75, 1.00, 0.5*0.5
     x, y = 0, 0
     
-    mode = 0
-
+    mode, wait = 0, 0
 
 #    ref_service(1.0, 4.0, dth*100)
     vel_max = 0.1
-    vel = 0.1
-    dx, dy, dth =  0.95*vel_max, sqrt(vel_max*vel_max*(1-0.95*0.95)), 0.05
-    
+    #vel = 0.1
+    dx, dy, dth =  0.95*vel_max, sqrt(vel_max*vel_max*(1-0.95*0.95)), 0.03
+#    dx, dy, dth = vel_max, 0.0, 0.1
 #    mode, dth = 1, -0.25
     while not rospy.is_shutdown():
 #      # square
-      if mode == 0 and th < 18.3/180.0*3.14:
-		th += copy.copy(dth) * dt * 1.0 # ? 
+      if mode == 0 and dx > 0.95*vel_max:
+        #dx -= 0.05*vel_max/200.0
+        #dy += sqrt(vel_max*vel_max*(1-0.95*0.95))/200.0
+        th += copy.copy(dth) * dt * 1.0 # ? 
       elif mode == 0:
+		mode += 1
+		dth = 0.03
+      elif mode == 1 and th < 21/180.0*3.14:
+#		mode += 10
+		th += copy.copy(dth) * dt * 1.0 # ? 
+      elif mode == 1:
 		dth = 0
 		mode += 1
-      elif mode == 1  and x > 1.57:
+      elif mode == 2  and x > 3.57:
 		mode += 1
-      elif (mode == 2) and th > -198.3/180.0*3.14:
-		dth =  -0.16
+      elif mode == 3  and dth > -0.16:
+		dth -= 0.001 if dth > -0.16 else 0
+		th += dth * dt * 1.0 # 0
+		wait += 1
+		dx -= (0.095-0.0993)/140
+		dy -= (0.0312-0.03085)/140
+      elif mode == 3:
+		mode += 1
+      elif mode == 4 and th > -125/180.0*3.14:
 		th += dth * dt * 1.0 # 0
 		dx = -r2*cos(th)*copy.copy(dth)
 		dy = -r2*sin(th)*copy.copy(dth)
-      elif mode == 2 and dth < 0:
-        dth +=  0.002
-      elif mode == 2:
-        mode += 1
-      elif mode == 3 and x < 0.129: # 0?
-		mode += 1
-		dth =  -0.2
-		dx, dy = 0.0, 0.0
-      elif mode == 4 and th> -360.0/180.0*3.14: # 360
-		th += dth * dt * 1.0 # 0
       elif mode == 4:
 		mode += 1
-		dth =  0.0
+		#dx, dy = -0.1, 0.0
+      elif mode == 5 and th > -180/180.0*3.14:
+  		th += dth * dt * 1.0 # 0
+		dx = -0.05-r2*cos(th)*copy.copy(dth)
+		dy = -r2*sin(th)*copy.copy(dth)	
+      elif mode == 5:
+		mode += 1	  
+      elif mode == 6 and (th > -210/180.0*3.14 or x > -0.95*vel_max):
+		th += dth * dt * 1.0  if th > -210/180.0*3.14 else 0# 0
+		dx += -0.05*vel_max/100.0 if x > -0.95*vel_max else 0
+		dy += sqrt(vel_max*vel_max*(1-0.95*0.95))/100.0 if y < vel_max*vel_max*(1-0.95*0.95) else 0
+      elif mode == 6:
+        dth = 0
+        mode += 1
+      elif mode == 7 and x < -0.65:
 		dx, dy = 0.0, 0.0
+		wait = 0
+      elif mode == 8:
+		wait += 1
+		mode += 1 if wait > 50 else 0
+      elif mode == 9 and dth > -0.17:
+		dth -= 0.001 if dth > -0.17 else 0
+      elif mode == 9:
+		mode += 1
+#      elif mode == 6 and x= < 0.0: # 0?
+#		mode += 1
+#		dth =  -0.2
+#		dx, dy = 0.0, 0.0
+#      elif mode == 4 and th> -360.0/180.0*3.14: # 360
+#		th += dth * dt * 1.0 # 0
+#      elif mode == 4:
+#		mode += 1
+#		dth =  0.0
+#		dx, dy = 0.0, 0.0
         
 
 
@@ -73,7 +109,7 @@ if __name__ == '__main__':
       x += dx*dt*m_v
       y += dy*dt*m_v
       
-      print("mode\t", mode, "vel\t", sqrt(dx*dx+dy*dy), "dx", dx, "dy", dy, "th\t", th, "dth\t", dth, "x", x)
+      print("mode\t", mode, "vel\t", sqrt(dx*dx+dy*dy), "dx", dx, "dy", dy, "th\t", th, "dth\t", dth, "x", x, "wait", wait)
 
       try:
         ref_service(1.0, 1.0, dx*100.0)

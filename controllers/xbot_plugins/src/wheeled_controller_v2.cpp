@@ -38,9 +38,9 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   else
 	std::cout << "couldn't open log file " << oss.str() << std::endl;
   
-//  char cwd[1024];
-//  if(getcwd(cwd, sizeof(cwd)) != NULL)
-//	  std::cout << "working directory\t" << cwd << std::endl;
+  char cwd[1024];
+  if(getcwd(cwd, sizeof(cwd)) != NULL)
+    std::cout << "working directory\t" << cwd << std::endl;
 //  
   file << "time,"
        << "com_x,"      << "com_y,"
@@ -184,7 +184,7 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
 
 bool mgnss::xbot_plugins::WheelsV2::close() { 
 	
-	file.flush();
+    file.flush();
     file.close();
 	
 	std::cout << "file closed" << std::endl;

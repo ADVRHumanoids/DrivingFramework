@@ -4,6 +4,7 @@
 #include <XCM/XBotControlPlugin.h>
 #include <mwoibn/robot_class/robot_xbot_rt.h>
 #include <mgnss/odometry/odometry.h>
+#include <fstream>
 
 namespace mgnss
 {
@@ -25,6 +26,14 @@ protected:
   virtual void control_loop(double time, double period);
 
 private:
+  std::ostringstream oss;
+  std::ofstream file;
+  Eigen::IOFormat fmt;
+
+  std::time_t t;
+  std::tm tm;
+  double start,now;
+  mwoibn::VectorN _print;
 
   std::unique_ptr<mgnss::odometry::Odometry> _controller_ptr;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;

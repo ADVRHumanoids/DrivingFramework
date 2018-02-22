@@ -5,7 +5,6 @@
 #include <mwoibn/point_handling/robot_points_handler.h>
 #include <mwoibn/filters/iir_second_order.h>
 
-
 namespace mgnss {
 
 namespace odometry {

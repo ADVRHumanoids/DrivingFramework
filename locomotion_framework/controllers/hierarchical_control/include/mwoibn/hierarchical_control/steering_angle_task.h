@@ -161,10 +161,10 @@ public:
 //      else
 //        _resteer[i] = false;
 
-      if (_error[i] > 30*mwoibn::PI/180)
-        _error[i] = 30*mwoibn::PI/180;
-      else if (_error[i] < -30*mwoibn::PI/180)
-        _error[i] = -30*mwoibn::PI/180;
+      if (_error[i] > 45*mwoibn::PI/180)
+        _error[i] = 45*mwoibn::PI/180;
+      else if (_error[i] < -45*mwoibn::PI/180)
+        _error[i] = -45*mwoibn::PI/180;
 //      while(_error[i] < -mwoibn::PI){
 //        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
 

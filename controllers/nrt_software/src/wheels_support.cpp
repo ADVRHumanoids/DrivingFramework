@@ -22,19 +22,34 @@ int main(int argc, char** argv)
 // init wheels_controller
 
   mwoibn::loaders::Robot loader;
+  std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+      "DrivingFramework/"
+      "locomotion_framework/configs/mwoibn_v2.yaml";
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
 
-  mwoibn::robot_class::Robot& robot = loader.init(
-      std::string(DRIVING_FRAMEWORK_WORKSPACE) +
-          "DrivingFramework/"
-          "locomotion_framework/configs/mwoibn_v2.yaml",
-      "fake", std::string(DRIVING_FRAMEWORK_WORKSPACE) +
-                     "DrivingFramework/"
-                     "locomotion_framework/configs/lower_body.yaml");
+  config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheels_support"];
+
+  std::string secondary_file = "";
+  if (config["secondary_file"])
+    secondary_file = config["secondary_file"].as<std::string>();
+
+//  mwoibn::robot_class::Robot& robot = loader.init(
+//      std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+//          "DrivingFramework/"
+//          "locomotion_framework/configs/mwoibn_v2.yaml",
+//      "fake", std::string(DRIVING_FRAMEWORK_WORKSPACE) +
+//                     "DrivingFramework/"
+//                     "locomotion_framework/configs/lower_body.yaml");
+
+  mwoibn::robot_class::Robot& robot = loader.init(config_file, config["robot"].as<std::string>(), secondary_file);
+
+
 
   mwoibn::SupportPolygon3 support(0.45, 0.22, 0.078, robot.rate());
   
-  mwoibn::WheeledMotionEvent wheeld_controller(robot);
-  
+//  mwoibn::WheeledMotionEvent wheeld_controller(robot);
+  mwoibn::WheeledMotionEvent wheeld_controller(robot, config_file);
+
   wheeld_controller.init();
     // starting
 

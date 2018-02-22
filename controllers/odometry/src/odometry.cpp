@@ -112,6 +112,7 @@ void mgnss::odometry::Odometry::update()
   _base.head(3) = _base_pos;
 
   _base_filtered = _base;
+  _base_filtered.head<3>() = _base_pos;
   //std::cout << _base << std::endl;
   _robot.command.set(_base, {0, 1, 2, 3, 4, 5},
                      mwoibn::robot_class::INTERFACE::POSITION);
