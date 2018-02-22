@@ -42,8 +42,8 @@ if __name__ == '__main__':
     d_sp = 0.002
     
     x_cp = np.array([0.47,   0.47, -0.66, -0.66])
-    y_cp = np.array([0.25,  -0.25,  0.25, -0.25])
-    
+#    y_cp = np.array([0.25,  -0.25,  0.25, -0.25])
+    y_cp = np.array([0.225,  -0.225,  0.225, -0.225])    
     ref_service(3.0, 0.0, 0.0)
 
     wait = 0;
@@ -54,6 +54,25 @@ if __name__ == '__main__':
       if mode == 0 and vel < vel_max and x > 0.1:
         vel += d_vel
         dx, dy =  vel,  0.00        
+
+        done = True
+        
+        check = y_cp[0] <  0.25
+        y_cp[0] += d_sp/1.0 if check else 0
+        done = done and not check
+
+        check = y_cp[1] > -0.25
+        y_cp[1] -= d_sp/1.0 if check else 0
+        done = done and not check        
+
+        check = y_cp[2] <  0.25
+        y_cp[2] += d_sp/1.0 if check else 0
+        done = done and not check
+
+        check = y_cp[3] > -0.25
+        y_cp[3] -= d_sp/1.0 if check else 0
+        done = done and not check
+		        
       elif mode == 0 and x >  0.4:
 		mode +=1
       elif mode == 1:
