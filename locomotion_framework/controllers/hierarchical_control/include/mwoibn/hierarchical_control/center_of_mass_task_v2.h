@@ -46,12 +46,15 @@ public:
   virtual void update();
 
   //! sets task reference
-  virtual void setReference(mwoibn::VectorN reference)
+  template<typename Vector>
+  void setReference(const Vector& reference)
   {
-    _reference = reference;
+    _reference[0] = reference[0];
+    _reference[1] = reference[1];
   }
+
   //! returnes task reference
-  mwoibn::Matrix getReference() { return _reference; }
+  const mwoibn::VectorN& getReference() { return _reference; }
 
   //! returns chain associated with a specific contact to a Jacobian pool
   virtual void releaseContact(int i)

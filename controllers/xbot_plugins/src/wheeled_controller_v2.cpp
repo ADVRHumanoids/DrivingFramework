@@ -1,6 +1,5 @@
 #include <mgnss/xbot_plugins/wheeled_controller_v2.h>
 
-//#include <unistd.h>
 REGISTER_XBOT_PLUGIN(WheelsV2, mgnss::xbot_plugins::WheelsV2)
 
 bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
@@ -17,14 +16,9 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   /* Save robot to a private member. */
   _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config_file, config["robot"].as<std::string>(), secondary_file, handle->getSharedMemory()));
 
-//  _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(
-//      handle->getRobotInterface(), handle->getPathToConfigFile(), "robot", handle->getSharedMemory()));
-
-
   _controller_ptr.reset(new mwoibn::WheeledMotionEvent(*_robot_ptr, config_file));
 
-  _srv_rt = handle->getRosHandle()->advertiseService("wheels_command", &mgnss::xbot_plugins::WheelsV2::evenstHandler, this);
-  _sub_rt = handle->getRosHandle()->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, &mgnss::xbot_plugins::WheelsV2::supportHandler, this);
+  _robot_ptr->update();
 
   t = std::time(nullptr);
   tm = *std::localtime(&t);
@@ -104,7 +98,6 @@ void mgnss::xbot_plugins::WheelsV2::on_start(double time)
 void mgnss::xbot_plugins::WheelsV2::on_stop(double time) {
 
     _controller_ptr->stop();
-
 }
 
 
@@ -136,8 +129,6 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
 
     }
 
-
-//    std::cout << "support\t" << _support.transpose() << std::endl;
     _controller_ptr->update(_support);
     _robot_ptr->send();
 	

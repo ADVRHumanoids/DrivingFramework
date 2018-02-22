@@ -50,7 +50,7 @@ public:
   //! sets task reference
   virtual void setReference(int i, const mwoibn::Vector3& reference)
   {
-    _reference.segment(i * 3, 3) = reference;
+    _reference.segment<3>(i * 3) = reference;
   }
   //! sets current state as a desired reference
   virtual void resetReference() { _reference.noalias() = _ik.getFullStateWorld(); }
@@ -60,7 +60,7 @@ public:
   //! sets task reference
   virtual mwoibn::VectorN getReference(int i) const
   {
-    return _reference.segment(i * 3, 3);
+    return _reference.segment<3>(i * 3);
   }
 
 protected:

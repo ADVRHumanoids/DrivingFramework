@@ -1,7 +1,7 @@
-driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
+driving_path: &driving  "/home/embedded/locomotion_src/workspace/src/"
+simulator_path: &simulator "/home/embedded/locomotion_src/workspace/src/"
 mwoibn:
-        middleware: "ROS"
+        middleware: "XBOT"
         robot:
                 name: "centauro"
                 default:
@@ -282,7 +282,7 @@ mwoibn:
                                 frequency: 200.0
                                 damping: 1.0
         feedbacks:
-                online: [link_side_online, motor_side_online, odometry]
+                online: [link_side_online, odometry]
                 offline: [lower_body]
                 simulated: [simulation_base, simulation_state]
         controllers:
@@ -315,7 +315,7 @@ mwoibn:
                         simulation_base: 
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
-                                reference: 2
+                                reference: centauro::pelvis
                                 initialize: true
                         floating_base: 
                                 source: "/gazebo/link_states"
@@ -372,7 +372,7 @@ mwoibn:
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
                         urdf: 
                                 path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_v2.urdf"
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
                         srdf:
                                 path: *driving

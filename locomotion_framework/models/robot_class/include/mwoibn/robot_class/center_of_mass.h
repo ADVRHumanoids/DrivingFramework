@@ -27,7 +27,7 @@ public:
   void update(bool jacobian = true);
 
   const mwoibn::Matrix& getJacobian() const { return _jacobian; }
-  mwoibn::Vector3 get() const { return _com; }
+  const mwoibn::Vector3& get() const { return _com; }
 
 protected:
   point_handling::RawPositionsHandler _points;
