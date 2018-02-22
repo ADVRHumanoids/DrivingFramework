@@ -29,14 +29,14 @@ protected:
   virtual void control_loop(double time, double period);
 
 private:
-  std::ostringstream oss;
-  std::ofstream file;
-  Eigen::IOFormat fmt;
+//  std::ostringstream oss;
+//  std::ofstream file;
+//  Eigen::IOFormat fmt;
 
-  std::time_t t;
-  std::tm tm;
-  double start,now;
-  mwoibn::VectorN _print;
+//  std::time_t t;
+//  std::tm tm;
+//  double start,now;
+//  mwoibn::VectorN _print;
   bool evenstHandler(custom_services::updatePDGains::Request& req,
                      custom_services::updatePDGains::Response& res){
 

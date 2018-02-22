@@ -150,7 +150,7 @@ if(TEST_TEMP)
 
   LIST( APPEND INSTALL_TARGETS
     my_test
-    contact_test
+#    contact_test
     joint_states
   )
   LIST( APPEND CATKIN_DEPENDS_SET
@@ -161,9 +161,9 @@ if(TEST_TEMP)
     custom_services
 #    reference_generation
   )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    visualization_tools
-  )
+#  LIST( APPEND CATKIN_DEPENDS_SET
+#    visualization_tools
+#  )
 
 endif(TEST_TEMP)
 
@@ -335,11 +335,11 @@ target_link_libraries(joint_states
     ${catkin_LIBRARIES}
  )
 
-add_executable(contact_test src/contact_test.cpp)
-add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
-target_link_libraries(contact_test
-    ${catkin_LIBRARIES}
- )
+#add_executable(contact_test src/contact_test.cpp)
+#add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(contact_test
+#    ${catkin_LIBRARIES}
+# )
 endif(TEST_TEMP)
 
 ## Install ##

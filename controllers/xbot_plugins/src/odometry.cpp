@@ -21,7 +21,7 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
   _controller_ptr.reset(new mgnss::odometry::Odometry(*_robot_ptr, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078));
 
   _robot_ptr->update();
-
+/*
   t = std::time(nullptr);
   tm = *std::localtime(&t);
 
@@ -51,14 +51,14 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
   fmt.rowSeparator = ", ";
 
   _print.setZero(13);
-
+*/
   return true;
 }
 
 void mgnss::xbot_plugins::Odometry::on_start(double time)
 {
-  start = time;
-  now = time;
+//  start = time;
+//  now = time;
     _valid = _robot_ptr->get();
 
     if (_valid)
@@ -95,7 +95,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 
     _controller_ptr->update();
     _robot_ptr->send();
-
+/*
     now = time;
     _print.setZero();
     _print[0] =  time - start;
@@ -104,13 +104,14 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
     _print.segment<6>(7) =  _controller_ptr->getFiltered();
 
     file << _print.transpose().format(fmt) << "\n";
+    */
 }
 
 bool mgnss::xbot_plugins::Odometry::close() {
 
-  file.flush();
-  file.close();
+//  file.flush();
+//  file.close();
 
-  std::cout << "odometry log closed" << std::endl;
+//  std::cout << "odometry log closed" << std::endl;
   return true; }
 

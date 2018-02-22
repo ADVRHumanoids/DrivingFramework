@@ -18,25 +18,28 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 
   _controller_ptr.reset(new mwoibn::WheeledMotionEvent(*_robot_ptr, config_file));
 
+  _srv_rt = handle->getRosHandle()->advertiseService("wheels_command", &mgnss::xbot_plugins::WheelsV2::evenstHandler, this);
+  _sub_rt = handle->getRosHandle()->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, &mgnss::xbot_plugins::WheelsV2::supportHandler, this);
+
   _robot_ptr->update();
 
-  t = std::time(nullptr);
-  tm = *std::localtime(&t);
+//  t = std::time(nullptr);
+//  tm = *std::localtime(&t);
 
-  oss << "RT_wheels_log_" << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << ".txt";
+//  oss << "RT_wheels_log_" << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << ".txt";
 
-  file.open(oss.str(),  std::ios::out);
+//  file.open(oss.str(),  std::ios::out);
 
-  if(file.is_open())
-	std::cout << "opened log file " << oss.str() << std::endl;
-  else
-	std::cout << "couldn't open log file " << oss.str() << std::endl;
+//  if(file.is_open())
+//	std::cout << "opened log file " << oss.str() << std::endl;
+//  else
+//	std::cout << "couldn't open log file " << oss.str() << std::endl;
   
-  char cwd[1024];
-  if(getcwd(cwd, sizeof(cwd)) != NULL)
-    std::cout << "working directory\t" << cwd << std::endl;
+//  char cwd[1024];
+//  if(getcwd(cwd, sizeof(cwd)) != NULL)
+//    std::cout << "working directory\t" << cwd << std::endl;
 //  
-  file << "time,"
+/*  file << "time,"
        << "com_x,"      << "com_y,"
        << "e_com_x,"    << "e_com_y,"
        << "r_com_x,"    << "r_com_y,"
@@ -75,7 +78,7 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   fmt.rowSeparator = ", ";
   
   _print.setZero(96);
-
+*/
 
 
   return true;
@@ -83,8 +86,8 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 
 void mgnss::xbot_plugins::WheelsV2::on_start(double time)
 {
-	start = time;
-	now = time;
+//	start = time;
+//	now = time;
     _valid = _robot_ptr->get();
 
     if (_valid)
@@ -131,7 +134,7 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
 
     _controller_ptr->update(_support);
     _robot_ptr->send();
-	
+  /*
 	now = time;
     _print.setZero();
     _print[0] =  time - start;
@@ -170,13 +173,13 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
     _print.segment<3>(93) = _controller_ptr->getBase();
 
     file << _print.transpose().format(fmt) << "\n";
-
+*/
 }
 
 bool mgnss::xbot_plugins::WheelsV2::close() { 
 	
-    file.flush();
-    file.close();
+//    file.flush();
+//    file.close();
 	
-	std::cout << "file closed" << std::endl;
+//	std::cout << "file closed" << std::endl;
 	return true; }

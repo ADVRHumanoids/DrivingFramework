@@ -61,8 +61,10 @@ int main(int argc, char** argv)
 
 
 
+  //  for(int i = 0; i < 2500; i++)
   while (ros::ok())
   {
+//      std::cout << i << std::endl;
     odometry.update();
     //    robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
     //    robot.command.set(velocities,
