@@ -20,7 +20,9 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
 
   _controller_ptr.reset(new mgnss::odometry::Odometry(*_robot_ptr, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078));
 
-  _robot_ptr->update();
+  _robot_ptr->get();
+  _robot_ptr->updateKinematics();
+
 /*
   t = std::time(nullptr);
   tm = *std::localtime(&t);

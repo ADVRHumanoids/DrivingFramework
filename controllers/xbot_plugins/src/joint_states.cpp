@@ -13,7 +13,6 @@ bool mgnss::xbot_plugins::JointStates::init_control_plugin(XBot::Handle::Ptr han
   if (config["secondary_file"])
     secondary_file = config["secondary_file"].as<std::string>();
 
-  /* Save robot to a private member. */
   _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config_file, config["robot"].as<std::string>(), secondary_file, handle->getSharedMemory()));
 
   _controller_ptr.reset(new mgnss::controllers::JointStates(*_robot_ptr));
@@ -21,9 +20,12 @@ bool mgnss::xbot_plugins::JointStates::init_control_plugin(XBot::Handle::Ptr han
   _srv_rt = handle->getRosHandle()->advertiseService<custom_services::jointStateCmnd::Request,
                            custom_services::jointStateCmnd::Response>(
             "trajectory", boost::bind(&mgnss::xbot_plugins::JointStates::referenceHandler, _1, _2, _controller_ptr.get()));
+  _robot_ptr->get();
+  _robot_ptr->updateKinematics();
 
+/*
   _robot_ptr->update();
-
+*/
   return true;
 }
 
@@ -36,12 +38,14 @@ void mgnss::xbot_plugins::JointStates::on_start(double time)
       _robot_ptr->updateKinematics();
       _controller_ptr->init();
     }
+
 }
 
 void mgnss::xbot_plugins::JointStates::on_stop(double time) {}
 
 void mgnss::xbot_plugins::JointStates::control_loop(double time, double period)
 {
+
     _valid = _robot_ptr->get();
 
     if (!_valid)

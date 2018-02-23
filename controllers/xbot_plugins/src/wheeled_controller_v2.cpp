@@ -22,7 +22,8 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   _srv_rt = handle->getRosHandle()->advertiseService("wheels_command", &mgnss::xbot_plugins::WheelsV2::evenstHandler, this);
   _sub_rt = handle->getRosHandle()->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, &mgnss::xbot_plugins::WheelsV2::supportHandler, this);
 
-  _robot_ptr->update();
+  _robot_ptr->get();
+  _robot_ptr->updateKinematics();
 
 //  t = std::time(nullptr);
 //  tm = *std::localtime(&t);

@@ -36,12 +36,12 @@ private:
       }
       else
           res.message = "Found requested position " + req.position;
-      //controller->setVelocity(req.velocity);
 
       if(req.pos_step)
         controller->step(req.pos_step);
 
       res.success = true;
+
       return true;
     }
 

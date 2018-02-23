@@ -18,12 +18,13 @@ MasterCommunicationInterface:
 
 XBotRTPlugins:
 #  plugins: ["Odometry", "JointStates", "WheelsV2"]
-  plugins: ["JointStates", "Odometry", "WheelsV2"]
+#  plugins: ["JointStates", "Odometry", "WheelsV2"]
+  plugins: ["JointStates", "Odometry"]
   io_plugins: []
   
 NRTPlugins:
-  plugins: ["HomingExample"]
-  
+#  plugins: ["HomingExample"]
+  plugins: []
 WebServer:
   enable: "false"
   address: "127.0.0.1"
