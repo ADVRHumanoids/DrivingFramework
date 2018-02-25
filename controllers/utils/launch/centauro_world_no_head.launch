@@ -51,7 +51,7 @@
   <arg name="wheels_actuators" default="true"/>
   <arg name="head_actuators" default="true"/>
 
-  <arg name="world_name" default="$(find centauro_gazebo)/worlds/centauro_iit.world"/>
+  <arg name="world_name" default="$(find centauro_gazebo)/worlds/centauro.world"/>
 
   <include file="$(find centauro_gazebo)/launch/centauro_world.launch">
       <arg name="arm_sensors" value="$(arg arm_sensors)"/>

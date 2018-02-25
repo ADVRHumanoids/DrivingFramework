@@ -1,7 +1,7 @@
-driving_path: &driving  "/home/embedded/locomotion_src/workspace/src/"
-simulator_path: &simulator "/home/embedded/locomotion_src/workspace/src/"
+driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
+simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
 mwoibn:
-        middleware: "XBOT"
+        middleware: "ROS"
         robot:
                 name: "centauro"
                 default:
@@ -446,7 +446,7 @@ mwoibn:
                 wheeled_motion:
                         robot: default
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: RT9
+                        tunning: NRT2
                         tunnings:
                                 NRT: # discontinous both, iit with floating base
                                         ratio: 1.0
@@ -465,6 +465,23 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.01
+                                NRT2: # discontinous both, iit with floating base
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 80
+                                        centre_of_mass_x: 50
+                                        centre_of_mass_y: 65
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01                                
                                 odom_NRT: # circular - odom, 
                                         ratio: 1.0
                                         damping: 0.0001

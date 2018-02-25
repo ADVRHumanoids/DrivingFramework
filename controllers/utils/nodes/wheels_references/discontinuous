@@ -280,7 +280,7 @@ if __name__ == '__main__':
 		y_cp[2] += d_sp/2.0 if check else 0
 		done = done and not check
 
-		check = y_cp[3] < -0.28 # 30
+		check = y_cp[3] < -0.32 # 30
 		y_cp[3] += 2*d_sp/2.0 if check else 0
 		done = done and not check
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
 		x_cp[2] += 2*d_sp/2.0 if check else 0
 		done = done and not check
 		
-		check = x_cp[3] <  -0.4
+		check = x_cp[3] <  -0.38
 		x_cp[3] += 2*d_sp/2.0 if check else 0
 		done = done and not check
 				
@@ -305,7 +305,7 @@ if __name__ == '__main__':
 		
       elif mode == 17:
 		wait += 1
-		mode += 1 if wait > 50 else 0	
+		mode += 1 if wait > 100 else 0	
 			
       elif mode == 18:
 		wait = 0

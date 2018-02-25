@@ -280,7 +280,7 @@ void mwoibn::WheeledMotionEvent::compute()
 
     if ((_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i]) && !_resteer[i])
     {
-      _start_steer[i] = _test_steer[i];
+                                                                                                                                                                                                                                                                                                                                                                                      _start_steer[i] = _test_steer[i];
       _resteer[i] = true;
       std::cout << "WARNING: ankle yaw " << i << " on limit."
                 << std::endl; // NRT
