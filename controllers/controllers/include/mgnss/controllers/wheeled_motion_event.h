@@ -37,11 +37,13 @@ public:
   void resteer(int i){_resteer[i] = true;
                       _start_steer[i] = _test_steer[i];
 
-                     std::cout << "started resteering" << std::endl;}
+                     //std::cout << "started resteering" << std::endl;
+                     }
   void stopResteer(int i){_resteer[i] = false;
                       _start_steer[i] = _test_steer[i];
 
-                     std::cout << "stoped resteering" << std::endl;}
+                     //std::cout << "stoped resteering" << std::endl;
+                     }
 
   void setSteering(int i, double th)
   {
@@ -110,22 +112,26 @@ public:
 
 //    std::cout << "_linear_vel\t" << _linear_vel << std::endl;
 //    std::cout << "_rate\t" << _robot.rate() << std::endl;
-//    std::cout << "_angular_vel\t" << _angular_vel << std::endl;
+//     std::cout << "_angular_vel\t" << _angular_vel << std::endl;
 
     _position += _linear_vel * _robot.rate();
     _heading += _angular_vel[2] * _robot.rate();
+//    std::cout << "before limits heading\t" << _heading << std::endl;
+
     _heading -= 6.28318531 * std::floor((_heading + 3.14159265) /
                                         6.28318531); // limit -pi:pi
 
 //    std::cout << "_heading\t" << _heading << std::endl;
+//    std::cout << "_z\t" << _z << std::endl;
 
     _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
     _com_ptr->setReference(_com_ref);
+
     _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate())*_orientation;
 
-    _pelvis_orientation_ptr->setReference(
-        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading) * _orientation);
+
+    _pelvis_orientation_ptr->setReference(0, _orientation * mwoibn::Quaternion::fromAxisAngle(_z, _heading));
   }
 
   void steering();
@@ -172,7 +178,7 @@ public:
   }
 
   void claim(int i){
-    std::cout << "claim\t" << i << std::endl;
+ //   std::cout << "claim\t" << i << std::endl;
     _steering_ptr->claimContact(i);
     _constraints_ptr->claimContact(i);
   }
@@ -183,9 +189,15 @@ public:
   }
 
   mwoibn::VectorN getCom(){ return _robot.centerOfMass().get().head<2>();}
+  const mwoibn::Vector3& getComFull(){ return _robot.centerOfMass().get();}
   const mwoibn::VectorN& errorCom(){return _com_ptr->getError();}
-  mwoibn::VectorN refCom(){return _com_ptr->getReference();}
-  mwoibn::VectorN getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+
+  const mwoibn::VectorN& refCom(){return _com_ptr->getReference();}
+  double refComX(){return _com_ptr->getReference()(0,0);}
+  double refComY(){return _com_ptr->getReference()(0,1);}
+
+  const mwoibn::Vector3& getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+
   mwoibn::VectorN errorCp(int i){ return _steering_ptr->getReferenceError(i);}
   const mwoibn::VectorN& refCp(){ return _steering_ptr->getReference();}
   const mwoibn::VectorN& getSteer(){ return _leg_steer_ptr->getCurrent();}
@@ -202,6 +214,8 @@ public:
   const mwoibn::VectorBool& isResteer(){return _resteer;}
   const mwoibn::VectorN& getAnkleYaw(){return _test_steer;}
   mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
+  const mwoibn::VectorN& getBaseError(){return _pelvis_position_ptr->getError();}
+  const mwoibn::VectorN& getBaseOrnError(){return _pelvis_orientation_ptr->getError();}
 
 protected:
   bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,

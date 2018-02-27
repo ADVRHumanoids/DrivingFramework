@@ -38,7 +38,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_init(YAML::Node config,
 
   _initStates();
 
-  
+
 }
 
 void mwoibn::robot_class::RobotXBotFeedback::_initStates(){
@@ -86,8 +86,8 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
 
     if (entry.second["space"].as<std::string>() == "OPERATIONAL")
     {
-        
-      _getDefaultPosition(entry.second, true, true, true);
+
+      _getDefaultPosition(entry.second, false, false, true);
 
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
@@ -118,9 +118,9 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     if (entry.second["layer"].as<std::string>() != "lower_level")
       continue;
 
-    entry.second["name"] = entry.first.as<std::string>(); 
+    entry.second["name"] = entry.first.as<std::string>();
     entry.second["gains"] = config["gains"][entry.second["name"].as<std::string>()];
-       
+
     BiMap map = readBiMap(entry.second["dofs"]);
 
     controllers.add(

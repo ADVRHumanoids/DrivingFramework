@@ -31,11 +31,17 @@ private:
                     mgnss::controllers::JointStates* controller)
   {
 
-      if(!controller->setFullPosition(req.position)){
-          res.message = "Position " + req.position + " has not been defined in the robot";
-      }
-      else
+      if(controller->setFullPosition(req.position)){
           res.message = "Found requested position " + req.position;
+          //res.message = "Position " + req.position + " has not been defined in the robot";
+      }
+      else if(controller->setVelocity(req.position, req.velocity))
+          res.message = "Set requested velocity for " + req.position;
+      else if(controller->setPosition(req.position, req.velocity))
+          res.message = "Set requested position for " + req.position;
+      else
+          res.message = "Unknown command " + req.position + ".";
+
 
       if(req.pos_step)
         controller->step(req.pos_step);

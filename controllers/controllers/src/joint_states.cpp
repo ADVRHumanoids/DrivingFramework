@@ -206,3 +206,36 @@
     _robot.update();
   }
 
+
+  bool mgnss::controllers::JointStates::setVelocity(std::string name, double vel){
+
+    double dof;
+    try{
+        dof = _robot.getDof(name)[0];
+    }
+    catch (const std::out_of_range& e){
+        return false;
+    }
+    for(int i = 0; i < _vel_map.size(); i++){
+        if (_vel_map[i] == dof){
+            _velocity[i] = vel;
+            return true;
+        }
+    }
+
+    return false;
+  }
+
+    bool mgnss::controllers::JointStates::setPosition(std::string name, double pos){
+
+    double dof;
+    try{
+        dof = _robot.getDof(name)[0];
+    }
+    catch (const std::out_of_range& e){
+        return false;
+    }
+
+    _pos_ref[dof] = pos;
+    return true;
+  }

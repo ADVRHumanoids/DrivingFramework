@@ -113,6 +113,10 @@ private:
   XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
   //Eigen::Matrix<double, 12, 1> _support;
   mwoibn::VectorN _support;
+  XBot::MatLogger::Ptr _logger;
+  mwoibn::Vector3 _log_point;
+  double start;
+
 };
 }
 }

@@ -192,15 +192,22 @@ void mwoibn::WheeledMotionEvent::init(){
       _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
       _leg_castor_ptr->setReference(_leg_castor_ptr->getCurrent());
 
-      _orientation = mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4])*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]);
+ //     std::cout << "contact state\t" << _steering_ptr->getState().transpose() << std::endl;
+      _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5])*mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]);
+      _heading = _steering_ptr->getState()[2];
 
-      _pelvis_orientation_ptr->setReference(0, _orientation);
+      //std::cout << "correct\t" << _pelvis_orientation_ptr->points().getPointStateWorld(0) << std::endl;
+      //_orientation = _pelvis_orientation_ptr->points().getPointStateWorld(0);
+      //std::cout << "orientation\t" << _orientation << std::endl;
+      //std::cout << "current\t" << _orientation * mwoibn::Quaternion::fromAxisAngle(_z, _heading) << std::endl;
+
+      _pelvis_orientation_ptr->setReference(0, _orientation*mwoibn::Quaternion::fromAxisAngle(_z, _heading));
+
 
       _position = _pelvis_position_ptr->points().getPointStateWorld(0);
       _position.head<2>() = _robot.centerOfMass().get().head<2>();
       _pelvis_position_ptr->setReference(0, _position);
       _com_ptr->setReference(_position);
-      _heading = _steering_ptr->getState()[2];
 
 }
 
@@ -273,6 +280,7 @@ void mwoibn::WheeledMotionEvent::compute()
   _robot.command.get(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
 
+
   // RESTEER AND CHECK FOR LIMITS
   for (int i = 0; i < _test_steer.size(); i++)
   {
@@ -319,6 +327,7 @@ void mwoibn::WheeledMotionEvent::compute()
 
   _robot.command.set(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
+
 }
 
 void mwoibn::WheeledMotionEvent::stop(){

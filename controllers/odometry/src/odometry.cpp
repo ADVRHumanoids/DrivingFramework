@@ -35,6 +35,8 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
       throw std::invalid_argument(
           std::string("Odometry: Couldn't find a link ") + names[i]);
     _ids[i] = dof[0];
+
+    _contact_points.push_back(_wheels_ph.getPointStateWorld(i));
   }
 
   _estimated =
@@ -48,15 +50,28 @@ void mgnss::odometry::Odometry::init(){
 
     _filter_ptr->computeCoeffs(_robot.rate());
 
+    //std::cout << "raw" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.feedbacks.reset();
+
+    //std::cout << "reset" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.get();
+
+    //std::cout << "get" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.updateKinematics();
     _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
     _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+
     _filter_ptr->reset(_base_pos);
 
     //std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
 
-    for(int i = 0; i < _estimated.size(); i++)
-    _estimated[i] =
-        _wheels_ph.getPointStateWorld(i); // start without an error for now
+    for(int i = 0; i < _estimated.size(); i++){
+        _contact_points[i] = _wheels_ph.getPointStateWorld(i);
+        _estimated[i] = _contact_points[i];
+    }
 
     _previous_state.noalias() = _state;
 
@@ -91,8 +106,8 @@ void mgnss::odometry::Odometry::update()
   }
 
   for (int i = 0; i < _wheels_ph.size(); i++){
-
-    _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);
+    _contact_points[i] = _wheels_ph.getPointStateWorld(i);
+    _pelvis[i] = _estimated[i] - _contact_points[i];
   }
 
   _compute2(); // this seems to be the best
@@ -101,7 +116,7 @@ void mgnss::odometry::Odometry::update()
       _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
 
   for(int i = 0; i < _wheels_ph.size(); i++)
-    _estimated[i] = _base.head<3>() + _wheels_ph.getPointStateWorld(i);
+    _estimated[i] = _base.head<3>() + _contact_points[i];
 
   _base_pos = _base.head(3);
 

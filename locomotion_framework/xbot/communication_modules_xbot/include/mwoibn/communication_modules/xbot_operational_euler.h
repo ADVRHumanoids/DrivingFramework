@@ -17,20 +17,21 @@ public:
                  mwoibn::robot_class::BiMap map, YAML::Node config,
                  XBot::RobotInterface& robot, double rate);
 
-  virtual bool initialized(){return true;} // not implemented yet
+  virtual bool initialized(){return _initialized;} // not implemented yet
+  virtual void reset();
   virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 position);
   virtual ~XBotOperationalEuler(){}
-
   virtual bool get();
 
 protected:
   XBot::ImuSensor::ConstPtr _imu;
 
   mwoibn::Vector3 _linear_state;
-  mwoibn::Matrix3 _rotation;
+  mwoibn::Matrix3 _rotation, _rot_z;
   mwoibn::VectorN _base;
   double _rate;
-  bool _is_static;
+  bool _is_static, _initialized = false;
+  mwoibn::Axis _z;
 
 };
 }

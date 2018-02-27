@@ -17,6 +17,9 @@ public:
 
   ~JointStates() {}
 
+  bool setVelocity(std::string name, double vel);
+  bool setPosition(std::string name, double pos);
+
   bool setPosition(std::string name);
   bool setFullPosition(std::string name);
 
