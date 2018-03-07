@@ -1,0 +1,147 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+from custom_messages.msg import CustomCmnd
+
+import rospy
+from numpy import cos, sin
+import numpy as np
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_support')
+    dt = 0.005
+    rate = rospy.Rate(200)
+    #print(1.0/dt)
+    name_base = 'wheels_command'
+
+    support = rospy.Publisher('wheels_support', CustomCmnd, queue_size=1)
+    msg = CustomCmnd()
+
+    support.publish(msg)
+
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name_base, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+        
+
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name_base, updatePDGains)
+
+    dth, r, th, magic = -0.2, 0.5, 0.0, 2.05
+
+    side, slide, v_min = 4.0, 1.0, 0.02
+
+    x, y, z_cp = 0, 0, 0.377
+    
+    z, z_max = 0.93, 1.1
+#    z, z_max = 0.63, 0.72
+    mode = 0
+
+    vel_max, vel, d_vel = 0.1, 0.1, 0.004
+
+    dx, dy =  0.1,  0.00
+    d_sp = 0.00002
+    
+    x_cp = np.array([0.47,   0.47, -0.64, -0.645])
+    y_cp = np.array([0.235,  -0.21,  0.235, -0.21])
+    
+    wait = 0;
+    vel_max = 0.2
+
+    while not rospy.is_shutdown(): # and mode == 2
+	 
+      if mode == 0 :
+		wait += 1
+		mode += 1 if wait > 1000 else 0
+		
+      elif mode == 1:
+		done = True
+		
+		check = x_cp[0] <  0.54
+		x_cp[0] += d_sp if check else 0
+		done = done and not check
+	
+		check = x_cp[1] <  0.54
+		x_cp[1] += d_sp if check else 0
+		done = done and not check
+
+		check = x_cp[2] >  -0.71
+		x_cp[2] -= d_sp if check else 0
+		done = done and not check
+
+		check = x_cp[3] >  -0.71
+		x_cp[3] -= d_sp if check else 0
+		done = done and not check
+		
+		mode += 1 if done else 0
+		wait = 0   
+
+#      elif mode == 2:
+#		wait += 1
+#		mode += 1 if wait > 2000 else 0
+		
+#      elif mode == 3:
+				
+		check = y_cp[0] <  0.27
+		y_cp[0] += d_sp/2.0 if check else 0
+		done = done and not check
+
+		check = y_cp[1] > -0.24
+		y_cp[1] -= d_sp/2.0 if check else 0
+		done = done and not check
+
+		check = y_cp[2] <  0.27
+		y_cp[2] += d_sp/2.0 if check else 0
+		done = done and not check
+
+		check = y_cp[3] > -0.24
+		y_cp[3] -= d_sp/2.0 if check else 0
+		done = done and not check
+
+      elif mode == 2:
+		wait += 1
+		mode += 1 if wait > 2000 else 0
+
+      elif mode == 3:
+		wait = 0
+		mode += 1
+		dx = 0
+
+
+#		check = z < z_max
+#		z += 0.005 if check else 0
+#		done = done and not check
+		
+#		dx = vel_max
+		
+#		mode += 1 if done else 0
+#		wait = 0   		
+
+				
+      x += dx*0.005*2
+      y += dy*0.005*2
+      
+      print("mode", mode, "v", np.sqrt(dx*dx+dy*dy), "x", x, "x_sp", x_cp, "y_sp", y_cp, "z", z, "wait", wait)
+      msg.position = [x_cp[0], y_cp[0], z_cp, x_cp[1], y_cp[1], z_cp, x_cp[2], y_cp[2], z_cp, x_cp[3], y_cp[3], z_cp, 2147483647]
+      support.publish(msg)
+
+      try:
+        ref_service(1.0, 1.0, dx*100.0)
+#        ref_service(2.0, 3.0, z*100.0)
+
+
+      except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
+
+
+      rate.sleep()
+
+
+
