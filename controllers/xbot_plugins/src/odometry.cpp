@@ -9,7 +9,7 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
   std::string config_file = config["config_file"].as<std::string>();
   config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["odometry"];
 
-  _logger = XBot::MatLogger::getLogger("/tmp/Odometry_logger");
+//  _logger = XBot::MatLogger::getLogger("/tmp/Odometry_logger");
 
   std::string secondary_file = "";
   if (config["secondary_file"])
@@ -24,7 +24,7 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
 
   _robot_ptr->get();
   _robot_ptr->updateKinematics();
-
+/*
   _logger->add("base_x", _controller_ptr->getRaw()[0]);
   _logger->add("base_y", _controller_ptr->getRaw()[1]);
   _logger->add("base_z", _controller_ptr->getRaw()[2]);
@@ -45,7 +45,7 @@ bool mgnss::xbot_plugins::Odometry::init_control_plugin(XBot::Handle::Ptr handle
   _logger->add("cp_4_z", _controller_ptr->getContact(3)[2]);
 
   _logger->add("time", 0.0);
-
+*/
 
 /*
   t = std::time(nullptr);
@@ -122,7 +122,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 
     _controller_ptr->update();
     _robot_ptr->send();
-
+/*
   _logger->add("base_x", _controller_ptr->getRaw()[0]);
   _logger->add("base_y", _controller_ptr->getRaw()[1]);
   _logger->add("base_z", _controller_ptr->getRaw()[2]);
@@ -143,7 +143,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
   _logger->add("cp_4_z", _controller_ptr->getContact(3)[2]);
 
   _logger->add("time", time);
-
+*/
 /*
     now = time;
     _print.setZero();
@@ -158,7 +158,7 @@ void mgnss::xbot_plugins::Odometry::control_loop(double time, double period)
 
 bool mgnss::xbot_plugins::Odometry::close() {
 
-    _logger->flush();
+//    _logger->flush();
 
 //  file.flush();
 //  file.close();

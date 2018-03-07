@@ -47,10 +47,10 @@ private:
           else if (req.d == 2)
             _controller_ptr->setBaseDotY(req.nr / 100.0);
           else if (req.d == 3)
-            _controller_ptr->setBaseDotZ(req.nr / 100.0);
+            _controller_ptr->setBaseDotZ(req.nr / 1000.0);
           else if (req.d == 4)
           {
-            _controller_ptr->setBaseDotHeading(req.nr / 100.0);
+            _controller_ptr->setBaseDotHeading(req.nr / 1000.0);
           }
           else if (req.d == 5)
             _controller_ptr->setBaseRotVelX(req.nr / 100.0);

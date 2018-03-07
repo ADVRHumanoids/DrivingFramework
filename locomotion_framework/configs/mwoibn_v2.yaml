@@ -461,9 +461,9 @@ mwoibn:
                 wheeled_motion:
                         robot: default
                         secondary_file: &config_lower /home/embedded/locomotion_src/workspace/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: HW1
+                        tunning: HW3
                         tunnings:
-                                HW_low:
+                                HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
@@ -480,18 +480,52 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.02
-                                HW1:
+                                HW1: # works straight and direct rotation
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 25 # 20
-                                        base_orinetation: 80
+                                        leg_steer: 60 # 20
+                                        base_orinetation: 120
                                         centre_of_mass_x: 40
                                         centre_of_mass_y: 40
                                         base_position: 30
-                                        contact_point: 20
+                                        contact_point: 80
                                         camber: 60
                                         castor: 30
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.005
+                                HW2:
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 65 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 55
+                                        centre_of_mass_y: 55
+                                        base_position: 30
+                                        contact_point: 90
+                                        camber: 60
+                                        castor: 30
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.007
+                                HW3: # works straight and direct rotation
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 52 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 44
+                                        centre_of_mass_y: 44
+                                        base_position: 30
+                                        contact_point: 80
+                                        camber: 50
+                                        castor: 20
                                         camber_damp: 0.08
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85

@@ -31,47 +31,54 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 
   _logger->add("e_base_z", _controller_ptr->getBaseError()[2]);
   _logger->add("r_base_z", _controller_ptr->getBodyPosition()[2]);
+
   _logger->add("e_base_rx", _controller_ptr->getBaseOrnError()[0]);
   _logger->add("e_base_ry", _controller_ptr->getBaseOrnError()[1]);
   _logger->add("e_base_rz", _controller_ptr->getBaseOrnError()[2]);
   _logger->add("base_rx", _robot_ptr->state.get()[3]);
   _logger->add("base_ry", _robot_ptr->state.get()[4]);
   _logger->add("base_rz", _robot_ptr->state.get()[5]);
+
   _logger->add("base_x", _robot_ptr->state.get()[0]);
   _logger->add("base_y", _robot_ptr->state.get()[1]);
   _logger->add("base_z", _robot_ptr->state.get()[2]);
+
   _logger->add("com_x", _controller_ptr->getCom()[0]);
   _logger->add("com_y", _controller_ptr->getCom()[1]);
   _logger->add("r_com_x", _controller_ptr->refCom()[0]);
   _logger->add("r_com_y", _controller_ptr->refCom()[1]);
-  _logger->add("r_1", _controller_ptr->isResteer()[0]);
-  _logger->add("r_2", _controller_ptr->isResteer()[1]);
-  _logger->add("r_3", _controller_ptr->isResteer()[2]);
-  _logger->add("r_4", _controller_ptr->isResteer()[3]);
+
+//  _logger->add("r_1", _controller_ptr->isResteer()[0]);
+//  _logger->add("r_2", _controller_ptr->isResteer()[1]);
+//  _logger->add("r_3", _controller_ptr->isResteer()[2]);
+//  _logger->add("r_4", _controller_ptr->isResteer()[3]);
+
   _logger->add("cp_1_x", _controller_ptr->getCp(0)[0]);
   _logger->add("cp_1_y", _controller_ptr->getCp(0)[1]);
-  _logger->add("cp_1_z", _controller_ptr->getCp(0)[2]);
+//  _logger->add("cp_1_z", _controller_ptr->getCp(0)[2]);
   _logger->add("cp_2_x", _controller_ptr->getCp(1)[0]);
   _logger->add("cp_2_y", _controller_ptr->getCp(1)[1]);
-  _logger->add("cp_2_z", _controller_ptr->getCp(1)[2]);
+//  _logger->add("cp_2_z", _controller_ptr->getCp(1)[2]);
   _logger->add("cp_3_x", _controller_ptr->getCp(2)[0]);
   _logger->add("cp_3_y", _controller_ptr->getCp(2)[1]);
-  _logger->add("cp_3_z", _controller_ptr->getCp(2)[2]);
+//  _logger->add("cp_3_z", _controller_ptr->getCp(2)[2]);
   _logger->add("cp_4_x", _controller_ptr->getCp(3)[0]);
   _logger->add("cp_4_y", _controller_ptr->getCp(3)[1]);
-  _logger->add("cp_4_z", _controller_ptr->getCp(3)[2]);
+//  _logger->add("cp_4_z", _controller_ptr->getCp(3)[2]);
+
   _logger->add("r_cp_1_x", _controller_ptr->refCp()[0]);
   _logger->add("r_cp_1_y", _controller_ptr->refCp()[1]);
-  _logger->add("r_cp_1_z", _controller_ptr->refCp()[2]);
+//  _logger->add("r_cp_1_z", _controller_ptr->refCp()[2]);
   _logger->add("r_cp_2_x", _controller_ptr->refCp()[3]);
   _logger->add("r_cp_2_y", _controller_ptr->refCp()[4]);
-  _logger->add("r_cp_2_z", _controller_ptr->refCp()[5]);
+//  _logger->add("r_cp_2_z", _controller_ptr->refCp()[5]);
   _logger->add("r_cp_3_x", _controller_ptr->refCp()[6]);
   _logger->add("r_cp_3_y", _controller_ptr->refCp()[7]);
-  _logger->add("r_cp_3_z", _controller_ptr->refCp()[8]);
+//  _logger->add("r_cp_3_z", _controller_ptr->refCp()[8]);
   _logger->add("r_cp_4_x", _controller_ptr->refCp()[9]);
   _logger->add("r_cp_4_y", _controller_ptr->refCp()[10]);
-  _logger->add("r_cp_4_z", _controller_ptr->refCp()[11]);
+//  _logger->add("r_cp_4_z", _controller_ptr->refCp()[11]);
+
   _logger->add("r_st_1", _controller_ptr->refSteer()[0]);
   _logger->add("r_st_2", _controller_ptr->refSteer()[1]);
   _logger->add("r_st_3", _controller_ptr->refSteer()[2]);
@@ -80,14 +87,26 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
   _logger->add("st_2", _controller_ptr->getSteer()[1]);
   _logger->add("st_3", _controller_ptr->getSteer()[2]);
   _logger->add("st_4", _controller_ptr->getSteer()[3]);
-  _logger->add("e_st_1", _controller_ptr->errorSteer()[0]);
-  _logger->add("e_st_2", _controller_ptr->errorSteer()[1]);
-  _logger->add("e_st_3", _controller_ptr->errorSteer()[2]);
-  _logger->add("e_st_4", _controller_ptr->errorSteer()[3]);
-  _logger->add("ankle_yaw_1", _robot_ptr->state.get()[10]);
-  _logger->add("ankle_yaw_2", _robot_ptr->state.get()[16]);
-  _logger->add("ankle_yaw_3", _robot_ptr->state.get()[22]);
-  _logger->add("ankle_yaw_4", _robot_ptr->state.get()[28]);
+
+  _logger->add("tan_sp_1", _controller_ptr->getDampingSP()[0]);
+  _logger->add("tan_sp_2", _controller_ptr->getDampingSP()[1]);
+  _logger->add("tan_sp_3", _controller_ptr->getDampingSP()[2]);
+  _logger->add("tan_sp_4", _controller_ptr->getDampingSP()[3]);
+
+  _logger->add("tan_icm_1", _controller_ptr->getDampingICM()[0]);
+  _logger->add("tan_icm_2", _controller_ptr->getDampingICM()[1]);
+  _logger->add("tan_icm_3", _controller_ptr->getDampingICM()[2]);
+  _logger->add("tan_icm_4", _controller_ptr->getDampingICM()[3]);
+
+//  _logger->add("ankle_yaw_1", _robot_ptr->state.get()[10]);
+//  _logger->add("ankle_yaw_2", _robot_ptr->state.get()[16]);
+//  _logger->add("ankle_yaw_3", _robot_ptr->state.get()[22]);
+//  _logger->add("ankle_yaw_4", _robot_ptr->state.get()[28]);
+//  _logger->add("e_st_1", _controller_ptr->errorSteer()[0]);
+//  _logger->add("e_st_2", _controller_ptr->errorSteer()[1]);
+//  _logger->add("e_st_3", _controller_ptr->errorSteer()[2]);
+//  _logger->add("e_st_4", _controller_ptr->errorSteer()[3]);
+
   _logger->add("time", 0.0);
 
 
@@ -216,48 +235,50 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
   _logger->add("base_rx", _robot_ptr->state.get()[3]);
   _logger->add("base_ry", _robot_ptr->state.get()[4]);
   _logger->add("base_rz", _robot_ptr->state.get()[5]);
+
   _logger->add("base_x", _robot_ptr->state.get()[0]);
   _logger->add("base_y", _robot_ptr->state.get()[1]);
   _logger->add("base_z", _robot_ptr->state.get()[2]);
+
   _logger->add("com_x", _controller_ptr->getComFull()[0]);
   _logger->add("com_y", _controller_ptr->getComFull()[1]);
 
   _logger->add("r_com_x", _controller_ptr->refCom()[0]);
   _logger->add("r_com_y", _controller_ptr->refCom()[1]);
 
-  _logger->add("r_1", _controller_ptr->isResteer()[0]);
-  _logger->add("r_2", _controller_ptr->isResteer()[1]);
-  _logger->add("r_3", _controller_ptr->isResteer()[2]);
-  _logger->add("r_4", _controller_ptr->isResteer()[3]);
+//  _logger->add("r_1", _controller_ptr->isResteer()[0]);
+//  _logger->add("r_2", _controller_ptr->isResteer()[1]);
+//  _logger->add("r_3", _controller_ptr->isResteer()[2]);
+//  _logger->add("r_4", _controller_ptr->isResteer()[3]);
 
   _log_point = _controller_ptr->getCp(0);
   _logger->add("cp_1_x", _log_point[0]);
   _logger->add("cp_1_y", _log_point[1]);
-  _logger->add("cp_1_z", _log_point[2]);
+//  _logger->add("cp_1_z", _log_point[2]);
   _log_point = _controller_ptr->getCp(1);
   _logger->add("cp_2_x", _log_point[0]);
   _logger->add("cp_2_y", _log_point[1]);
-  _logger->add("cp_2_z", _log_point[2]);
+//  _logger->add("cp_2_z", _log_point[2]);
   _log_point = _controller_ptr->getCp(2);
   _logger->add("cp_3_x", _log_point[0]);
   _logger->add("cp_3_y", _log_point[1]);
-  _logger->add("cp_3_z", _log_point[2]);
+//  _logger->add("cp_3_z", _log_point[2]);
   _log_point = _controller_ptr->getCp(3);
   _logger->add("cp_4_x", _log_point[0]);
   _logger->add("cp_4_y", _log_point[1]);
-  _logger->add("cp_4_z", _log_point[2]);
+//  _logger->add("cp_4_z", _log_point[2]);
   _logger->add("r_cp_1_x", _controller_ptr->refCp()[0]);
   _logger->add("r_cp_1_y", _controller_ptr->refCp()[1]);
-  _logger->add("r_cp_1_z", _controller_ptr->refCp()[2]);
+//  _logger->add("r_cp_1_z", _controller_ptr->refCp()[2]);
   _logger->add("r_cp_2_x", _controller_ptr->refCp()[3]);
   _logger->add("r_cp_2_y", _controller_ptr->refCp()[4]);
-  _logger->add("r_cp_2_z", _controller_ptr->refCp()[5]);
+//  _logger->add("r_cp_2_z", _controller_ptr->refCp()[5]);
   _logger->add("r_cp_3_x", _controller_ptr->refCp()[6]);
   _logger->add("r_cp_3_y", _controller_ptr->refCp()[7]);
-  _logger->add("r_cp_3_z", _controller_ptr->refCp()[8]);
+//  _logger->add("r_cp_3_z", _controller_ptr->refCp()[8]);
   _logger->add("r_cp_4_x", _controller_ptr->refCp()[9]);
   _logger->add("r_cp_4_y", _controller_ptr->refCp()[10]);
-  _logger->add("r_cp_4_z", _controller_ptr->refCp()[11]);
+//  _logger->add("r_cp_4_z", _controller_ptr->refCp()[11]);
   _logger->add("r_st_1", _controller_ptr->refSteer()[0]);
   _logger->add("r_st_2", _controller_ptr->refSteer()[1]);
   _logger->add("r_st_3", _controller_ptr->refSteer()[2]);
@@ -266,14 +287,25 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
   _logger->add("st_2", _controller_ptr->getSteer()[1]);
   _logger->add("st_3", _controller_ptr->getSteer()[2]);
   _logger->add("st_4", _controller_ptr->getSteer()[3]);
-  _logger->add("e_st_1", _controller_ptr->errorSteer()[0]);
-  _logger->add("e_st_2", _controller_ptr->errorSteer()[1]);
-  _logger->add("e_st_3", _controller_ptr->errorSteer()[2]);
-  _logger->add("e_st_4", _controller_ptr->errorSteer()[3]);
-  _logger->add("ankle_yaw_1", _robot_ptr->state.get()[10]);
-  _logger->add("ankle_yaw_2", _robot_ptr->state.get()[16]);
-  _logger->add("ankle_yaw_3", _robot_ptr->state.get()[22]);
-  _logger->add("ankle_yaw_4", _robot_ptr->state.get()[28]);
+//  _logger->add("e_st_1", _controller_ptr->errorSteer()[0]);
+//  _logger->add("e_st_2", _controller_ptr->errorSteer()[1]);
+//  _logger->add("e_st_3", _controller_ptr->errorSteer()[2]);
+//  _logger->add("e_st_4", _controller_ptr->errorSteer()[3]);
+
+  _logger->add("tan_sp_1", _controller_ptr->getDampingSP()[0]);
+  _logger->add("tan_sp_2", _controller_ptr->getDampingSP()[1]);
+  _logger->add("tan_sp_3", _controller_ptr->getDampingSP()[2]);
+  _logger->add("tan_sp_4", _controller_ptr->getDampingSP()[3]);
+
+  _logger->add("tan_icm_1", _controller_ptr->getDampingICM()[0]);
+  _logger->add("tan_icm_2", _controller_ptr->getDampingICM()[1]);
+  _logger->add("tan_icm_3", _controller_ptr->getDampingICM()[2]);
+  _logger->add("tan_icm_4", _controller_ptr->getDampingICM()[3]);
+
+  //_logger->add("ankle_yaw_1", _robot_ptr->state.get()[10]);
+  //_logger->add("ankle_yaw_2", _robot_ptr->state.get()[16]);
+  //_logger->add("ankle_yaw_3", _robot_ptr->state.get()[22]);
+  //_logger->add("ankle_yaw_4", _robot_ptr->state.get()[28]);
 
   _logger->add("time", time-start);
 

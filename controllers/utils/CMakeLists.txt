@@ -35,7 +35,7 @@ if(ROS_CONTROL)
 endif(ROS_CONTROL)
 endif(VISUALIZATION_TOOLS)
 
- LIST( APPEND PYTHON_INSTALL circular square support discontinuous discontinuous_odom turn_iit straight_iit support_iit turn_iit_odom turn_iit_rt straight_iit_rt support_iit_rt circular_RT support_RT)
+ LIST( APPEND PYTHON_INSTALL circular square support discontinuous discontinuous_odom turn_iit straight_iit support_iit turn_iit_odom turn_iit_rt straight_iit_rt support_iit_rt support_iit_hw circular_RT support_RT)
  prepend_paths(PYTHON_INSTALL wheels_references)
  LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 
@@ -47,7 +47,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS ${catkin_INCLUDE_DIRS} launch
   LIBRARIES
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}

@@ -37,7 +37,7 @@ private:
 
   std::unique_ptr<mgnss::odometry::Odometry> _controller_ptr;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
-  XBot::MatLogger::Ptr _logger;
+//  XBot::MatLogger::Ptr _logger;
 
   bool _initialized = false, _valid = false, _rate = false;
 
