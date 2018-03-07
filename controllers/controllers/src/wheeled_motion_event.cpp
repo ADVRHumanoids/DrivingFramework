@@ -32,7 +32,7 @@ mwoibn::WheeledMotionEvent::WheeledMotionEvent(
   _com_ptr->setDofs(_robot.selectors().get("lower_body").getBool());
 
   _steering_ptr.reset(
-      new mwoibn::hierarchical_control::CartesianFlatReferenceTask2(
+      new mwoibn::hierarchical_control::CartesianFlatReferenceTask3(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                    robot.getLinks("wheels")),
           _robot, *_com_ptr.get()));

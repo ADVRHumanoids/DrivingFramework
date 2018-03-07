@@ -3,7 +3,7 @@
 
 mgnss::events::Steering5::Steering5(
     mwoibn::robot_class::Robot& robot,
-    mwoibn::hierarchical_control::CartesianFlatReferenceTask2& plane,
+    mwoibn::hierarchical_control::CartesianFlatReferenceTask3& plane,
     mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
     double margin, double max)
     : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt), _margin(margin),
