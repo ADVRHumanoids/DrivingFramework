@@ -2,9 +2,8 @@
 
 
   mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot)
-      : _robot(robot), _wheels("pelvis", robot)
+      : modules::Base(robot), _wheels("pelvis", robot)
   {
-
 
     _vel_map = _robot.selectors().get("wheels").which();
     _ankle_map = _robot.selectors().get("camber").which();
@@ -119,7 +118,7 @@
   void mgnss::controllers::JointStates::update()
   {
     _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
-
+    /*
     if(_init && _ankle_map.size()){
 
       for (int k = 0; k < _ankle_map.size(); k++)
@@ -143,7 +142,7 @@
 
       return;
     }
-
+	*/
 
     _last_position = _position;
 
@@ -184,7 +183,7 @@
         _position[i] = _pos_ref[i];
     }
 
-
+	/*
     for (int i = 0; i < _wheels.size(); i++)
     {
       _last = _wheels_positions[i];
@@ -194,6 +193,7 @@
       _velocity[i] = _vel_sign[i] * _error.norm() / _robot.rate();
 
     }
+	 */
 //    std::cout << _velocity.transpose() << std::endl;
   }
 
@@ -203,6 +203,54 @@
 
     _robot.command.set(_velocity, _vel_map,
                        mwoibn::robot_class::INTERFACE::VELOCITY);
-    _robot.update();
+    _robot.send();
+   // _robot.update();
   }
+
+
+  bool mgnss::controllers::JointStates::setVelocity(std::string name, double vel){
+
+    double dof = mwoibn::NON_EXISTING;
+    try{
+		if(_robot.getDof(name).size()){
+			dof = _robot.getDof(name)[0];
+		}
+		else
+			return false;
+    }
+    catch (const std::out_of_range& e){
+        return false;
+    }
+    for(int i = 0; i < _vel_map.size(); i++){
+        if (_vel_map[i] == dof){
+            _velocity[i] = vel;
+            return true;
+        }
+    }
+
+    return false;
+  }
+
+    bool mgnss::controllers::JointStates::setPosition(std::string name, double pos){
+
+    double dof;
+    try{
+
+		if(_robot.getDof(name).size()){
+
+			dof = _robot.getDof(name)[0];
+		}
+		else{
+		return false;
+		}
+    }
+    catch (const std::out_of_range& e){
+
+        return false;
+    }
+
+    _pos_ref[dof] = pos;
+    return true;
+  }
+
 

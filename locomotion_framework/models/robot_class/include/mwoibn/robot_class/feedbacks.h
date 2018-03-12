@@ -47,6 +47,13 @@ public:
      return success;
    }
 
+   void reset(){
+     for (auto& feedback : _feedbacks)
+       feedback->reset();
+
+     return;
+   }
+
    mwoibn::communication_modules::BasicFeedback& feedback(unsigned int id){
      if (id < _feedbacks.size())
        return *_feedbacks.at(id);

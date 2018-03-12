@@ -4,7 +4,7 @@
 #include <XCM/XBotControlPlugin.h>
 
 #include <mwoibn/robot_class/robot_xbot_rt.h>
-#include <mgnss/controllers/wheeled_motion.h>
+#include <mgnss/controllers/wheeled_motion_event.h>
 
 namespace mgnss
 {

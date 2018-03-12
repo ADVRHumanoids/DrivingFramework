@@ -17,7 +17,7 @@ namespace hierarchical_control
  *to control the position of a point defined in one of a robot reference frames
  *
  */
-class CartesianFlatReferenceTask3 : public CartesianWorldTask
+class CartesianFlatReferenceTask4 : public CartesianWorldTask
 {
 
 public:
@@ -27,7 +27,7 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  CartesianFlatReferenceTask3(point_handling::PositionsHandler ik,
+  CartesianFlatReferenceTask4(point_handling::PositionsHandler ik,
                               mwoibn::robot_class::Robot& robot, mwoibn::hierarchical_control::CenterOfMassTask& com)
       : CartesianWorldTask(ik), _robot(robot), _com(com)
   {
@@ -99,7 +99,7 @@ public:
     init();
   }
 
-  virtual ~CartesianFlatReferenceTask3() {}
+  virtual ~CartesianFlatReferenceTask4() {}
 
   void init()
   {

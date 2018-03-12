@@ -136,15 +136,17 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
 
         continue;
       }
+      /*
       if (entry.second["space"].as<std::string>() == "OPERATIONAL")
       {
-        _getDefaultPosition(entry.second, true, true, true);
+        _getDefaultPosition(entry.second, true, false, true);
         feedbacks.add(
             std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
                 new mwoibn::communication_modules::XBotOperationalEulerFromNRT(
                     state, map, entry.second)), entry.first.as<std::string>());
         continue;
       }
+      */
 
     }
   }

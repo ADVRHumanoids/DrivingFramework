@@ -49,7 +49,9 @@
   <depend>controllers</depend> 
   <depend>custom_services</depend>
   <depend>custom_messages</depend>
-  <depend>odometry</depend>
+  <depend>state_estimation</depend>
+  <depend>plugins</depend>
+  <depend>ros_callbacks</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

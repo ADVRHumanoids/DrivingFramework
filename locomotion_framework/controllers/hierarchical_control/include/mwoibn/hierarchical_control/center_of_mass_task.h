@@ -53,7 +53,7 @@ public:
     _reference[1] = reference[1];
   }
   //! returnes task reference
-  mwoibn::Matrix getReference() { return _reference; }
+  const mwoibn::VectorN& getReference() { return _reference; }
 
   //! returns chain associated with a specific contact to a Jacobian pool
   virtual void releaseContact(int i)

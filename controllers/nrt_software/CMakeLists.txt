@@ -38,7 +38,8 @@ if(VISUALIZATION_TOOLS)
 endif(VISUALIZATION_TOOLS)
 
   LIST( APPEND CATKIN_DEPENDS_SET
-        loaders
+        plugins
+        ros_callbacks
         )
 
 if(COLLISION_CHECK)
@@ -124,12 +125,13 @@ if(WHEELS_MOTION)
 
   LIST( APPEND INSTALL_TARGETS
 #    wheeled_locomotion_6
-    wheels_cut
-    wheels_cut_v2
+#    wheels_cut
+#    wheels_cut_v2
     wheels_event
-    wheels_full
+#    wheels_full
 #    wheeled_motion_run
     wheels_support
+    wheels
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -141,7 +143,7 @@ if(WHEELS_MOTION)
 #    reference_generation
     controllers
     communication
-    visualization_tools
+
   )
 
 endif(WHEELS_MOTION)
@@ -175,7 +177,7 @@ if(ODOMETRY)
     roscpp
     robot_class_xbot
     robot_class_ros_extension
-    odometry
+    state_estimation
   )
 
 endif(ODOMETRY)
@@ -202,8 +204,8 @@ if(COLLISION_CHECK)
 endif(COLLISION_CHECK)
 
 catkin_package(
-  INCLUDE_DIRS ${catkin_INCLUDE_DIRS}
-  LIBRARIES
+  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  LIBRARIES nrt_plugins
   CATKIN_DEPENDS 
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -211,9 +213,22 @@ catkin_package(
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 #  ${XBotCore-interfaces_INCLUDE_DIRS}
 )
+
+add_library(nrt_plugins
+   src/plugins/joint_states.cpp
+#   src/plugins/odometry.cpp
+ )
+
+add_dependencies(nrt_plugins ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(nrt_plugins
+   ${catkin_LIBRARIES}
+ )
+
 
 if(COLLISION_CHECK)
 add_executable(collision_check src/collision_check.cpp)
@@ -283,23 +298,23 @@ if(WHEELS_MOTION)
 #    ${catkin_LIBRARIES}
 # )
 
-add_executable(wheels_cut src/wheels_cut.cpp)
-add_dependencies(wheels_cut ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_cut
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheels_cut src/wheels_cut.cpp)
+#add_dependencies(wheels_cut ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(wheels_cut
+#    ${catkin_LIBRARIES}
+# )
 
-add_executable(wheels_cut_v2 src/wheels_cut_v2.cpp)
-add_dependencies(wheels_cut_v2 ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_cut_v2
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheels_cut_v2 src/wheels_cut_v2.cpp)
+#add_dependencies(wheels_cut_v2 ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(wheels_cut_v2
+#    ${catkin_LIBRARIES}
+# )
 
-add_executable(wheels_full src/wheels_full.cpp)
-add_dependencies(wheels_full ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_full
-    ${catkin_LIBRARIES}
- )
+#add_executable(wheels_full src/wheels_full.cpp)
+#add_dependencies(wheels_full ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(wheels_full
+#    ${catkin_LIBRARIES}
+# )
 
 add_executable(wheels_event src/wheels_event.cpp)
 add_dependencies(wheels_event ${catkin_EXPORTED_TARGETS})
@@ -312,12 +327,20 @@ add_dependencies(wheels_support ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wheels_support
     ${catkin_LIBRARIES}
  )
+
+add_executable(wheels src/exec/wheels.cpp)
+add_dependencies(wheels nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels
+    nrt_plugins
+    ${catkin_LIBRARIES}
+ )
 endif(WHEELS_MOTION)#############
 
 if(ODOMETRY)
-add_executable(odometry src/odometry.cpp)
-add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
+add_executable(odometry src/exec/odometry.cpp)
+add_dependencies(odometry nrt_plugins ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry
+    nrt_plugins
     ${catkin_LIBRARIES}
  )
 endif(ODOMETRY)
@@ -328,10 +351,12 @@ add_dependencies(my_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(my_test
     ${catkin_LIBRARIES}
  )
+endif(TEST_TEMP)
 
-add_executable(joint_states src/joint_states.cpp)
-add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
-target_link_libraries(joint_states
+
+add_executable(joint_states src/exec/joint_states.cpp)
+add_dependencies(joint_states nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joint_states nrt_plugins
     ${catkin_LIBRARIES}
  )
 
@@ -340,7 +365,7 @@ target_link_libraries(joint_states
 #target_link_libraries(contact_test
 #    ${catkin_LIBRARIES}
 # )
-endif(TEST_TEMP)
+
 
 ## Install ##
 #############

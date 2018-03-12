@@ -88,7 +88,7 @@ if __name__ == '__main__':
       try:
         ref_service(1.0, 1.0, dx*100.0)
         ref_service(1.0, 2.0, dy*100.0)
-        ref_service(1.0, 4.0, dth*100.0)
+        ref_service(1.0, 4.0, dth*1000.0)
 
       except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))

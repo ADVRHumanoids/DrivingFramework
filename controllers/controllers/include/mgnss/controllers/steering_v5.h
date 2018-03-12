@@ -20,7 +20,7 @@ class Steering5
 
 public:
   Steering5(mwoibn::robot_class::Robot& robot,
-            mwoibn::hierarchical_control::CartesianFlatReferenceTask3& plane,
+            mwoibn::hierarchical_control::CartesianFlatReferenceTask4& plane,
             mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
             double margin = 0.04, double max = 2.79252680);
 
@@ -58,7 +58,7 @@ public:
   static void limitPI(double ref, double& st);
 
 protected:
-  mwoibn::hierarchical_control::CartesianFlatReferenceTask3& _plane;
+  mwoibn::hierarchical_control::CartesianFlatReferenceTask4& _plane;
   double _dt, _margin, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
   mwoibn::VectorN _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp,
       _damp_icm, _pb_icm, _pb_sp;

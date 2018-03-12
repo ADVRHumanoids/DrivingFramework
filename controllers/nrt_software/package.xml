@@ -66,8 +66,9 @@
   <depend>custom_messages</depend>
   <depend>controllers</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>communication</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>odometry</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>loaders</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>state_estimation</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>plugins</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>ros_callbacks</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

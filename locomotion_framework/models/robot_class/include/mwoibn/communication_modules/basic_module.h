@@ -132,6 +132,8 @@ public:
 
   std::string getMapName(){ return _map.getName();}
 
+  virtual void reset(){}
+
 protected:
   mwoibn::robot_class::BiMap _map;
   mwoibn::robot_class::State& _command;

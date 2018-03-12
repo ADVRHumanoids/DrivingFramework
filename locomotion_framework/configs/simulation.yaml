@@ -1,0 +1,18 @@
+mwoibn:
+        feedback:
+                imu_base:
+                        offset_orientation:
+                                xx: 1
+                                xy: 0
+                                xz: 0
+                                yx: 0
+                                yy: 1
+                                yz: 0
+                                zx: 0
+                                zy: 0
+                                zz: 1
+                        offset_position:
+                                x: 0
+                                y: 0
+                                z: 0
+                                

@@ -47,8 +47,8 @@ int main(int argc, char** argv)
 
   mwoibn::SupportPolygon3 support(0.45, 0.22, 0.078, robot.rate());
   
-//  mwoibn::WheeledMotionEvent wheeld_controller(robot);
-  mwoibn::WheeledMotionEvent wheeld_controller(robot, config_file);
+//  mgnss::controllers::WheeledMotionEvent wheeld_controller(robot);
+  mgnss::controllers::WheeledMotionEvent wheeld_controller(robot, config_file);
 
   wheeld_controller.init();
     // starting

@@ -161,6 +161,7 @@ public:
 
   robot_class::BiMap readBiMap(YAML::Node config);
 
+  static std::string readPath(YAML::Node config);
   /** @brief creates a map from a vector of links in a new map
    */
   robot_class::BiMap makeBiMap(
@@ -247,7 +248,7 @@ protected:
   virtual void _loadMapFromModel(YAML::Node config);
 
 
-  YAML::Node _readRobotConfig(const YAML::Node full_config,
+  YAML::Node _readRobotConfig(YAML::Node full_config,
                               std::string config_name);
   YAML::Node _readConfig(const YAML::Node lists, const YAML::Node defined,
                          YAML::Node config);

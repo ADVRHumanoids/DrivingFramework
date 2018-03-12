@@ -1,7 +1,7 @@
-#ifndef PROGRAMS_JOINT_STATES_H
-#define PROGRAMS_JOINT_STATES_H
+#ifndef __MGNSS__CONTROLLERS_JOINT_STATES_H
+#define __MGNSS__CONTROLLERS_JOINT_STATES_H
 
-#include <mwoibn/robot_class/robot.h>
+#include <mgnss/modules/base.h>
 #include <mwoibn/point_handling/robot_points_handler.h>
 #include <mgnss/controllers/steering.h>
 
@@ -9,7 +9,7 @@ namespace mgnss
 {
 namespace controllers
 {
-class JointStates
+class JointStates: public mgnss::modules::Base
 {
 
 public:
@@ -17,13 +17,18 @@ public:
 
   ~JointStates() {}
 
+  bool setVelocity(std::string name, double vel);
+  bool setPosition(std::string name, double pos);
+
   bool setPosition(std::string name);
   bool setFullPosition(std::string name);
 
   void step(double step) { _step = step; }
-  void init();
-  void update();
-  void send();
+  virtual void init();
+  virtual void update();
+  virtual void send();
+  virtual void stop(){}
+  virtual void close(){}
 
 protected:
   mwoibn::VectorN _position, _velocity, _last_ankle, _last_position, _des_ankle, _init_ankle;
@@ -32,9 +37,12 @@ protected:
   mwoibn::Vector3 _error, _last;
   mwoibn::point_handling::PositionsHandler _wheels;
   std::vector<mwoibn::Vector3> _wheels_positions;
-  mwoibn::robot_class::Robot& _robot;
+  //mwoibn::robot_class::Robot& _robot;
   double _step;
   bool _init;
+
+
+
 };
 }
 }

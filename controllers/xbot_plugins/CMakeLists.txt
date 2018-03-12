@@ -35,7 +35,9 @@ LIST( APPEND CATKIN_DEPENDS_SET
   controllers
   custom_services
   custom_messages
-  odometry
+  state_estimation
+  plugins
+  ros_callbacks
 )
 
 find_package(catkin REQUIRED COMPONENTS

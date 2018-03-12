@@ -40,11 +40,12 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>robot_class</depend> <!-- all programs -->
   <depend>hierarchical_control</depend> 
   <depend>motor_side_reference</depend> 
   <depend>gravity_compensation</depend> 
-  <depend>dynamic_models</depend> 
+  <depend>dynamic_models</depend>
+  <depend>modules</depend> 
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

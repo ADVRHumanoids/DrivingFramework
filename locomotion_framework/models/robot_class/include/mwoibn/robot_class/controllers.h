@@ -77,6 +77,14 @@ public:
 
   void remove(std::string name) { remove(getId(name)); }
 
+   void reset(){
+     for (auto& controller : _controllers)
+       controller->reset();
+
+     return;
+   }
+
+
 protected:
   std::vector<std::unique_ptr<mwoibn::communication_modules::BasicController>>
       _controllers;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(odometry)
+project(modules)
 
 
 set (VERSION_MAJOR 0)
@@ -8,15 +8,15 @@ set (LOG_INFO ${PROJECT_NAME})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-#LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
 set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS odometry)
-LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_point_handling filters)
+#LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers joint_space_controllers)
+LIST( APPEND CATKIN_DEPENDS_SET robot_class)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -27,7 +27,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES
-        ${INSTALL_TARGETS}
+#        wheeled_motion
+#        centralized_controllers
+#        joint_space_controllers
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -37,18 +39,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-)
-
-add_library(odometry
-   src/odometry.cpp
-)
-
-add_dependencies(odometry 
-   ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(odometry
-   ${catkin_LIBRARIES}
 )
 
 ## Mark executables and/or libraries for installation

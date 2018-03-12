@@ -1,10 +1,10 @@
-#include <mgnss/odometry/odometry.h>
+#include <mgnss/state_estimation/odometry.h>
 
 #include <iomanip>
 
-mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
+mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
                                     std::vector<std::string> names, double r)
-    : _robot(robot), _wheels_ph("ROOT", _robot), _r(r)
+    : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot), _r(r)
 {
   _ids.setConstant(names.size(), mwoibn::NON_EXISTING);
   _state.setZero(names.size());
@@ -35,6 +35,8 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
       throw std::invalid_argument(
           std::string("Odometry: Couldn't find a link ") + names[i]);
     _ids[i] = dof[0];
+
+    _contact_points.push_back(_wheels_ph.getPointStateWorld(i));
   }
 
   _estimated =
@@ -44,19 +46,32 @@ mgnss::odometry::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
 
 }
 
-void mgnss::odometry::Odometry::init(){
+void mgnss::state_estimation::Odometry::init(){
 
     _filter_ptr->computeCoeffs(_robot.rate());
 
+    //std::cout << "raw" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.feedbacks.reset();
+
+    //std::cout << "reset" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.get();
+
+    //std::cout << "get" << _robot.state.get().head<6>().transpose() << std::endl;
+
+    _robot.updateKinematics();
     _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
     _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+
     _filter_ptr->reset(_base_pos);
 
-    std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
+    //std::cout << "Odometry filter: initial state: " << _base_pos.transpose() << std::endl;
 
-    for(int i = 0; i < _estimated.size(); i++)
-    _estimated[i] =
-        _wheels_ph.getPointStateWorld(i); // start without an error for now
+    for(int i = 0; i < _estimated.size(); i++){
+        _contact_points[i] = _wheels_ph.getPointStateWorld(i);
+        _estimated[i] = _contact_points[i];
+    }
 
     _previous_state.noalias() = _state;
 
@@ -65,7 +80,7 @@ void mgnss::odometry::Odometry::init(){
 
 }
 
-void mgnss::odometry::Odometry::update()
+void mgnss::state_estimation::Odometry::update()
 {
 
   _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
@@ -91,8 +106,8 @@ void mgnss::odometry::Odometry::update()
   }
 
   for (int i = 0; i < _wheels_ph.size(); i++){
-
-    _pelvis[i] = _estimated[i] - _wheels_ph.getPointStateWorld(i);
+    _contact_points[i] = _wheels_ph.getPointStateWorld(i);
+    _pelvis[i] = _estimated[i] - _contact_points[i];
   }
 
   _compute2(); // this seems to be the best
@@ -101,7 +116,7 @@ void mgnss::odometry::Odometry::update()
       _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
 
   for(int i = 0; i < _wheels_ph.size(); i++)
-    _estimated[i] = _base.head<3>() + _wheels_ph.getPointStateWorld(i);
+    _estimated[i] = _base.head<3>() + _contact_points[i];
 
   _base_pos = _base.head(3);
 
@@ -123,7 +138,7 @@ void mgnss::odometry::Odometry::update()
 }
 
 // just chose the "median"
-void mgnss::odometry::Odometry::_compute1()
+void mgnss::state_estimation::Odometry::_compute1()
 {
 
   _distances();
@@ -132,7 +147,7 @@ void mgnss::odometry::Odometry::_compute1()
 }
 
 // remove element by element
-void mgnss::odometry::Odometry::_compute2()
+void mgnss::state_estimation::Odometry::_compute2()
 {
   if (_selector.sum() < 3)
   {
@@ -153,12 +168,12 @@ void mgnss::odometry::Odometry::_compute2()
 }
 
 // remove element by element
-void mgnss::odometry::Odometry::_compute3()
+void mgnss::state_estimation::Odometry::_compute3()
 {
 
 }
 
-void mgnss::odometry::Odometry::_mad()
+void mgnss::state_estimation::Odometry::_mad()
 {
 
   mwoibn::VectorN distanceSotr, madV, madVSort;
@@ -206,7 +221,7 @@ void mgnss::odometry::Odometry::_mad()
 }
 
 
-void mgnss::odometry::Odometry::_average()
+void mgnss::state_estimation::Odometry::_average()
 {
   _base.head(3).setZero();
   for (int i = 0; i < _selector.size(); i++)
@@ -220,7 +235,7 @@ void mgnss::odometry::Odometry::_average()
 
 // compute MAD - remove and average
 
-void mgnss::odometry::Odometry::_distances()
+void mgnss::state_estimation::Odometry::_distances()
 {
 
   for (int i = 0; i < _distance.size(); i++)
@@ -241,7 +256,7 @@ void mgnss::odometry::Odometry::_distances()
   }
 }
 
-int mgnss::odometry::Odometry::_max()
+int mgnss::state_estimation::Odometry::_max()
 {
 
   int id = -1;
@@ -258,7 +273,7 @@ int mgnss::odometry::Odometry::_max()
   return id;
 }
 
-int mgnss::odometry::Odometry::_min()
+int mgnss::state_estimation::Odometry::_min()
 {
   int id = -1;
   double value = mwoibn::MAX_DOUBLE;

@@ -667,7 +667,8 @@ void mwoibn::robot_class::Robot::_loadActuators(YAML::Node actuators_config)
 
 mwoibn::robot_class::BiMap
 mwoibn::robot_class::Robot::makeBiMap(std::vector<std::string> link_names,
-                                      std::string map_name, std::vector<std::string> names)
+                                      std::string map_name,
+                                      std::vector<std::string> names)
 {
 
   mwoibn::VectorInt map = mwoibn::VectorInt::Constant(getDofs(), NON_EXISTING);
@@ -696,7 +697,8 @@ mwoibn::robot_class::Robot::makeBiMap(std::vector<std::string> link_names,
 }
 
 void mwoibn::robot_class::Robot::addBiMap(robot_class::Robot& other,
-                                          std::string map_name, std::vector<std::string> names)
+                                          std::string map_name,
+                                          std::vector<std::string> names)
 {
 
   mwoibn::VectorInt map = mwoibn::VectorInt::Constant(getDofs(), NON_EXISTING);
@@ -705,7 +707,8 @@ void mwoibn::robot_class::Robot::addBiMap(robot_class::Robot& other,
 
   mwoibn::VectorInt my_dofs, other_dofs;
 
-  for (auto& link: other.getLinks(other.biMaps().get("RBDL").get(), true)){
+  for (auto& link : other.getLinks(other.biMaps().get("RBDL").get(), true))
+  {
 
     try
     {
@@ -713,8 +716,9 @@ void mwoibn::robot_class::Robot::addBiMap(robot_class::Robot& other,
       other_dofs = other.getDof(link);
 
       if (my_dofs.size() && my_dofs.size() != other_dofs.size())
-        throw(std::invalid_argument("size of " + link + " is different for two models unique mapping is not defined"));
-
+        throw(std::invalid_argument(
+            "size of " + link +
+            " is different for two models unique mapping is not defined"));
     }
     catch (const std::out_of_range& e)
     {
@@ -811,14 +815,53 @@ void mwoibn::robot_class::Robot::_loadConfig(YAML::Node config,
 }
 
 YAML::Node
-mwoibn::robot_class::Robot::_readRobotConfig(const YAML::Node full_config,
+mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
                                              std::string config_name)
 {
-
-  // get specific configuration
   if (!full_config["robot"][config_name])
     throw std::invalid_argument(std::string("Unknown configuration: ") +
                                 config_name);
+  if (!full_config["robot"]["systems"])
+    throw std::invalid_argument(std::string(
+        "Systems configuration has not been defined for the robot " +
+        config_name));
+  if (!full_config["robot"]["systems"][full_config["system"].as<std::string>()])
+    throw std::invalid_argument(
+        full_config["system"].as<std::string>() +
+        std::string(" configuration has not been defined for the robot ") +
+        config_name);
+  if (!full_config["robot"]["layer"])
+    throw std::invalid_argument(std::string("Please specify robot layer."));
+  if (!full_config["layers"])
+    throw std::invalid_argument(
+        std::string("Layers have not been configured for the robot."));
+  if (!full_config["layers"][full_config["robot"]["layer"]
+                                          .as<std::string>()])
+    throw std::invalid_argument(
+        std::string("Layers have not been configured for the robot."));
+
+  // get specific configuration
+  std::cout << "\t system\t" << full_config["system"].as<std::string>() << std::endl;
+  std::cout << "\t layer\t" << full_config["robot"]["layer"].as<std::string>() << std::endl;
+
+  std::string system_file = readPath(
+      full_config["robot"]["systems"][full_config["system"].as<std::string>()]);
+  YAML::Node system_config = getConfig(system_file);
+
+  std::string layer_file = readPath(
+      full_config["layers"][full_config["robot"]["layer"].as<std::string>()]);
+  YAML::Node layer_config = getConfig(layer_file);
+
+  mwoibn::robot_class::Robot::compareEntry(full_config, system_config);
+  mwoibn::robot_class::Robot::compareEntry(full_config, layer_config);
+
+
+  if (full_config["robot"]["rate"]){
+    full_config["robot"][config_name]["rate"] = full_config["robot"]["rate"];
+    std::cout << "\t rate\t" << full_config["robot"]["rate"].as<double>() << " Hz" << std::endl;
+  }
+  else
+    std::cout << "\t rate\t undefiend" << std::endl;
 
   // in config_robot all the data that are used later should be stored
   YAML::Node config = full_config["robot"][config_name];
@@ -1018,12 +1061,27 @@ std::string mwoibn::robot_class::Robot::_readUrdf(YAML::Node config)
     throw(std::invalid_argument(
         "Please define an urdf source in the yaml file.\n"));
 
-
-  std::string file = "";
+  /*std::string file = "";
   if (config["urdf"]["path"])
     file = config["urdf"]["path"].as<std::string>();
 
   file += config["urdf"]["file"].as<std::string>();
+
+  std::cout << "from file:\t" << file << std::endl;
+
+  return file;
+  */
+  return readPath(config["urdf"]);
+}
+
+std::string mwoibn::robot_class::Robot::readPath(YAML::Node config)
+{
+
+  std::string file = "";
+  if (config["path"])
+    file = config["path"].as<std::string>();
+
+  file += config["file"].as<std::string>();
 
   std::cout << "from file:\t" << file << std::endl;
 
@@ -1038,13 +1096,7 @@ std::string mwoibn::robot_class::Robot::_readSrdf(YAML::Node config)
   if (config["srdf"]["file"].as<std::string>() == "")
     return "";
 
-  std::string file = "";
-  if (config["srdf"]["path"])
-    file = config["srdf"]["path"].as<std::string>();
-
-  file += config["srdf"]["file"].as<std::string>();
-
-  return file;
+  return readPath(config["srdf"]);
 }
 
 bool mwoibn::robot_class::Robot::_initUrdf(std::string& urdf_description,

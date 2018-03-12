@@ -1,0 +1,772 @@
+driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
+simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
+mwoibn:
+        middleware: "ROS"
+        system: "SM" # SM
+        layers:
+            RT:
+                        path: *driving
+                        file: "DrivingFramework/locomotion_framework/configs/RT.yaml"
+            NRT:
+                        path: *driving
+                        file: "DrivingFramework/locomotion_framework/configs/NRT.yaml"
+        robot:
+                name: "centauro"
+                layer: "NRT"
+                systems:
+                        HW: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/configs/hardware.yaml"
+                        SM: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/configs/simulation.yaml"
+                default:
+                        type: "NRT"
+                        controller: 
+                                list: [position_controller, velocity_controller]
+                        feedback: 
+                                layer: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false
+
+                reference:
+                        type: "NRT"
+                        controller: 
+                                list: ["lower_body"]
+                        feedback: 
+                                layer: "offline"
+                        actuators: 
+                                read: "false"
+                        contacts: 
+                                read: "true"
+                                feedback: false
+
+                higher_scheme:
+                        type: "NRT"
+                        controller: 
+                                layer: "higher_level"
+                        feedback: 
+                                layer: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false
+                full_model:
+                        type: "NRT"
+                        controller: 
+                                list: []
+                        feedback: 
+                                layer: "online"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false  
+                simulated:
+                        type: "NRT"
+                        controller: 
+                                layer: ""
+                        feedback: 
+                                layer: "simulated"
+                        actuators: 
+                                read: "true"
+                        contacts: 
+                                read: "true"
+                                feedback: false  
+                empty:
+                        type: "NRT"
+                        controller: 
+                                layer: ""
+                        feedback: 
+                                layer: ""
+                        actuators: 
+                                read: false
+                        contacts: 
+                                read: false
+                                feedback: false  
+                odometry:
+                        type: "NRT"
+                        controller: 
+                                list: [odometry]
+                        feedback: 
+                                list: [link_side_online, imu_base]
+                        actuators: 
+                                read: true
+                        contacts: 
+                                read: true
+                                feedback: false 
+                joint_space:
+                        type: "NRT"
+                        controller: 
+                                layer: "lower_level"
+                        feedback: 
+                                list: [link_side_online]
+                        actuators: 
+                                read: true
+                        contacts: 
+                                read: false
+                                feedback: false
+                fake:
+                        type: "NRT"
+                        controller: 
+                                layer: ""
+                        feedback: 
+                                list: [link_side_online]
+                        actuators: 
+                                read: true
+                        contacts: 
+                                read: false
+                                feedback: false
+
+
+        feedback:
+                link_side_online: 
+                        space: JOINT
+                        dofs: 
+                                chain: all
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false    
+                simulation_state: 
+                        space: JOINT
+                        dofs: 
+                                chain: all
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                motor_side_online:
+                floating_base:
+                        space: OPERATIONAL 
+                        convention:
+                                orientation:
+                                        type: QUATERNION
+                                        convention: HAMILTONIAN
+                                position:
+                                        type: FULL
+                        dofs: 
+                                chain: all
+                                type: body
+                                name: pelvis
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
+                simulation_base:
+                        space: OPERATIONAL 
+                        convention:
+                                orientation:
+                                        type: QUATERNION
+                                        convention: HAMILTONIAN
+                                position:
+                                        type: FULL
+                        dofs: 
+                                chain: all
+                                type: body
+                                name: pelvis
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                imu_base:
+                        space: OPERATIONAL 
+                        convention:
+                                orientation:
+                                        type: QUATERNION
+                                        convention: HAMILTONIAN
+                                position:
+                                        type: NONE
+                        dofs: 
+                                chain: all
+                                type: body
+                                name: pelvis
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
+                        offset_orientation:
+                                xx: -1
+                                xy: 0
+                                xz: 0
+                                yx: 0
+                                yy: 1
+                                yz: 0
+                                zx: 0
+                                zy: 0
+                                zz: -1
+                        offset_position:
+                                x: 0
+                                y: 0
+                                z: 0
+                whole_body:
+                        space: JOINT
+                        dofs: 
+                                chain: all
+                                type: all
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                lower_body:
+                        space: JOINT
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                odometry:
+                        space: JOINT
+                        dofs: 
+                                chain: base
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
+                velocity_reference:
+                        space: JOINT
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
+                        interface:
+                                position: false
+                                velocity: true
+                                effort: false
+        controller:
+                position_controller:
+                        dofs: 
+                                chain: position
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: true
+                        initialize: "link_side_online"
+                velocity_controller:
+                        dofs: 
+                                chain: wheels
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: false
+                                velocity: true
+                                effort: false
+                whole_body:
+                        dofs: 
+                                chain: all
+                                type: all
+                                mapping: RBDL
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                lower_body:
+                        dofs: 
+                                chain: lower_body
+                                type: all
+                                mapping: RBDL #this he RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: true
+                                effort: false
+                                effort: false
+                odometry:
+                        dofs: 
+                                chain: base
+                                type: all
+                                mapping: RBDL_LOWER #this he RBDL model that it is working with is only lower body
+                        interface:
+                                position: true
+                                velocity: false
+                                effort: false
+                        filter:
+                                run: false
+                                frequency: 200.0
+                                damping: 1.0
+        feedbacks:
+                online: [link_side_online, odometry]
+                offline: [lower_body]
+                simulated: [simulation_base, simulation_state]
+        controllers:
+                lower_level: [position_controller, velocity_controller]
+                higher_level: [lower_body]
+
+        ros:
+                mapping:
+                        PYTHON:
+                                loading: topic
+                                source: "joint_states"
+                                message: sensor_msgs::JointState
+                        RBDL_LOWER:
+                                loading: model
+                                urdf: "/robot_lower_body"
+                source:
+                        urdf: "/robot_description"
+                        srdf: "/robot_srdf"
+                        actuators: "actuators_yaml"
+                        contacts: "contacts_yaml"
+                feedback:
+                        link_side_online: 
+                                source: "joint_states"
+                                message: sensor_msgs::JointState
+                                initialize: true
+                        simulation_state: 
+                                source: "joint_states"
+                                message: sensor_msgs::JointState
+                                initialize: true
+                        simulation_base: 
+                                source: "/gazebo/link_states"
+                                message: gazebo_msgs::LinkStates
+                                reference: centauro::pelvis
+                                initialize: true
+                        floating_base: 
+                                source: "/gazebo/link_states"
+                                message: gazebo_msgs::LinkStates
+                                reference: centauro::pelvis
+                                initialize: true
+                        imu_base: 
+                                source: "/gazebo/link_states"
+                                message: gazebo_msgs::LinkStates
+                                reference: centauro::pelvis
+                                initialize: true
+                        whole_body:
+                                source2: "position_controller/reference"
+                                source: "desired_state"
+                                message: custom_messages::CustomCmnd
+                                initialize: false
+                        lower_body:
+                                source: "desired_state"
+                                message: custom_messages::CustomCmnd
+                                initialize: false
+                        odometry:
+                                source: "base_odometry"
+                                message: custom_messages::CustomCmnd
+                                initialize: true
+                        velocity_reference:
+                                source: "desired_state"
+                                message: custom_messages::CustomCmnd
+                                initialize: false
+                        motor_side_online: 
+                                space: SKIP
+                                
+                controller:
+                        position_controller:
+                                type: custom_controller/ActuatorPositionControllerClasses
+                                sink: /command
+                                ff_service: /set_ff_torque
+                        velocity_controller:
+                                type: custom_controller/ActuatorVelocityController
+                                sink: /command
+                        whole_body:
+                                type: "reference"
+                                sink2: "position_controller/reference"
+                                sink: "desired_state"
+                        lower_body:
+                                type: "reference"
+                                sink: "desired_state"
+                        odometry:
+                                type: "reference"
+                                sink: "base_odometry"
+        xbot:
+                source:
+                        config: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
+                        urdf: 
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
+#                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
+                        srdf:
+                                path: *driving
+                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                        actuators: 
+                                path: *simulator
+                                file: "centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
+                        contacts: 
+                                path: *simulator 
+                                file: "centauro-simulator/centauro/centauro_config/config/contacts.yaml"
+                        controller: 
+                                path: *driving
+                                file: "" 
+                mapping:
+                        RBDL_LOWER:
+                                loading: model
+                                urdf: 
+                                        path: *driving
+                                        file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                feedback:
+                        link_side_online:
+                                layer: online
+                                dofs:
+                                        mapping: XBOT
+                        velocity_online:
+                                layer: online
+                                dofs:
+                                        mapping: XBOT
+                        motor_side_online:
+                                layer: online
+                                space: SKIP
+                        floating_base:
+                                layer: NRT
+                                sensor: imu_link
+                                source: "floating_base"
+                        imu_base:
+                                layer: online
+                                sensor: imu_link
+                                source: "floating_base"
+                        whole_body: 
+                                layer: NRT
+                                source: "desired_state"
+                        velocity_reference: 
+                                layer: NRT
+                                source: "desired_state"
+                        lower_body: 
+                                layer: NRT
+                                source: "desired_state"
+                        odometry: 
+                                layer: RT
+                                source: "base_odometry"
+                controller:
+                        position_controller:
+                                layer: lower_level
+                                dofs:
+                                        mapping: XBOT
+                        velocity_controller:
+                                layer: lower_level
+                                dofs:
+                                        mapping: XBOT
+                        whole_body:
+                                layer: NRT
+                                sink: "desired_state"
+                        lower_body:
+                                layer: NRT
+                                sink: "desired_state"
+                        odometry:
+                                layer: RT
+                                sink: "base_odometry"
+        modules:
+                wheeled_motion:
+                        layer: "NRT"
+                        robot: default
+                        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
+                        tunning: NRT2
+                        tunnings:
+                                HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15 # 20
+                                        base_orinetation: 20
+                                        centre_of_mass_x: 20
+                                        centre_of_mass_y: 20
+                                        base_position: 20
+                                        contact_point: 10
+                                        camber: 10
+                                        castor: 5
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.02
+                                HW1: # works straight and direct rotation
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 60 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 40
+                                        centre_of_mass_y: 40
+                                        base_position: 30
+                                        contact_point: 80
+                                        camber: 60
+                                        castor: 30
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.005
+                                HW2:
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 65 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 55
+                                        centre_of_mass_y: 55
+                                        base_position: 30
+                                        contact_point: 90
+                                        camber: 60
+                                        castor: 30
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.007
+                                HW3: # works straight and direct rotation
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 52 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 44
+                                        centre_of_mass_y: 44
+                                        base_position: 30
+                                        contact_point: 80
+                                        camber: 50
+                                        castor: 20
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                NRT: # discontinous both, iit with floating base
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 80
+                                        centre_of_mass_x: 50
+                                        centre_of_mass_y: 65
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                NRT2: # discontinous both, iit with floating base
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 80
+                                        centre_of_mass_x: 50
+                                        centre_of_mass_y: 65
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01                                
+                                odom_NRT: # circular - odom, 
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 45
+                                        centre_of_mass_x: 45
+                                        centre_of_mass_y: 45
+                                        base_position: 10
+                                        contact_point: 20
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                odom_NRT_iit: # circular - odom, 
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 40
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 5
+                                        contact_point: 22
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                RT:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 25
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
+                                        contact_point: 22
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.04
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                RT2:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 25
+                                        base_orinetation: 40
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 10
+                                        contact_point: 30
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
+                                RT3:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
+                                        contact_point: 20
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.03
+                                RT4:
+                                        ratio: 3.5
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 8
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 30
+                                        centre_of_mass_y: 30
+                                        base_position: 5
+                                        contact_point: 12
+                                        camber: 15
+                                        castor: 10
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.8
+                                        steer_feedback: 0.2
+                                        steer_damp: 0.01
+                                RT5: # worked once
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 14 # 20
+                                        base_orinetation: 125
+                                        centre_of_mass_x: 125
+                                        centre_of_mass_y: 125
+                                        base_position: 12
+                                        contact_point: 70 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.015                                        
+                                RT6: # works but sharp
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 14 # 20
+                                        base_orinetation: 125
+                                        centre_of_mass_x: 125
+                                        centre_of_mass_y: 125
+                                        base_position: 12
+                                        contact_point: 70 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.017  
+                                RT7: # semi working for circular
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15 # 20
+                                        base_orinetation: 160
+                                        centre_of_mass_x: 120
+                                        centre_of_mass_y: 120
+                                        base_position: 12
+                                        contact_point: 85 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.025
+                                RT8: # try support
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 40 # 20
+                                        base_orinetation: 250
+                                        centre_of_mass_x: 250
+                                        centre_of_mass_y: 250
+                                        base_position: 20
+                                        contact_point: 300 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.02
+                                RT9: # semi working for circular
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 40 # 20
+                                        base_orinetation: 240
+                                        centre_of_mass_x: 240
+                                        centre_of_mass_y: 240
+                                        base_position: 20
+                                        contact_point: 120 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01                                                                                                                           
+                joint_states:
+                        layer: "NRT"
+                        robot: joint_space
+                odometry:
+                        layer: "NRT"
+                        robot: odometry
+                        secondary_file: *config_lower          
+                wheels_support:
+                        layer: "NRT"
+                        robot: fake
+                        secondary_file: *config_lower

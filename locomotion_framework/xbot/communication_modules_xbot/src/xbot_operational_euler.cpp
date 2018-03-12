@@ -42,14 +42,16 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 
   _base.setZero(_size);
 
-//  std::cout << "offset\n" << _offset_position << std::endl;
+  std::cout << "offset position\n" << _offset_position << std::endl;
+  std::cout << "offset orientation\n" << _offset_orientation << std::endl;
 
   _linear_state << 0,0,0; // position estimation is not supported
+
 //  _rotation << 1,0,0,0,1,0,0,0,1;
-  
+
 //  BasicOperationalEuler::getPosition(_rotation, _linear_state);
 
-//  std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
+  std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
 
 //  std::cout <<_map_dofs << std::endl;
 
@@ -71,10 +73,48 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
                            mwoibn::Vector3 position)
   {
 
+    if(!_initialized) reset();
+
     _base.tail(3) =
-        (_offset_orientation * orientation)
+        (_offset_orientation*orientation)
             .eulerAngles(_angels[0], _angels[1],
                          _angels[2]); // Check if the convention is met here
 
+    //_base.tail<1>()[0] -= _offset_z;
     _command.set(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
   }
+
+void mwoibn::communication_modules::XBotOperationalEuler::reset(){
+
+  if(!_size) {
+    _initialized = true;
+    return;
+  }
+/*
+  _base.tail(3) =
+        (_offset_orientation*_rotation)
+            .eulerAngles(_angels[0], _angels[1],
+                         _angels[2]); // Check if the convention is met here
+*/
+
+ _rot_z = _offset_orientation*_rotation;
+
+ _rot_z(2,0)  = 0;
+ _rot_z(2,1)  = 0;
+ _rot_z(2,2)  = 1;
+ _rot_z(0,2)  = 0;
+ _rot_z(1,2)  = 0;
+
+ _offset_orientation = _rot_z*_offset_orientation;
+
+  //_offset_z = _base.tail<1>()[0];
+
+  //std::cout << "IMU init\t" << _base[5]*180/mwoibn::PI << std::endl;
+  //std::cout << "IMU rotation\t" << _rotation << std::endl;
+
+ // _base[2] = 0;
+  _initialized = true;
+
+
+    return;
+}

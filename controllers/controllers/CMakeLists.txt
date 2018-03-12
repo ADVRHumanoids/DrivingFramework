@@ -16,7 +16,7 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers joint_space_controllers)
-LIST( APPEND CATKIN_DEPENDS_SET robot_class hierarchical_control dynamic_models gravity_compensation motor_side_reference)
+LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}

@@ -1,7 +1,8 @@
-#ifndef PROGRAMS_WHEELED_MOTION_EVENT_H
-#define PROGRAMS_WHEELED_MOTION_EVENT_H
+#ifndef __MGNSS_WHEELED_MOTION_EVENT_H
+#define __MGNSS_WHEELED_MOTION_EVENT_H
 
-#include <mwoibn/robot_class/robot.h>
+//#include <mwoibn/robot_class/robot.h>
+#include <mgnss/modules/base.h>
 
 #include <mwoibn/hierarchical_control/hierarchical_controller.h>
 #include <mwoibn/hierarchical_control/constraints_task.h>
@@ -16,10 +17,12 @@
 #include <mwoibn/hierarchical_control/steering_angle_task.h>
 #include <mwoibn/hierarchical_control/center_of_mass_task.h>
 
-namespace mwoibn
+namespace mgnss
+{
+namespace controllers
 {
 
-class WheeledMotionEvent
+class WheeledMotionEvent: public modules::Base
 {
 
 public:
@@ -27,9 +30,38 @@ public:
 
   ~WheeledMotionEvent() {}
 
-  void init();
+  virtual void init();
 
-  void stop();
+  virtual void stop();
+  virtual void send(){
+    _robot.send();
+  } // NOT IMPLEMENTED
+
+  virtual void update(){
+    //std::cout << _steering_ptr->getReference().transpose() << std::endl;
+    _robot.centerOfMass().update();
+
+    updateBase();
+
+    _next_step[0] =
+        (_position[0] - _robot.centerOfMass().get()[0]) / _robot.rate();
+    _next_step[1] =
+        (_position[1] - _robot.centerOfMass().get()[1]) / _robot.rate();
+    _next_step[2] =
+        (_heading - _steering_ptr->getState()[2]); // just limit the difference
+
+    _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
+                                             6.28318531); // limit -pi:pi
+    _next_step[2] = _next_step[2] / _robot.rate();
+    steering();
+    compute();
+
+  } // NOT IMPLEMENTED
+  virtual void close(){} // NOT IMPLEMENTED
+  virtual void setRate(double rate){
+    modules::Base::setRate(rate);
+    setRate();
+  }
 
   void setRate(){ _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);}
 
@@ -37,11 +69,13 @@ public:
   void resteer(int i){_resteer[i] = true;
                       _start_steer[i] = _test_steer[i];
 
-                     std::cout << "started resteering" << std::endl;}
+                     //std::cout << "started resteering" << std::endl;
+                     }
   void stopResteer(int i){_resteer[i] = false;
                       _start_steer[i] = _test_steer[i];
 
-                     std::cout << "stoped resteering" << std::endl;}
+                     //std::cout << "stoped resteering" << std::endl;
+                     }
 
   void setSteering(int i, double th)
   {
@@ -110,22 +144,26 @@ public:
 
 //    std::cout << "_linear_vel\t" << _linear_vel << std::endl;
 //    std::cout << "_rate\t" << _robot.rate() << std::endl;
-//    std::cout << "_angular_vel\t" << _angular_vel << std::endl;
+//     std::cout << "_angular_vel\t" << _angular_vel << std::endl;
 
     _position += _linear_vel * _robot.rate();
     _heading += _angular_vel[2] * _robot.rate();
+//    std::cout << "before limits heading\t" << _heading << std::endl;
+
     _heading -= 6.28318531 * std::floor((_heading + 3.14159265) /
                                         6.28318531); // limit -pi:pi
 
 //    std::cout << "_heading\t" << _heading << std::endl;
+//    std::cout << "_z\t" << _z << std::endl;
 
     _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
     _com_ptr->setReference(_com_ref);
+
     _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate())*_orientation;
 
-    _pelvis_orientation_ptr->setReference(
-        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading) * _orientation);
+
+    _pelvis_orientation_ptr->setReference(0, _orientation * mwoibn::Quaternion::fromAxisAngle(_z, _heading));
   }
 
   void steering();
@@ -172,7 +210,7 @@ public:
   }
 
   void claim(int i){
-    std::cout << "claim\t" << i << std::endl;
+ //   std::cout << "claim\t" << i << std::endl;
     _steering_ptr->claimContact(i);
     _constraints_ptr->claimContact(i);
   }
@@ -183,9 +221,15 @@ public:
   }
 
   mwoibn::VectorN getCom(){ return _robot.centerOfMass().get().head<2>();}
+  const mwoibn::Vector3& getComFull(){ return _robot.centerOfMass().get();}
   const mwoibn::VectorN& errorCom(){return _com_ptr->getError();}
-  mwoibn::VectorN refCom(){return _com_ptr->getReference();}
-  mwoibn::VectorN getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+
+  const mwoibn::VectorN& refCom(){return _com_ptr->getReference();}
+  double refComX(){return _com_ptr->getReference()(0,0);}
+  double refComY(){return _com_ptr->getReference()(0,1);}
+
+  const mwoibn::Vector3& getCp(int i){ return _steering_ptr->getPointStateReference(i);}
+
   mwoibn::VectorN errorCp(int i){ return _steering_ptr->getReferenceError(i);}
   const mwoibn::VectorN& refCp(){ return _steering_ptr->getReference();}
   const mwoibn::VectorN& getSteer(){ return _leg_steer_ptr->getCurrent();}
@@ -202,6 +246,11 @@ public:
   const mwoibn::VectorBool& isResteer(){return _resteer;}
   const mwoibn::VectorN& getAnkleYaw(){return _test_steer;}
   mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
+  const mwoibn::VectorN& getBaseError(){return _pelvis_position_ptr->getError();}
+  const mwoibn::VectorN& getBaseOrnError(){return _pelvis_orientation_ptr->getError();}
+
+//  bool evenstHandler(custom_services::updatePDGains::Request& req,
+//                     custom_services::updatePDGains::Response& res);
 
 protected:
   bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,
@@ -209,7 +258,7 @@ protected:
   {
     return task.getError().cwiseAbs().maxCoeff() < eps;
   }
-  mwoibn::robot_class::Robot& _robot;
+  //mwoibn::robot_class::Robot& _robot;
 
   std::unique_ptr<mwoibn::hierarchical_control::ConstraintsTask>
       _constraints_ptr;
@@ -220,7 +269,7 @@ protected:
       _pelvis_orientation_ptr;
   std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
       _com_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::CartesianFlatReferenceTask3>
+  std::unique_ptr<mwoibn::hierarchical_control::CartesianFlatReferenceTask4>
       _steering_ptr;
 
   std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
@@ -248,6 +297,7 @@ protected:
   mwoibn::VectorBool _resteer;
 
 };
+}
 }
 
 #endif // WHEELED_MOTION_H

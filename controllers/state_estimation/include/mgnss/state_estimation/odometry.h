@@ -1,40 +1,48 @@
-#ifndef PROGRAM_ODOMETRY_H
-#define PROGRAM_ODOMETRY_H
+#ifndef __MGNSS_STATE_ESTIMATION_ODOMETRY_H
+#define __MGNSS_STATE_ESTIMATION_ODOMETRY_H
 
-#include <mwoibn/robot_class/robot.h>
+//#include <mwoibn/robot_class/robot.h>
+#include <mgnss/modules/base.h>
 #include <mwoibn/point_handling/robot_points_handler.h>
 #include <mwoibn/filters/iir_second_order.h>
 
 namespace mgnss {
 
-namespace odometry {
+namespace state_estimation {
 
 /**
  * it assumes the pelvis orientation is provided by the external source? - in my case the imu? - do it using the online floating base feedback - remove the postion estimation
  */
-class Odometry{
+class Odometry: public mgnss::modules::Base{
 public:
     Odometry(mwoibn::robot_class::Robot& robot, std::vector<std::string> names, double r);
     ~Odometry(){}
 
-    void setRate(){ _filter_ptr->computeCoeffs(_robot.rate()); }
+    virtual void setRate(double rate){
+       mgnss::modules::Base::setRate(rate);
+      _filter_ptr->computeCoeffs(_robot.rate());
+    }
 
     const mwoibn::Vector6& getRaw(){return _base_raw;}
     const mwoibn::Vector6& getFiltered(){return _base_filtered;}
+    const mwoibn::Point& getContact(int i){return _contact_points[i];}
 
     const mwoibn::Vector6& get(){return _base;}
-    void update();
-    void init();
+    virtual void update();
+    virtual void init();
+    virtual void send(){ _robot.send();}
+    virtual void stop(){} // NOT IMPLEMENTED
+    virtual void close(){} // NOT IMPLEMENTED
 
 protected:
-    mwoibn::robot_class::Robot& _robot; // robot is needed for the joint state and imu feedbacks
+    //mwoibn::robot_class::Robot& _robot; // robot is needed for the joint state and imu feedbacks
 
     mwoibn::VectorN _state, _previous_state, _error, _distance; // _state - current wheel position
     mwoibn::VectorInt _selector, _contacts; // _state - current wheel position
 
     std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr;
 
-    std::vector<mwoibn::Point> _estimated, _pelvis; // _estimated - wheel center position
+    std::vector<mwoibn::Point> _estimated, _pelvis, _contact_points; // _estimated - wheel center position
     std::vector<mwoibn::Vector3> _directions, _axes; // directions
     double _r;
     mwoibn::VectorInt _ids;

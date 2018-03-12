@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 from custom_services.srv import updatePDGains
+from custom_messages.msg import CustomCmnd
 import rospy
 from numpy import cos, sin
 import numpy as np
@@ -9,7 +10,11 @@ if __name__ == '__main__':
     dt = 0.005
     rate = rospy.Rate(200)
     #print(1.0/dt)
-    name = '/centauro/wheels_command'
+    name = 'wheels_command'
+    
+    support = rospy.Publisher('wheels_support', CustomCmnd, queue_size=1)
+    msg = CustomCmnd()
+   
     service_ok = False
     while (not rospy.is_shutdown() and not service_ok):
       try:
@@ -39,16 +44,17 @@ if __name__ == '__main__':
 #    ref_service(1.0, 4.0, dth*100)
 
     dx, dy =  vel,  0.00
-    d_sp = 0.002
+    d_sp = 0.0005
     
     x_cp = np.array([0.47,   0.47, -0.66, -0.66])
 #    y_cp = np.array([0.25,  -0.25,  0.25, -0.25])
     y_cp = np.array([0.225,  -0.225,  0.225, -0.225])    
-    ref_service(3.0, 0.0, 0.0)
+#    ref_service(3.0, 0.0, 0.0)
+    z_cp = np.array([0.3035,  0.3035,  0.3035, 0.3035])    
 
     wait = 0;
     
-    while not rospy.is_shutdown(): # and mode == 2
+    while not rospy.is_shutdown() and mode < 23:
 #      th = th + dth * dt * magic
 	  
       if mode == 0 and vel < vel_max and x > 0.1:
@@ -160,16 +166,19 @@ if __name__ == '__main__':
 		mode += 1 if wait > 0 else 0	
 			
       elif mode == 6:
-		ref_service(9.0, 3.0, 0.05*1000.0)
+		ref_service(3, 1, 3)	
+		z_cp[3] += 0.005	  
+		# ref_service(9.0, 3.0, 0.05*1000.0)
 		mode += 1
 		wait = 0
 		
       elif mode == 7:
 		wait += 1
+		z_cp[3] += 0.005	  
+
 		mode += 1 if wait > 50 else 0
 		
       elif mode == 8:
-		ref_service(9.0, 3.0, 0.00)
 		mode += 1
 		wait = 0
 		
@@ -204,14 +213,17 @@ if __name__ == '__main__':
 		wait = 0
 
       elif mode == 11:
-  		ref_service(9.0, 3.0, -0.05*1000.0)
+  		#ref_service(9.0, 3.0, -0.05*1000.0)
+		z_cp[3] -= 0.005	  
 
 		wait += 1
-		mode += 1 if wait > 38 else 0
+		mode += 1 if wait > 50 else 0
 		
       elif mode == 12:
-		ref_service(12.0, 3.0, 0.0)
-		ref_service(15.0, 3.0, 0.078)
+		# ref_service(12.0, 3.0, 0.0)
+		# ref_service(15.0, 3.0, 0.078)
+		z_cp[3] -= 0.005	  
+		ref_service(3.0, 0.0, 3.0)
 
 		mode += 1
 		wait = 0
@@ -248,7 +260,7 @@ if __name__ == '__main__':
 		done = done and not check
 		
 		check = x_cp[2] <  -0.40
-		x_cp[2] += 2*d_sp if check else 0
+		x_cp[2] += 3*d_sp if check else 0
 		done = done and not check
 		
 		check = x_cp[3] <  -0.43
@@ -263,7 +275,8 @@ if __name__ == '__main__':
 		wait = 0		
       elif mode == 15:
 		wait += 1
-		mode += 1 if wait > 50 else 0					
+		mode += 1 if wait > 50 else 0
+							
       elif mode == 16:
 		
 		done = True
@@ -309,71 +322,68 @@ if __name__ == '__main__':
 			
       elif mode == 18:
 		wait = 0
-		ref_service(9.0, 0.0, 0.1*1000.0)
-
+		# ref_service(9.0, 0.0, 0.1*1000.0)
+		ref_service(3, 1, 0)	
+		z_cp[0] += 0.005	  
 		mode += 1
 		
       elif mode == 19:
-
-#		check = z > z_max-0.06
-#		z -= 0.002 if check else 0
-#		done = done and not check
+		z_cp[0] += 0.005	  
 				  
 		wait += 1
 		mode += 1 if wait > 20 else 0
 	
-		
       elif mode == 20:
-
-		ref_service(9.0, 0.0, 0.0*1000.0)
-		mode += 1
+        wait = 0
+        mode += 1
+        
       elif mode == 21:
-
-#		check = z > z_max-0.06
-#		z -= 0.002 if check else 0
-#		done = done and not check
 				  
 		wait += 1
-		mode += 1 if wait > 50 else 0
-		
+		mode += 1 if wait > 100 else 0
 		
       elif mode == 22:
-		 
+  
 		done = True
-		
-#		check = x_cp[3] <  -0.35
-#		x_cp[3] += 2*d_sp if check else 0
-#		done = done and not check		
-#		check = z < z_max+0.7
-#		z += 0.002 if check else 0
-#		done = done and not check
-
-		
-#		check = x_cp[3] <  -0.42
-#		x_cp[3] += 2*d_sp if check else 0
-#		done = done and not check
-
+        
+		check = z < z_max+0.1
+		z += 0.002 if check else 0
+		done = done and not check
+			
+		check = x_cp[3] >  -0.40
+		x_cp[3] -= 2*d_sp/2.0 if check else 0
+		done = done and not check
+				
 		mode += 1 if done else 0
-		wait = 0		
+		
+		
+      # elif mode == 22:
+		 
+		# done = True
+		
+		# mode += 1 if done else 0
+		# wait = 0		
 
+      msg.position = [x_cp[0], y_cp[0], z_cp[0], x_cp[1], y_cp[1], z_cp[1], x_cp[2], y_cp[2], z_cp[2], x_cp[3], y_cp[3], z_cp[3], 2147483647]
+      support.publish(msg)
 				
       x += dx*0.005*2
       y += dy*0.005*2
       
-      print("mode", mode, "v", np.sqrt(dx*dx+dy*dy), "x", x, "x_sp", x_cp, "y_sp", y_cp, "z", z, "wait", wait)
+      print("mode", mode, "v", np.sqrt(dx*dx+dy*dy), "x", x, "x_sp", x_cp, "y_sp", y_cp, "z_sp", z_cp, "z", z, "wait", wait)
 
       try:
         ref_service(1.0, 1.0, dx*100.0)
         ref_service(2.0, 3.0, z*100.0)
 
-        ref_service(13.0, 0.0, x_cp[0]*100.0)
-        ref_service(13.0, 1.0, x_cp[1]*100.0)
-        ref_service(13.0, 2.0, x_cp[2]*100.0)
-        ref_service(13.0, 3.0, x_cp[3]*100.0)
-        ref_service(14.0, 0.0, y_cp[0]*100.0)
-        ref_service(14.0, 1.0, y_cp[1]*100.0)
-        ref_service(14.0, 2.0, y_cp[2]*100.0)
-        ref_service(14.0, 3.0, y_cp[3]*100.0)
+ #       ref_service(13.0, 0.0, x_cp[0]*100.0)
+ #       ref_service(13.0, 1.0, x_cp[1]*100.0)
+ #       ref_service(13.0, 2.0, x_cp[2]*100.0)
+ #       ref_service(13.0, 3.0, x_cp[3]*100.0)
+ #       ref_service(14.0, 0.0, y_cp[0]*100.0)
+ #       ref_service(14.0, 1.0, y_cp[1]*100.0)
+ #       ref_service(14.0, 2.0, y_cp[2]*100.0)
+ #       ref_service(14.0, 3.0, y_cp[3]*100.0)
       except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))
 
