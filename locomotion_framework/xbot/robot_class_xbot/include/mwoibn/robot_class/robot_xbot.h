@@ -32,6 +32,7 @@ public:
    * description, if no value given dafualt "/robot_description" is used
    */
   RobotXBot(std::string config_file, std::string config_name, std::string secondary_file = "");
+  RobotXBot(YAML::Node full_config, std::string config_name);
 
   virtual ~RobotXBot() {}
   virtual void wait(){}

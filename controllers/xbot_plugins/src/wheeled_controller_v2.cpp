@@ -152,8 +152,8 @@ bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(
 
 bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(XBot::Handle::Ptr handle){
   mgnss::plugins::XbotBase::init_control_plugin(handle);
-  _support.noalias() = _controller_ptr->getSupportReference();
-
+  _support = get().getSupportReference();
+  return true;
 }
 
 void mgnss::xbot_plugins::WheelsV2::on_start(double time)
@@ -161,9 +161,43 @@ void mgnss::xbot_plugins::WheelsV2::on_start(double time)
 //	now = time;
     mgnss::plugins::XbotBase::on_start(time);
     if (_valid)
-      _support.noalias() = _controller_ptr->getSupportReference();
+      _support.noalias() = get().getSupportReference();
 
 }
+
+void mgnss::xbot_plugins::WheelsV2::control_loop(double time, double period)
+{
+
+    _valid = _robot_ptr->get();
+
+    if (!_valid)
+      return;
+
+    _robot_ptr->updateKinematics();
+
+    if (!_initialized)
+    {
+      if(!_rate){
+       _setRate(period);
+       _rate = true;
+      }
+       _valid = _robot_ptr->feedbacks.reset();
+       if(_valid){
+
+         _controller_ptr->init();
+       }
+       if(_rate && _valid)
+        _initialized = true;
+    }
+
+    _controller_ptr->update();
+    _controller_ptr->send();
+
+//   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
+
+}
+
+
 /*
 void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
                                                           double period)

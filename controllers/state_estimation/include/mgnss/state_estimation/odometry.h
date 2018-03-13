@@ -16,6 +16,9 @@ namespace state_estimation {
 class Odometry: public mgnss::modules::Base{
 public:
     Odometry(mwoibn::robot_class::Robot& robot, std::vector<std::string> names, double r);
+    Odometry(mwoibn::robot_class::Robot& robot, std::string config_file);
+    Odometry(mwoibn::robot_class::Robot& robot, YAML::Node config);
+
     ~Odometry(){}
 
     virtual void setRate(double rate){
@@ -35,8 +38,10 @@ public:
     virtual void close(){} // NOT IMPLEMENTED
 
 protected:
+    void _allocate(std::vector<std::string> names);
     //mwoibn::robot_class::Robot& _robot; // robot is needed for the joint state and imu feedbacks
-
+    void _checkConfig(YAML::Node config);
+    void _initConfig(YAML::Node config);
     mwoibn::VectorN _state, _previous_state, _error, _distance; // _state - current wheel position
     mwoibn::VectorInt _selector, _contacts; // _state - current wheel position
 

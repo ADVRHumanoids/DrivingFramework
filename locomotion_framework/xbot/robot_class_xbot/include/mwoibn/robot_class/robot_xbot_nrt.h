@@ -17,6 +17,8 @@ public:
   RobotXBotNRT(std::string config_file, std::string config_name,
                std::string secondary_file = "");
 
+  RobotXBotNRT(YAML::Node full_config, std::string config_name);
+
   virtual ~RobotXBotNRT() {}
 //  virtual void update()
 //  {

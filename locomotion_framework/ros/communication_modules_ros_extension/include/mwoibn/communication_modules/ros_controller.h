@@ -60,13 +60,12 @@ public:
   virtual ~RosController() {}
 
   virtual bool send();
-
+  virtual bool initialize(){_initFilters(); _initialized = true;}
 protected:
   ros::NodeHandle _node;
   ros::Publisher _command_pub;
   custom_messages::CustomCmnd _des_q;
   mwoibn::VectorN _filtered;
-  bool _initialized = false;
 
   void _initFilters(){
     if(!_filter) return;

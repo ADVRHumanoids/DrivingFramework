@@ -99,7 +99,7 @@ protected:
   XBot::SubscriberNRT<mwoibn::VectorRT> _sub_velocity;
   XBot::SubscriberNRT<mwoibn::VectorRT> _sub_torque;
   const int check = RT_SIZE - 1;
-  bool _initialized = false;
+  //bool _initialized = false;
 };
 }
 }

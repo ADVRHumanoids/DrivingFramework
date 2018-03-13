@@ -13,7 +13,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
@@ -98,6 +98,25 @@ ycm_library_install(JointStates 1 0 0)
 LIST( APPEND INSTALL_TARGETS JointStates )
 
 ################################################
+################### ODOMETRY ###################
+################################################
+
+if ( Xenomai_FOUND )
+    set_xeno_flags(Odometry)
+endif()
+add_library(Odometry SHARED
+    src/odometry.cpp
+)
+
+target_link_libraries(Odometry ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+add_dependencies(Odometry ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+ycm_library_install(Odometry 1 0 0)
+
+LIST( APPEND INSTALL_TARGETS Odometry )
+
+
+
+################################################
 ################## WHEELS NEW ##################
 ################################################
 
@@ -114,22 +133,6 @@ ycm_library_install(WheelsV2 1 0 0)
 
 LIST( APPEND INSTALL_TARGETS WheelsV2 )
 
-################################################
-################### ODOMETRY ###################
-################################################
-
-if ( Xenomai_FOUND )
-    set_xeno_flags(Odometry)
-endif()
-add_library(Odometry SHARED
-    src/odometry.cpp
-)
-
-target_link_libraries(Odometry ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
-add_dependencies(Odometry ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(Odometry 1 0 0)
-
-LIST( APPEND INSTALL_TARGETS Odometry )
 
 
 #################################################

@@ -23,9 +23,10 @@ public:
 
 protected:
   virtual void control_loop(double time, double period);
-  virtual void _setRate(double period){_controller_ptr->setRate(period);}
+  virtual void _setRate(double period){
+    _controller_ptr->setRate(period);}
   virtual std::string _setName() = 0;
-  virtual void _resetPrt(std::string config_file) = 0;
+  virtual void _resetPrt(YAML::Node config) = 0;
   virtual void _initCallbacks(XBot::Handle::Ptr handle) = 0;
   std::unique_ptr<mgnss::modules::Base> _controller_ptr;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;

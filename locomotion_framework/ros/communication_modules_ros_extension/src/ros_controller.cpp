@@ -3,7 +3,7 @@
 bool mwoibn::communication_modules::RosController::send()
 {
 
-  if(!_initialized) {_initFilters(); _initialized = true;}
+  if(!_initialized) {initialize();}
 
   if (_position)
   {/*
@@ -45,5 +45,5 @@ bool mwoibn::communication_modules::RosController::send()
   // des_q.header.stamp = ros::Time::now();
   _command_pub.publish(_des_q);
 
-  return true;
+  return _initialized;
 }

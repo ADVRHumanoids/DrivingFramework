@@ -35,7 +35,6 @@ public:
    }
 
    _data.setZero();
-
    std::cout << "\tSuccess" << std::endl;
 
   }
@@ -77,8 +76,6 @@ public:
       return _initialized;
   }
 
-  virtual bool initialized(){return _initialized;} // not implemented yet
-
 protected:
 
 mwoibn::VectorRT _data;
@@ -87,7 +84,7 @@ XBot::SubscriberRT<mwoibn::VectorRT> _sub_position;
 XBot::SubscriberRT<mwoibn::VectorRT> _sub_velocity;
 XBot::SubscriberRT<mwoibn::VectorRT> _sub_torque;
 const int check = RT_SIZE - 1;
-bool _initialized = false;
+//bool _initialized = false;
 
 };
 }

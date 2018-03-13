@@ -53,8 +53,6 @@ public:
     _initialized = true;
   }
 
-  virtual bool initialized(){return _initialized;} // not implemented yet
-
 protected:
   XBot::SubscriberRT<mwoibn::VectorFS> _sub_position;
   mwoibn::VectorFS _state;

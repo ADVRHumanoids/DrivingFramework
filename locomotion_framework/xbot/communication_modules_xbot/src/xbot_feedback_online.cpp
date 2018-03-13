@@ -3,6 +3,8 @@
 bool mwoibn::communication_modules::XBotFeedbackOnline::get()
 {
 
+  if (!_initialized) initialize();
+
   if (_position){
     _robot.getMotorPosition(_pub);
     _command.set(_pub, _map.reversed(), robot_class::INTERFACE::POSITION);
@@ -18,5 +20,51 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::get()
                  robot_class::INTERFACE::TORQUE);
   }
 
-  return true;
+  return _initialized;
 }
+
+bool mwoibn::communication_modules::XBotFeedbackOnline::_inLimits(mwoibn::robot_class::INTERFACE interface){
+  bool success = true;
+  for (int i = 0; i < _command.size(); i++)
+  {
+    success = _inLimits(i, interface) && success;
+  }
+  return success;
+}
+
+bool mwoibn::communication_modules::XBotFeedbackOnline::_inLimits(int i, mwoibn::robot_class::INTERFACE interface){
+
+    if(_map.get()[i] == mwoibn::NON_EXISTING) return true;
+
+    if (_lower_limits.state(interface)[i] == mwoibn::NON_EXISTING)
+       return true;
+
+    bool in_limits = _command.state(interface)[i] > _lower_limits.state(interface)[i];
+    in_limits = _command.state(interface)[i] < _upper_limits.state(interface)[i] && in_limits;
+
+
+    if(!in_limits)
+      std::cout << "Encoder reading for " << _robot.getJointByDofIndex(_map.get()[i])->getJointName()
+                << "is outside defined joint limits.\n"
+                << "\t reading: " << _command.state(interface)[i]
+                << "\n\t lower limit" << _lower_limits.state(interface)[i]
+                << "\n\t upper limit" << _upper_limits.state(interface)[i];
+    return in_limits;
+
+}
+
+bool mwoibn::communication_modules::XBotFeedbackOnline::reset(){
+  bool success = true;
+
+  if(_position){
+    success = _inLimits(mwoibn::robot_class::INTERFACE::POSITION) && success;
+  }
+  if(_velocity){
+    success = _inLimits(mwoibn::robot_class::INTERFACE::VELOCITY) && success;
+  }
+  if(_torque){
+    success = _inLimits(mwoibn::robot_class::INTERFACE::TORQUE) && success;
+  }
+  return success;
+}
+

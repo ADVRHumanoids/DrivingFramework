@@ -67,8 +67,9 @@ public:
     }
   }
 
-  virtual void initialize()
+  virtual bool initialize()
   {
+    if(_initialized) return _initialized;
     if (_position){
       _positions[check] = mwoibn::IS_VALID;
     }
@@ -76,6 +77,9 @@ public:
       _velocities[check] = mwoibn::IS_VALID;
     if (_torque)
       _torques[check] = mwoibn::IS_VALID;
+
+    _initialized = true;
+    return _initialized;
   }
 
   virtual bool send()

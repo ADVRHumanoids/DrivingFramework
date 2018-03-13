@@ -132,7 +132,11 @@ public:
 
   std::string getMapName(){ return _map.getName();}
 
-  virtual void reset(){}
+  virtual bool reset(){return true;}
+  virtual bool initialized(){return _initialized;}
+  virtual bool initialize(){
+    _initialized = true;
+    return initialized();}
 
 protected:
   mwoibn::robot_class::BiMap _map;
@@ -151,7 +155,7 @@ protected:
   bool _velocity;
   bool _torque;
   bool _filter;
-
+  bool _initialized = false;
   int _dofs;
 };
 }

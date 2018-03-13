@@ -27,6 +27,7 @@ class WheeledMotionEvent: public modules::Base
 
 public:
   WheeledMotionEvent(mwoibn::robot_class::Robot& robot, std::string config_file);
+  WheeledMotionEvent(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
   ~WheeledMotionEvent() {}
 
@@ -61,9 +62,10 @@ public:
   virtual void setRate(double rate){
     modules::Base::setRate(rate);
     setRate();
+
   }
 
-  void setRate(){ _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);}
+  virtual void setRate(){ _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);}
 
   void resetSteering();
   void resteer(int i){_resteer[i] = true;
@@ -253,6 +255,7 @@ public:
 //                     custom_services::updatePDGains::Response& res);
 
 protected:
+  void _allocate(YAML::Node config);
   bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,
                const double eps) const
   {

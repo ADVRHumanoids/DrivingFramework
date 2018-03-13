@@ -27,6 +27,22 @@ mwoibn::robot_class::RobotRos::RobotRos(std::string config_file,
   }
 }
 
+mwoibn::robot_class::RobotRos::RobotRos(YAML::Node full_config,
+                                        std::string config_name)
+    : mwoibn::robot_class::RobotRos::Robot()
+{
+  YAML::Node config = YAML::Clone(full_config);
+  try
+  {
+    _init(config, config_name);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw(std::invalid_argument(std::string("\nrobot:\t") + config_name +
+                                std::string("\n") + e.what()));
+  }
+}
+
 YAML::Node mwoibn::robot_class::RobotRos::_init(YAML::Node config,
                                                 std::string config_name)
 {

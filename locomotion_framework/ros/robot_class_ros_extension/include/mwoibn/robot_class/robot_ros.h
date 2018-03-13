@@ -37,6 +37,7 @@ public:
    * @brief Constructor from a parameter file
    */
   RobotRos(std::string config_file, std::string config_name, std::string secondary_file = "");
+  RobotRos(YAML::Node full_config, std::string config_name);
 
   virtual ~RobotRos() { _node.shutdown(); }
   virtual bool isRunning() { return ros::ok(); }

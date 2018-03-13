@@ -50,7 +50,6 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 //  _rotation << 1,0,0,0,1,0,0,0,1;
 
 //  BasicOperationalEuler::getPosition(_rotation, _linear_state);
-
   std::cout << "Loaded xbot operational feedback " << config["name"] << std::endl;
 
 //  std::cout <<_map_dofs << std::endl;
@@ -84,11 +83,11 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
     _command.set(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
   }
 
-void mwoibn::communication_modules::XBotOperationalEuler::reset(){
+bool mwoibn::communication_modules::XBotOperationalEuler::reset(){
 
   if(!_size) {
     _initialized = true;
-    return;
+    return _initialized;
   }
 /*
   _base.tail(3) =
@@ -116,5 +115,5 @@ void mwoibn::communication_modules::XBotOperationalEuler::reset(){
   _initialized = true;
 
 
-    return;
+    return _initialized;
 }

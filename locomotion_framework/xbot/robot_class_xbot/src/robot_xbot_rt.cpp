@@ -9,60 +9,8 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
 {
   _robot = robot;
 
-  /*
-  std::string xbot_file = config_file;
-
-  YAML::Node config = YAML::LoadFile(config_file);
-
-  std::cout << "robot start" << std::endl;
-
-  if (!config["mwoibnRobot"])
-    throw(std::invalid_argument(
-        "Please define robot configuration parameters in [mwoibnRobot].\n"));
-
-  config = config["mwoibnRobot"];
-
-  if (!config[robot_reference])
-    throw(std::invalid_argument(
-        "Please define which robot configuration should be considered.\n"));
-
-  config = config[robot_reference];
-
-  if (!config["config_file"])
-    throw(std::invalid_argument(
-        "Please define robot configuration files in [mwoibnRobot][" +
-        robot_reference + "][config_file].\n"));
-  if (!config["config_name"])
-    throw(
-        std::invalid_argument("Please define which robot configuration should "
-                              "be loaded in [mwoibnRobot][config_name].\n"));
-
-  config_file = config["config_file"].as<std::string>();
-  std::string config_name = config["config_name"].as<std::string>();
-  std::string secondary_file = "";
-  if (config["secondary_file"])
-  {
-    secondary_file = config["secondary_file"].as<std::string>();
-  } */
   YAML::Node config = getConfig(config_file,
                       secondary_file); // this is done twice with this robot
-
-//  std::string file_path = "";
-//  if(config["xbot"] && config["xbot"]["source"] && config["xbot"]["source"]["config"]){
-//      if(config["xbot"]["source"]["config"]["path"])
-//        file_path = config["xbot"]["source"]["config"]["path"].as<std::string>();
-//      if(config["xbot"]["source"]["config"]["path"])
-//        file_path += config["xbot"]["source"]["config"]["file"].as<std::string>();
-//  }
-
-//  if(file_path.compare(xbot_file)){
-//    std::cout << "WARNING: Different XBot config file has been received from constructor and config file. Proceed with the constructor file.\n";
-//    std::cout << "\tconstructor:\t" << xbot_file << "\n";
-//    std::cout << "\tfile:\t" << file_path << std::endl;
-//    }
-
-//  config["xbot"]["source"]["config"]["path"] = "";
-//  config["xbot"]["source"]["config"]["file"] = xbot_file;
 
   try
   {
@@ -75,6 +23,33 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   catch (const std::invalid_argument& e)
   {
     throw(std::invalid_argument("config file:\t" + config_file +
+                                std::string("\n robot configuration: \t ") +
+                                config_name + std::string("\nerror:\t") +
+                                e.what()));
+  }
+
+  _sense = true;
+  }
+
+mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
+    XBot::RobotInterface::Ptr robot, YAML::Node full_config,
+    std::string config_name,
+    XBot::SharedMemory::Ptr shared_memory)
+    : RobotXBotFeedback()
+{
+  _robot = robot;
+  YAML::Node config = YAML::Clone(full_config);
+  try
+  {
+    YAML::Node robot =
+        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+    //    _init(config, robot);
+
+    _init(config, robot, shared_memory);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw(std::invalid_argument("config file:\t" +
                                 std::string("\n robot configuration: \t ") +
                                 config_name + std::string("\nerror:\t") +
                                 e.what()));
@@ -161,6 +136,9 @@ void mwoibn::robot_class::RobotXBotRT::_loadControllers(
   for (auto entry : config)
   {
     if (entry.first.as<std::string>() == "source") continue;
+    if (entry.first.as<std::string>() == "mode") continue;
+    if (entry.first.as<std::string>() == "gains") continue;
+
 
     entry.second["name"] = entry.first.as<std::string>();
 

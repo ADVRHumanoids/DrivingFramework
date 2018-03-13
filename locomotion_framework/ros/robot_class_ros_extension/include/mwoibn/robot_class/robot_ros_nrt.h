@@ -25,6 +25,8 @@ public:
   RobotRosNRT(std::string config_file, std::string config_name,
               std::string secondary_file = "");
 
+  RobotRosNRT(YAML::Node full_config, std::string config_name);
+
   virtual ~RobotRosNRT() {}
 
   virtual bool send()

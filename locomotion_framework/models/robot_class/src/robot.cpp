@@ -814,10 +814,7 @@ void mwoibn::robot_class::Robot::_loadConfig(YAML::Node config,
   }
 }
 
-YAML::Node
-mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
-                                             std::string config_name)
-{
+YAML::Node mwoibn::robot_class::Robot::readFullConfig(YAML::Node full_config, std::string config_name){
   if (!full_config["robot"][config_name])
     throw std::invalid_argument(std::string("Unknown configuration: ") +
                                 config_name);
@@ -839,10 +836,14 @@ mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
                                           .as<std::string>()])
     throw std::invalid_argument(
         std::string("Layers have not been configured for the robot."));
+  if (!full_config["robot"]["mode"])
+    throw std::invalid_argument(
+        std::string("Please specify robot operational mode."));
 
   // get specific configuration
   std::cout << "\t system\t" << full_config["system"].as<std::string>() << std::endl;
   std::cout << "\t layer\t" << full_config["robot"]["layer"].as<std::string>() << std::endl;
+  std::cout << "\t mode\t" << full_config["robot"]["mode"].as<std::string>() << std::endl;
 
   std::string system_file = readPath(
       full_config["robot"]["systems"][full_config["system"].as<std::string>()]);
@@ -862,7 +863,14 @@ mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
   }
   else
     std::cout << "\t rate\t undefiend" << std::endl;
+  return full_config;
+}
 
+YAML::Node
+mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
+                                             std::string config_name)
+{
+  full_config = readFullConfig(full_config, config_name);
   // in config_robot all the data that are used later should be stored
   YAML::Node config = full_config["robot"][config_name];
 
@@ -887,6 +895,7 @@ mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
     config["controller"] =
         _readConfig(full_config["controllers"], full_config["controller"],
                     config["controller"]);
+    config["controller"]["mode"] = full_config["robot"]["mode"];
   }
   catch (const std::invalid_argument& e)
   {

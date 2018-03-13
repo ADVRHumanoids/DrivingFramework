@@ -3,6 +3,6 @@ mwoibn:
                 rate: 200
         modules:
                 odometry:
-                        tunning:
+                        filter:
                                 damping: 1
                                 cut_off_frequency: 200

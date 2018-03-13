@@ -11,13 +11,12 @@ namespace mgnss
 {
 namespace xbot_plugins
 {
-class Odometry : public plugins::XbotBase
+class Odometry : public mgnss::plugins::XbotBase
 {
 protected:
-  virtual void control_loop(double time, double period);
-  virtual void _resetPrt(std::string config_file)
+  virtual void _resetPrt(YAML::Node config)
   {
-    _controller_ptr.reset(new mgnss::state_estimation::Odometry(*_robot_ptr, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078));
+    _controller_ptr.reset(new mgnss::state_estimation::Odometry(*_robot_ptr, config));
   }
   virtual void _initCallbacks(XBot::Handle::Ptr handle)
   {

@@ -29,6 +29,30 @@ mwoibn::robot_class::RobotRosNRT::RobotRosNRT(std::string config_file,
   updateKinematics();
 }
 
+mwoibn::robot_class::RobotRosNRT::RobotRosNRT(YAML::Node full_config,
+                                              std::string config_name)
+    : mwoibn::robot_class::RobotRos()
+{
+  YAML::Node config = YAML::Clone(full_config);
+  YAML::Node robot;
+  try
+  {
+    robot = mwoibn::robot_class::RobotRos::_init(config, config_name);
+    _loadMappings(robot["mapping"]);
+    _loadFeedbacks(robot["feedback"]);
+    _loadControllers(robot["controller"]);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw(std::invalid_argument(std::string("\nrobot:\t") + config_name +
+                                std::string("\n") + e.what()));
+  }
+
+  wait();
+  get();
+  updateKinematics();
+}
+
 void mwoibn::robot_class::RobotRosNRT::_loadFeedbacks(YAML::Node config)
 {
   for (auto entry : config)
@@ -168,9 +192,13 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
 
   for (auto entry : config)
   {
+    if (entry.first.as<std::string>() == "mode") continue;
+
     entry.second["name"] = entry.first.as<std::string>();
 
     BiMap map = readBiMap(entry.second["dofs"]);
+
+
 
     if (!entry.second["type"])
       throw(std::invalid_argument(std::string("Unknown controller type for " +
@@ -181,7 +209,11 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
         "custom_controller/ActuatorPositionControllerClasses")
     {
       mwoibn::communication_modules::BasicFeedback* feedback = nullptr;
-
+      if (config["mode"].as<std::string>() == "idle"){
+        std::cout << "Robot in the IDLE mode - lower-level controller " << entry.first.as<std::string>() <<
+                     " has not been initialized." << std::endl;
+        continue;
+      }
      // if (entry.second["initialize"] && entry.second["initialize"].as<std::string>() != "")
         feedback = &feedbacks.feedback(entry.second["initialize"].as<std::string>());
 
@@ -214,7 +246,11 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
     if (entry.second["type"].as<std::string>() ==
         "custom_controller/ActuatorVelocityController")
     {
-
+      if (config["mode"].as<std::string>() == "idle"){
+        std::cout << "Robot in the IDLE mode - lower-level controller " << entry.first.as<std::string>() <<
+                     " has not been initialized." << std::endl;
+        continue;
+      }
       controllers.add(
           std::unique_ptr<mwoibn::communication_modules::BasicController>(
               new mwoibn::communication_modules::VelocityController(

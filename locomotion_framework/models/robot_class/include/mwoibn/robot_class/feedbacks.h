@@ -47,11 +47,13 @@ public:
      return success;
    }
 
-   void reset(){
-     for (auto& feedback : _feedbacks)
-       feedback->reset();
+   bool reset(){
+     bool success = true;
 
-     return;
+     for (auto& feedback : _feedbacks)
+       success = feedback->reset() && success;
+
+     return success;
    }
 
    mwoibn::communication_modules::BasicFeedback& feedback(unsigned int id){

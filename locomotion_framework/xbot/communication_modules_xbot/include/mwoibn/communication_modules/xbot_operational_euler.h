@@ -17,8 +17,9 @@ public:
                  mwoibn::robot_class::BiMap map, YAML::Node config,
                  XBot::RobotInterface& robot, double rate);
 
-  virtual bool initialized(){return _initialized;} // not implemented yet
-  virtual void reset();
+  virtual bool initialize(){reset();}
+
+  virtual bool reset();
   virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 position);
   virtual ~XBotOperationalEuler(){}
   virtual bool get();
@@ -30,7 +31,7 @@ protected:
   mwoibn::Matrix3 _rotation, _rot_z;
   mwoibn::VectorN _base;
   double _rate;
-  bool _is_static, _initialized = false;
+  bool _is_static;
   mwoibn::Axis _z;
 
 };

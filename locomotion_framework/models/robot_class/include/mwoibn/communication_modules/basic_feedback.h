@@ -29,7 +29,6 @@ public:
   virtual ~BasicFeedback() {}
 
   mwoibn::VectorInt getSelector() const { return _map.get(); }
-  virtual bool initialized() = 0;
   virtual bool get() = 0;
 
 

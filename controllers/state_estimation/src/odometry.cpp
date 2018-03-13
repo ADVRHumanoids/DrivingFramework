@@ -6,6 +6,73 @@ mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
                                     std::vector<std::string> names, double r)
     : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot), _r(r)
 {
+   _allocate(names);
+   _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 1000, 1));
+}
+
+mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
+                                    std::string config_file)
+    : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot)
+{
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
+
+  if (!config["modules"])
+    throw std::invalid_argument(
+        std::string("Couldn't find modules configurations."));
+  if (!config["modules"]["odometry"])
+    throw std::invalid_argument(
+        std::string("Couldn't find odometry module configuration."));
+
+   config = config["modules"]["odometry"];
+
+  _checkConfig(config);
+  _initConfig(config);
+}
+
+mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
+                                    YAML::Node config)
+    : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot)
+{
+  _checkConfig(config);
+  _initConfig(config);
+}
+
+void mgnss::state_estimation::Odometry::_initConfig(YAML::Node config){
+
+  std::vector<std::string> names = _robot.getLinks(config["chain"].as<std::string>());
+
+   _r = config["wheel_radius"].as<double>();
+   _allocate(names);
+   _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+
+
+}
+void mgnss::state_estimation::Odometry::_checkConfig(YAML::Node config){
+
+   if (!config["chain"])
+     throw std::invalid_argument(
+         std::string("Please specify srdf chain for odometry plugin."));
+   if (!config["filter"])
+     throw std::invalid_argument(
+         std::string("Please specify filter parameters for odometry plugin."));
+   if (!config["filter"]["damping"])
+     throw std::invalid_argument(
+         std::string("Please specify filter damping for odometry plugin."));
+   if (!config["filter"]["cut_off_frequency"])
+     throw std::invalid_argument(
+         std::string("Please specify filter cut-off frequency for odometry plugin."));
+   if (!config["wheel_radius"])
+     throw std::invalid_argument(
+         std::string("Please specify wheel radius [m] for odometry plugin."));
+
+   std::cout << "Odometry: read " << config["chain"].as<std::string>() << " chain." << std::endl;
+   std::cout << "Odometry: filter damping " << config["filter"]["damping"].as<double>() << std::endl;
+   std::cout << "Odometry: filter cut-off frequency " << config["filter"]["cut_off_frequency"].as<double>() << std::endl;
+   std::cout << "Odometry: wheel radius " << config["wheel_radius"].as<double>() << std::endl;
+
+}
+
+void mgnss::state_estimation::Odometry::_allocate(std::vector<std::string> names){
   _ids.setConstant(names.size(), mwoibn::NON_EXISTING);
   _state.setZero(names.size());
   _error.setZero(names.size());
@@ -41,10 +108,8 @@ mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
 
   _estimated =
       _wheels_ph.getFullStatesWorld(); // start without an error for now
-
-  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 200, 1));
-
 }
+
 
 void mgnss::state_estimation::Odometry::init(){
 
@@ -52,7 +117,7 @@ void mgnss::state_estimation::Odometry::init(){
 
     //std::cout << "raw" << _robot.state.get().head<6>().transpose() << std::endl;
 
-    _robot.feedbacks.reset();
+//    _robot.feedbacks.reset();
 
     //std::cout << "reset" << _robot.state.get().head<6>().transpose() << std::endl;
 

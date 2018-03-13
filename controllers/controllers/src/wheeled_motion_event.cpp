@@ -4,6 +4,19 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
     mwoibn::robot_class::Robot& robot, std::string config_file)
     : modules::Base(robot)
 {
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
+  _allocate(config);
+}
+
+mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
+    mwoibn::robot_class::Robot& robot, YAML::Node config)
+    : modules::Base(robot)
+{
+  _allocate(config);
+}
+
+void mgnss::controllers::WheeledMotionEvent::_allocate(YAML::Node config){
+
   _x << 1, 0, 0;
   _y << 0, 1, 0;
   _z << 0, 0, 1;
@@ -15,7 +28,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   mwoibn::Vector3 pelvis;
   pelvis << 0, 0, 1;
   mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
-                                                     robot.getLinks("base"));
+                                                     _robot.getLinks("base"));
   _pelvis_position_ptr.reset(
       new mwoibn::hierarchical_control::CartesianSelectiveTask(pelvis_ph,
                                                                pelvis));
@@ -23,7 +36,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _pelvis_orientation_ptr.reset(
       new mwoibn::hierarchical_control::OrientationSelectiveTask(
           mwoibn::point_handling::OrientationsHandler("ROOT", _robot,
-                                                      robot.getLinks("base")),
+                                                      _robot.getLinks("base")),
           pelvis, _robot));
 
 
@@ -34,7 +47,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _steering_ptr.reset(
       new mwoibn::hierarchical_control::CartesianFlatReferenceTask4(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
-                                                   robot.getLinks("wheels")),
+                                                   _robot.getLinks("wheels")),
           _robot, *_com_ptr.get()));
 
   mwoibn::Axis x, y, z, ax;
@@ -44,27 +57,27 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
 //  mwoibn::hierarchical_control::CastorAngle castor1(
   ax << 0, 1, 0;
   mwoibn::hierarchical_control::CastorAngle castor1(
-      robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("ankle2_1", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::CamberAngle camber1(
-      robot, mwoibn::point_handling::Point("wheel_1", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::SteeringAngle steer1(
-      robot, mwoibn::point_handling::Point("wheel_1", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), x, y,
       z, ax);
   ax << 0, 1, 0;
   mwoibn::hierarchical_control::CastorAngle castor3(
-      robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("ankle2_3", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::CamberAngle camber3(
-      robot, mwoibn::point_handling::Point("wheel_3", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  1;
   mwoibn::hierarchical_control::SteeringAngle steer3(
-      robot, mwoibn::point_handling::Point("wheel_3", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), x, y,
       z, ax);
 
   z <<  0, -1,  0;
@@ -73,37 +86,36 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
 
   ax << 0, -1, 0;
   mwoibn::hierarchical_control::CastorAngle castor2(
-      robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("ankle2_2", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::CamberAngle camber2(
-      robot, mwoibn::point_handling::Point("wheel_2", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::SteeringAngle steer2(
-      robot, mwoibn::point_handling::Point("wheel_2", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), x, y,
       z, ax);
   ax << 0, -1, 0;
   mwoibn::hierarchical_control::CastorAngle castor4(
-      robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("ankle2_4", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::CamberAngle camber4(
-      robot, mwoibn::point_handling::Point("wheel_4", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), x, y,
       z, ax);
   ax <<  0,  0,  -1;
   mwoibn::hierarchical_control::SteeringAngle steer4(
-      robot, mwoibn::point_handling::Point("wheel_4", robot.getModel()), x, y,
+      _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), x, y,
       z, ax);
 
   _leg_steer_ptr.reset(new mwoibn::hierarchical_control::SteeringAngleTask(
-      {steer1, steer2, steer3, steer4}, robot));
+      {steer1, steer2, steer3, steer4}, _robot));
   _leg_camber_ptr.reset(new mwoibn::hierarchical_control::CamberAngleTask(
-      {camber1, camber2, camber3, camber4}, robot));
+      {camber1, camber2, camber3, camber4}, _robot));
   _leg_castor_ptr.reset(new mwoibn::hierarchical_control::CastorAngleTask(
-      {castor1, castor2, castor3, castor4}, robot));
+      {castor1, castor2, castor3, castor4}, _robot));
 
-  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
   std::cout << "Wheeled Motion loaded " << config["tunning"] << " tunning." << std::endl;
 
   config = config["tunnings"][config["tunning"].as<std::string>()];
@@ -150,16 +162,16 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _linear_vel.setZero();
   _angular_vel.setZero();
 
-  _select_steer = robot.getDof(robot.getLinks("camber"));
-  _select_wheel = robot.getDof(robot.getLinks("wheels"));
+  _select_steer = _robot.getDof(_robot.getLinks("camber"));
+  _select_wheel = _robot.getDof(_robot.getLinks("wheels"));
   _l_limits.setZero(_select_steer.size());
   _u_limits.setZero(_select_steer.size());
   _start_steer.setZero(_select_steer.size());
   _resteer.setConstant(_select_steer.size(), false);
   _current_steer.setZero(_select_steer.size());
   steerings.setZero(_select_steer.size());
-  robot.lower_limits.get(_l_limits, _select_steer);
-  robot.upper_limits.get(_u_limits, _select_steer);
+  _robot.lower_limits.get(_l_limits, _select_steer);
+  _robot.upper_limits.get(_u_limits, _select_steer);
 
   _test_steer.setZero(_select_steer.size());
 

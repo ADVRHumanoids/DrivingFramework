@@ -23,20 +23,49 @@ mgnss::plugins::RosBase::RosBase(int argc, char** argv)
 
     std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/locomotion_framework/configs/mwoibn_v2_5.yaml"; // for now, later take it as a parameter
 
+    // Read MWOIBN config file
     YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
 
-    //std::string config_file = config["config_file"].as<std::string>();
-    config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][_name];
+    YAML::Node plugin_config = mwoibn::robot_class::Robot::getConfig(config_file);
+
+
+    if (!plugin_config["modules"])
+      throw std::invalid_argument(config_file +
+          std::string("\t Could not find modules configuration."));
+    if (!plugin_config["modules"][_name])
+      throw std::invalid_argument(config_file +
+          std::string("\t Could not find ") + _name + std::string(" module configuration."));
+
+    plugin_config = plugin_config["modules"][_name];
+
+    if (!plugin_config["robot"])
+      throw std::invalid_argument(config_file +
+          std::string("\t Could not find robot configuration in module parameters."));
+    if (!plugin_config["layer"])
+      throw std::invalid_argument(config_file +
+          std::string("\t Please specify robot layer."));
+    if (!plugin_config["mode"])
+      throw std::invalid_argument(config_file +
+          std::string("\t Please specify controller mode."));
+
 
     std::string secondary_file = "";
-    if (config["secondary_file"])
-      secondary_file = config["secondary_file"].as<std::string>();
+    if (plugin_config["secondary_file"])
+      secondary_file = plugin_config["secondary_file"].as<std::string>();
 
-    _robot_ptr.reset(mwoibn::loaders::Robot::create(config_file,  config["robot"].as<std::string>(), secondary_file).release());
+    std::cout << "secondary file " << secondary_file << std::endl;
 
-//    mgnss::controllers::JointStates controller(robot, path);
+    config = mwoibn::robot_class::Robot::getConfig(config_file, secondary_file);
 
-    _resetPrt(config_file);
+    config["robot"]["layer"] = plugin_config["layer"].as<std::string>();
+    config["robot"]["mode"] = plugin_config["mode"].as<std::string>();
+
+    _robot_ptr.reset(mwoibn::loaders::Robot::create(config,  plugin_config["robot"].as<std::string>()).release());
+
+    config = mwoibn::robot_class::Robot::readFullConfig(config, plugin_config["robot"].as<std::string>());
+    config = config["modules"][_name];
+
+    _resetPrt(config);
     _initCallbacks();
 
     _robot_ptr->get();

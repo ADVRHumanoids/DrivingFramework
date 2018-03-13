@@ -27,7 +27,7 @@ public:
 protected:
   virtual void _setRate(double period){_controller_ptr->setRate(period);}
   virtual std::string _setName() = 0;
-  virtual void _resetPrt(std::string config_file) = 0;
+  virtual void _resetPrt(YAML::Node config) = 0;
   virtual void _initCallbacks() = 0;
   std::unique_ptr<mgnss::modules::Base> _controller_ptr;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;

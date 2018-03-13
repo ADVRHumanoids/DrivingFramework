@@ -22,7 +22,7 @@ public:
 
 protected:
   virtual std::string _setName(){return "joint_states";}
-  virtual void _resetPrt(std::string config_file){
+  virtual void _resetPrt(YAML::Node config){
     _controller_ptr.reset(new mgnss::controllers::JointStates(*_robot_ptr));
   }
 

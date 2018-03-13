@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES
-        ${INSTALL_TARGETS}
+        odometry
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS

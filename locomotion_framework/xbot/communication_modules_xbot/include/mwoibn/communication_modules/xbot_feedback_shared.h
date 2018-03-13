@@ -52,7 +52,7 @@ public:
     std::cout << "\tSuccess" << std::endl;
   }
 
-  virtual bool initialized()
+  virtual bool initialize()
   {
     _sub_position.get(_positions);
     if (_position && _positions[check] != mwoibn::IS_VALID)
@@ -73,7 +73,7 @@ public:
 
   virtual bool get()
   {
-    if(!initialized()) return false;
+    if(!initialize()) return false;
 
     if (_position)
     {

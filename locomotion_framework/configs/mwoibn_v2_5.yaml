@@ -1,7 +1,7 @@
 driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
 simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
 mwoibn:
-        middleware: "ROS"
+        middleware: "XBOT"
         system: "SM" # SM
         layers:
             RT:
@@ -12,7 +12,6 @@ mwoibn:
                         file: "DrivingFramework/locomotion_framework/configs/NRT.yaml"
         robot:
                 name: "centauro"
-                layer: "NRT"
                 systems:
                         HW: 
                                 path: *driving
@@ -21,7 +20,6 @@ mwoibn:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/configs/simulation.yaml"
                 default:
-                        type: "NRT"
                         controller: 
                                 list: [position_controller, velocity_controller]
                         feedback: 
@@ -33,7 +31,6 @@ mwoibn:
                                 feedback: false
 
                 reference:
-                        type: "NRT"
                         controller: 
                                 list: ["lower_body"]
                         feedback: 
@@ -45,7 +42,6 @@ mwoibn:
                                 feedback: false
 
                 higher_scheme:
-                        type: "NRT"
                         controller: 
                                 layer: "higher_level"
                         feedback: 
@@ -56,7 +52,6 @@ mwoibn:
                                 read: "true"
                                 feedback: false
                 full_model:
-                        type: "NRT"
                         controller: 
                                 list: []
                         feedback: 
@@ -67,7 +62,6 @@ mwoibn:
                                 read: "true"
                                 feedback: false  
                 simulated:
-                        type: "NRT"
                         controller: 
                                 layer: ""
                         feedback: 
@@ -78,7 +72,6 @@ mwoibn:
                                 read: "true"
                                 feedback: false  
                 empty:
-                        type: "NRT"
                         controller: 
                                 layer: ""
                         feedback: 
@@ -89,7 +82,6 @@ mwoibn:
                                 read: false
                                 feedback: false  
                 odometry:
-                        type: "NRT"
                         controller: 
                                 list: [odometry]
                         feedback: 
@@ -100,7 +92,6 @@ mwoibn:
                                 read: true
                                 feedback: false 
                 joint_space:
-                        type: "NRT"
                         controller: 
                                 layer: "lower_level"
                         feedback: 
@@ -111,7 +102,6 @@ mwoibn:
                                 read: false
                                 feedback: false
                 fake:
-                        type: "NRT"
                         controller: 
                                 layer: ""
                         feedback: 
@@ -465,10 +455,11 @@ mwoibn:
                                 sink: "base_odometry"
         modules:
                 wheeled_motion:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: default
+                        mode: "full"
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: NRT2
+                        tunning: RT10
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0
@@ -658,22 +649,22 @@ mwoibn:
                                         steer_feedback: 0.2
                                         steer_damp: 0.03
                                 RT4:
-                                        ratio: 3.5
+                                        ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 8
-                                        base_orinetation: 30
-                                        centre_of_mass_x: 30
-                                        centre_of_mass_y: 30
-                                        base_position: 5
-                                        contact_point: 12
-                                        camber: 15
-                                        castor: 10
+                                        leg_steer: 10 # 20
+                                        base_orinetation: 125
+                                        centre_of_mass_x: 125
+                                        centre_of_mass_y: 125
+                                        base_position: 15
+                                        contact_point: 100 # 75
+                                        camber: 100
+                                        castor: 60
                                         camber_damp: 0.08
-                                        castor_damp: 0.10
-                                        steer_open_loop: 0.8
-                                        steer_feedback: 0.2
-                                        steer_damp: 0.01
+                                        castor_damp: 0.12
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.010  
                                 RT5: # worked once
                                         ratio: 1.0
                                         damping: 0.0001
@@ -758,15 +749,37 @@ mwoibn:
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.01                                                                                                                           
+                                        steer_damp: 0.01
+                                RT10:
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 15 # 20
+                                        base_orinetation: 160
+                                        centre_of_mass_x: 100
+                                        centre_of_mass_y: 100
+                                        base_position: 20
+                                        contact_point: 85 # 75
+                                        camber: 100
+                                        castor: 60
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01                                                                                                                    
                 joint_states:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: joint_space
+                        mode: "full"
                 odometry:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: odometry
-                        secondary_file: *config_lower          
+                        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/odometry.yaml
+                        mode: "full"
+                        wheel_radius: 0.078
+                        chain: "wheels"
                 wheels_support:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: fake
                         secondary_file: *config_lower
+                        mode: "full"

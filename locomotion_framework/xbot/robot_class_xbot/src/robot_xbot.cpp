@@ -13,6 +13,13 @@ mwoibn::robot_class::RobotXBot::RobotXBot(std::string config_file,
                               // be easily supported
 }
 
+mwoibn::robot_class::RobotXBot::RobotXBot(YAML::Node full_config,
+                                          std::string config_name)
+{
+  YAML::Node config = YAML::Clone(full_config);
+  _init(config, config_name); // thanks to this function more config files can
+                              // be easily supported
+}
 YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
                                                  std::string config_name)
 {

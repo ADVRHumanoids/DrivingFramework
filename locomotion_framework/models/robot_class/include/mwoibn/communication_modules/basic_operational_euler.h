@@ -136,7 +136,8 @@ public:
 
   virtual ~BasicOperationalEuler() {}
 
-  virtual bool initialized() { return false; }
+  virtual bool initialize(){}
+
   virtual bool get() { return false; }
 
   // this recomputation is correct for points descrbied by euler angels

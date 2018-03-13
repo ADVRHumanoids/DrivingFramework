@@ -42,8 +42,8 @@ protected:
   mwoibn::VectorN _support;
   virtual std::string _setName(){return "wheeled_motion";}
 
-  virtual void _resetPrt(std::string config_file){
-    _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent(*_robot_ptr, config_file));
+  virtual void _resetPrt(YAML::Node config){
+    _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent(*_robot_ptr, config));
   }
 
   virtual void _initCallbacks(){

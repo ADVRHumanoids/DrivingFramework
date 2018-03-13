@@ -37,6 +37,39 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
   }
 }
 
+
+mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(YAML::Node full_config,
+                                                std::string config_name)
+    : RobotXBotFeedback()
+{
+  YAML::Node config = YAML::Clone(full_config);
+  YAML::Node middleware = config["ros"];
+
+  try
+  {
+    YAML::Node robot =
+        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+    if (!robot["rate"])
+      throw(std::invalid_argument(
+          std::string("Desired frequency not defined in a configuration ") +
+          std::string(", ") + config_name));
+    _rate_ptr.reset(new ros::Rate(robot["rate"].as<double>()));
+
+    _sense = true; // because of the weird XBot behaviour in the NRT layer
+
+    _loadConfig(middleware["feedback"], robot["feedback"]);
+    _loadConfig(middleware["controller"], robot["controller"]);
+
+    _init(config, robot);
+  }
+  catch (const std::invalid_argument& e)
+  {
+    throw(std::invalid_argument(std::string("\n robot configuration: \t ") +
+                                config_name + std::string("\nerror:\t") +
+                                e.what()));
+  }
+}
+
 void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
     YAML::Node config)
 {
@@ -127,7 +160,7 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadControllers(
 
   for (auto entry : config)
   {
-
+    if (entry.first.as<std::string>() == "mode") continue;
     if (entry.first.as<std::string>() == "gains") continue;
     if (entry.first.as<std::string>() == "source") continue;
 

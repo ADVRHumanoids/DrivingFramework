@@ -96,4 +96,4 @@ GazeboXBotPlugin:
 #        config_name: default
 
 mwoibn:
-   config_file: &config /home/embedded/locomotion_src/workspace/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
+   config_file: &config /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2_5.yaml

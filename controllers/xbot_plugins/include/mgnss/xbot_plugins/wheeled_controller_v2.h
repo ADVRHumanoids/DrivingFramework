@@ -22,11 +22,14 @@ public:
   virtual bool init_control_plugin(XBot::Handle::Ptr handle);
 
   virtual void on_start(double time);
+  mgnss::controllers::WheeledMotionEvent& get(){return static_cast<mgnss::controllers::WheeledMotionEvent&>(*_controller_ptr);}
 
 protected:
-  virtual void _resetPrt(std::string config_file)
+  virtual void control_loop(double time, double period);
+
+  virtual void _resetPrt(YAML::Node config)
   {
-    _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent(*_robot_ptr, config_file));
+    _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent(*_robot_ptr, config));
   }
 
   virtual void _initCallbacks(XBot::Handle::Ptr handle)
@@ -53,7 +56,7 @@ private:
 //  mwoibn::VectorN _print;
 
 
-  std::unique_ptr<mgnss::controllers::WheeledMotionEvent> _controller_ptr;
+//  std::unique_ptr<mgnss::controllers::WheeledMotionEvent> _controller_ptr;
   XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
   XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
   mwoibn::VectorN _support;

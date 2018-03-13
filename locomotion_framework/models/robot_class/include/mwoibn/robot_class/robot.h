@@ -176,6 +176,7 @@ public:
                         const std::string secondary_file = "");
   static void compareEntry(YAML::Node entry_main, YAML::Node entry_second);
 
+  static YAML::Node readFullConfig(YAML::Node full_config, std::string config_name);
 
 protected:
   //! Alternative robot class initializer,

@@ -26,8 +26,8 @@ public:
 protected:
   virtual std::string _setName(){return "odometry";}
 
-  virtual void _resetPrt(std::string config_file){
-    _controller_ptr.reset(new mgnss::state_estimation::Odometry(*_robot_ptr, {"wheel_1", "wheel_2", "wheel_3", "wheel_4"}, 0.078));
+  virtual void _resetPrt(YAML::Node config){
+    _controller_ptr.reset(new mgnss::state_estimation::Odometry(*_robot_ptr, config));
   }
 
   virtual void _initCallbacks(){}
