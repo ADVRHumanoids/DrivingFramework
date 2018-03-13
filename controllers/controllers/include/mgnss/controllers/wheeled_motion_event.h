@@ -33,6 +33,9 @@ public:
 
   virtual void init();
 
+  virtual void startLog(mwoibn::common::Logger& logger);
+  virtual void log(mwoibn::common::Logger& logger, double time);
+
   virtual void stop();
   virtual void send(){
     _robot.send();

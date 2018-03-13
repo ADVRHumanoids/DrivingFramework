@@ -23,9 +23,9 @@ public:
     _support.noalias() = get().getSupportReference();
   }
 
-  void start()
+  void start(double time)
   {
-    mgnss::plugins::RosBase::start();
+    mgnss::plugins::RosBase::start(time);
     if (_valid)
       _support.noalias() = get().getSupportReference();
   }

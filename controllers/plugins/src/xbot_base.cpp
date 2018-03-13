@@ -56,6 +56,9 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
   _resetPrt(config);
   _initCallbacks(handle);
 
+  _logger_ptr.reset(new mwoibn::common::XbotLogger(_name));
+  _controller_ptr->startLog(*_logger_ptr.get());
+
   _robot_ptr->get();
   _robot_ptr->updateKinematics();
 
@@ -64,7 +67,7 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
 
 void mgnss::plugins::XbotBase::on_start(double time)
 {
-    start = time;
+    _start = time;
 
     _valid = _robot_ptr->get() && _robot_ptr->feedbacks.reset();
 
@@ -107,6 +110,7 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
 
     _controller_ptr->update();
     _controller_ptr->send();
+    _controller_ptr->log(*_logger_ptr.get(), time-_start);
 
 //   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
 
@@ -114,5 +118,7 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
 
 bool mgnss::plugins::XbotBase::close() {
   _controller_ptr->close();
+  _logger_ptr->flush();
+  _logger_ptr->close();
   return true; }
 

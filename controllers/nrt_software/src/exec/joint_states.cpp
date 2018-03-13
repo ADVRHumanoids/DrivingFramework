@@ -6,10 +6,10 @@ int main(int argc, char** argv)
   mgnss::nrt_software::plugins::JointStates controller(argc, argv);
 
   controller.init();
-  controller.start();
+  controller.start(ros::Time::now().toSec());
 
   while(ros::ok()){
-      controller.control_loop();
+      controller.control_loop(ros::Time::now().toSec());
   }
 
   controller.close();

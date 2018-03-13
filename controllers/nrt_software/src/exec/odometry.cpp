@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   mgnss::nrt_software::plugins::Odometry controller(argc, argv);
 
   controller.init();
-  controller.start();
+  controller.start(ros::Time::now().toSec());
 
 /*
   std::ostringstream oss;
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
   //  for(int i = 0; i < 2500; i++)
   while (ros::ok())
   {
-    controller.control_loop();
+    controller.control_loop(ros::Time::now().toSec());
 
 /*    now = ros::Time::now().toSec();
     print.setZero();

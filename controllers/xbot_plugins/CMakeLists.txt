@@ -38,6 +38,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   state_estimation
   plugins
   ros_callbacks
+  mwoibn_xbot_common
 )
 
 find_package(catkin REQUIRED COMPONENTS

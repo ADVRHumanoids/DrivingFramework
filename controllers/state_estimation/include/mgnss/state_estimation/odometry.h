@@ -36,6 +36,8 @@ public:
     virtual void send(){ _robot.send();}
     virtual void stop(){} // NOT IMPLEMENTED
     virtual void close(){} // NOT IMPLEMENTED
+    virtual void startLog(mwoibn::common::Logger& logger);
+    virtual void log(mwoibn::common::Logger& logger, double time);
 
 protected:
     void _allocate(std::vector<std::string> names);

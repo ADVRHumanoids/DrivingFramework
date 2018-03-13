@@ -68,15 +68,18 @@ mgnss::plugins::RosBase::RosBase(int argc, char** argv)
     _resetPrt(config);
     _initCallbacks();
 
+    _logger_ptr.reset(new mwoibn::common::RosLogger(_name));
+    _controller_ptr->startLog(*_logger_ptr.get());
+
     _robot_ptr->get();
     _robot_ptr->updateKinematics();
 
   return true;
 }
 
-void mgnss::plugins::RosBase::start()
+void mgnss::plugins::RosBase::start(double time)
 {
-    //start = time;
+    _start = time;
 
     _valid = _robot_ptr->get();
     _rate = true;
@@ -95,7 +98,7 @@ void mgnss::plugins::RosBase::stop() {
   _controller_ptr->stop();
 }
 
-void mgnss::plugins::RosBase::control_loop()
+void mgnss::plugins::RosBase::control_loop(double time)
 {
 
     _valid = _robot_ptr->get();
@@ -119,11 +122,15 @@ void mgnss::plugins::RosBase::control_loop()
 
     _controller_ptr->update();
     _controller_ptr->send();
+    _controller_ptr->log(*_logger_ptr.get(), time-_start);
+
     _robot_ptr->wait();
 
 }
 
 bool mgnss::plugins::RosBase::close() {
   _controller_ptr->close();
+  _logger_ptr->flush();
+  _logger_ptr->close();
   return true; }
 

@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   //wheeld_controller.init();
   //mwoibn::robot_class::Robot& robot = controller.robot();
 
-  controller.start();
+  controller.start(ros::Time::now().toSec());
 
  /*
   std::ostringstream oss;
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
   while (ros::ok())
   {
 //      std::cout << i << std::endl;
-    controller.control_loop();
+    controller.control_loop(ros::Time::now().toSec());
 /*
     now = ros::Time::now().toSec();
     print.setZero();

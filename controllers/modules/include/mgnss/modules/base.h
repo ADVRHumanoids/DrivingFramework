@@ -2,6 +2,7 @@
 #define __MGNSS__CONTROLLERS_BASE_H
 
 #include <mwoibn/robot_class/robot.h>
+#include <mwoibn/common/logger.h>
 
 namespace mgnss
 {
@@ -23,7 +24,8 @@ public:
   virtual void setRate(double rate){
     _robot.setRate(rate);
   }
-
+  virtual void startLog(mwoibn::common::Logger& logger) = 0;
+  virtual void log(mwoibn::common::Logger& logger, double time) = 0;
 protected:
   mwoibn::robot_class::Robot& _robot;
 };
