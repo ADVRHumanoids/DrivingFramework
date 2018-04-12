@@ -57,7 +57,7 @@ public:
 
   //! Returns number of actuated(?) DOFs
   int getDofs() { return _model.dof_count; }
-  
+
   virtual double rate() {return _rate;}
 
   virtual void setRate(double rate){_rate = rate;}

@@ -29,8 +29,18 @@ public:
   virtual void send();
   virtual void stop(){}
   virtual void close(){}
-  virtual void startLog(mwoibn::common::Logger& logger){}
-  virtual void log(mwoibn::common::Logger& logger, double time){}
+  virtual void startLog(mwoibn::common::Logger& logger){
+    logger.addField("time", 0);
+    logger.start();
+
+  }
+  virtual void log(mwoibn::common::Logger& logger, double time){
+    logger.addEntry("time", time);
+    logger.write();
+  }
+
+
+
 
 protected:
   mwoibn::VectorN _position, _velocity, _last_ankle, _last_position, _des_ankle, _init_ankle;

@@ -204,14 +204,8 @@ void mgnss::controllers::WheeledMotionEvent::init(){
       _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
       _leg_castor_ptr->setReference(_leg_castor_ptr->getCurrent());
 
- //     std::cout << "contact state\t" << _steering_ptr->getState().transpose() << std::endl;
       _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5])*mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]);
       _heading = _steering_ptr->getState()[2];
-
-      //std::cout << "correct\t" << _pelvis_orientation_ptr->points().getPointStateWorld(0) << std::endl;
-      //_orientation = _pelvis_orientation_ptr->points().getPointStateWorld(0);
-      //std::cout << "orientation\t" << _orientation << std::endl;
-      //std::cout << "current\t" << _orientation * mwoibn::Quaternion::fromAxisAngle(_z, _heading) << std::endl;
 
       _pelvis_orientation_ptr->setReference(0, _orientation*mwoibn::Quaternion::fromAxisAngle(_z, _heading));
 
@@ -302,13 +296,10 @@ void mgnss::controllers::WheeledMotionEvent::compute()
     {
                                                                                                                                                                                                                                                                                                                                                                                       _start_steer[i] = _test_steer[i];
       _resteer[i] = true;
-//      std::cout << "WARNING: ankle yaw " << i << " on limit."
-//                << std::endl; // NRT
     }
 
     if (_resteer[i])
     {
-//      std::cout << "dsgnkjhlfsymetljhmgdbfc" << std::endl;
       mwoibn::eigen_utils::limitToHalfPi(_test_steer[i]);
 
       if (std::fabs(_test_steer[i]) > 1.0 &&
@@ -355,58 +346,56 @@ void mgnss::controllers::WheeledMotionEvent::steering()
   _steering_ref_ptr->compute2(_next_step);
 
   steerings.noalias() = _steering_ref_ptr->get();
-//  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
 
   for (int i = 0; i < 4; i++)
   {
     setSteering(i, steerings[i]);
   }
-//  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
-
-//  std::cout << "next step\t" << _next_step.transpose() << std::endl;
 
 }
 
 void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& logger){
+
   logger.addField("time", 0.0);
 
+/*
   logger.addField("e_base_z", getBaseError()[2]);
   logger.addField("r_base_z", getBodyPosition()[2]);
-
+*/
   logger.addField("e_base_rx", getBaseOrnError()[0]);
   logger.addField("e_base_ry", getBaseOrnError()[1]);
   logger.addField("e_base_rz", getBaseOrnError()[2]);
   logger.addField("base_rx", _robot.state.get()[3]);
   logger.addField("base_ry", _robot.state.get()[4]);
   logger.addField("base_rz", _robot.state.get()[5]);
-
+/*
   logger.addField("base_x", _robot.state.get()[0]);
   logger.addField("base_y", _robot.state.get()[1]);
   logger.addField("base_z", _robot.state.get()[2]);
-
-  logger.addField("com_x", getCom()[0]);
-  logger.addField("com_y", getCom()[1]);
-  logger.addField("r_com_x", refCom()[0]);
-  logger.addField("r_com_y", refCom()[1]);
+*/
+////  logger.addField("com_x", getComFull()[0]);
+////  logger.addField("com_y", getComFull()[1]);
+////  logger.addField("r_com_x", refCom()[0]);
+////  logger.addField("r_com_y", refCom()[1]);
 
 //  logger.addField("r_1", isResteer()[0]);
 //  logger.addField("r_2", isResteer()[1]);
 //  logger.addField("r_3", isResteer()[2]);
 //  logger.addField("r_4", isResteer()[3]);
 
-  logger.addField("cp_1_x", getCp(0)[0]);
-  logger.addField("cp_1_y", getCp(0)[1]);
+////  logger.addField("cp_1_x", getCp(0)[0]);
+////  logger.addField("cp_1_y", getCp(0)[1]);
 // _logger.addField("cp_1_z", getCp(0)[2]);
-  logger.addField("cp_2_x", getCp(1)[0]);
-  logger.addField("cp_2_y", getCp(1)[1]);
+////  logger.addField("cp_2_x", getCp(1)[0]);
+////  logger.addField("cp_2_y", getCp(1)[1]);
 //  _logger.addField("cp_2_z", getCp(1)[2]);
-  logger.addField("cp_3_x", getCp(2)[0]);
-  logger.addField("cp_3_y", getCp(2)[1]);
+////  logger.addField("cp_3_x", getCp(2)[0]);
+ //// logger.addField("cp_3_y", getCp(2)[1]);
 //  _logger.addField("cp_3_z", getCp(2)[2]);
-  logger.addField("cp_4_x", getCp(3)[0]);
-  logger.addField("cp_4_y", getCp(3)[1]);
+////  logger.addField("cp_4_x", getCp(3)[0]);
+////  logger.addField("cp_4_y", getCp(3)[1]);
 //  logger.addField("cp_4_z", getCp(3)[2]);
-
+/*
   logger.addField("r_cp_1_x", refCp()[0]);
   logger.addField("r_cp_1_y", refCp()[1]);
 //  _logger.addField("r_cp_1_z", refCp()[2]);
@@ -419,16 +408,20 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
   logger.addField("r_cp_4_x", refCp()[9]);
   logger.addField("r_cp_4_y", refCp()[10]);
 //  logger.addField("r_cp_4_z", refCp()[11]);
-
-  logger.addField("r_st_1", refSteer()[0]);
-  logger.addField("r_st_2", refSteer()[1]);
-  logger.addField("r_st_3", refSteer()[2]);
-  logger.addField("r_st_4", refSteer()[3]);
-  logger.addField("st_1", getSteer()[0]);
-  logger.addField("st_2", getSteer()[1]);
-  logger.addField("st_3", getSteer()[2]);
-  logger.addField("st_4", getSteer()[3]);
-
+*/
+  logger.addEntry("r_st_1", refSteer()[0]);
+  logger.addEntry("r_st_2", refSteer()[1]);
+  logger.addEntry("r_st_3", refSteer()[2]);
+  logger.addEntry("r_st_4", refSteer()[3]);
+  logger.addEntry("st_1", getSteer()[0]);
+  logger.addEntry("st_2", getSteer()[1]);
+  logger.addEntry("st_3", getSteer()[2]);
+  logger.addEntry("st_4", getSteer()[3]);
+  logger.addField("e_st_1", errorSteer()[0]);
+  logger.addField("e_st_2", errorSteer()[1]);
+  logger.addField("e_st_3", errorSteer()[2]);
+  logger.addField("e_st_4", errorSteer()[3]);
+/*
   logger.addField("tan_sp_1", getDampingSP()[0]);
   logger.addField("tan_sp_2", getDampingSP()[1]);
   logger.addField("tan_sp_3", getDampingSP()[2]);
@@ -445,50 +438,58 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("e_st_1", errorSteer()[0]);
 //  logger.addField("e_st_2", errorSteer()[1]);
 //  logger.addField("e_st_3", errorSteer()[2]);
-//  logger.addField("e_st_4", _controller_ptr->errorSteer()[3]);
+//  logger.addField("e_st_4", errorSteer()[3]);
+*/
   logger.start();
 }
 
 void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger, double time){
   logger.addEntry("time", time);
 
+  //std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count();
+
+/*
   logger.addEntry("e_base_z", getBaseError()[2]);
   logger.addEntry("r_base_z", getBodyPosition()[2]);
-
+*/
   logger.addEntry("e_base_rx", getBaseOrnError()[0]);
   logger.addEntry("e_base_ry", getBaseOrnError()[1]);
   logger.addEntry("e_base_rz", getBaseOrnError()[2]);
   logger.addEntry("base_rx", _robot.state.get()[3]);
   logger.addEntry("base_ry", _robot.state.get()[4]);
   logger.addEntry("base_rz", _robot.state.get()[5]);
-
+/*
   logger.addEntry("base_x", _robot.state.get()[0]);
   logger.addEntry("base_y", _robot.state.get()[1]);
   logger.addEntry("base_z", _robot.state.get()[2]);
+*/
 
-  logger.addEntry("com_x", getCom()[0]);
-  logger.addEntry("com_y", getCom()[1]);
-  logger.addEntry("r_com_x", refCom()[0]);
-  logger.addEntry("r_com_y", refCom()[1]);
+////  logger.addEntry("com_x", getComFull()[0]);
+////  logger.addEntry("com_y", getComFull()[1]);
+////  logger.addEntry("r_com_x", refCom()[0]);
+////  logger.addEntry("r_com_y", refCom()[1]);
+
 
 //  logger.addEntry("r_1", isResteer()[0]);
 //  logger.addEntry("r_2", isResteer()[1]);
 //  logger.addEntry("r_3", isResteer()[2]);
 //  logger.addEntry("r_4", isResteer()[3]);
 
-  logger.addEntry("cp_1_x", getCp(0)[0]);
-  logger.addEntry("cp_1_y", getCp(0)[1]);
+////  logger.addEntry("cp_1_x", getCp(0)[0]);
+////  logger.addEntry("cp_1_y", getCp(0)[1]);
 // _logger.addEntry("cp_1_z", getCp(0)[2]);
-  logger.addEntry("cp_2_x", getCp(1)[0]);
-  logger.addEntry("cp_2_y", getCp(1)[1]);
+////  logger.addEntry("cp_2_x", getCp(1)[0]);
+////  logger.addEntry("cp_2_y", getCp(1)[1]);
 //  _logger.addEntry("cp_2_z", getCp(1)[2]);
-  logger.addEntry("cp_3_x", getCp(2)[0]);
-  logger.addEntry("cp_3_y", getCp(2)[1]);
+////  logger.addEntry("cp_3_x", getCp(2)[0]);
+////  logger.addEntry("cp_3_y", getCp(2)[1]);
 //  _logger.addEntry("cp_3_z", getCp(2)[2]);
-  logger.addEntry("cp_4_x", getCp(3)[0]);
-  logger.addEntry("cp_4_y", getCp(3)[1]);
-//  logger.addEntry("cp_4_z", getCp(3)[2]);
 
+////  logger.addEntry("cp_4_x", getCp(3)[0]);
+////  logger.addEntry("cp_4_y", getCp(3)[1]);
+
+//  logger.addEntry("cp_4_z", getCp(3)[2]);
+/*
   logger.addEntry("r_cp_1_x", refCp()[0]);
   logger.addEntry("r_cp_1_y", refCp()[1]);
 //  _logger.addEntry("r_cp_1_z", refCp()[2]);
@@ -501,7 +502,7 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
   logger.addEntry("r_cp_4_x", refCp()[9]);
   logger.addEntry("r_cp_4_y", refCp()[10]);
 //  logger.addEntry("r_cp_4_z", refCp()[11]);
-
+*/
   logger.addEntry("r_st_1", refSteer()[0]);
   logger.addEntry("r_st_2", refSteer()[1]);
   logger.addEntry("r_st_3", refSteer()[2]);
@@ -510,7 +511,11 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
   logger.addEntry("st_2", getSteer()[1]);
   logger.addEntry("st_3", getSteer()[2]);
   logger.addEntry("st_4", getSteer()[3]);
-
+  logger.addEntry("e_st_1", errorSteer()[0]);
+  logger.addEntry("e_st_2", errorSteer()[1]);
+  logger.addEntry("e_st_3", errorSteer()[2]);
+  logger.addEntry("e_st_4", errorSteer()[3]);
+/*
   logger.addEntry("tan_sp_1", getDampingSP()[0]);
   logger.addEntry("tan_sp_2", getDampingSP()[1]);
   logger.addEntry("tan_sp_3", getDampingSP()[2]);
@@ -524,10 +529,7 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 //  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);
 //  logger.addEntry("ankle_yaw_4", _robot.state.get()[28]);
-//  logger.addEntry("e_st_1", errorSteer()[0]);
-//  logger.addEntry("e_st_2", errorSteer()[1]);
-//  logger.addEntry("e_st_3", errorSteer()[2]);
-//  logger.addEntry("e_st_4", _controller_ptr->errorSteer()[3]);
 
+*/
   logger.write();
 }

@@ -199,11 +199,12 @@
 
   void mgnss::controllers::JointStates::send()
   {
-    _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
+      _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
 
     _robot.command.set(_velocity, _vel_map,
                        mwoibn::robot_class::INTERFACE::VELOCITY);
     _robot.send();
+
    // _robot.update();
   }
 

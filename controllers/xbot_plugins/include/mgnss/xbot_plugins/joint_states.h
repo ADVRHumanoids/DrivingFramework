@@ -33,6 +33,45 @@ protected:
   }
   virtual std::string _setName(){return "joint_states";}
 
+
+void control_loop(double time, double period)
+{
+
+    _valid = _robot_ptr->get();
+
+    if (!_valid)
+      return;
+
+    if (!_initialized)
+    {
+
+      if(!_rate){
+       _setRate(period); // here I may need a controller method
+       _rate = true;
+      }
+       if(_valid){
+         _valid = _robot_ptr->feedbacks.reset();
+         _controller_ptr->init();
+       }
+       if(_rate && _valid)
+        _initialized = true;
+    }
+
+    _controller_ptr->update();
+
+    _begin = std::chrono::high_resolution_clock::now();
+
+    _controller_ptr->send();
+
+    _end = std::chrono::high_resolution_clock::now();
+
+    _logger_ptr->addField("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+    _controller_ptr->log(*_logger_ptr.get(), time-_start);
+
+//   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
+
+}
+
 private:
   // std::unique_ptr<mgnss::controllers::JointStates> _controller_ptr;
   // std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;

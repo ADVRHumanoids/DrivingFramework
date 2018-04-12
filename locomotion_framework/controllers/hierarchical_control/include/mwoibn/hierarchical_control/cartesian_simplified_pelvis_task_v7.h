@@ -73,7 +73,7 @@ public:
     _rotation.setZero(3, 3);
     _zero.setZero(6);
     _jacobian_th.setZero(2, _robot.getDofs());
-
+    _contact_j.setZero(3, _robot.getDofs());
     _full_error.setZero(ik.size() * 3);
 
     //    _map = _robot.biMaps().get("full_body").get();
@@ -118,6 +118,7 @@ public:
 
   virtual void updateError()
   {
+
     _last_error.noalias() = _error; // save previous state
     // updateState(); // this will be updated by steering call
 
@@ -129,7 +130,9 @@ public:
 
       _full_error.segment<3>(3 * i).noalias() =
           _rotation * _reference.segment<3>(3 * i);
-      _full_error.segment<3>(3 * i) -= _ik.getPointStateWorld(i) + computeContact(i);
+
+      computeContact(i);
+      _full_error.segment<3>(3 * i) -= _ik.getPointStateWorld(i) + _point;
 
       _full_error.segment<2>(3 * i) =
           _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3 * i);
@@ -149,20 +152,23 @@ public:
         //        _reference.segment<3>(3 * i).transpose() <<  std::endl;
         //        _error[3*i + 2] = 0;
       }
+
     }
        // std::cout << "error\t" << "\t" << _full_error.transpose() << "\t ref" << std::endl;
        // std::cout << "reference\t" << "\t" << _reference.transpose() << "\t ref" << std::endl;
 
     //    \t" << _reference.transpose() <<  std::endl;
+
   }
 
-  mwoibn::Vector3 computeContact(int i){
+  void computeContact(int i){
+
     double norm = 1/(_ground_normal - _axes_world[i]*_ground_normal.transpose()*_axes_world[i]).norm();
-    mwoibn::Vector3 contact = -(_ground_normal - _axes_world[i]*_ground_normal.transpose()*_axes_world[i])*norm*R;
-    contact -= (_ground_normal)*r;
+    _point = -(_ground_normal - _axes_world[i]*_ground_normal.transpose()*_axes_world[i])*norm*R;
+    _point -= (_ground_normal)*r;
     //std::cout << i << "contact\t" << "\t" << contact.transpose() << "\t ref" << std::endl;
 
-    return contact;
+    //return contact;
   }
 
   void updateState()
@@ -224,10 +230,12 @@ public:
 
   virtual void updateJacobian()
   {
+
     _last_jacobian.noalias() = _jacobian;
 
     for (int i = 0; i < _ik.size(); i++)
     {
+      computeContactJacobian(i);
       if (_selector[i])
       {
         //computeContactJacobian(i);
@@ -236,7 +244,7 @@ public:
 
         //std::cout << "original\n" << _jacobian_th << std::endl;
 
-        _jacobian_th.noalias() -= computeContactJacobian(i).topRows<2>();
+        _jacobian_th.noalias() -= _contact_j.topRows<2>();
         //std::cout << "after\n"  << _jacobian_th << std::endl;
 
         _jacobian_th(0, 2) -= (std::sin(_state[2]) * _reference[3 * i] +
@@ -254,33 +262,31 @@ public:
       else
       {
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) =
-            -_ik.getFullPointJacobian(i) - computeContactJacobian(i);
+            -_ik.getFullPointJacobian(i) - _contact_j;
         _jacobian.block(3 * i, 0, 2, _robot.getDofs()) =
             -_com.getJacobian() +
             _jacobian.block(3 * i, 0, 2, _robot.getDofs());
         //        _jacobian.row(3*i + 2).setZero();
       }
     }
+
   }
 
-  mwoibn::Matrix computeContactJacobian(int i){
+  void computeContactJacobian(int i){
     double norm = 1/(_ground_normal - _axes_world[i]*_ground_normal.transpose()*_axes_world[i]).norm();
 
-    mwoibn::Vector3 vector = _axes_world[i]*_ground_normal.transpose()*_axes_world[i];
-    mwoibn::Matrix3 contact_j, contact_temp;
-    mwoibn::eigen_utils::skew(vector, contact_j);
-    mwoibn::eigen_utils::skew(_axes_world[i], contact_temp);
+    _point = _axes_world[i]*_ground_normal.transpose()*_axes_world[i];
+    mwoibn::eigen_utils::skew(_point, _contact_1);
+    mwoibn::eigen_utils::skew(_axes_world[i], _contact_2);
 
-    contact_j += (_axes_world[i]*_ground_normal.transpose()*contact_temp);
+    _contact_1 += (_axes_world[i]*_ground_normal.transpose()*_contact_2);
 
-    mwoibn::Matrix3 contact_2 = 0.5*norm*norm*_ground_normal*_ground_normal.transpose();
-    contact_2 -= mwoibn::Matrix3::Identity();
-    contact_2 -= 0.5*norm*norm*_axes_world[i]*_axes_world[i].transpose()*_ground_normal*_ground_normal.transpose();
+    _contact_2 = 0.5*norm*norm*_ground_normal*_ground_normal.transpose();
+    _contact_2 -= mwoibn::Matrix3::Identity();
+    _contact_2 -= 0.5*norm*norm*_axes_world[i]*_axes_world[i].transpose()*_ground_normal*_ground_normal.transpose();
 
-    mwoibn::Matrix contact;
-    contact = contact_2*contact_j*_wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
+    _contact_j = _contact_2*_contact_1*_wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
 
-    return contact;
   }
 
   using CartesianWorldTask::getReference;
@@ -327,7 +333,8 @@ public:
     _rotation << std::cos(_state[2]), std::sin(_state[2]), 0,
         -std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0, 1;
 
-    _track_point = _ik.getPointStateWorld(i) + computeContact(i);
+     computeContact(i);
+    _track_point = _ik.getPointStateWorld(i) + _point;
     _track_point.head<2>() -= _robot.centerOfMass().get().head<2>();
 
     _point.noalias() = _rotation * _track_point;
@@ -358,11 +365,13 @@ protected:
   RigidBodyDynamics::Model _flat_model;
   mwoibn::Vector3 _point_flat, _temp_point, _point, _track_point;
   std::vector<int> _ids;
-  mwoibn::Matrix _rotation, _jacobian_th;
+  mwoibn::Matrix _rotation, _jacobian_th, _contact_j;
   mwoibn::VectorBool _selector;
   std::vector<mwoibn::Axis> _axes, _axes_world, _x_world;
   mwoibn::Axis _ground_normal;
   double R = 0.01, r = 0.068;
+  mwoibn::Matrix3 _contact_1, _contact_2;
+
 };
 } // namespace package
 } // namespace library

@@ -45,6 +45,15 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
         mwoibn::robot_class::RobotXBot::_init(config, config_name);
     //    _init(config, robot);
 
+    if (!robot["rate"])
+      throw(std::invalid_argument(
+          std::string("Desired frequency not defined in a configuration ") +
+          std::string(", ") + config_name));
+    else
+        std::cout << "rate\t" << robot["rate"].as<double>() << std::endl;
+
+    setRate(1/robot["rate"].as<double>());
+
     _init(config, robot, shared_memory);
   }
   catch (const std::invalid_argument& e)

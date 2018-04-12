@@ -147,6 +147,7 @@ void mgnss::state_estimation::Odometry::init(){
 
 void mgnss::state_estimation::Odometry::update()
 {
+  //_begin = std::chrono::high_resolution_clock::now();
 
   _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
 
@@ -198,6 +199,7 @@ void mgnss::state_estimation::Odometry::update()
                      mwoibn::robot_class::INTERFACE::POSITION);
 
   _previous_state.noalias() = _state;
+  //_end = std::chrono::high_resolution_clock::now();
 
   //  return _base;
 }
@@ -354,7 +356,11 @@ int mgnss::state_estimation::Odometry::_min()
 }
 
 void mgnss::state_estimation::Odometry::startLog(mwoibn::common::Logger& logger){
+
   logger.addField("time", 0);
+//  logger.addEntry("exec", 0.0);
+
+/*
   logger.addField("raw_x", getRaw()[0]);
   logger.addField("raw_y", getRaw()[1]);
   logger.addField("raw_z", getRaw()[2]);
@@ -367,10 +373,34 @@ void mgnss::state_estimation::Odometry::startLog(mwoibn::common::Logger& logger)
   logger.addField("fil_tx", getFiltered()[3]);
   logger.addField("fil_ty", getFiltered()[4]);
   logger.addField("fil_tz", getFiltered()[5]);
+
+  logger.addField("1x", getContact(0)[0]);
+  logger.addField("1y", getContact(0)[1]);
+  logger.addField("1z", getContact(0)[2]);
+
+  logger.addField("2x", getContact(1)[0]);
+  logger.addField("2y", getContact(1)[1]);
+  logger.addField("2z", getContact(1)[2]);
+
+  logger.addField("3x", getContact(2)[0]);
+  logger.addField("3y", getContact(2)[1]);
+  logger.addField("3z", getContact(2)[2]);
+
+  logger.addField("4x", getContact(3)[0]);
+  logger.addField("4y", getContact(3)[1]);
+  logger.addField("4z", getContact(3)[2]);
+
+*/
   logger.start();
-}
+
+
+ }
 void mgnss::state_estimation::Odometry::log(mwoibn::common::Logger& logger, double time){
   logger.addEntry("time", time);
+//  logger.addEntry("exec", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+
+/*
+
   logger.addEntry("raw_x", getRaw()[0]);
   logger.addEntry("raw_y", getRaw()[1]);
   logger.addEntry("raw_z", getRaw()[2]);
@@ -383,5 +413,23 @@ void mgnss::state_estimation::Odometry::log(mwoibn::common::Logger& logger, doub
   logger.addEntry("fil_tx", getFiltered()[3]);
   logger.addEntry("fil_ty", getFiltered()[4]);
   logger.addEntry("fil_tz", getFiltered()[5]);
+
+  logger.addField("1x", getContact(0)[0]);
+  logger.addField("1y", getContact(0)[1]);
+  logger.addField("1z", getContact(0)[2]);
+
+  logger.addField("2x", getContact(1)[0]);
+  logger.addField("2y", getContact(1)[1]);
+  logger.addField("2z", getContact(1)[2]);
+
+  logger.addField("3x", getContact(2)[0]);
+  logger.addField("3y", getContact(2)[1]);
+  logger.addField("3z", getContact(2)[2]);
+
+  logger.addField("4x", getContact(3)[0]);
+  logger.addField("4y", getContact(3)[1]);
+  logger.addField("4z", getContact(3)[2]);
+   */
   logger.write();
+
 }

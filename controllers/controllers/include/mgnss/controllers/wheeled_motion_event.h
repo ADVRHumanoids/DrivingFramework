@@ -17,6 +17,8 @@
 #include <mwoibn/hierarchical_control/steering_angle_task.h>
 #include <mwoibn/hierarchical_control/center_of_mass_task.h>
 
+#include <chrono>
+
 namespace mgnss
 {
 namespace controllers
@@ -42,8 +44,10 @@ public:
   } // NOT IMPLEMENTED
 
   virtual void update(){
+ //   _begin = std::chrono::high_resolution_clock::now();
     //std::cout << _steering_ptr->getReference().transpose() << std::endl;
-    _robot.centerOfMass().update();
+
+   _robot.centerOfMass().update();
 
     updateBase();
 
@@ -57,8 +61,11 @@ public:
     _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
                                              6.28318531); // limit -pi:pi
     _next_step[2] = _next_step[2] / _robot.rate();
+
     steering();
     compute();
+    //_end = std::clock();
+//    _end = std::chrono::high_resolution_clock::now();
 
   } // NOT IMPLEMENTED
   virtual void close(){} // NOT IMPLEMENTED
@@ -301,7 +308,7 @@ protected:
   int count = 0;
 
   mwoibn::VectorBool _resteer;
-
+  std::chrono::high_resolution_clock::time_point _begin, _end;
 };
 }
 }

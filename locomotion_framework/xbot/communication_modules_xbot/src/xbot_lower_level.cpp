@@ -13,6 +13,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
 //    std::cout << "position after\t" << pub.transpose() << std::endl;
     _robot.setPositionReference(pub);
   }
+
   if (_velocity)
   {
     _robot.getVelocityReference(pub);
@@ -37,5 +38,6 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
 
   _robot.setStiffness(stiffness);
   _robot.setDamping(damping);
+
   return true;
 }

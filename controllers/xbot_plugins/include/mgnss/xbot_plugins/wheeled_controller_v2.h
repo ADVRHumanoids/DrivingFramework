@@ -57,6 +57,7 @@ private:
 
 
 //  std::unique_ptr<mgnss::controllers::WheeledMotionEvent> _controller_ptr;
+
   XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
   XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
   mwoibn::VectorN _support;

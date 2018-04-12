@@ -35,6 +35,7 @@ find_package(Eigen3 REQUIRED)
 LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   modules
+  roscpp
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -64,7 +65,7 @@ include_directories(
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES BasePlugin
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}

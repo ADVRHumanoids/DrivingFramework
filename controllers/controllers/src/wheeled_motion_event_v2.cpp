@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_event_v2.h>
+#include <mgnss/controllers/wheeled_motion_event_v2.h>
 
 mwoibn::WheeledMotionEvent2::WheeledMotionEvent2(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& full_robot)
     : _robot(robot), _full_robot(full_robot)
@@ -176,17 +177,6 @@ mwoibn::WheeledMotionEvent2::WheeledMotionEvent2(mwoibn::robot_class::Robot& rob
   robot.lower_limits.get(_l_limits, _select_steer);
   robot.upper_limits.get(_u_limits, _select_steer);
 
-//  std::cout << "current state\t" << _steering_ptr->getState() << std::endl;
-//  std::cout << "-PI" << _steering_ptr->getState()[4]-mwoibn::PI << std::endl;
-//  std::cout << "current orientation\t" << _pelvis_orientation_ptr->points().getPointStateWorld(0) << std::endl;
-//  std::cout << "orientation x\t" << mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]) << std::endl;
-//  std::cout << "orientation y\t" << mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]-mwoibn::PI) << std::endl;
-//  std::cout << "orientation z\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading) << std::endl;
-//  std::cout << "orientation\t" << _orientation << std::endl;
-//  std::cout << "orientation xy\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading)*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]) << std::endl;
-
-//  std::cout << "my computation\t" << mwoibn::Quaternion::fromAxisAngle(_z, _heading)*_orientation << std::endl;
-
   _previous_command = mwoibn::VectorN::Zero(3);
   _command.setZero(_robot.getDofs());
 }
@@ -212,9 +202,7 @@ void mwoibn::WheeledMotionEvent2::nextStep(const mwoibn::VectorN& support)
   _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
                                            6.28318531); // limit -pi:pi
   _next_step[2] = _next_step[2] / _robot.rate();
-  //  _next_step[0] = velocity[0];
-  //  _next_step[1] = velocity[1];
-  //  _next_step[2] = omega;
+
   steering();
 }
 
@@ -252,8 +240,6 @@ void mwoibn::WheeledMotionEvent2::fullUpdate(const mwoibn::VectorN& support)
 }
 void mwoibn::WheeledMotionEvent2::compute()
 {
-//_leg_castor_ptr->updateError();
-//  _leg_steer_ptr->updateError();
   _command.noalias() = _hierarchical_controller.update();
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
@@ -266,27 +252,6 @@ void mwoibn::WheeledMotionEvent2::compute()
 
   if (count == 30)
   {
-//    std::cout << "com\t";
-//    std::cout << _com_ptr->getError().transpose() << std::endl;
-//    std::cout << "steer\t";
-//    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
-//    std::cout << "error\t";
-//    std::cout << _steering_ptr->getWorldError().transpose() << std::endl;
-
-//    std::cout.precision(6);
-
-//    std::cout << std::fixed << _leg_camber_ptr->getReference(0) * 180 / 3.14
-//              << "\t";
-
-//    std::cout << std::fixed << steerings.transpose() * 180 / 3.14 << "\t";
-//    std::cout << std::fixed << _leg_steer_ptr->getCurrent()[0] * 180 / 3.14
-//              << "\t";
-//    std::cout << std::fixed << _leg_steer_ptr->getError().transpose() * 180 / 3.14
-//              << std::endl;
-//    std::cout << std::fixed << (_steering_ptr->getWorldError())[0] * 100
-//              << "\t";
-//    std::cout << std::fixed << (_steering_ptr->getWorldError())[1] * 100
-//              << std::endl;
     count = 0;
   }
   else
@@ -306,6 +271,5 @@ void mwoibn::WheeledMotionEvent2::steering()
     steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
     steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
     setSteering(i, steerings[i]);
-//    std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;
   }
 }

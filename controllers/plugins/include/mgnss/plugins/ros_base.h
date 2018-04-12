@@ -3,6 +3,7 @@
 
 #include <mgnss/modules/base.h>
 #include <mwoibn/common/ros_logger.h>
+#include <ros/ros.h>
 //#include <custom_services/jointStateCmnd.h>
 
 namespace mgnss

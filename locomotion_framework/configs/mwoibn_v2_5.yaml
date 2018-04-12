@@ -1,8 +1,8 @@
-driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
+driving_path: &driving  "/home/embedded/locomotion_src/workspace/src/"
+simulator_path: &simulator "/home/embedded/locomotion_src/workspace/src/"
 mwoibn:
         middleware: "XBOT"
-        system: "SM" # SM
+        system: "HW" # SM
         layers:
             RT:
                         path: *driving
@@ -13,120 +13,125 @@ mwoibn:
         robot:
                 name: "centauro"
                 systems:
-                        HW: 
+                        HW:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/configs/hardware.yaml"
-                        SM: 
+                        SM:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/configs/simulation.yaml"
                 default:
-                        controller: 
+                        controller:
                                 list: [position_controller, velocity_controller]
-                        feedback: 
+                        feedback:
                                 layer: "online"
-                        actuators: 
+                        actuators:
                                 read: "true"
-                        contacts: 
+                        contacts:
                                 read: "true"
                                 feedback: false
 
                 reference:
-                        controller: 
+                        controller:
                                 list: ["lower_body"]
-                        feedback: 
+                        feedback:
                                 layer: "offline"
-                        actuators: 
+                        actuators:
                                 read: "false"
-                        contacts: 
+                        contacts:
                                 read: "true"
                                 feedback: false
 
                 higher_scheme:
-                        controller: 
+                        controller:
                                 layer: "higher_level"
-                        feedback: 
+                        feedback:
                                 layer: "online"
-                        actuators: 
+                        actuators:
                                 read: "true"
-                        contacts: 
+                        contacts:
                                 read: "true"
                                 feedback: false
                 full_model:
-                        controller: 
+                        controller:
                                 list: []
-                        feedback: 
+                        feedback:
                                 layer: "online"
-                        actuators: 
+                        actuators:
                                 read: "true"
-                        contacts: 
+                        contacts:
                                 read: "true"
-                                feedback: false  
+                                feedback: false
                 simulated:
-                        controller: 
+                        controller:
                                 layer: ""
-                        feedback: 
+                        feedback:
                                 layer: "simulated"
-                        actuators: 
+                        actuators:
                                 read: "true"
-                        contacts: 
+                        contacts:
                                 read: "true"
-                                feedback: false  
+                                feedback: false
                 empty:
-                        controller: 
+                        controller:
                                 layer: ""
-                        feedback: 
+                        feedback:
                                 layer: ""
-                        actuators: 
+                        actuators:
                                 read: false
-                        contacts: 
+                        contacts:
                                 read: false
-                                feedback: false  
+                                feedback: false
                 odometry:
-                        controller: 
+                        controller:
                                 list: [odometry]
-                        feedback: 
+                        feedback:
                                 list: [link_side_online, imu_base]
-                        actuators: 
+                        actuators:
                                 read: true
-                        contacts: 
+                        contacts:
                                 read: true
-                                feedback: false 
+                                feedback: false
                 joint_space:
-                        controller: 
+                        controller:
                                 layer: "lower_level"
-                        feedback: 
+                        feedback:
                                 list: [link_side_online]
-                        actuators: 
+                        actuators:
                                 read: true
-                        contacts: 
+                        contacts:
                                 read: false
                                 feedback: false
                 fake:
-                        controller: 
+                        controller:
                                 layer: ""
-                        feedback: 
+                        feedback:
                                 list: [link_side_online]
-                        actuators: 
+                        actuators:
                                 read: true
-                        contacts: 
+                        contacts:
                                 read: false
                                 feedback: false
 
 
         feedback:
-                link_side_online: 
+                link_side_online:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: actuated
                                 mapping: PYTHON
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false    
-                simulation_state: 
+                                effort: false
+                        limits:
+                                tolerance:
+                                    position: 5
+                                    velocity: 0
+                                    torque: 0
+                simulation_state:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: actuated
                                 mapping: PYTHON
@@ -136,14 +141,14 @@ mwoibn:
                                 effort: false
                 motor_side_online:
                 floating_base:
-                        space: OPERATIONAL 
+                        space: OPERATIONAL
                         convention:
                                 orientation:
                                         type: QUATERNION
                                         convention: HAMILTONIAN
                                 position:
                                         type: FULL
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: body
                                 name: pelvis
@@ -153,14 +158,14 @@ mwoibn:
                                 velocity: false
                                 effort: false
                 simulation_base:
-                        space: OPERATIONAL 
+                        space: OPERATIONAL
                         convention:
                                 orientation:
                                         type: QUATERNION
                                         convention: HAMILTONIAN
                                 position:
                                         type: FULL
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: body
                                 name: pelvis
@@ -170,14 +175,14 @@ mwoibn:
                                 velocity: true
                                 effort: false
                 imu_base:
-                        space: OPERATIONAL 
+                        space: OPERATIONAL
                         convention:
                                 orientation:
                                         type: QUATERNION
                                         convention: HAMILTONIAN
                                 position:
                                         type: NONE
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: body
                                 name: pelvis
@@ -202,7 +207,7 @@ mwoibn:
                                 z: 0
                 whole_body:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: all
                                 mapping: RBDL
@@ -212,7 +217,7 @@ mwoibn:
                                 effort: false
                 lower_body:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: lower_body
                                 type: all
                                 mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
@@ -222,7 +227,7 @@ mwoibn:
                                 effort: false
                 odometry:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: base
                                 type: all
                                 mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
@@ -232,7 +237,7 @@ mwoibn:
                                 effort: false
                 velocity_reference:
                         space: JOINT
-                        dofs: 
+                        dofs:
                                 chain: lower_body
                                 type: all
                                 mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
@@ -242,7 +247,7 @@ mwoibn:
                                 effort: false
         controller:
                 position_controller:
-                        dofs: 
+                        dofs:
                                 chain: position
                                 type: actuated
                                 mapping: PYTHON
@@ -252,7 +257,7 @@ mwoibn:
                                 effort: true
                         initialize: "link_side_online"
                 velocity_controller:
-                        dofs: 
+                        dofs:
                                 chain: wheels
                                 type: actuated
                                 mapping: PYTHON
@@ -261,7 +266,7 @@ mwoibn:
                                 velocity: true
                                 effort: false
                 whole_body:
-                        dofs: 
+                        dofs:
                                 chain: all
                                 type: all
                                 mapping: RBDL
@@ -270,7 +275,7 @@ mwoibn:
                                 velocity: true
                                 effort: false
                 lower_body:
-                        dofs: 
+                        dofs:
                                 chain: lower_body
                                 type: all
                                 mapping: RBDL #this he RBDL model that it is working with is only lower body
@@ -280,7 +285,7 @@ mwoibn:
                                 effort: false
                                 effort: false
                 odometry:
-                        dofs: 
+                        dofs:
                                 chain: base
                                 type: all
                                 mapping: RBDL_LOWER #this he RBDL model that it is working with is only lower body
@@ -315,25 +320,25 @@ mwoibn:
                         actuators: "actuators_yaml"
                         contacts: "contacts_yaml"
                 feedback:
-                        link_side_online: 
+                        link_side_online:
                                 source: "joint_states"
                                 message: sensor_msgs::JointState
                                 initialize: true
-                        simulation_state: 
+                        simulation_state:
                                 source: "joint_states"
                                 message: sensor_msgs::JointState
                                 initialize: true
-                        simulation_base: 
+                        simulation_base:
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
                                 reference: centauro::pelvis
                                 initialize: true
-                        floating_base: 
+                        floating_base:
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
                                 reference: centauro::pelvis
                                 initialize: true
-                        imu_base: 
+                        imu_base:
                                 source: "/gazebo/link_states"
                                 message: gazebo_msgs::LinkStates
                                 reference: centauro::pelvis
@@ -355,9 +360,9 @@ mwoibn:
                                 source: "desired_state"
                                 message: custom_messages::CustomCmnd
                                 initialize: false
-                        motor_side_online: 
+                        motor_side_online:
                                 space: SKIP
-                                
+
                 controller:
                         position_controller:
                                 type: custom_controller/ActuatorPositionControllerClasses
@@ -378,29 +383,29 @@ mwoibn:
                                 sink: "base_odometry"
         xbot:
                 source:
-                        config: 
+                        config:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
-                        urdf: 
+                        urdf:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
 #                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
                         srdf:
                                 path: *driving
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
-                        actuators: 
+                        actuators:
                                 path: *simulator
                                 file: "centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
-                        contacts: 
-                                path: *simulator 
+                        contacts:
+                                path: *simulator
                                 file: "centauro-simulator/centauro/centauro_config/config/contacts.yaml"
-                        controller: 
+                        controller:
                                 path: *driving
-                                file: "" 
+                                file: ""
                 mapping:
                         RBDL_LOWER:
                                 loading: model
-                                urdf: 
+                                urdf:
                                         path: *driving
                                         file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
                 feedback:
@@ -423,16 +428,16 @@ mwoibn:
                                 layer: online
                                 sensor: imu_link
                                 source: "floating_base"
-                        whole_body: 
+                        whole_body:
                                 layer: NRT
                                 source: "desired_state"
-                        velocity_reference: 
+                        velocity_reference:
                                 layer: NRT
                                 source: "desired_state"
-                        lower_body: 
+                        lower_body:
                                 layer: NRT
                                 source: "desired_state"
-                        odometry: 
+                        odometry:
                                 layer: RT
                                 source: "base_odometry"
                 controller:
@@ -458,8 +463,8 @@ mwoibn:
                         layer: "RT"
                         robot: default
                         mode: "full"
-                        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: RT10
+                        secondary_file: &config_lower /home/embedded/locomotion_src/workspace/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
+                        tunning: HW4
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0
@@ -478,6 +483,23 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.02
+                                HW4: # works straight and direct rotation
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 120 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 40
+                                        centre_of_mass_y: 40
+                                        base_position: 30
+                                        contact_point: 5
+                                        camber: 30
+                                        castor: 15
+                                        camber_damp: 0.08
+                                        castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.01
                                 HW1: # works straight and direct rotation
                                         ratio: 1.0
                                         damping: 0.0001
@@ -562,8 +584,8 @@ mwoibn:
                                         castor_damp: 0.12
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.01                                
-                                odom_NRT: # circular - odom, 
+                                        steer_damp: 0.01
+                                odom_NRT: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
@@ -580,7 +602,7 @@ mwoibn:
                                         steer_open_loop: 0.8
                                         steer_feedback: 0.2
                                         steer_damp: 0.03
-                                odom_NRT_iit: # circular - odom, 
+                                odom_NRT_iit: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
@@ -664,7 +686,7 @@ mwoibn:
                                         castor_damp: 0.12
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.010  
+                                        steer_damp: 0.010
                                 RT5: # worked once
                                         ratio: 1.0
                                         damping: 0.0001
@@ -681,7 +703,7 @@ mwoibn:
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.015                                        
+                                        steer_damp: 0.015
                                 RT6: # works but sharp
                                         ratio: 1.0
                                         damping: 0.0001
@@ -698,7 +720,7 @@ mwoibn:
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.017  
+                                        steer_damp: 0.017
                                 RT7: # semi working for circular
                                         ratio: 1.0
                                         damping: 0.0001
@@ -740,11 +762,6 @@ mwoibn:
                                         leg_steer: 40 # 20
                                         base_orinetation: 240
                                         centre_of_mass_x: 240
-                                        centre_of_mass_y: 240
-                                        base_position: 20
-                                        contact_point: 120 # 75
-                                        camber: 100
-                                        castor: 60
                                         camber_damp: 0.08
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
@@ -766,7 +783,7 @@ mwoibn:
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.01                                                                                                                    
+                                        steer_damp: 0.01
                 joint_states:
                         layer: "RT"
                         robot: joint_space
@@ -774,7 +791,7 @@ mwoibn:
                 odometry:
                         layer: "RT"
                         robot: odometry
-                        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/odometry.yaml
+                        secondary_file: /home/embedded/locomotion_src/workspace/src/DrivingFramework/locomotion_framework/configs/odometry.yaml
                         mode: "full"
                         wheel_radius: 0.078
                         chain: "wheels"
