@@ -47,21 +47,24 @@ public:
       std::cout << "\tInitialized torque interface in "
                 << config["source"].as<std::string>() << "/torque\n";
     }
-    
+
 
     std::cout << "\tSuccess" << std::endl;
   }
 
   virtual bool initialize()
   {
+    //std::cout << "shared initialize" << std::endl;
     _sub_position.get(_positions);
+
+    //std::cout << _positions.transpose() << std::endl;
     if (_position && _positions[check] != mwoibn::IS_VALID)
       return false;
-    
+
     _sub_velocity.get(_velocities);
     if (_velocity && _velocities[check] != mwoibn::IS_VALID)
       return false;
-    
+
     _sub_torque.get(_torques);
     if (_torque && _torques[check] != mwoibn::IS_VALID)
       return false;
@@ -99,7 +102,7 @@ public:
 
 protected:
   mwoibn::VectorRT _positions, _velocities, _torques;
-  
+
   XBot::SharedObject<mwoibn::VectorRT> _sub_position;
   XBot::SharedObject<mwoibn::VectorRT> _sub_velocity;
   XBot::SharedObject<mwoibn::VectorRT> _sub_torque;

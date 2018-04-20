@@ -32,6 +32,7 @@ public:
           config["sink"].as<std::string>() + "/position");
       std::cout << "\tInitialized position interface in "
                 << config["sink"].as<std::string>() << "/position\n";
+
     }
     if (_velocity)
     {
@@ -52,7 +53,7 @@ public:
 
   virtual ~XBotControllerShared()
   {
-      
+
     if (_position){
       _positions[check] = mwoibn::INVALID;
       _pub_position.set(_positions);
@@ -69,8 +70,10 @@ public:
 
   virtual bool initialize()
   {
+ //     std::cout << "initialaizing" << std::endl;
     if(_initialized) return _initialized;
     if (_position){
+ //       std::cout << "is_valid\t" << mwoibn::IS_VALID << std::endl;
       _positions[check] = mwoibn::IS_VALID;
     }
     if (_velocity)
@@ -89,6 +92,7 @@ public:
     if (_position){
       mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
             _positions);
+ //     std::cout << _positions.transpose() << std::endl;
       _pub_position.set(_positions);
     }
     if (_velocity){

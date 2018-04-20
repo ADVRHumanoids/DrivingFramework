@@ -70,6 +70,7 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
 
 void mgnss::plugins::XbotBase::on_start(double time)
 {
+
    _start = time;
 
     _valid = _robot_ptr->get() && _robot_ptr->feedbacks.reset();
@@ -94,6 +95,7 @@ void mgnss::plugins::XbotBase::on_stop(double time) {
 
 void mgnss::plugins::XbotBase::control_loop(double time, double period)
 {
+
     _begin = std::chrono::high_resolution_clock::now();
 
     _valid = _robot_ptr->get();
@@ -122,18 +124,18 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
 
     _controller_ptr->update();
 
-    _begin = std::chrono::high_resolution_clock::now();
+    //_begin = std::chrono::high_resolution_clock::now();
 
     _controller_ptr->send();
 
     _end = std::chrono::high_resolution_clock::now();
 
-    _logger_ptr->addField("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+    _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
 
 
     _controller_ptr->log(*_logger_ptr.get(), time-_start);
 
-//   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
+  // std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
 
 }
 

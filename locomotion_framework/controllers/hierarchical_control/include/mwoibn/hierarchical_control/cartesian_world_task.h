@@ -55,7 +55,9 @@ public:
   //! sets current state as a desired reference
   virtual void resetReference() { _reference.noalias() = _ik.getFullStateWorld(); }
   //! returnes task reference
-  virtual const mwoibn::VectorN& getReference() const { return _reference; }
+  virtual const mwoibn::VectorN& getReference() const {
+      return _reference; }
+
   const point_handling::PositionsHandler& points() { return _ik; }
   //! sets task reference
   virtual mwoibn::VectorN getReference(int i) const

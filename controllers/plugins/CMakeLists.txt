@@ -5,6 +5,8 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
    find_package(Xenomai)
@@ -14,7 +16,6 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
 include_directories(${CMAKE_BINARY_DIR})
 configure_file(
@@ -50,6 +51,9 @@ find_package(catkin REQUIRED COMPONENTS
 #set(MASTER_PATH ${CMAKE_INSTALL_PREFIX})
 #set(CMAKE_INSTALL_PREFIX ${ADVR_SUPERBUILD_DIR})
 
+set(MASTER_PATH ${CMAKE_INSTALL_PREFIX})
+set(CMAKE_INSTALL_PREFIX ${ADVR_SUPERBUILD_DIR})
+
 #message(WARNING "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 
 ## Specify additional locations of header files
@@ -78,6 +82,11 @@ add_library(BasePlugin SHARED
     src/xbot_base.cpp
     src/ros_base.cpp
 )
+if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(BasePlugin)
+endif()
+
 
 target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(BasePlugin ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
@@ -88,16 +97,16 @@ LIST( APPEND INSTALL_TARGETS BasePlugin )
 #################### INSTALL ####################
 #################################################
 
-## Mark executables and/or libraries for installation
+# Mark executables and/or libraries for installation
  install(TARGETS ${INSTALL_TARGETS}
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+   ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
+   LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
+   RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/bin/
  )
 
 # Mark cpp header files for installation
  install(DIRECTORY include/mgnss/${PROJECT_NAME}
-   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mgnss/
+   DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/include/mgnss/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
@@ -106,10 +115,10 @@ LIST( APPEND INSTALL_TARGETS BasePlugin )
 ############### RESTORE VARIABLES ###############
 #################################################
 
-#set(CMAKE_INSTALL_PREFIX ${MASTER_PATH})
+set(CMAKE_INSTALL_PREFIX ${MASTER_PATH})
 
-# install(DIRECTORY include/mgnss/${PROJECT_NAME}
-#   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mgnss/
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+ install(DIRECTORY include/mgnss/${PROJECT_NAME}
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mgnss/
+   FILES_MATCHING PATTERN "*.h"
+   PATTERN ".svn" EXCLUDE
+ )

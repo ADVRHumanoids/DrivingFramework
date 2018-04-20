@@ -18,7 +18,7 @@ MasterCommunicationInterface:
 
 XBotRTPlugins:
 #  plugins: ["Odometry", "JointStates", "WheelsV2"]
-  plugins: ["JointStates", "Odometry", "WheelsV2"]
+  plugins: ["JointStates","Odometry", "WheelsV2"]
 #  plugins: ["JointStates", "Odometry"]
   io_plugins: []
   

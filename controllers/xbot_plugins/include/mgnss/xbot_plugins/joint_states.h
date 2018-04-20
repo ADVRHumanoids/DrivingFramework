@@ -59,15 +59,16 @@ void control_loop(double time, double period)
 
     _controller_ptr->update();
 
-    _begin = std::chrono::high_resolution_clock::now();
+//    _begin = std::chrono::high_resolution_clock::now();
 
     _controller_ptr->send();
 
+/*
     _end = std::chrono::high_resolution_clock::now();
 
     _logger_ptr->addField("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
     _controller_ptr->log(*_logger_ptr.get(), time-_start);
-
+*/
 //   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
 
 }

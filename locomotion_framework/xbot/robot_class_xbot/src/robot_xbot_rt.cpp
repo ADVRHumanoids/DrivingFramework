@@ -76,9 +76,11 @@ void mwoibn::robot_class::RobotXBotRT::_init(
   _loadMappings(robot["mapping"]);
 
   _loadFeedbacks(robot["feedback"], shared_memory);
+
   _loadControllers(robot["controller"], shared_memory);
 
   mwoibn::robot_class::RobotXBotFeedback::_initStates();
+
 }
 
 void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
@@ -160,6 +162,7 @@ void mwoibn::robot_class::RobotXBotRT::_loadControllers(
           std::unique_ptr<mwoibn::communication_modules::BasicController>(
               new mwoibn::communication_modules::XBotControllerShared(
                   command, map,  entry.second, shared_memory)), entry.first.as<std::string>());
+
       continue;
     }
     if (entry.second["layer"].as<std::string>() == "NRT")

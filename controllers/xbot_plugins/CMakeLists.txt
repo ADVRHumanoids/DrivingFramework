@@ -5,8 +5,14 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+
+    message(WARNING "MO enable_xeno")
+
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
+    message(WARNING "enable_xeno")
+
    find_package(Xenomai)
    find_package(RTnet)
 endif()
@@ -16,7 +22,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 
 
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 include(MacroYCMInstallLibrary)
 
 set(INSTALL_TARGETS "")
@@ -85,12 +90,13 @@ include_directories(
 ############## CONSTANT REFERENCES #############
 ################################################
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(JointStates)
-endif()
 add_library(JointStates SHARED
     src/joint_states.cpp
 )
+if ( Xenomai_FOUND )
+    set_xeno_flags(JointStates)
+endif()
+
 
 target_link_libraries(JointStates ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(JointStates ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
@@ -102,12 +108,14 @@ LIST( APPEND INSTALL_TARGETS JointStates )
 ################### ODOMETRY ###################
 ################################################
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(Odometry)
-endif()
 add_library(Odometry SHARED
     src/odometry.cpp
 )
+
+if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(Odometry)
+endif()
 
 target_link_libraries(Odometry ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(Odometry ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
@@ -121,12 +129,13 @@ LIST( APPEND INSTALL_TARGETS Odometry )
 ################## WHEELS NEW ##################
 ################################################
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(WheelsV2)
-endif()
 add_library(WheelsV2 SHARED
     src/wheeled_controller_v2.cpp
 )
+if ( Xenomai_FOUND )
+    set_xeno_flags(WheelsV2)
+endif()
+
 
 target_link_libraries(WheelsV2 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(WheelsV2 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})

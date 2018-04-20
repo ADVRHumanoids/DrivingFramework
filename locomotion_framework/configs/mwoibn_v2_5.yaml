@@ -483,23 +483,23 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.02
-                                HW4: # works straight and direct rotation
+                                HW4:
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 120 # 20
+                                        leg_steer: 100 # 20
                                         base_orinetation: 120
                                         centre_of_mass_x: 40
                                         centre_of_mass_y: 40
                                         base_position: 30
-                                        contact_point: 5
+                                        contact_point: 7
                                         camber: 30
                                         castor: 15
                                         camber_damp: 0.08
                                         castor_damp: 0.10
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
-                                        steer_damp: 0.01
+                                        steer_damp: 0.02
                                 HW1: # works straight and direct rotation
                                         ratio: 1.0
                                         damping: 0.0001

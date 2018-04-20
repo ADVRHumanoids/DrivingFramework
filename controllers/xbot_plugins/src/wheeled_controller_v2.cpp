@@ -4,7 +4,8 @@ REGISTER_XBOT_PLUGIN(WheelsV2, mgnss::xbot_plugins::WheelsV2)
 
 
 bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(XBot::Handle::Ptr handle){
-  mgnss::plugins::XbotBase::init_control_plugin(handle);
+   mgnss::plugins::XbotBase::init_control_plugin(handle);
+
   _support = get().getSupportReference();
   return true;
 }
@@ -19,11 +20,15 @@ void mgnss::xbot_plugins::WheelsV2::on_start(double time)
 
 void mgnss::xbot_plugins::WheelsV2::control_loop(double time, double period)
 {
+    _begin = std::chrono::high_resolution_clock::now();
 
     _valid = _robot_ptr->get();
 
-    if (!_valid)
+    if (!_valid){
+      //  std::cout << "!valid" << std::endl;
       return;
+
+    }
 
 
     _robot_ptr->updateKinematics();
@@ -50,6 +55,9 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time, double period)
     _controller_ptr->update();
 
     _controller_ptr->send();
+    _end = std::chrono::high_resolution_clock::now();
+
+    _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
 
 
     _controller_ptr->log(*_logger_ptr.get(), time-_start);
