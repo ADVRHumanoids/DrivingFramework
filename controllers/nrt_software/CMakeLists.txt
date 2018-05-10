@@ -130,6 +130,7 @@ if(WHEELS_MOTION)
     wheels_event
 #    wheels_full
 #    wheeled_motion_run
+    wheels_world
     wheels_support
     wheels
   )
@@ -331,6 +332,13 @@ target_link_libraries(wheels_support
 add_executable(wheels src/exec/wheels.cpp)
 add_dependencies(wheels nrt_plugins ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wheels
+    nrt_plugins
+    ${catkin_LIBRARIES}
+ )
+
+add_executable(wheels_world src/exec/wheels_world.cpp)
+add_dependencies(wheels_world nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_world
     nrt_plugins
     ${catkin_LIBRARIES}
  )

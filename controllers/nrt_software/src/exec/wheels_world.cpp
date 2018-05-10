@@ -1,10 +1,10 @@
 #define FULL_ROBOT
 
-#include <mgnss/nrt_software/plugins/wheeled_motion_event.h>
+#include <mgnss/nrt_software/plugins/wheeled_motion_world.h>
 #include <config.h>
 #include <mwoibn/loaders/robot.h>
 
-#include <mgnss/controllers/wheeled_motion_event.h>
+#include <mgnss/controllers/wheeled_motion_world.h>
 #include <mgnss/controllers/wheeled_references_v3.h>
 #include <custom_services/updatePDGains.h>
 
@@ -19,7 +19,7 @@
 
 int main(int argc, char** argv)
 {
-  mgnss::nrt_software::plugins::WheeledMotionEvent controller(argc, argv);
+  mgnss::nrt_software::plugins::WheeledMotionWorld controller(argc, argv);
 
   controller.init();
   controller.start(ros::Time::now().toSec());

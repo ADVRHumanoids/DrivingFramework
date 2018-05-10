@@ -1,5 +1,5 @@
-#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_7_H
-#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_7_H
+#ifndef HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_WORLD_H
+#define HIERARCHICAL_CONTROL_CATRESIAN_SIMPLIFIED_PELVIS_TASK_WORLD_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/cartesian_world_task.h"
@@ -17,7 +17,7 @@ namespace hierarchical_control
  *to control the position of a point defined in one of a robot reference frames
  *
  */
-class CartesianFlatReferenceTask4 : public CartesianWorldTask
+class CartesianFlatReferenceWorld : public CartesianWorldTask
 {
 
 public:
@@ -27,7 +27,7 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  CartesianFlatReferenceTask4(point_handling::PositionsHandler ik,
+  CartesianFlatReferenceWorld(point_handling::PositionsHandler ik,
                               mwoibn::robot_class::Robot& robot, mwoibn::hierarchical_control::CenterOfMassTask& com)
       : CartesianWorldTask(ik), _robot(robot), _com(com)
   {
@@ -99,7 +99,7 @@ public:
     init();
   }
 
-  virtual ~CartesianFlatReferenceTask4() {}
+  virtual ~CartesianFlatReferenceWorld() {}
 
   void init()
   {
@@ -108,9 +108,7 @@ public:
 
     for (int i = 0; i < _ik.size(); i++)
     {
-      _reference.segment<3>(3 * i) = getPointStateReference(i);
-      //      _temp_point = _ik.getPointStateWorld(i);
-      //      setReferenceWorld(i, _temp_point, false);
+      _reference.segment<3>(3 * i) = _ik.getPointStateWorld(i);
     }
   }
 
@@ -131,8 +129,8 @@ public:
           _rotation * _reference.segment<3>(3 * i);
       _full_error.segment<3>(3 * i) -= _ik.getPointStateWorld(i) + computeContact(i);
 
-      _full_error.segment<2>(3 * i) =
-          _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3 * i);
+//      _full_error.segment<2>(3 * i) =
+//          _robot.centerOfMass().get().head(2) + _full_error.segment<2>(3 * i);
 
       if (_selector[i])
       {
@@ -231,8 +229,7 @@ public:
       if (_selector[i])
       {
         //computeContactJacobian(i);
-        _jacobian_th.noalias() =
-            -_com.getJacobian() - _ik.getFullPointJacobian(i).topRows<2>();
+        _jacobian_th.noalias() = - _ik.getFullPointJacobian(i).topRows<2>();
 
         //std::cout << "original\n" << _jacobian_th << std::endl;
 
@@ -324,13 +321,13 @@ public:
 
   virtual const mwoibn::Vector3& getPointStateReference(int i)
   {
-    _rotation << std::cos(_state[2]), std::sin(_state[2]), 0,
-        -std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0, 1;
+    //_rotation << std::cos(_state[2]), std::sin(_state[2]), 0,
+    //    -std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0, 1;
 
     _track_point = _ik.getPointStateWorld(i) + computeContact(i);
-    _track_point.head<2>() -= _robot.centerOfMass().get().head<2>();
+    //_track_point.head<2>() -= _robot.centerOfMass().get().head<2>();
 
-    _point.noalias() = _rotation * _track_point;
+    _point.noalias() = _track_point;
     return _point;
   }
 
@@ -339,10 +336,10 @@ public:
 
   virtual const mwoibn::Vector3& getReferenceError(int i)
   {
-    _rotation << std::cos(_state[2]), std::sin(_state[2]), 0,
-        -std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0, 1;
+ //   _rotation << std::cos(_state[2]), std::sin(_state[2]), 0,
+ //       -std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0, 1;
 
-    _point.noalias() = _rotation * (_full_error.segment<3>(3 * i));
+    _point.noalias() = (_full_error.segment<3>(3 * i));
     return _point;
   }
 
