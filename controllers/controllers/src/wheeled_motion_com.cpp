@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_com.h>
+#include <mgnss/controllers/steering_v2.h>
 
 mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
     : _robot(robot)
@@ -29,7 +30,7 @@ mwoibn::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
           pelvis, _robot));
   _com_ptr.reset(new mwoibn::hierarchical_control::CenterOfMassTask(_robot));
   _steering_ptr.reset(
-      new mwoibn::hierarchical_control::CartesianFlatReferenceTask(
+      new mwoibn::hierarchical_control::CartesianFlatReferenceTaskV4(
           mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                    robot.getLinks("wheels")),
           _robot));

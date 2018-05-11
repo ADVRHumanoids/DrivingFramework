@@ -3,18 +3,12 @@
 
 #include <mwoibn/robot_class/robot.h>
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h>
+#include <mgnss/controllers/steering_reference.h>
 
 namespace mgnss {
 
 namespace events
 {
-
-void limit(double b_ref, double& b);
-void limit(const mwoibn::VectorN& b_ref, mwoibn::VectorN& b);
-void limit2(double b_ref, double& b);
-
-void jointLimits(double& b, double max = 2.79252680);
-void jointLimits(mwoibn::VectorN& b, double max = 2.79252680);
 
 class Steering
 {

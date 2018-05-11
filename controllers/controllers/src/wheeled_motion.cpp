@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion.h>
+#include <mgnss/controllers/steering_v4.h>
 
 mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
     : _robot(robot)
@@ -76,7 +77,7 @@ mwoibn::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& robot)
   init_steerings.setZero(4);
 
   _steering_ref_ptr.reset(
-      new mgnss::events::Steering(_robot, *_steering_ptr, init_steerings, 0.7, 0.3, _dt, 0.1));
+      new mgnss::events::Steering4(_robot, *_steering_ptr, init_steerings, 0.7, 0.3, _dt, 0.1));
 
   steerings.resize(_leg_z_ptr->points().size());
   axis << 0, 0, 1;

@@ -31,6 +31,7 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 find_package(Eigen3 REQUIRED)
+find_package(XCM REQUIRED)
 
 LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
@@ -62,8 +63,13 @@ include_directories(
 )
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
-  LIBRARIES BasePlugin
+  INCLUDE_DIRS 
+        include 
+        ${catkin_INCLUDE_DIRS}   
+        ${XCM_INCLUDE_DIRS}
+  LIBRARIES 
+        BasePlugin
+        ${XCM_LIBRARIES}
   CATKIN_DEPENDS 
 	${CATKIN_DEPENDS_SET}
   DEPENDS

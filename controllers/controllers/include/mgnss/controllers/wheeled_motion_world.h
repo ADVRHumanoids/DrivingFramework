@@ -8,7 +8,7 @@
 #include <mwoibn/hierarchical_control/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_world.h>
-#include <mgnss/controllers/steering_v6.h>
+#include <mgnss/controllers/steering_reference.h>
 
 #include <mwoibn/hierarchical_control/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
@@ -147,19 +147,11 @@ public:
 
   void updateBase(){
 
-//    std::cout << "_linear_vel\t" << _linear_vel << std::endl;
-//    std::cout << "_rate\t" << _robot.rate() << std::endl;
-//     std::cout << "_angular_vel\t" << _angular_vel << std::endl;
-
     _position += _linear_vel * _robot.rate();
     _heading += _angular_vel[2] * _robot.rate();
-//    std::cout << "before limits heading\t" << _heading << std::endl;
-
     _heading -= 6.28318531 * std::floor((_heading + 3.14159265) /
                                         6.28318531); // limit -pi:pi
 
-//    std::cout << "_heading\t" << _heading << std::endl;
-//    std::cout << "_z\t" << _z << std::endl;
 
     _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
@@ -285,7 +277,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
       _leg_steer_ptr;
 
-  std::unique_ptr<mgnss::events::Steering6> _steering_ref_ptr;
+  std::unique_ptr<mgnss::events::SteeringReference> _steering_ref_ptr;
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 

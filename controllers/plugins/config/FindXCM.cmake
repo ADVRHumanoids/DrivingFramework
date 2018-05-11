@@ -5,9 +5,9 @@
 #  XBOTINTERFACE_LIBRARIES - The libraries needed to use LibXml2
 #  XBOTINTERFACE_DEFINITIONS - Compiler switches required for using LibXml2
 
-#find_package(XBotInterface)
+#find_package(XBotCore-interfaces)
 
-find_path(XBotInterface_INCLUDE_DIRS XBotInterface/XBotInterface.h
+find_path(XCM_INCLUDE_DIRS XCM/XBotControlPlugin.h
           PATH_SUFFIXES include
           PATHS
           /usr/local/include/
@@ -15,8 +15,8 @@ find_path(XBotInterface_INCLUDE_DIRS XBotInterface/XBotInterface.h
           ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/include/)
 
 # find the yaml-cpp library
-find_library(XBotInterface_LIBRARIES
-             NAMES XBotInterface
+find_library(XCM_LIBRARIES
+             NAMES XCM
              PATHS 
                     /usr/lib/x86_64-linux-gnu/
                     /usr/local
@@ -29,5 +29,5 @@ find_library(XBotInterface_LIBRARIES
 
 # handle the QUIETLY and REQUIRED arguments and set YAMLCPP_FOUND to TRUE if all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(XBotInterface DEFAULT_MSG XBotInterface_INCLUDE_DIRS XBotInterface_LIBRARIES)
-mark_as_advanced(XBotInterface_INCLUDE_DIRS XBotInterface_LIBRARIES)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(XCM DEFAULT_MSG XCM_INCLUDE_DIRS)
+mark_as_advanced(XCM_INCLUDE_DIRS)

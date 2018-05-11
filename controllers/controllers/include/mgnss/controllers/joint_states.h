@@ -3,7 +3,7 @@
 
 #include <mgnss/modules/base.h>
 #include <mwoibn/point_handling/robot_points_handler.h>
-#include <mgnss/controllers/steering.h>
+#include <mgnss/controllers/steering_reference.h>
 
 namespace mgnss
 {

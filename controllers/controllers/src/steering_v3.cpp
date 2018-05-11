@@ -1,5 +1,5 @@
 #include <mgnss/controllers/steering_v3.h>
-#include <mgnss/controllers/steering.h>
+#include <mgnss/controllers/steering_reference.h>
 
 mgnss::events::Steering3::Steering3(
     mwoibn::robot_class::Robot& robot,

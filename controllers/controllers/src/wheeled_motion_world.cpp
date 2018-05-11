@@ -1,4 +1,6 @@
 #include <mgnss/controllers/wheeled_motion_world.h>
+#include <mgnss/controllers/steering_v5.h>
+
 
 mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
     mwoibn::robot_class::Robot& robot, std::string config_file)
@@ -178,7 +180,7 @@ void mgnss::controllers::WheeledMotionWorld::_allocate(YAML::Node config){
   _test_steer.setZero(_select_steer.size());
 
   _com_ref.setZero(2);
-  _steering_ref_ptr.reset(new mgnss::events::Steering6(
+  _steering_ref_ptr.reset(new mgnss::events::Steering5(
       _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
 
   _previous_command = mwoibn::VectorN::Zero(3);
@@ -348,7 +350,7 @@ void mgnss::controllers::WheeledMotionWorld::stop(){
 void mgnss::controllers::WheeledMotionWorld::steering()
 {
 
-  _steering_ref_ptr->compute2(_next_step);
+  _steering_ref_ptr->compute(_next_step);
 
   steerings.noalias() = _steering_ref_ptr->get();
 //  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;

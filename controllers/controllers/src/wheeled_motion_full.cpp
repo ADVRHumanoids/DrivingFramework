@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_full.h>
+#include <mgnss/controllers/steering_v4.h>
 
 mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
     : _robot(robot)
@@ -138,7 +139,7 @@ mwoibn::WheeledMotionFull::WheeledMotionFull(mwoibn::robot_class::Robot& robot)
 
   mwoibn::VectorN init;
   init.setZero(4);
-  _steering_ref_ptr.reset(new mgnss::events::Steering(
+  _steering_ref_ptr.reset(new mgnss::events::Steering4(
       _robot, *_steering_ptr, init, 0.7, 0.3, _dt, 0.1));
 
   _leg_steer_ptr->setReference(steerings);

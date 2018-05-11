@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
+#include <mgnss/controllers/steering_v5.h>
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
     mwoibn::robot_class::Robot& robot, std::string config_file)
@@ -352,7 +353,7 @@ void mgnss::controllers::WheeledMotionEvent::stop(){
 void mgnss::controllers::WheeledMotionEvent::steering()
 {
 
-  _steering_ref_ptr->compute2(_next_step);
+  _steering_ref_ptr->compute(_next_step);
 
   steerings.noalias() = _steering_ref_ptr->get();
 //  std::cout << steerings.transpose()*180/mwoibn::PI << std::endl;

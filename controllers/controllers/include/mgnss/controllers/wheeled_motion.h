@@ -7,7 +7,7 @@
 #include <mwoibn/hierarchical_control/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h>
-#include <mgnss/controllers/steering.h>
+#include <mgnss/controllers/steering_reference.h>
 
 #include <mwoibn/hierarchical_control/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
@@ -114,7 +114,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
       _leg_z_ptr;
 
-  std::unique_ptr<mgnss::events::Steering> _steering_ref_ptr;
+  std::unique_ptr<mgnss::events::SteeringReference> _steering_ref_ptr;
 
   mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
 

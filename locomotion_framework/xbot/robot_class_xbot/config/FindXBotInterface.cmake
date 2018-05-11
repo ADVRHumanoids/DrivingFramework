@@ -5,7 +5,7 @@
 #  XBOTINTERFACE_LIBRARIES - The libraries needed to use LibXml2
 #  XBOTINTERFACE_DEFINITIONS - Compiler switches required for using LibXml2
 
-find_package(XBotInterface)
+# find_package(XBotInterface)
 
 find_path(XBotInterface_INCLUDE_DIRS XBotInterface/XBotInterface.h
           PATH_SUFFIXES include

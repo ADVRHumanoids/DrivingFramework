@@ -10,6 +10,8 @@ set(LOG_INFO ${PROJECT_NAME})
 # set C++11
 add_definitions(-std=c++11)
 
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+
 # set-up options
 option(LOGGER "Run loggers" OFF)
 
@@ -63,8 +65,6 @@ LIST(APPEND ROBOT_XBOT_EXPORTED_TARGETS
 	${XBotInterface_EXPORTED_TARGETS}
 	${XCM_EXPORTED_TARGETS}
 )
-
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config)
 
 catkin_package(
         INCLUDE_DIRS 

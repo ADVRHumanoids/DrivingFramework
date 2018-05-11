@@ -43,12 +43,11 @@ include_directories(
 
 
 add_library(wheeled_motion
-   src/steering.cpp                 
+
    src/steering_v2.cpp                 
-   src/steering_v3.cpp     
    src/steering_v4.cpp
    src/steering_v5.cpp   
-   src/steering_v6.cpp
+
    src/wheeled_motion.cpp     
    src/wheeled_references.cpp 
    src/wheeled_references_v2.cpp

@@ -1,4 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_event_v2.h>
+#include <mgnss/controllers/steering_v4.h>
 
 mwoibn::WheeledMotionEvent2::WheeledMotionEvent2(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& full_robot)
     : _robot(robot), _full_robot(full_robot)
