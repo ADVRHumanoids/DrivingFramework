@@ -41,6 +41,9 @@ public:
 
   virtual void setReference(int i, const mwoibn::Vector3& reference) = 0;
 
+  using CartesianWorldTask::getReference;
+  using CartesianWorldTask::setReference;
+
   virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference, bool update) = 0;
 
   virtual mwoibn::Vector3
@@ -52,6 +55,10 @@ public:
   const mwoibn::VectorN& getWorldError() const { return _error; }
 
   virtual const mwoibn::Vector3& getReferenceError(int i) = 0;
+
+  virtual void releaseContact(int i) { }
+  virtual void claimContact(int i) { }
+
 
 protected:
   mwoibn::VectorN _state;

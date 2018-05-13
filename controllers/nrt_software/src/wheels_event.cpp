@@ -198,7 +198,7 @@ int main(int argc, char** argv)
     if(wheeld_controller.isResteer()[3])
       print[88] = 1;
     print.segment<4>(89) = wheeld_controller.getAnkleYaw();
-    print.segment<3>(93) = wheeld_controller.getBase();
+    print.segment<3>(93) = robot.state.get().head<3>();
 
     file << print.transpose().format(fmt) << "\n";
 

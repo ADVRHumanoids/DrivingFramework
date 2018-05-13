@@ -21,9 +21,9 @@ class SteeringAngle
 {
 public:
   SteeringAngle(mwoibn::robot_class::Robot& robot,
-                mwoibn::point_handling::Point point, mwoibn::Axis x,
-                mwoibn::Axis y, mwoibn::Axis z, mwoibn::Axis axis)
-      : _x_body(x), _y_body(y), _z_body(z), _axis(axis), _point(point),
+                mwoibn::point_handling::Point point,
+                mwoibn::Axis axis)
+      : _axis(axis), _point(point),
         _robot(robot)
   {
     _x_world << 1, 0, 0;
@@ -91,7 +91,7 @@ public:
 
 protected:
   mwoibn::Axis _v2, _n, _v1, _y;
-  mwoibn::Axis _x_body, _y_body, _z_body, _axis;
+  mwoibn::Axis _axis;
 
   mwoibn::Axis _x_world, _y_world,
       _z_world; // for now assume the basic initialization
@@ -149,33 +149,14 @@ public:
       }
 
       else if (_error[i] < 0 &&  std::fabs(_error[i] + mwoibn::PI) < 50*mwoibn::PI/180){
-//        if(!_resteer[i]){
-
-//        std::cout << i << "\t change config" << std::endl;
         _error[i]+= mwoibn::PI;
-//        _ref[i] += mwoibn::PI;
         _resteer[i] = true;
-//        std::cout << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
-//        }
       }
-//      else
-//        _resteer[i] = false;
 
       if (_error[i] > 30*mwoibn::PI/180)
         _error[i] = 30*mwoibn::PI/180;
       else if (_error[i] < -30*mwoibn::PI/180)
         _error[i] = -30*mwoibn::PI/180;
-//      while(_error[i] < -mwoibn::PI){
-//        std::cout << i << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
-
-//        _error[i]+= mwoibn::PI;
-//        _ref[i] += mwoibn::PI;
-//        std::cout << "\t" << _ref[i] <<  "\t" << _error[i] << std::endl;
-
-//      }
-
-
-
 
     }
   }

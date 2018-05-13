@@ -21,9 +21,9 @@ class CamberAngle
 {
 public:
   CamberAngle(mwoibn::robot_class::Robot& robot,
-              mwoibn::point_handling::Point point, mwoibn::Axis x,
-              mwoibn::Axis y, mwoibn::Axis z, mwoibn::Axis axis)
-      : _x_body(x), _y_body(y), _z_body(z), _axis(axis), _point(point), _robot(robot)
+              mwoibn::point_handling::Point point,
+              mwoibn::Axis axis)
+      : _axis(axis), _point(point), _robot(robot)
   {
     _x_world << 1,0,0;
     _y_world << 0,1,0;
@@ -100,7 +100,7 @@ public:
   const mwoibn::Matrix& getJacobian(){return _J;}
 
 protected:
-  mwoibn::Axis _x_body, _y_body, _z_body, _axis;
+  mwoibn::Axis _axis;
   mwoibn::Axis _v2, _n, _v1, _y;
 
   mwoibn::Axis _x_world, _y_world,
@@ -137,17 +137,13 @@ protected:
   virtual void updateError()
   {
     _last_error.noalias() = _error;
-//    std::cout << std::fixed << "camber\t";
 
     for(int i = 0; i < _angles.size(); i++){
       _angles[i].update();
       _error[i] = _ref[i] - _angles[i].get();
-//      std::cout << std::fixed << _angels[i].get()*180/mwoibn::PI << "\t";
     }
-//    std::cout << std::endl;
 
     eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
-//    std::cout << std::fixed << "error\t" << _error.transpose() * 180 / 3.14 << std::endl;
 
   }
 

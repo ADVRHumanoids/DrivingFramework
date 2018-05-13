@@ -324,7 +324,7 @@ void mgnss::xbot_plugins::WheelsV2::control_loop(double time,
     if(_controller_ptr->isResteer()[3])
       _print[88] = 1;
     _print.segment<4>(89) = _controller_ptr->getAnkleYaw();
-    _print.segment<3>(93) = _controller_ptr->getBase();
+    _print.segment<3>(93) = _robot.state.get().head<3>();
 
     file << _print.transpose().format(fmt) << "\n";
 */

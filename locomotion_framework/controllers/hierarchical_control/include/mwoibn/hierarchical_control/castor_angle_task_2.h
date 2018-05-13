@@ -20,9 +20,8 @@ class CastorAngle2
 {
 public:
   CastorAngle2(mwoibn::robot_class::Robot& robot,
-              mwoibn::point_handling::Point point, mwoibn::Axis x,
-              mwoibn::Axis y, mwoibn::Axis z, mwoibn::Axis axis)
-      : _x_body(x), _y_body(y), _z_body(z), _point(point), _robot(robot), _axis(axis)
+              mwoibn::point_handling::Point point, mwoibn::Axis axis)
+      : _point(point), _robot(robot), _axis(axis)
   {
     _x_world << 1,0,0;
     _y_world << 0,1,0;
@@ -97,7 +96,7 @@ public:
   const mwoibn::Matrix& getJacobian(){return _J;}
 
 protected:
-  mwoibn::Axis _x_body, _y_body, _z_body, _axis;
+  mwoibn::Axis _axis;
   mwoibn::Axis _v2, _n, _v1;
 
   mwoibn::Axis _x_world, _y_world,
