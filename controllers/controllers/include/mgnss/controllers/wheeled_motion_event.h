@@ -1,11 +1,8 @@
 #ifndef __MGNSS_CONTROLLERS_WHEELED_MOTION_EVENT_H
 #define __MGNSS_CONTROLLERS_WHEELED_MOTION_EVENT_H
 
-#include <mgnss/controllers/wheels_controller.h>
+#include <mgnss/controllers/wheels_controller_extend.h>
 
-#include <mwoibn/hierarchical_control/castor_angle_task.h>
-#include <mwoibn/hierarchical_control/camber_angle_task_2.h>
-#include <mwoibn/hierarchical_control/steering_angle_task.h>
 #include <mwoibn/hierarchical_control/center_of_mass_task.h>
 
 namespace mgnss
@@ -13,7 +10,7 @@ namespace mgnss
 namespace controllers
 {
 
-class WheeledMotionEvent: public WheelsController
+class WheeledMotionEvent: public WheelsControllerExtend
 {
 
 public:
@@ -27,7 +24,6 @@ public:
   virtual void startLog(mwoibn::common::Logger& logger);
   virtual void log(mwoibn::common::Logger& logger, double time);
 
-  void resetSteering();
   void resteer(int i){_resteer[i] = true;
                       _start_steer[i] = _test_steer[i];
 
@@ -39,28 +35,7 @@ public:
                      //std::cout << "stoped resteering" << std::endl;
                      }
 
-  void setSteering(int i, double th)
-  {
-    _leg_steer_ptr->setReference(i, th);
-  }
-  void setCastor(int i, double th)
-  {
-    _leg_castor_ptr->setReference(i, th);
-  }
-  void setCamber(int i, double th)
-  {
-    _leg_camber_ptr->setReference(i, th);
-  }
 
-  void setBaseX(double x){
-    _position[0] = x;
-  }
-  void setBaseY(double y){
-    _position[1] = y;
-  }
-  void setBaseZ(double z){
-    _position[2] = z;
-  }
 
   void updateBase(){
 
@@ -77,29 +52,6 @@ public:
 
   void fullUpdate(const mwoibn::VectorN& support);
   void compute();
-
-  bool isDoneSteering(const double eps) const
-  {
-    return _isDone(*_leg_steer_ptr, eps);
-  }
-  bool isDonePlanar(const double eps) const
-  {
-    return _isDone(*_steering_ptr, eps);
-  }
-  bool isDoneWheels(const double eps) const
-  {
-    return _isDone(*_leg_camber_ptr, eps);
-  }
-
-  void claim(int i){
-    _steering_ptr->claimContact(i);
-    _constraints_ptr->claimContact(i);
-  }
-
-  void release(int i){
-    _steering_ptr->releaseContact(i);
-    _constraints_ptr->releaseContact(i);
-  }
 
   mwoibn::VectorN getCom(){ return _robot.centerOfMass().get().head<2>();}
   const mwoibn::Vector3& getComFull(){ return _robot.centerOfMass().get();}
@@ -141,13 +93,6 @@ protected:
 
   std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
       _com_ptr;
-
-  std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
-      _leg_camber_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::CastorAngleTask>
-      _leg_castor_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
-      _leg_steer_ptr;
 
   mwoibn::VectorInt _select_wheel;
   mwoibn::VectorN _test_steer, _current_steer, _start_steer;

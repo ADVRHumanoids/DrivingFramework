@@ -57,18 +57,6 @@ public:
   virtual void resetSteering() = 0;
 
   virtual void setSteering(int i, double th) = 0;
-//  void setSteering(int i, double th)
-//  {
-//    _leg_steer_ptr->setReference(i, th);
-//  }
-//  void setCastor(int i, double th)
-//  {
-//    _leg_castor_ptr->setReference(i, th);
-//  }
-//  void setCamber(int i, double th)
-//  {
-//    _leg_camber_ptr->setReference(i, th);
-//  }
 
   void rotateBaseX(double th)
   {
@@ -83,16 +71,16 @@ public:
   virtual void setBaseRotVelX(double dth) { _angular_vel[0] = dth; }
   virtual void setBaseRotVelY(double dth) { _angular_vel[1] = dth; }
 
+  void setBaseX(double x){
+    _position[0] = x;
+  }
+  void setBaseY(double y){
+    _position[1] = y;
+  }
+  void setBaseZ(double z){
+    _position[2] = z;
+  }
 
-//  void setBaseX(double x){
-//    _position[0] = x;
-//  }
-//  void setBaseY(double y){
-//    _position[1] = y;
-//  }
-//  void setBaseZ(double z){
-//    _position[2] = z;
-//  }
   virtual void setBaseHeading(double th) { _heading = th; }
 
   virtual void setBaseDotX(double dx) { _linear_vel[0] = dx; }

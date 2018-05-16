@@ -109,9 +109,6 @@ protected:
   mwoibn::VectorN _zero;
   mwoibn::Vector3 _temp_point;
   std::vector<int> _ids;
-  //mwoibn::Matrix _jacobian_3D, _jacobian_flat_3D, _jacobian_flat_2D, _rotation,
-  //    _jacobian6, _jacobian_2D;
-  //mwoibn::PseudoInverse _inverser;
 
   void _buildModel(){
 

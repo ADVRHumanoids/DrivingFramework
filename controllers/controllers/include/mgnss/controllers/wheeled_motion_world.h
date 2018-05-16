@@ -1,10 +1,8 @@
 #ifndef __MGNSS_WHEELED_MOTION_WORLD_H
 #define __MGNSS_WHEELED_MOTION_WORLD_H
 
-#include <mgnss/controllers/wheels_controller.h>
-#include <mwoibn/hierarchical_control/castor_angle_task_2.h>
-#include <mwoibn/hierarchical_control/camber_angle_task_2.h>
-#include <mwoibn/hierarchical_control/steering_angle_task.h>
+#include <mgnss/controllers/wheels_controller_extend.h>
+
 #include <mwoibn/hierarchical_control/center_of_mass_task.h>
 
 namespace mgnss
@@ -12,7 +10,7 @@ namespace mgnss
 namespace controllers
 {
 
-class WheeledMotionWorld : public WheelsController
+class WheeledMotionWorld : public WheelsControllerExtend
 {
 
 public:
@@ -27,7 +25,6 @@ public:
   virtual void startLog(mwoibn::common::Logger& logger);
   virtual void log(mwoibn::common::Logger& logger, double time);
 
-  void resetSteering();
   void resteer(int i)
   {
     _resteer[i] = true;
@@ -38,14 +35,6 @@ public:
     _resteer[i] = false;
     _start_steer[i] = _test_steer[i];
   }
-
-  void setSteering(int i, double th) { _leg_steer_ptr->setReference(i, th); }
-  void setCastor(int i, double th) { _leg_castor_ptr->setReference(i, th); }
-  void setCamber(int i, double th) { _leg_camber_ptr->setReference(i, th); }
-
-  void setBaseX(double x) { _position[0] = x; }
-  void setBaseY(double y) { _position[1] = y; }
-  void setBaseZ(double z) { _position[2] = z; }
 
   void updateBase()
   {
@@ -69,18 +58,6 @@ public:
   void fullUpdate(const mwoibn::VectorN& support);
   void compute();
 
-  bool isDoneSteering(const double eps) const
-  {
-    return _isDone(*_leg_steer_ptr, eps);
-  }
-  bool isDonePlanar(const double eps) const
-  {
-    return _isDone(*_steering_ptr, eps);
-  }
-  bool isDoneWheels(const double eps) const
-  {
-    return _isDone(*_leg_camber_ptr, eps);
-  }
 
   void claim(int i)
   {
@@ -149,13 +126,6 @@ public:
 protected:
 
   std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask> _com_ptr;
-
-  std::unique_ptr<mwoibn::hierarchical_control::CamberAngleTask>
-      _leg_camber_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::CastorAngleTask2>
-      _leg_castor_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::SteeringAngleTask>
-      _leg_steer_ptr;
 
   mwoibn::VectorN _com_ref;
   mwoibn::VectorInt _select_wheel;

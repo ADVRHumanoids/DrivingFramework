@@ -459,7 +459,7 @@ mwoibn:
                         robot: default
                         mode: "full"
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: odom_NRT
+                        tunning: NRT2
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0

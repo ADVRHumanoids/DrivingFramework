@@ -14,6 +14,7 @@ option(CENTRALIZED_CONTROLLER ON)
 option(CENTER_OF_MASS_CONTROLLER ON)
 option(WHEELS_MOTION ON)
 option(TEST_TEMP ON)
+option(JOINT_STATES ON)
 option(GRAVITY_TEST ON)
 option(ODOMETRY ON)
 ## Find catkin macros and libraries
@@ -149,7 +150,7 @@ if(WHEELS_MOTION)
 
 endif(WHEELS_MOTION)
 
-if(TEST_TEMP)
+if(JOINT_STATES)
 
   LIST( APPEND INSTALL_TARGETS
     my_test
@@ -167,6 +168,16 @@ if(TEST_TEMP)
 #  LIST( APPEND CATKIN_DEPENDS_SET
 #    visualization_tools
 #  )
+
+endif(JOINT_STATES)
+
+if(TEST_TEMP)
+  LIST( APPEND INSTALL_TARGETS
+    test_swing_twist
+  )
+  LIST( APPEND CATKIN_DEPENDS_SET
+    common
+  )
 
 endif(TEST_TEMP)
 
@@ -293,30 +304,6 @@ endif(GRAVITY_TEST)
 
 if(WHEELS_MOTION)
 
-#add_executable(wheeled_locomotion_6 src/wheeled_locomotion_v6.cpp)
-#add_dependencies(wheeled_locomotion_6 ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheeled_locomotion_6
-#    ${catkin_LIBRARIES}
-# )
-
-#add_executable(wheels_cut src/wheels_cut.cpp)
-#add_dependencies(wheels_cut ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheels_cut
-#    ${catkin_LIBRARIES}
-# )
-
-#add_executable(wheels_cut_v2 src/wheels_cut_v2.cpp)
-#add_dependencies(wheels_cut_v2 ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheels_cut_v2
-#    ${catkin_LIBRARIES}
-# )
-
-#add_executable(wheels_full src/wheels_full.cpp)
-#add_dependencies(wheels_full ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(wheels_full
-#    ${catkin_LIBRARIES}
-# )
-
 add_executable(wheels_event src/wheels_event.cpp)
 add_dependencies(wheels_event ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wheels_event
@@ -354,19 +341,26 @@ target_link_libraries(odometry
 endif(ODOMETRY)
 
 if(TEST_TEMP)
+add_executable(test_swing_twist test/swing_twist.cpp)
+add_dependencies(test_swing_twist nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(test_swing_twist
+    ${catkin_LIBRARIES}
+ )
+endif(TEST_TEMP)
+
+if(JOINT_STATES)
 add_executable(my_test src/my_test.cpp)
 add_dependencies(my_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(my_test
     ${catkin_LIBRARIES}
  )
-endif(TEST_TEMP)
-
 
 add_executable(joint_states src/exec/joint_states.cpp)
 add_dependencies(joint_states nrt_plugins ${catkin_EXPORTED_TARGETS})
 target_link_libraries(joint_states nrt_plugins
     ${catkin_LIBRARIES}
  )
+endif(JOINT_STATES)
 
 #add_executable(contact_test src/contact_test.cpp)
 #add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
