@@ -66,7 +66,7 @@ public:
   virtual void getAngles(const mwoibn::Matrix3& rotation)
   {
 
-    _temp_point = rotation.transpose().eulerAngles(2, 1, 0);
+    _temp_point = rotation.eulerAngles(2, 1, 0);
 
     //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
     //    -pi:pi)

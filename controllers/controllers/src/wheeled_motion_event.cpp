@@ -242,7 +242,24 @@ void mgnss::controllers::WheeledMotionEvent::steering()
 
 void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& logger){
   logger.addField("time", 0.0);
+  logger.addField("state", _steering_ptr->getState()[2]);
+  logger.addField("twist", _steering_ptr->getTwist());
 
+  mwoibn::Vector3 test;
+
+  test = _steering_ptr->getTestReference(0);
+
+  logger.addField("ref_0_0", test[0]);
+  logger.addField("ref_0_1", test[1]);
+  logger.addField("ref_0_2", test[2]);
+
+  test = _steering_ptr->twistReference(0);
+
+  logger.addField("tref_0_0", test[0]);
+  logger.addField("tref_0_1", test[1]);
+  logger.addField("tref_0_2", test[2]);
+
+  /*
   logger.addField("e_base_z", getBaseError()[2]);
   logger.addField("r_base_z", getBodyPosition()[2]);
 
@@ -310,7 +327,7 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
   logger.addField("tan_icm_2", getDampingICM()[1]);
   logger.addField("tan_icm_3", getDampingICM()[2]);
   logger.addField("tan_icm_4", getDampingICM()[3]);
-
+*/
 //  logger.addField("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addField("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addField("ankle_yaw_3", _robot.state.get()[22]);
@@ -324,7 +341,25 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 
 void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger, double time){
   logger.addEntry("time", time);
+  logger.addEntry("state", _steering_ptr->getState()[2]);
+  logger.addEntry("twist", _steering_ptr->getTwist());
 
+
+  mwoibn::Vector3 test;
+
+  test = _steering_ptr->getTestReference(0);
+
+  logger.addEntry("ref_0_0", test[0]);
+  logger.addEntry("ref_0_1", test[1]);
+  logger.addEntry("ref_0_2", test[2]);
+
+  test = _steering_ptr->twistReference(0);
+
+  logger.addEntry("tref_0_0", test[0]);
+  logger.addEntry("tref_0_1", test[1]);
+  logger.addEntry("tref_0_2", test[2]);
+
+  /*
   logger.addEntry("e_base_z", getBaseError()[2]);
   logger.addEntry("r_base_z", getBodyPosition()[2]);
 
@@ -392,7 +427,7 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
   logger.addEntry("tan_icm_2", getDampingICM()[1]);
   logger.addEntry("tan_icm_3", getDampingICM()[2]);
   logger.addEntry("tan_icm_4", getDampingICM()[3]);
-
+*/
 //  logger.addEntry("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);

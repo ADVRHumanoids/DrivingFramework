@@ -36,9 +36,9 @@ public:
   void update()
   {
     // axis - z
-    _v1 = _point.getRotationWorld(_robot.state.get()).transpose() * _z_world;
+    _v1 = _point.getRotationWorld(_robot.state.get()) * _z_world;
 
-    _n = _point.getRotationWorld(_robot.state.get()).transpose() * _axis;
+    _n = _point.getRotationWorld(_robot.state.get()) * _axis;
 
     _v2 = _z_world - _n * _z_world.transpose() * _n;
 

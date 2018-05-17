@@ -193,7 +193,7 @@ public:
 
   static Quaternion fromMatrix(const Eigen::Matrix3d& mat)
   {
-    return Quaternion(Eigen::Quaterniond(mat.transpose()));
+    return Quaternion(Eigen::Quaterniond(mat));
   }
 
   Eigen::Matrix3d toMatrix() const

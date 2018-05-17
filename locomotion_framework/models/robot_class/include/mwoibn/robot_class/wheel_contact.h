@@ -181,6 +181,7 @@ public:
     _offset_pos = new_state;
   } // PH
 
+  // it assumes the flat ground and is spherical, I should have a torus module that I am assiging to the contact point tracking and contact point
   virtual void update()
   {
     setPointStateFixed(0, _ref_position);

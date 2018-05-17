@@ -118,7 +118,6 @@ public:
     _temp_point = _pelvis_ptr->point(0)
                       .getRotationWorld(_robot.state.get(
                           mwoibn::robot_class::INTERFACE::POSITION))
-                      .transpose()
                       .eulerAngles(2, 1, 0);
 
     //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,

@@ -95,7 +95,7 @@ void mgnss::state_estimation::Odometry::_allocate(std::vector<std::string> names
     _directions.push_back(_wheels_ph.point(i)
                               .getRotationWorld(_robot.state.get(
                                   mwoibn::robot_class::INTERFACE::POSITION))
-                              .row(2));
+                              .col(2));
 
     mwoibn::VectorInt dof = _robot.getDof(names[i]);
     if (dof.size() == 0)
@@ -159,7 +159,7 @@ void mgnss::state_estimation::Odometry::update()
     _directions[i] = _wheels_ph.point(i)
                          .getRotationWorld(_robot.state.get(
                              mwoibn::robot_class::INTERFACE::POSITION))
-                         .row(2); // z axis
+                         .col(2); // z axis
 
     _directions[i] = _directions[i].cross(_axes[i]); //?
     _directions[i].normalize();

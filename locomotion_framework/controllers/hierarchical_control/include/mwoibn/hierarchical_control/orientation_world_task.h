@@ -35,7 +35,7 @@ public:
     _init(_ik.getFullJacobianRows(), _ik.getFullJacobianCols());
 
     _reference = _ik.getFullStatesWorld();
-//    _previous_state = _reference;
+
 
     mwoibn::VectorN state =
         robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);

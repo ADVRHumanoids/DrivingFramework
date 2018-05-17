@@ -285,9 +285,19 @@ public:
   /** @brief get Position in a world frame
    */
   const Point::Rotation&
-  getRotationWorld(const mwoibn::VectorN& joint_positions, bool update = false);
+  getRotationWorld(const mwoibn::VectorN& joint_positions, bool update = false){
+
+    _temp_rotation = RigidBodyDynamics::CalcBodyWorldOrientation(
+                         _model, joint_positions, _body_id, update).transpose()*getRotationFixed();
+
+    return _temp_rotation;
+  }
+
   Point::Rotation getRotationWorld(const mwoibn::VectorN& joint_positions,
-                                   bool update = false) const;
+                                   bool update = false) const{
+    return RigidBodyDynamics::CalcBodyWorldOrientation(
+          _model, joint_positions, _body_id, update).transpose()*getRotationFixed();
+  }
 
   /** @brief set new tracked point giving data in a world frame
    */

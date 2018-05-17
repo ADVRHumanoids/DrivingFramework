@@ -194,7 +194,7 @@ protected:
     _wheel_axis = _wheels.point(i)
                       .getRotationWorld(_robot.state.get(
                           mwoibn::robot_class::INTERFACE::POSITION))
-                      .row(2); // z axis
+                      .col(2); // z axis
 
     _x = _wheel_axis * _ground.transpose() * _wheel_axis;
 
@@ -218,7 +218,7 @@ protected:
     _wheel_axis = _wheels.point(i)
                       .getRotationWorld(_robot.state.get(
                           mwoibn::robot_class::INTERFACE::POSITION))
-                      .row(2); // z axis
+                      .col(2); // z axis
 
     mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian(
         _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
@@ -262,7 +262,7 @@ protected:
     _wheel_axis = _wheels.point(i)
                       .getRotationWorld(_robot.state.get(
                           mwoibn::robot_class::INTERFACE::POSITION))
-                      .row(2); // z axis
+                      .col(2); // z axis
 
     mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian(
         _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));

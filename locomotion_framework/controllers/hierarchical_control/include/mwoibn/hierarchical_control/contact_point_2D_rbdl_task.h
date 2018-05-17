@@ -65,7 +65,7 @@ public:
       direction = _wheels_ptr->point(i)
                            .getRotationWorld(_robot.state.get(
                                mwoibn::robot_class::INTERFACE::POSITION))
-                           .row(2); // z axis, for our kinematics wheel axis in general
+                           .col(2); // z axis, for our kinematics wheel axis in general
 
       direction = direction.cross(axis); //?
       direction.normalize();

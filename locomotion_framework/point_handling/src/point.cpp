@@ -234,32 +234,13 @@ void Point::setPositionReference(const Point::Position position,
 }
 
 const Point::Rotation&
-Point::getRotationWorld(const mwoibn::VectorN& joint_positions, bool update)
-{
-
-  _temp_rotation = RigidBodyDynamics::CalcBodyWorldOrientation(
-                       _model, joint_positions, _body_id, update) *
-                   getRotationFixed().transpose();
-
-  return _temp_rotation;
-}
-
-Point::Rotation Point::getRotationWorld(const mwoibn::VectorN& joint_positions,
-                                        bool update) const
-{  
-  return RigidBodyDynamics::CalcBodyWorldOrientation(_model, joint_positions,
-                                                     _body_id, update) *
-         getRotationFixed().transpose();
-}
-
-const Point::Rotation&
 Point::getRotationReference(unsigned int reference_id,
                             const mwoibn::VectorN& joint_positions, bool update)
 {
 
   _temp_rotation =
       RigidBodyDynamics::CalcBodyWorldOrientation(
-          _model, joint_positions, reference_id, update).transpose() *
+          _model, joint_positions, reference_id, update) *
       getRotationWorld(joint_positions);
 
   return _temp_rotation;
@@ -304,7 +285,8 @@ void Point::setRotationWorld(const Point::Rotation rotation,
                              bool update)
 {
 
-  _orientation = Point::Orientation();
+//  _orientation = Point::Orientation();
+  setOrientationFixed(Point::Orientation());
   Point::Rotation fixed =
       getRotationWorld(joint_positions, update).transpose() * rotation;
   setRotationFixed(fixed);
@@ -316,7 +298,7 @@ void Point::setRotationReference(const Point::Rotation rotation,
                                  bool update)
 {
 
-  _orientation = Point::Orientation();
+  setOrientationFixed(Point::Orientation());
   Point::Rotation fixed =
       getRotationReference(reference_id, joint_positions, update).transpose() *
       rotation;
@@ -330,7 +312,7 @@ void Point::setRotationReference(const Point::Rotation rotation,
                                  bool update)
 {
 
-  _orientation = Point::Orientation();
+  setOrientationFixed(Point::Orientation());
   Point::Rotation fixed = getRotationReference(reference_name, joint_positions,
                                                update).transpose() *
                           rotation;

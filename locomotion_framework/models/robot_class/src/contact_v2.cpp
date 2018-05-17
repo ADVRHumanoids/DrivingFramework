@@ -23,7 +23,7 @@ void mwoibn::robot_class::ContactV2::_initDirections(
 
 const mwoibn::Matrix& mwoibn::robot_class::ContactV2::getPointJacobian(int i)
 {
-  return getPointJacobian(_points[i]->getRotationWorld(_positions));
+  return getPointJacobian(_points[i]->getRotationWorld(_positions).transpose()); // transpose?
 }
 
 const mwoibn::Matrix&

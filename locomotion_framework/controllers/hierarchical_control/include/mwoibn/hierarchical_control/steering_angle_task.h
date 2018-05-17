@@ -41,8 +41,7 @@ public:
 
     _n = _z_world;
 
-    _y = _point.getRotationWorld(_robot.state.get()).transpose() * _axis;
-
+    _y = _point.getRotationWorld(_robot.state.get()) * _axis;
     _v2 = _y.cross(_z_world);
 
     mwoibn::Scalar b = 1 / _v2.norm();
