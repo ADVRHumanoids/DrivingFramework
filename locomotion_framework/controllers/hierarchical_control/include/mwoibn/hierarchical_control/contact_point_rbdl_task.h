@@ -94,8 +94,8 @@ public:
 
   virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference, bool update) = 0;
 
-  virtual mwoibn::Vector3
-  getReferenceWorld(int i, bool update) = 0;
+//  virtual mwoibn::Vector3
+//  getReferenceWorld(int i) = 0;
 
   virtual const mwoibn::Vector3& getPointStateReference(int i) = 0;
 

@@ -131,7 +131,7 @@ public:
       _orientation.x() = msg->pose[_ref].orientation.x;
       _orientation.y() = msg->pose[_ref].orientation.y;
       _orientation.z() = msg->pose[_ref].orientation.z;
-      _orientation.w() = -msg->pose[_ref].orientation.w;
+      _orientation.w() = msg->pose[_ref].orientation.w;
 
       if (_is_position)
         _linear_state << msg->pose[_ref].position.x, msg->pose[_ref].position.y,

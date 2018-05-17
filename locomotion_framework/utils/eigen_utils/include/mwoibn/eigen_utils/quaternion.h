@@ -110,7 +110,7 @@ public:
    * @param vector
    * @return
    */
-  double toAxisAngle(Eigen::Vector3d& vector)
+  double toAxisAngle(Eigen::Vector3d& vector) const
   {
     return toAxisAngle(vector, *this);
   }
@@ -123,12 +123,12 @@ public:
     return angleAxis.angle();
   }
 
-  Quaternion inversed()
+  Quaternion inversed() const
   {
     return Quaternion(-this->x(), -this->y(), -this->z(), this->w(), false);
   }
 
-  Quaternion reciprocal()
+  Quaternion reciprocal() const
   {
     double n = this->norm();
     n = n * n;
@@ -198,7 +198,7 @@ public:
 
   Eigen::Matrix3d toMatrix() const
   {
-    return ((*this).toRotationMatrix()).transpose();
+    return ((*this).toRotationMatrix());
   }
 
   Quaternion(Eigen::Quaterniond& q) : Eigen::Quaterniond(q) {}
@@ -222,6 +222,19 @@ public:
     orientation.y() = vector[1 + first];
     orientation.z() = vector[2 + first];
     orientation.w() = vector[3 + first];
+  }
+
+  Eigen::Vector3d rotate (const Eigen::Vector3d &vec) const {
+
+    Quaternion vec_quat (vec[0], vec[1], vec[2], 0.0), res_quat;
+
+    //res_quat = vec_quat * (*this);
+    //res_quat = reciprocal() * res_quat;
+
+    res_quat = (*this) * vec_quat;
+    res_quat = res_quat * reciprocal();
+
+    return res_quat.axis();
   }
 };
 } // namespace

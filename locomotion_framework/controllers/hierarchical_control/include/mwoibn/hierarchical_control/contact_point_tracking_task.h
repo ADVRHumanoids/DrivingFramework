@@ -44,10 +44,29 @@ public:
   using CartesianWorldTask::getReference;
   using CartesianWorldTask::setReference;
 
+  virtual double getTwist() const {return 0;}
+  virtual mwoibn::Vector3 twistTransform(mwoibn::Vector3 vec) const {
+    return vec;
+  }
+
+  virtual mwoibn::Vector3 twistReference(int i){
+
+    mwoibn::Vector3 reference;
+    reference = _reference.segment(i * 3, 3);
+
+    return reference;
+  }
   virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference, bool update) = 0;
 
   virtual mwoibn::Vector3
-  getReferenceWorld(int i, bool update) = 0;
+  getReferenceWorld(int i) = 0;
+
+  virtual mwoibn::Vector3
+  getTestReference(int i){
+//    std::cout << _getTransform() << std::endl;
+    mwoibn::Vector3 test = _getTransform()*_reference.segment(i * 3, 3);
+    return test;
+  }
 
   virtual const mwoibn::Vector3& getPointStateReference(int i) = 0;
 
@@ -63,6 +82,10 @@ public:
 protected:
   mwoibn::VectorN _state;
   mwoibn::robot_class::Robot& _robot;
+  mwoibn::Matrix3 _transform;
+  virtual const mwoibn::Matrix3& _getTransform(){
+    return _transform;
+  }
   //mwoibn::Vector3 _point_flat, _temp_point;
   //mwoibn::Matrix _jacobian_3D, _jacobian_flat_3D, _jacobian_flat_2D, _rotation,
   //    _jacobian6, _jacobian_2D;

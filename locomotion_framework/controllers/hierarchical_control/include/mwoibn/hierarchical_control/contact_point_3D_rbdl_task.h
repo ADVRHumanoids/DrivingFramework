@@ -170,11 +170,9 @@ public:
   }
 
   virtual mwoibn::Vector3
-  getReferenceWorld(int i, bool update) // it can have update as it uses RBDL
+  getReferenceWorld(int i) // it can have update as it uses RBDL
                                         // call and cannot be constant anyway
   {
-    if (update)
-      updateState();
 
     mwoibn::Vector3 reference;
     reference = _reference.segment(i * 3, 3);
@@ -203,7 +201,7 @@ protected:
   mwoibn::VectorBool _selector;
   mwoibn::Axis _ground_normal;
   mwoibn::VectorN _full_error;
-  mwoibn::Matrix3 _rotation, _transform;
+  mwoibn::Matrix3 _rotation;
   mwoibn::Matrix _temp_jacobian, _point_jacobian;
   mwoibn::Vector3 _point;
 
@@ -225,9 +223,7 @@ protected:
   virtual mwoibn::Vector3 _worldToBase(mwoibn::Vector3 point) = 0;
   virtual mwoibn::Vector3 _baseToWorld(mwoibn::Vector3 point) = 0;
 
-  virtual const mwoibn::Matrix3& _getTransform(){
-    return _transform;
-  }
+
 };
 } // namespace package
 } // namespace library

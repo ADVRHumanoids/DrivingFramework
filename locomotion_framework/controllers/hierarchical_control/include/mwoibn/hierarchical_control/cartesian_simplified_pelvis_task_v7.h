@@ -60,8 +60,41 @@ public:
     return contact;
   }
 
+  virtual void updateState(){
+
+    ContactPoint3DRbdlTask::updateState();
+
+    q_twist = _pelvis_ptr->point(0).getOrientationWorld(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)).transposed();
+    q_twist = q_twist.twistSwing(_ground_normal);
+    angle_twist = q_twist.toAxisAngle(axis_twist);
+
+  }
+
+  double getTwist() const {return angle_twist;}
+
+  virtual mwoibn::Vector3 twistTransform(const mwoibn::Vector3& vec) const {
+    return q_twist.rotate(vec);
+  }
+
+  virtual mwoibn::Vector3 twistReference(int i){
+
+    mwoibn::Vector3 reference;
+    reference = _reference.segment(i * 3, 3);
+
+    reference = q_twist.rotate(reference);
+
+    //std::cout << "twist\n" << q_twist.toMatrix()<< std::endl;
+    //std::cout << "state\n" << _getTransform() << std::endl;
+    //reference.head<2>() += _robot.centerOfMass().get().head<2>();
+
+    return reference;
+  }
+
 protected:
   mwoibn::hierarchical_control::CenterOfMassTask& _com;
+  mwoibn::Quaternion q_twist;
+  double angle_twist;
+  mwoibn::Vector3 axis_twist;
 
   double R = 0.01, r = 0.068;
 
@@ -117,6 +150,8 @@ protected:
         std::sin(_state[2]), std::cos(_state[2]), 0, 0, 0,
         1;
   }
+
+
 };
 } // namespace package
 } // namespace library

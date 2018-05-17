@@ -239,7 +239,7 @@ Point::getRotationWorld(const mwoibn::VectorN& joint_positions, bool update)
 
   _temp_rotation = RigidBodyDynamics::CalcBodyWorldOrientation(
                        _model, joint_positions, _body_id, update) *
-                   getRotationFixed();
+                   getRotationFixed().transpose();
 
   return _temp_rotation;
 }
@@ -249,7 +249,7 @@ Point::Rotation Point::getRotationWorld(const mwoibn::VectorN& joint_positions,
 {  
   return RigidBodyDynamics::CalcBodyWorldOrientation(_model, joint_positions,
                                                      _body_id, update) *
-         getRotationFixed();
+         getRotationFixed().transpose();
 }
 
 const Point::Rotation&

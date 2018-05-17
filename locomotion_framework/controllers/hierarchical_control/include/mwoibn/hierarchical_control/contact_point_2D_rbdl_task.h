@@ -100,11 +100,9 @@ public:
   }
 
   virtual mwoibn::Vector3
-  getReferenceWorld(int i, bool update) // it can have update as it uses RBDL
+  getReferenceWorld(int i) // it can have update as it uses RBDL
                                         // call and cannot be constant anyway
   {
-    if (update)
-      updateState();
 
     mwoibn::Vector3 reference;
     reference.head(2) = _reference.segment(i * 2, 2);

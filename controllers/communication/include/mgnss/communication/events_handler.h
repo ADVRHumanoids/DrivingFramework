@@ -1,21 +1,12 @@
 #ifndef PROGRAMS_EVENT_HANDLER
 #define PROGRAMS_EVENT_HANDLER
 
-//#include <MathGeoLib/Geometry/GeometryAll.h>
 
-//#include <mwoibn/robot_class/contact_v2.h>
-
-//#include <mwoibn/robot_class/robot.h>
-//#include <mwoibn/hierarchical_control/hierarchical_controller.h>
-//#include <mwoibn/hierarchical_control/center_of_mass_task.h>
-//#include <mwoibn/hierarchical_control/constraints_task.h>
 #include <mwoibn/hierarchical_control/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/orientation_selective_task.h>
 
 #include <mwoibn/point_handling/robot_points_handler.h>
 // trajectory generation
-//#include <mwoibn/reference_generation/line.h>
-//#include <mwoibn/reference_generation/local_circle.h>
 #include <mgnss/communication/basic_handler.h>
 
 namespace events

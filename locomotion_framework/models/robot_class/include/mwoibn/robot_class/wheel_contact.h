@@ -19,65 +19,6 @@ class WheelContact : public ContactV2
 {
 
 public:
-  //  WheelContact(
-  //      int body_ref, mwoibn::VectorN position, int body_id,
-  //      RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-  //      bool is_active, mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
-  //      std::string name = "")
-  //      : ContactV2(body_ref, position, body_id, model, positions, is_active,
-  //                  directions, type, name),
-  //        _ref_position(position)
-  //  {
-  //    mwoibn::point_handling::RawFullStatesHandler ph_chain(
-  //        "ROOT", _model, {mwoibn::point_handling::Point(body_id, _model)});
-  //    _local_chain = ph_chain.getChain();
-  //  }
-
-  //  WheelContact(
-  //      std::string body_ref, mwoibn::VectorN position, std::string body_name,
-  //      RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-  //      bool is_active, mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
-  //      std::string name = "")
-  //      : ContactV2(body_ref, position, body_name, model, positions,
-  //      is_active,
-  //                  directions, type, name),
-  //        _ref_position(position)
-  //  {
-  //    mwoibn::point_handling::RawFullStatesHandler ph_chain(
-  //        "ROOT", _model, {mwoibn::point_handling::Point(body_name, _model)});
-  //    _local_chain = ph_chain.getChain();
-  //  }
-
-  //  WheelContact(
-  //      int body_ref, point_handling::Point point,
-  //      RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-  //      bool is_active, mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN)
-  //      : ContactV2(body_ref, point, model, positions, is_active, directions,
-  //                  type)
-  //  {
-  //    mwoibn::point_handling::RawFullStatesHandler ph_chain("ROOT", _model,
-  //                                                          {point});
-  //    _local_chain = ph_chain.getChain();
-  //    _ref_position = point.getPositionReference(0, positions);
-  //  }
-
-  //  WheelContact(
-  //      std::string body_ref, point_handling::Point point,
-  //      RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-  //      bool is_active, mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN)
-  //      : ContactV2(body_ref, point, model, positions, is_active, directions,
-  //                  type)
-  //  {
-  //    mwoibn::point_handling::RawFullStatesHandler ph_chain("ROOT", _model,
-  //                                                          {point});
-  //    _local_chain = ph_chain.getChain();
-  //    _ref_position = point.getPositionReference(0, positions);
-  //  }
-
   WheelContact(RigidBodyDynamics::Model& model,
                const mwoibn::VectorN& positions, YAML::Node config)
       : ContactV2(model, positions, config,
@@ -112,6 +53,7 @@ public:
     update();
     return ContactV2::getPointJacobian(rotation_matrix, i);
   }
+
   virtual mwoibn::VectorN getPosition()
   {
     update();
@@ -137,42 +79,6 @@ class WheelContactV2 : public ContactV2
 {
 
 public:
-  //  WheelContactV2(
-  //      mwoibn::VectorN ref_position, mwoibn::Vector3 terrein_offset, int
-  //      body_id,
-  //      RigidBodyDynamics::Model& model, const mwoibn::VectorN& positions,
-  //      bool is_active, mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
-  //      std::string name = "")
-  //      : ContactV2(ref_position, body_id, model, positions, is_active,
-  //                  directions, type, name),
-  //        _ref_position(ref_position)
-  //  {
-  //    _offset = mwoibn::VectorN::Zero(7);
-  //    _offset.tail(4) << 0, 0, 0, 1;
-  //    _offset.head(3) << terrein_offset;
-
-  //    update();
-  //  }
-
-  //  WheelContactV2(
-  //      mwoibn::VectorN ref_position, mwoibn::Vector3 terrein_offset,
-  //      std::string body_name, RigidBodyDynamics::Model& model,
-  //      const mwoibn::VectorN& positions, bool is_active,
-  //      mwoibn::Matrix6 directions,
-  //      robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN,
-  //      std::string name = "")
-  //      : ContactV2(ref_position, body_name, model, positions, is_active,
-  //                  directions, type, name),
-  //        _ref_position(ref_position)
-  //  {
-  //    _offset = mwoibn::VectorN::Zero(7);
-  //    _offset.tail(4) << 0, 0, 0, 1;
-  //    _offset.head(3) << terrein_offset;
-
-  //    update();
-  //  }
-
   WheelContactV2(RigidBodyDynamics::Model& model,
                  const mwoibn::VectorN& positions, YAML::Node config)
       : ContactV2(model, positions, config)

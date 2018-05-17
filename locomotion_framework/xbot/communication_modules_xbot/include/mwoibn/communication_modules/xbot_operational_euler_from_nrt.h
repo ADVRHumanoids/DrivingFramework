@@ -45,7 +45,7 @@ public:
     _orientation.x() = _state[3];
     _orientation.y() = _state[4];
     _orientation.z() = _state[5];
-    _orientation.w() = -_state[6];
+    _orientation.w() = _state[6];
 
     _linear_state = _state.head(3);
 
