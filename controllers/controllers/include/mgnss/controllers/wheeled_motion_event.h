@@ -256,6 +256,8 @@ public:
   const mwoibn::VectorN& getDampingICM(){return _steering_ref_ptr->getDampingICM();}
   const mwoibn::VectorN& getDampingSP(){return _steering_ref_ptr->getDampingSP();}
   const mwoibn::VectorBool& isResteer(){return _resteer;}
+  const mwoibn::VectorInt& countResteer(){return _reset_count;}
+
   const mwoibn::VectorN& getAnkleYaw(){return _test_steer;}
   mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
   const mwoibn::VectorN& getBaseError(){return _pelvis_position_ptr->getError();}
@@ -303,7 +305,7 @@ protected:
   mwoibn::Axis _x, _y, _z;
   mwoibn::Quaternion _orientation;
   bool _reference = false;
-  mwoibn::VectorInt _select_steer, _select_wheel;
+  mwoibn::VectorInt _select_steer, _select_wheel, _reset_count;
   mwoibn::VectorN _l_limits, _u_limits, _test_steer, _current_steer, _start_steer;
   int count = 0;
 

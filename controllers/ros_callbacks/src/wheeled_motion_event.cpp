@@ -8,7 +8,7 @@ bool mgnss::ros_callbacks::wheeled_motion_event::evenstHandler(custom_services::
         if (req.d == 1)
           controller_ptr->setBaseDotX(req.nr / 100.0);
         else if (req.d == 2)
-          controller_ptr->setBaseDotY(req.nr / 100.0);
+          controller_ptr->setBaseDotY(req.nr / 1000.0);
         else if (req.d == 3)
           controller_ptr->setBaseDotZ(req.nr / 1000.0);
         else if (req.d == 4)
