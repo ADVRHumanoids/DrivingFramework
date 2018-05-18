@@ -28,7 +28,7 @@ protected:
   XBot::ImuSensor::ConstPtr _imu;
 
   mwoibn::Vector3 _linear_state;
-  mwoibn::Matrix3 _rotation, _rot_z;
+  mwoibn::Matrix3 _rotation, _rot_z, _offset_org;
   mwoibn::VectorN _base;
   double _rate;
   bool _is_static;

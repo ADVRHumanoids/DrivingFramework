@@ -42,6 +42,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>robot_class_xbot</depend> <!-- all programs -->
   <depend>modules</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>roscpp</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

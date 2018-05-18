@@ -16,6 +16,15 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   {
     YAML::Node robot =
         mwoibn::robot_class::RobotXBot::_init(config, config_name);
+
+    if(!robot["rate"])
+      throw(std::invalid_argument(
+          std::string("Desired frequency not defined in the configuration ") +
+          std::string(", ") + config_name));
+    else
+      std::cout << "rate\t" << robot["rate"].as<double>() << std::endl;
+
+    setRate(1/robot["rate"].as<double>());
     //    _init(config, robot);
 
     _init(config, robot, shared_memory);
@@ -43,7 +52,15 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   {
     YAML::Node robot =
         mwoibn::robot_class::RobotXBot::_init(config, config_name);
-    //    _init(config, robot);
+
+    if(!robot["rate"])
+      throw(std::invalid_argument(
+          std::string("Desired frequency not defined in the configuration ") +
+          std::string(", ") + config_name));
+    else
+      std::cout << "rate\t" << robot["rate"].as<double>() << std::endl;
+
+    setRate(1/robot["rate"].as<double>());
 
     _init(config, robot, shared_memory);
   }

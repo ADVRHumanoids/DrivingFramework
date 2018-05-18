@@ -33,7 +33,7 @@ protected:
   std::unique_ptr<mgnss::modules::Base> _controller_ptr;
   std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
   std::unique_ptr<mwoibn::common::Logger> _logger_ptr;
-
+  std::chrono::high_resolution_clock::time_point _begin, _end;
 //  XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
   bool _initialized = false, _valid = false, _rate = false;
   std::string _name = "";

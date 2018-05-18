@@ -147,7 +147,7 @@ void mgnss::state_estimation::Odometry::init(){
 
 void mgnss::state_estimation::Odometry::update()
 {
-
+  //_begin = std::chrono::high_resolution_clock::now();
   _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
 
   _error.noalias() = _state - _previous_state;
@@ -198,7 +198,7 @@ void mgnss::state_estimation::Odometry::update()
                      mwoibn::robot_class::INTERFACE::POSITION);
 
   _previous_state.noalias() = _state;
-
+  //_end = std::chrono::high_resolution_clock::now();
   //  return _base;
 }
 
@@ -355,33 +355,33 @@ int mgnss::state_estimation::Odometry::_min()
 
 void mgnss::state_estimation::Odometry::startLog(mwoibn::common::Logger& logger){
   logger.addField("time", 0);
-  logger.addField("raw_x", getRaw()[0]);
-  logger.addField("raw_y", getRaw()[1]);
-  logger.addField("raw_z", getRaw()[2]);
-  logger.addField("raw_tx", getRaw()[3]);
-  logger.addField("raw_ty", getRaw()[4]);
-  logger.addField("raw_tz", getRaw()[5]);
-  logger.addField("fil_x", getFiltered()[0]);
-  logger.addField("fil_y", getFiltered()[1]);
-  logger.addField("fil_z", getFiltered()[2]);
-  logger.addField("fil_tx", getFiltered()[3]);
-  logger.addField("fil_ty", getFiltered()[4]);
-  logger.addField("fil_tz", getFiltered()[5]);
+//  logger.addField("raw_x", getRaw()[0]);
+//  logger.addField("raw_y", getRaw()[1]);
+//  logger.addField("raw_z", getRaw()[2]);
+//  logger.addField("raw_tx", getRaw()[3]);
+//  logger.addField("raw_ty", getRaw()[4]);
+//  logger.addField("raw_tz", getRaw()[5]);
+//  logger.addField("fil_x", getFiltered()[0]);
+//  logger.addField("fil_y", getFiltered()[1]);
+//  logger.addField("fil_z", getFiltered()[2]);
+//  logger.addField("fil_tx", getFiltered()[3]);
+//  logger.addField("fil_ty", getFiltered()[4]);
+//  logger.addField("fil_tz", getFiltered()[5]);
   logger.start();
 }
 void mgnss::state_estimation::Odometry::log(mwoibn::common::Logger& logger, double time){
   logger.addEntry("time", time);
-  logger.addEntry("raw_x", getRaw()[0]);
-  logger.addEntry("raw_y", getRaw()[1]);
-  logger.addEntry("raw_z", getRaw()[2]);
-  logger.addEntry("raw_tx", getRaw()[3]);
-  logger.addEntry("raw_ty", getRaw()[4]);
-  logger.addEntry("raw_tz", getRaw()[5]);
-  logger.addEntry("fil_x", getFiltered()[0]);
-  logger.addEntry("fil_y", getFiltered()[1]);
-  logger.addEntry("fil_z", getFiltered()[2]);
-  logger.addEntry("fil_tx", getFiltered()[3]);
-  logger.addEntry("fil_ty", getFiltered()[4]);
-  logger.addEntry("fil_tz", getFiltered()[5]);
+//  logger.addEntry("raw_x", getRaw()[0]);
+//  logger.addEntry("raw_y", getRaw()[1]);
+//  logger.addEntry("raw_z", getRaw()[2]);
+//  logger.addEntry("raw_tx", getRaw()[3]);
+//  logger.addEntry("raw_ty", getRaw()[4]);
+//  logger.addEntry("raw_tz", getRaw()[5]);
+//  logger.addEntry("fil_x", getFiltered()[0]);
+//  logger.addEntry("fil_y", getFiltered()[1]);
+//  logger.addEntry("fil_z", getFiltered()[2]);
+//  logger.addEntry("fil_tx", getFiltered()[3]);
+//  logger.addEntry("fil_ty", getFiltered()[4]);
+//  logger.addEntry("fil_tz", getFiltered()[5]);
   logger.write();
 }

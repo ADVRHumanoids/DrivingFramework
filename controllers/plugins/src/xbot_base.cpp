@@ -57,6 +57,7 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
   _initCallbacks(handle);
 
   _logger_ptr.reset(new mwoibn::common::XbotLogger(_name));
+  _logger_ptr->addField("update", 0.0);
   _controller_ptr->startLog(*_logger_ptr.get());
 
   _robot_ptr->get();
@@ -73,8 +74,10 @@ void mgnss::plugins::XbotBase::on_start(double time)
 
     if (_valid)
     {
+      _setRate(_robot_ptr->rate());
       _robot_ptr->updateKinematics();
       _controller_ptr->init();
+       _initialized = true;
     }
 
 }
@@ -85,6 +88,7 @@ void mgnss::plugins::XbotBase::on_stop(double time) {
 
 void mgnss::plugins::XbotBase::control_loop(double time, double period)
 {
+    _begin = std::chrono::high_resolution_clock::now();
 
     _valid = _robot_ptr->get();
 
@@ -95,21 +99,20 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
 
     if (!_initialized)
     {
-
-      if(!_rate){
-       _setRate(period); // here I may need a controller method
-       _rate = true;
-      }
+      _setRate(_robot_ptr->rate());
+      _valid = _robot_ptr->feedbacks.reset();
        if(_valid){
-         _valid = _robot_ptr->feedbacks.reset();
          _controller_ptr->init();
+         _initialized = true;
        }
-       if(_rate && _valid)
-        _initialized = true;
     }
 
     _controller_ptr->update();
     _controller_ptr->send();
+
+    _end = std::chrono::high_resolution_clock::now();
+
+    _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
     _controller_ptr->log(*_logger_ptr.get(), time-_start);
 
 //   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;

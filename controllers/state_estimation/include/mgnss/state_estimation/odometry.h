@@ -5,6 +5,7 @@
 #include <mgnss/modules/base.h>
 #include <mwoibn/point_handling/robot_points_handler.h>
 #include <mwoibn/filters/iir_second_order.h>
+#include <chrono>
 
 namespace mgnss {
 
@@ -73,6 +74,8 @@ protected:
     mwoibn::Vector6 _base_raw, _base_filtered;
 //    mwoibn::point_handling::FullStatesHandler _wheels_ph;
 //    mwoibn::point_handling::OrientationsHandler _directions_ph;
+    std::chrono::high_resolution_clock::time_point _begin, _end;
+
 
 
 };

@@ -87,6 +87,7 @@ public:
 //  mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
   const mwoibn::VectorN& getBaseError(){return _pelvis_position_ptr->getError();}
   const mwoibn::VectorN& getBaseOrnError(){return _pelvis_orientation_ptr->getError();}
+  const mwoibn::VectorInt& countResteer(){return _reset_count;}
 
 protected:
   void _allocate(YAML::Node config);
@@ -94,7 +95,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
       _com_ptr;
 
-  mwoibn::VectorInt _select_wheel;
+  mwoibn::VectorInt _select_wheel, _reset_count;
   mwoibn::VectorN _test_steer, _current_steer, _start_steer;
 
   mwoibn::VectorBool _resteer;
