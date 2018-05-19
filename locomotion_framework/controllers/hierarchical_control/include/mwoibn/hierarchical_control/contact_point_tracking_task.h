@@ -63,7 +63,9 @@ public:
 
   virtual mwoibn::Vector3
   getTestReference(int i){
-//    std::cout << _getTransform() << std::endl;
+//    std::cout << "getTestReference 1\t" << _getTransform() << std::endl;
+
+//    std::cout << "getTestReference 2\t" << _getTransform()*_reference.segment(i * 3, 3) << std::endl;
     mwoibn::Vector3 test = _getTransform()*_reference.segment(i * 3, 3);
     return test;
   }

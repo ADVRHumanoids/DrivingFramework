@@ -40,7 +40,7 @@ public:
 
   Quaternion inverse()
   {
-    return Quaternion((*this).x(), (*this).y(), (*this).z(), -(*this).w());
+    return Quaternion((*this).x(), (*this).y(), (*this).z(), -(*this).w(), false);
   }
 
   ~Quaternion() {}
@@ -50,7 +50,7 @@ public:
     return Quaternion(w()*q.x() + x()*q.w() + y()*q.z() - z()*q.y(),
                       w()*q.y() - x()*q.z() + y()*q.w() + z()*q.x(),
                       w()*q.z() + x()*q.y() - y()*q.x() + z()*q.w(),
-                      w()*q.w() - x()*q.x() - y()*q.y() - z()*q.z());
+                      w()*q.w() - x()*q.x() - y()*q.y() - z()*q.z(), false);
   }
 
   Quaternion chuj(const Quaternion& q) const
@@ -58,13 +58,13 @@ public:
     return Quaternion(q.w() * x() + q.x() * w() + q.y() * z() - q.z() * y(),
                       q.w() * y() + q.y() * w() + q.z() * x() - q.x() * z(),
                       q.w() * z() + q.z() * w() + q.x() * y() - q.y() * x(),
-                      q.w() * w() - q.x() * x() - q.y() * y() - q.z() * z());
+                      q.w() * w() - q.x() * x() - q.y() * y() - q.z() * z(), false);
   }
 
   Quaternion operator*(const double& s) const
   {
     return Quaternion((*this).x() * s, (*this).y() * s, (*this).z() * s,
-                      (*this).w() * s);
+                      (*this).w() * s, false);
   }
 
   using Eigen::Quaterniond::w;
@@ -176,12 +176,12 @@ public:
   Quaternion twistSwing(const Eigen::Vector3d dir)
   {
 
-    return Quaternion(this->reciprocal()).swingTwist(dir).reciprocal();
+    return reciprocal().swingTwist(dir).reciprocal();
   }
 
   Quaternion twistSwing(const Eigen::Vector3d dir, Quaternion& q_swing)
   {
-    Quaternion q_twist = Quaternion(this->reciprocal()).swingTwist(dir, q_swing).reciprocal();
+    Quaternion q_twist = this->reciprocal().swingTwist(dir, q_swing).reciprocal();
     q_swing = q_swing.reciprocal();
 
     return q_twist;
@@ -230,10 +230,7 @@ public:
 
   Eigen::Vector3d rotate (const Eigen::Vector3d &vec) const {
 
-    Quaternion vec_quat (vec[0], vec[1], vec[2], 0.0), res_quat;
-
-    //res_quat = vec_quat * (*this);
-    //res_quat = reciprocal() * res_quat;
+    Quaternion vec_quat (vec[0], vec[1], vec[2], 0.0, false), res_quat;
 
     res_quat = (*this)*vec_quat;
     res_quat = res_quat*reciprocal();

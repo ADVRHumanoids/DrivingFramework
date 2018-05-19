@@ -79,8 +79,10 @@ public:
   virtual mwoibn::Vector3 twistReference(int i){
 
     mwoibn::Vector3 reference;
-    reference = _reference.segment(i * 3, 3);
+    reference = _reference.segment<3>(i * 3);
+//    std::cout << "twisd inh 1\t" << q_twist << std::endl;
 
+//    std::cout << "twisd inh 2\t" << q_twist.rotate(reference) << std::endl;
     reference = q_twist.rotate(reference);
 
     //std::cout << "twist\n" << q_twist.toMatrix()<< std::endl;
