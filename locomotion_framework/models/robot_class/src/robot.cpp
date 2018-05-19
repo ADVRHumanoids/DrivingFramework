@@ -194,13 +194,10 @@ void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
       continue;
     mwoibn::VectorInt dof = getDof(link_name);
 
-    if (joint->limits->lower)
+    if (joint->type != urdf::Joint::CONTINUOUS)
     {
       limits.setConstant(dof.size(), joint->limits->lower);
       lower_limits.set(limits, dof, INTERFACE::POSITION);
-    }
-    if (joint->limits->upper)
-    {
       limits.setConstant(dof.size(), joint->limits->upper);
       upper_limits.set(limits, dof, INTERFACE::POSITION);
     }

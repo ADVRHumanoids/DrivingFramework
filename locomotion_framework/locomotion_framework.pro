@@ -198,7 +198,16 @@ HEADERS += common/include/mwoibn/common/ros.h \
     models/loaders/include/mwoibn/loaders/config.h \
     models/loaders/include/mwoibn/loaders/robot.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/center_of_mass_task_v2.h \
-    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v6.h
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v6.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v7.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_world.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/castor_angle_task_2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/center_of_mass_task_v3.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/constraints_task_v2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_2D_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_3D_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_tracking_task.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \

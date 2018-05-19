@@ -123,7 +123,12 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false    
+                                effort: false
+                        limits:
+                                tolerance:
+                                        position: 5
+                                        velocity: 0
+                                        torque: 0
                 simulation_state: 
                         space: JOINT
                         dofs: 
@@ -475,6 +480,40 @@ mwoibn:
                                         castor: 5
                                         camber_damp: 0.08
                                         castor_damp: 0.10
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.02
+                                HW_str_1:
+                                        ratio: 1.15
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 70 # 20
+                                        base_orinetation: 30
+                                        centre_of_mass_x: 25
+                                        centre_of_mass_y: 25
+                                        base_position: 30
+                                        contact_point: 9.2
+                                        camber: 60
+                                        castor: 30
+                                        camber_damp: 0.1
+                                        castor_damp: 0.15
+                                        steer_open_loop: 0.85
+                                        steer_feedback: 0.15
+                                        steer_damp: 0.018
+                                HW_static_1:
+                                        ratio: 1.15
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 80 # 20
+                                        base_orinetation: 120
+                                        centre_of_mass_x: 40
+                                        centre_of_mass_y: 40
+                                        base_position: 30
+                                        contact_point: 9.2
+                                        camber: 60
+                                        castor: 30
+                                        camber_damp: 0.1
+                                        castor_damp: 0.15
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.02

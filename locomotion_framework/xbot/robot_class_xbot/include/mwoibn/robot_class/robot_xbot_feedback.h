@@ -49,7 +49,7 @@ public:
   {
     if (Robot::send() && _move)
     {
-      _robot->move(); // shouldn't this go with controllers.send()?
+      _robot->move();
        return true;
     }
     return false;

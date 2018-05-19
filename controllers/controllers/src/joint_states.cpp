@@ -14,6 +14,11 @@
     _last_ankle.setZero(_ankle_map.size());
     _des_ankle.setZero(_ankle_map.size());
 
+    _position = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+    _last_position = _position;
+
+    _pos_ref = _position;
+    _vel_ref = _velocity;
     _init_ankle.setZero(_ankle_map.size());
 
     for (auto link : _robot.getLinks("wheels"))
@@ -22,18 +27,18 @@
   }
 
   void mgnss::controllers::JointStates::init(){
-      _position = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+      _position.noalias() = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
       _robot.state.get(_des_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
       _robot.state.get(_init_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
 
-      _pos_ref = _position;
-      _vel_ref = _velocity;
+      _pos_ref.noalias() = _position;
+      _vel_ref.noalias() = _velocity;
 
       _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
       _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
 
-      _wheels_positions = _wheels.getFullStatesReference();
+//      _wheels_positions = _wheels.getFullStatesReference();
 
   }
 
@@ -50,7 +55,7 @@
     return true;
 
   }
-
+/*
   bool mgnss::controllers::JointStates::setPosition(std::string name)
   {
     if (!_robot.groupStates().isDefined(name)) return false;
@@ -108,7 +113,7 @@
 
     return true;
     }
-
+*/
   //  bool setVelocity(double vel) {
   //    for(int i = 0; i < _vel_map.size(); i++){
   //      if(_vel_map[i])
@@ -144,7 +149,7 @@
     }
 	*/
 
-    _last_position = _position;
+    _last_position.noalias() = _position;
 
 //    for (int i = 0; i < _wheels.size(); i++)
 //    {
