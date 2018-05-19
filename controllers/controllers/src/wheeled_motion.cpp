@@ -31,8 +31,8 @@ void mgnss::controllers::WheeledMotion::_setInitialConditions(){
   {
     steerings[i] = 0;
     _leg_xy_ptr->setReference(i,
-                              _leg_xy_ptr->getOffset(i) *
-                                  mwoibn::Quaternion::fromAxisAngle(_z, 0.0));
+                              _leg_xy_ptr->getOffset(i)*(
+                                  mwoibn::Quaternion::fromAxisAngle(_z, 0.0)));
   }
 
   _position = _pelvis_position_ptr->points().getPointStateWorld(0);
@@ -116,8 +116,8 @@ void mgnss::controllers::WheeledMotion::resetSteering()
 {
   for (int i = 0; i < 4; i++)
   {
-    _leg_z_ptr->setReference(i, _leg_z_ptr->getOffset(i) *
-                                    mwoibn::Quaternion::fromAxisAngle(_z, 0));
+    _leg_z_ptr->setReference(i, _leg_z_ptr->getOffset(i)*(
+                                    mwoibn::Quaternion::fromAxisAngle(_z, 0)));
   }
 }
 

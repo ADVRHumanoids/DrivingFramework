@@ -88,7 +88,7 @@ void mgnss::controllers::WheeledMotionCom::_setInitialConditions(){
 
   WheelsControllerExtend::_setInitialConditions();
 
-  _orientation = mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4])*mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]);
+  _orientation = (mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]) * mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]));
 
   _pelvis_orientation_ptr->setReference(0, _orientation);
 

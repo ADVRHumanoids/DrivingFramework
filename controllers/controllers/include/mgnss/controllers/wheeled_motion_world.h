@@ -44,20 +44,15 @@ public:
     _pelvis_position_ptr->setReference(0, _position);
     _com_ptr->setReference(_com_ref);
 
-    _orientation =
-        mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0] * _robot.rate()) *
-        mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1] * _robot.rate()) *
-        _orientation;
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*(mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate()))*(_orientation);
+    _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
 
-    _pelvis_orientation_ptr->setReference(
-        0, _orientation * mwoibn::Quaternion::fromAxisAngle(_z, _heading));
   }
 
   void steering();
 
   void fullUpdate(const mwoibn::VectorN& support);
   void compute();
-
 
   void claim(int i)
   {
@@ -71,20 +66,13 @@ public:
     _constraints_ptr->releaseContact(i);
   }
 
-  virtual double getBaseGroundX()
-  {
-    return _robot.centerOfMass().get()[0];
-  }
-  virtual double getBaseGroundY()
-  {
-    return _robot.centerOfMass().get()[1];
-  }
+  virtual double getBaseGroundX() { return _robot.centerOfMass().get()[0]; }
+  virtual double getBaseGroundY() { return _robot.centerOfMass().get()[1]; }
   virtual double getBaseGroundZ()
   {
     return _pelvis_position_ptr->points().getPointStateWorld(0)[2];
   }
-  virtual double getBaseGroundRz(){
-    return _steering_ptr->getState()[2];}
+  virtual double getBaseGroundRz() { return _steering_ptr->getState()[2]; }
 
   mwoibn::VectorN getCom() { return _robot.centerOfMass().get().head<2>(); }
   const mwoibn::Vector3& getComFull() { return _robot.centerOfMass().get(); }
@@ -111,8 +99,7 @@ public:
   }
   const mwoibn::VectorBool& isResteer() { return _resteer; }
   const mwoibn::VectorN& getAnkleYaw() { return _test_steer; }
-//  mwoibn::VectorN getBase() { return _robot.state.get().head<3>(); }
-
+  //  mwoibn::VectorN getBase() { return _robot.state.get().head<3>(); }
 
   const mwoibn::VectorN& getBaseError()
   {
@@ -124,7 +111,6 @@ public:
   }
 
 protected:
-
   std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask> _com_ptr;
 
   mwoibn::VectorN _com_ref;

@@ -133,10 +133,10 @@ void mgnss::controllers::WheeledMotionWorld::_setInitialConditions(){
 
   WheelsControllerExtend::_setInitialConditions();
 
-  _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5])*mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]);
+  _orientation = (mwoibn::Quaternion::fromAxisAngle(_y, _steering_ptr->getState()[4]) * mwoibn::Quaternion::fromAxisAngle(_x, _steering_ptr->getState()[5]));
   _heading = _steering_ptr->getState()[2];
 
-  _pelvis_orientation_ptr->setReference(0, _orientation*mwoibn::Quaternion::fromAxisAngle(_z, _heading));
+  _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
 
   _position = _pelvis_position_ptr->points().getPointStateWorld(0);
   _position.head<2>() = _robot.centerOfMass().get().head<2>();

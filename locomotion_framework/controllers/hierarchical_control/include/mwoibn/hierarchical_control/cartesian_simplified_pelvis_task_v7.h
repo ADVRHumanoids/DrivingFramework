@@ -64,7 +64,7 @@ public:
 
     ContactPoint3DRbdlTask::updateState();
 
-    q_twist = _pelvis_ptr->point(0).getOrientationWorld(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)).transposed();
+    q_twist = _pelvis_ptr->point(0).getOrientationWorld(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
     q_twist = q_twist.twistSwing(_ground_normal);
     angle_twist = q_twist.toAxisAngle(axis_twist);
 

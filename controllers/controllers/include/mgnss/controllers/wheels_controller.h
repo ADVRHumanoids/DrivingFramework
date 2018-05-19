@@ -60,12 +60,12 @@ public:
 
   void rotateBaseX(double th)
   {
-    _orientation = mwoibn::Quaternion::fromAxisAngle(_x, th) * _orientation;
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_x, th)*(_orientation);
   }
 
   void rotateBaseY(double th)
   {
-    _orientation = mwoibn::Quaternion::fromAxisAngle(_y, th) * _orientation;
+    _orientation = mwoibn::Quaternion::fromAxisAngle(_y, th)*(_orientation);
   }
 
   virtual void setBaseRotVelX(double dth) { _angular_vel[0] = dth; }

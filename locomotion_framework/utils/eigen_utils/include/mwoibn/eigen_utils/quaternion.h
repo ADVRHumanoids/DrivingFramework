@@ -47,14 +47,18 @@ public:
 
   Quaternion operator*(const Quaternion& q) const
   {
-    return Quaternion(q.w() * (*this).x() + q.x() * (*this).w() +
-                          q.y() * (*this).z() - q.z() * (*this).y(),
-                      q.w() * (*this).y() + q.y() * (*this).w() +
-                          q.z() * (*this).x() - q.x() * (*this).z(),
-                      q.w() * (*this).z() + q.z() * (*this).w() +
-                          q.x() * (*this).y() - q.y() * (*this).x(),
-                      q.w() * (*this).w() - q.x() * (*this).x() -
-                          q.y() * (*this).y() - q.z() * (*this).z());
+    return Quaternion(w()*q.x() + x()*q.w() + y()*q.z() - z()*q.y(),
+                      w()*q.y() - x()*q.z() + y()*q.w() + z()*q.x(),
+                      w()*q.z() + x()*q.y() - y()*q.x() + z()*q.w(),
+                      w()*q.w() - x()*q.x() - y()*q.y() - z()*q.z());
+  }
+
+  Quaternion chuj(const Quaternion& q) const
+  {
+    return Quaternion(q.w() * x() + q.x() * w() + q.y() * z() - q.z() * y(),
+                      q.w() * y() + q.y() * w() + q.z() * x() - q.x() * z(),
+                      q.w() * z() + q.z() * w() + q.x() * y() - q.y() * x(),
+                      q.w() * w() - q.x() * x() - q.y() * y() - q.z() * z());
   }
 
   Quaternion operator*(const double& s) const
@@ -146,7 +150,7 @@ public:
 
     Quaternion q_twist = swingTwist(dir);
 
-    q_swing = (*this) * q_twist.reciprocal();
+    q_swing = (*this)*q_twist.reciprocal();
 
     return q_twist;
   }
@@ -163,7 +167,7 @@ public:
 
     double l = std::sqrt(m * m + u * u * norm);
 
-    Quaternion q_twist(-dir[0] * u / l, -dir[1] * u / l, -dir[2] * u / l, m / l,
+    Quaternion q_twist(dir[0] * u / l, dir[1] * u / l, dir[2] * u / l, m / l,
                        false);
 
     return q_twist;
@@ -231,8 +235,8 @@ public:
     //res_quat = vec_quat * (*this);
     //res_quat = reciprocal() * res_quat;
 
-    res_quat = (*this) * vec_quat;
-    res_quat = res_quat * reciprocal();
+    res_quat = (*this)*vec_quat;
+    res_quat = res_quat*reciprocal();
 
     return res_quat.axis();
   }

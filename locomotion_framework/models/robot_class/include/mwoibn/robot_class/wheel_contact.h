@@ -188,7 +188,7 @@ public:
     _state = getPointStateWorld(0);
     mwoibn::point_handling::Point::fromFullState(_state, _state_pos,
                                                  _state_quat);
-    _temp_quat = _state_quat * _offset_quat;
+    _temp_quat = _state_quat*_offset_quat;
     _state_pos += _offset_pos;
     mwoibn::point_handling::Point::toFullState(_state, _state_pos, _temp_quat);
     setPointStateWorld(0, _state);

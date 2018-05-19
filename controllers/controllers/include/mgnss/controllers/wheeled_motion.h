@@ -35,8 +35,7 @@ public:
     _pelvis_position_ptr->setReference(0, _position);
 
     _pelvis_orientation_ptr->setReference(
-        0, _pelvis_orientation_ptr->getOffset(0) *
-               mwoibn::Quaternion::fromAxisAngle(_z, _heading));
+        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*_pelvis_orientation_ptr->getOffset(0));
   }
 
   virtual void steering();
