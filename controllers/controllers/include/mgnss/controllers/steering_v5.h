@@ -30,6 +30,7 @@ protected:
   virtual void _PT(int i);
 
   virtual void _computeTreshhold();
+  virtual void _resetTreshhold();
 
 
 };

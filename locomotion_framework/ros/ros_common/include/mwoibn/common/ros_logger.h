@@ -43,7 +43,7 @@ public:
         if(!_print.size())
         _file << name;
         else
-          _file << ", " << name;
+          _file << "," << name;
         _map.insert(std::pair<std::string, double>(name, _print.size()));
         _print.conservativeResize(_print.size()+1);
         _print.tail<1>()[0] = init_value;

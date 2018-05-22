@@ -88,6 +88,10 @@ public:
   const mwoibn::VectorN& getBaseError(){return _pelvis_position_ptr->getError();}
   const mwoibn::VectorN& getBaseOrnError(){return _pelvis_orientation_ptr->getError();}
   const mwoibn::VectorInt& countResteer(){return _reset_count;}
+  const mwoibn::VectorN& getVel(){return _steering_ref_ptr->v();}
+  const mwoibn::VectorN& getDamp(){return _steering_ref_ptr->damp();}
+  const mwoibn::VectorN& rawSteer(){ return _steering_ref_ptr->getRaw();}
+
 
 protected:
   void _allocate(YAML::Node config);

@@ -60,7 +60,7 @@ public:
   SteeringReference(mwoibn::robot_class::Robot& robot,
            mwoibn::hierarchical_control::ContactPointTrackingTask& plane, mwoibn::VectorN init_pose,
            double K_icm, double K_sp, double dt, double margin = 0.04,
-           double max = 2.79252680): _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt), _margin(margin),
+           double max = 2.79252680): _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt),
     _state(robot.state.state(mwoibn::robot_class::INTERFACE::POSITION))
   {
     _v_icm.setZero(_size);
@@ -68,11 +68,13 @@ public:
     _v_sp.setZero(_size);
     _b_sp.setZero(_size);
     _b.setZero(_size);
+    _v.setZero(_size);
+    _damp.setZero(_size);
     _b_st = init_pose;
     _plane_ref.setZero(2);
     _resteer.setConstant(_size, false);
     _steer.setConstant(_size, false);
-
+    _treshhold = margin/ dt;
 
   }
 
@@ -83,6 +85,7 @@ public:
 
   virtual void setRate(double dt)
   {
+    _resetTreshhold();
     _dt = dt;
     _computeTreshhold();
   }
@@ -90,8 +93,11 @@ public:
 
   const mwoibn::VectorN& getICM() { return _b_icm; }
   const mwoibn::VectorN& getSP() { return _b_sp; }
+  const mwoibn::VectorN& getRaw() { return _b; }
   const mwoibn::VectorN& vICM() { return _v_icm; }
   const mwoibn::VectorN& vSP() { return _v_sp; }
+  const mwoibn::VectorN& v() { return _v; }
+  const mwoibn::VectorN& damp() { return _damp; }
   const mwoibn::VectorN& getDampingSP() { return _damp_sp; }
   const mwoibn::VectorN& getDampingICM() { return _damp_icm; }
   void resteer(const mwoibn::VectorBool& steer)
@@ -117,7 +123,22 @@ public:
     _SPT(); // returns a velue in a robot space
 
     for (int i = 0; i < _size; i++) _merge(i);
+//    std::cout << std::endl;
+  }
 
+  static int limit2PI(double ref, double& st, int factor){
+
+    if(st - ref > mwoibn::HALF_PI){
+      st -= mwoibn::PI;
+      factor -= 1;
+     limit2PI(ref, st, factor);
+    }
+    else if ((ref - st > mwoibn::HALF_PI)){
+      st += mwoibn::PI;
+      factor += 1;
+      limit2PI(ref, st, factor);
+    }
+    return factor;
   }
 
   static void limit2PI(double ref, double& st){
@@ -131,6 +152,7 @@ public:
       limit2PI(ref, st);
     }
   }
+
 
   static void limitPI(double ref, double& st){
 
@@ -146,8 +168,8 @@ public:
 
 protected:
   mwoibn::hierarchical_control::ContactPointTrackingTask& _plane;
-  double _dt, _margin, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
-  mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp;
+  double _dt, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
+  mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp, _v, _damp;
   const mwoibn::VectorN& _state;
   mwoibn::VectorInt _dofs;
   mwoibn::VectorBool _resteer, _steer;
@@ -165,9 +187,10 @@ protected:
 
   virtual void _merge(int i){
     _b[i] = std::atan2(_K_icm * _v_icm[i] * std::sin(_b_icm[i]) +
-                           _K_sp * _v_sp[i] * std::sin(_b_sp[i]),
+                       _K_sp  * _v_sp[i] * std::sin(_b_sp[i]),
                        _K_icm * _v_icm[i] * std::cos(_b_icm[i]) +
-                           _K_sp * _v_sp[i] * std::cos(_b_sp[i]));
+                       _K_sp  * _v_sp[i] * std::cos(_b_sp[i]));
+
   }
 
   virtual double _computeVelocity(int i){
@@ -184,6 +207,7 @@ protected:
     _y = -std::sin(_heading) * next_step[0];
     _y += std::cos(_heading) * next_step[1];
     _y += _plane_ref[0] * next_step[2];
+
 
     _b_icm[i] = std::atan2(_y, _x); // this uses atan2 to avoid
                                     // singularities in a atan
@@ -203,6 +227,7 @@ protected:
     _v_sp[i] = _plane_ref.norm() / _dt;
   }
   virtual void _computeTreshhold() = 0;
+  virtual void _resetTreshhold() = 0;
 };
 }
 }

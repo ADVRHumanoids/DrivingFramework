@@ -13,17 +13,21 @@ mgnss::events::Steering5::Steering5(
   _damp_sp.setZero(_size);
   _damp_icm.setZero(_size);
 
-  _computeTreshhold();
+  _treshhold = _treshhold/_dt;
+//  _computeTreshhold();
 
 }
 
 void mgnss::events::Steering5::_computeTreshhold(){
-  _treshhold = _margin/_dt;
+  _treshhold = _treshhold/_dt;
 }
 
+void mgnss::events::Steering5::_resetTreshhold(){
+  _treshhold = _treshhold*_dt;
+}
 
 void mgnss::events::Steering5::_merge(int i){
-  if(_resteer[i]) _b_st[i] -= mwoibn::PI;
+  if(_resteer[i]) _b_st[i] -= mwoibn::PI; // change velocity sign
 
   double vel = _computeVelocity(i);
 

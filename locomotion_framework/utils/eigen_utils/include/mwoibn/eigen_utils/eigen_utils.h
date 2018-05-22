@@ -280,16 +280,22 @@ void skew(const _Vector_Type_& vec, _Matrix_Type_& mat){
 
 
 template <typename _Matrix_Type1_, typename _Matrix_Type2_> inline
-void limitHalfPi(_Matrix_Type1_ b_ref, _Matrix_Type2_& b){
+int limitHalfPi(_Matrix_Type1_ b_ref, _Matrix_Type2_& b){
   //  _Matrix_Type_ limited = vec;
+    int factor = 0;
+
     for(int i = 0; i < std::max(b_ref.rows(), b_ref.cols()); i++) // How will it work for matrices?
-      limitHalfPi(b_ref[i], b[i]);
+      factor += limitHalfPi(b_ref[i], b[i]);
+
+    return factor;
   }
 
 template <> inline
-void limitHalfPi(double b_ref, double& b)
+int limitHalfPi(double b_ref, double& b)
 {
-  b +=   3.14159265 * (std::floor((b_ref + 1.57079632) / 3.14159265) -  std::floor((b + 1.57079632) / 3.14159265));
+  int factor = (std::floor((b_ref + 1.57079632) / 3.14159265) -  std::floor((b + 1.57079632) / 3.14159265));
+  b +=   3.14159265 * factor;
+  return factor;
 }
 
 inline void limit2PI(double ref, double& st){

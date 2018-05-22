@@ -71,7 +71,7 @@ void mgnss::controllers::WheelsController::nextStep()
       (_heading - getBaseGroundRz()); // just limit the difference
 
   _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
-                                           6.28318531); // limit -pi:pi
+                                           6.28318531); // limit -pi:pi, this may cause problems
   _next_step[2] = _next_step[2] / _robot.rate();
   steering();
 }

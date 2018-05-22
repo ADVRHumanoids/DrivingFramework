@@ -29,6 +29,8 @@ protected:
 
   virtual void _merge(int i);
   virtual void _computeTreshhold();
+  virtual void _resetTreshhold(){}
+  double _margin;
 
 };
 }

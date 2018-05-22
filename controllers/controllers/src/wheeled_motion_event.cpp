@@ -1,5 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
-#include <mgnss/controllers/steering_v5.h>
+#include <mgnss/controllers/steering_v6.h>
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v7.h>
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
@@ -16,8 +16,8 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _initIK(config);
   _allocate();
 
-  _steering_ref_ptr.reset(new mgnss::events::Steering5(
-      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
+  _steering_ref_ptr.reset(new mgnss::events::Steering6(
+      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
@@ -28,8 +28,8 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _initIK(config);
   _allocate();
 
-  _steering_ref_ptr.reset(new mgnss::events::Steering5(
-      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
+  _steering_ref_ptr.reset(new mgnss::events::Steering6(
+      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
 
@@ -177,18 +177,22 @@ void mgnss::controllers::WheeledMotionEvent::_correct(){
   _robot.command.get(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
 
+//  std::cout << "test_steer\t" << _test_steer.transpose() << std::endl;
+//  std::cout << "lower\t" << _l_limits.transpose() << std::endl;
+//  std::cout << "upper\t" << _u_limits.transpose() << std::endl;
+
   // RESTEER AND CHECK FOR LIMITS
   for (int i = 0; i < _test_steer.size(); i++)
   {
     double steer = _test_steer[i];
 
-    if (((_test_steer[i] - _l_limits[i]) < -0.05 && (_current_steer[i] - _l_limits[i]) < 0.05)
-        || ((_test_steer[i] - _u_limits[i]) > 0.05  && (_current_steer[i] - _u_limits[i]) > -0.05))
+    if (((_test_steer[i] - _l_limits[i]) < -0.005 && (_current_steer[i] - _l_limits[i]) < 0.005)
+        || ((_test_steer[i] - _u_limits[i]) > 0.005  && (_current_steer[i] - _u_limits[i]) > -0.005))
     {
       if(!_resteer[i]){
       _reset_count[i] = _reset_count[i] + 1;
       }
-      if(_reset_count[i] == 250){ //100
+      if(_reset_count[i] == 50){ //100
       _resteer[i] = true;
       _start_steer[i] = _test_steer[i];
       _reset_count[i] = 0;
@@ -305,29 +309,13 @@ void mgnss::controllers::WheeledMotionEvent::steering()
 
 void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& logger){
   logger.addField("time", 0.0);
-  logger.addField("state", _steering_ptr->getState()[2]);
-  logger.addField("twist", _steering_ptr->getTwist());
-
-  mwoibn::Vector3 test;
-
-  test = _steering_ptr->getTestReference(0);
-
-  logger.addField("ref_0_0", test[0]);
-  logger.addField("ref_0_1", test[1]);
-  logger.addField("ref_0_2", test[2]);
-
-  test = _steering_ptr->twistReference(0);
-
-  logger.addField("tref_0_0", test[0]);
-  logger.addField("tref_0_1", test[1]);
-  logger.addField("tref_0_2", test[2]);
 
 //  logger.addField("e_base_z", getBaseError()[2]);
 //  logger.addField("r_base_z", getBodyPosition()[2]);
 
 //  logger.addField("e_base_rx", getBaseOrnError()[0]);
 //  logger.addField("e_base_ry", getBaseOrnError()[1]);
-  logger.addField("e_base_rz", getBaseOrnError()[2]);
+//  logger.addField("e_base_rz", getBaseOrnError()[2]);
 //  logger.addField("base_rx", _robot.state.get()[3]);
 //  logger.addField("base_ry", _robot.state.get()[4]);
 //  logger.addField("base_rz", _robot.state.get()[5]);
@@ -351,11 +339,11 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("r_3", isResteer()[2]);
 //  logger.addField("r_4", isResteer()[3]);
 
-  logger.addField("cp_1_x", getCp(0)[0]);
-  logger.addField("cp_1_y", getCp(0)[1]);
+//  logger.addField("cp_1_x", getCp(0)[0]);
+//  logger.addField("cp_1_y", getCp(0)[1]);
 // _logger.addField("cp_1_z", getCp(0)[2]);
-//  logger.addField("cp_2_x", getCp(1)[0]);
-//  logger.addField("cp_2_y", getCp(1)[1]);
+  logger.addField("cp_2_x", getCp(1)[0]);
+  logger.addField("cp_2_y", getCp(1)[1]);
 //  _logger.addField("cp_2_z", getCp(1)[2]);
 //  logger.addField("cp_3_x", getCp(2)[0]);
 //  logger.addField("cp_3_y", getCp(2)[1]);
@@ -367,8 +355,8 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("r_cp_1_x", refCp()[0]);
 //  logger.addField("r_cp_1_y", refCp()[1]);
 //  _logger.addField("r_cp_1_z", refCp()[2]);
-//  logger.addField("r_cp_2_x", refCp()[3]);
-//  logger.addField("r_cp_2_y", refCp()[4]);
+  logger.addField("r_cp_2_x", refCp()[3]);
+  logger.addField("r_cp_2_y", refCp()[4]);
 //  _logger.addField("r_cp_2_z", refCp()[5]);
 //  logger.addField("r_cp_3_x", refCp()[6]);
 //  logger.addField("r_cp_3_y", refCp()[7]);
@@ -377,24 +365,41 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("r_cp_4_y", refCp()[10]);
 //  logger.addField("r_cp_4_z", refCp()[11]);
 
+//  logger.addField("st_icm_1", getSteerICM()[0]);
+  logger.addField("st_icm_2", getSteerICM()[1]);
+
+//  logger.addField("st_sp_1", getSteerSP()[0]);
+  logger.addField("st_sp_2", getSteerSP()[1]);
+
+//  logger.addField("st_raw_1", rawSteer()[0]);
+  logger.addField("st_raw_2", rawSteer()[1]);
+
 //  logger.addField("r_st_1", refSteer()[0]);
-//  logger.addField("r_st_2", refSteer()[1]);
+  logger.addField("r_st_2", refSteer()[1]);
 //  logger.addField("r_st_3", refSteer()[2]);
 //  logger.addField("r_st_4", refSteer()[3]);
 //  logger.addField("st_1", getSteer()[0]);
-//  logger.addField("st_2", getSteer()[1]);
+  logger.addField("st_2", getSteer()[1]);
 //  logger.addField("st_3", getSteer()[2]);
 //  logger.addField("st_4", getSteer()[3]);
 
-  logger.addField("tan_sp_1", getDampingSP()[0]);
-//  logger.addField("tan_sp_2", getDampingSP()[1]);
+//  logger.addField("tan_sp_1", getDampingSP()[0]);
+  logger.addField("tan_sp_2", getDampingSP()[1]);
 //  logger.addField("tan_sp_3", getDampingSP()[2]);
 //  logger.addField("tan_sp_4", getDampingSP()[3]);
-  logger.addField("tan_icm_1", getDampingICM()[0]);
-//  logger.addField("tan_icm_2", getDampingICM()[1]);
+//  logger.addField("tan_icm_1", getDampingICM()[0]);
+  logger.addField("tan_icm_2", getDampingICM()[1]);
 //  logger.addField("tan_icm_3", getDampingICM()[2]);
 //  logger.addField("tan_icm_4", getDampingICM()[3]);
 
+//  logger.addField("v_icm_1", getVelICM()[0]);
+  logger.addField("v_icm_2", getVelICM()[1]);
+//  logger.addField("v_sp_1", getVelSP()[0]);
+  logger.addField("v_sp_2", getVelSP()[1]);
+//  logger.addField("v_1", getVel()[0]);
+  logger.addField("v_2", getVel()[1]);
+//  logger.addField("d_1", getDamp()[0]);
+  logger.addField("d_2", getDamp()[1]);
 //  logger.addField("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addField("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addField("ankle_yaw_3", _robot.state.get()[22]);
@@ -408,10 +413,10 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 
 void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger, double time){
   logger.addEntry("time", time);
-  logger.addEntry("state", _steering_ptr->getState()[2]);
-  logger.addEntry("twist", _steering_ptr->getTwist());
+//  logger.addEntry("state", _steering_ptr->getState()[2]);
+//  logger.addEntry("twist", _steering_ptr->getTwist());
 
-
+/*
   mwoibn::Vector3 test;
 
   test = _steering_ptr->getTestReference(0);
@@ -426,13 +431,13 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
   logger.addEntry("tref_0_1", test[1]);
   logger.addEntry("tref_0_2", test[2]);
 
-
+*/
 //  logger.addEntry("e_base_z", getBaseError()[2]);
 //  logger.addEntry("r_base_z", getBodyPosition()[2]);
 
 //  logger.addEntry("e_base_rx", getBaseOrnError()[0]);
 //  logger.addEntry("e_base_ry", getBaseOrnError()[1]);
-  logger.addEntry("e_base_rz", getBaseOrnError()[2]);
+//  logger.addEntry("e_base_rz", getBaseOrnError()[2]);
 //  logger.addEntry("base_rx", _robot.state.get()[3]);
 //  logger.addEntry("base_ry", _robot.state.get()[4]);
 //  logger.addEntry("base_rz", _robot.state.get()[5]);
@@ -446,21 +451,21 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
   logger.addEntry("r_com_x", refCom()[0]);
   logger.addEntry("r_com_y", refCom()[1]);
 
-//  logger.addField("r_1", countResteer()[0]);
-//  logger.addField("r_2", countResteer()[1]);
-//  logger.addField("r_3", countResteer()[2]);
-//  logger.addField("r_4", countResteer()[3]);
+//  logger.addEntry("r_1", countResteer()[0]);
+//  logger.addEntry("r_2", countResteer()[1]);
+//  logger.addEntry("r_3", countResteer()[2]);
+//  logger.addEntry("r_4", countResteer()[3]);
 
 //  logger.addEntry("r_1", isResteer()[0]);
 //  logger.addEntry("r_2", isResteer()[1]);
 //  logger.addEntry("r_3", isResteer()[2]);
 //  logger.addEntry("r_4", isResteer()[3]);
 
-  logger.addEntry("cp_1_x", getCp(0)[0]);
-  logger.addEntry("cp_1_y", getCp(0)[1]);
+//  logger.addEntry("cp_1_x", getCp(0)[0]);
+//  logger.addEntry("cp_1_y", getCp(0)[1]);
 // _logger.addEntry("cp_1_z", getCp(0)[2]);
-//  logger.addEntry("cp_2_x", getCp(1)[0]);
-//  logger.addEntry("cp_2_y", getCp(1)[1]);
+  logger.addEntry("cp_2_x", getCp(1)[0]);
+  logger.addEntry("cp_2_y", getCp(1)[1]);
 //  _logger.addEntry("cp_2_z", getCp(1)[2]);
 //  logger.addEntry("cp_3_x", getCp(2)[0]);
 //  logger.addEntry("cp_3_y", getCp(2)[1]);
@@ -472,8 +477,8 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 //  logger.addEntry("r_cp_1_x", refCp()[0]);
 //  logger.addEntry("r_cp_1_y", refCp()[1]);
 //  _logger.addEntry("r_cp_1_z", refCp()[2]);
-//  logger.addEntry("r_cp_2_x", refCp()[3]);
-//  logger.addEntry("r_cp_2_y", refCp()[4]);
+  logger.addEntry("r_cp_2_x", refCp()[3]);
+  logger.addEntry("r_cp_2_y", refCp()[4]);
 //  _logger.addEntry("r_cp_2_z", refCp()[5]);
 //  logger.addEntry("r_cp_3_x", refCp()[6]);
 //  logger.addEntry("r_cp_3_y", refCp()[7]);
@@ -482,24 +487,44 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 //  logger.addEntry("r_cp_4_y", refCp()[10]);
 //  logger.addEntry("r_cp_4_z", refCp()[11]);
 
+
+//  logger.addEntry("st_icm_1", getSteerICM()[0]);
+  logger.addEntry("st_icm_2", getSteerICM()[1]);
+
+//  logger.addEntry("st_sp_1", getSteerSP()[0]);
+  logger.addEntry("st_sp_2", getSteerSP()[1]);
+
+//  logger.addEntry("st_raw_1", rawSteer()[0]);
+  logger.addEntry("st_raw_2", rawSteer()[1]);
+
+
 //  logger.addEntry("r_st_1", refSteer()[0]);
-//  logger.addEntry("r_st_2", refSteer()[1]);
+  logger.addEntry("r_st_2", refSteer()[1]);
 //  logger.addEntry("r_st_3", refSteer()[2]);
 //  logger.addEntry("r_st_4", refSteer()[3]);
 //  logger.addEntry("st_1", getSteer()[0]);
-//  logger.addEntry("st_2", getSteer()[1]);
+  logger.addEntry("st_2", getSteer()[1]);
 //  logger.addEntry("st_3", getSteer()[2]);
 //  logger.addEntry("st_4", getSteer()[3]);
 
-  logger.addEntry("tan_sp_1", getDampingSP()[0]);
-//  logger.addEntry("tan_sp_2", getDampingSP()[1]);
+//  logger.addEntry("tan_sp_1", getDampingSP()[0]);
+  logger.addEntry("tan_sp_2", getDampingSP()[1]);
 //  logger.addEntry("tan_sp_3", getDampingSP()[2]);
 //  logger.addEntry("tan_sp_4", getDampingSP()[3]);
-  logger.addEntry("tan_icm_1", getDampingICM()[0]);
-//  logger.addEntry("tan_icm_2", getDampingICM()[1]);
+//  logger.addEntry("tan_icm_1", getDampingICM()[0]);
+  logger.addEntry("tan_icm_2", getDampingICM()[1]);
 //  logger.addEntry("tan_icm_3", getDampingICM()[2]);
 //  logger.addEntry("tan_icm_4", getDampingICM()[3]);
 
+
+//  logger.addEntry("v_icm_1", getVelICM()[0]);
+  logger.addEntry("v_icm_2", getVelICM()[1]);
+//  logger.addEntry("v_sp_1", getVelSP()[0]);
+  logger.addEntry("v_sp_2", getVelSP()[1]);
+//  logger.addEntry("v_1", getVel()[0]);
+  logger.addEntry("v_2", getVel()[1]);
+//  logger.addEntry("d_1", getDamp()[0]);
+  logger.addEntry("d_2", getDamp()[1]);
 //  logger.addEntry("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);
