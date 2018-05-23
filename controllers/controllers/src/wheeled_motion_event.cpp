@@ -373,6 +373,7 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 
 //  logger.addField("st_raw_1", rawSteer()[0]);
   logger.addField("st_raw_2", rawSteer()[1]);
+  logger.addField("st_org_2", pureSteer()[1]);
 
 //  logger.addField("r_st_1", refSteer()[0]);
   logger.addField("r_st_2", refSteer()[1]);
@@ -496,6 +497,7 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 
 //  logger.addEntry("st_raw_1", rawSteer()[0]);
   logger.addEntry("st_raw_2", rawSteer()[1]);
+  logger.addEntry("st_org_2", pureSteer()[1]);
 
 
 //  logger.addEntry("r_st_1", refSteer()[0]);

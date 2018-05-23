@@ -9,16 +9,13 @@ mgnss::events::Steering6::Steering6(
 {
   _pb_icm.setZero(_size);
   _pb_sp.setZero(_size);
+  _pb.setZero(_size);
 
   _damp_sp.setZero(_size);
   _damp_icm.setZero(_size);
 
   _treshhold_icm = margin_icm/dt;
   _treshhold_sp = margin_sp/dt;
-//  std::cout << margin << "\t" << margin_icm << "\t" << margin_sp << std::endl;
-//  std::cout << _treshhold << "\t" << _treshhold_icm << "\t" << _treshhold_sp << std::endl;
-
- // _computeTreshhold();
 
 }
 
@@ -39,34 +36,26 @@ void mgnss::events::Steering6::_computeTreshhold(){
 
 
 void mgnss::events::Steering6::_merge(int i){
-//  if(_resteer[i]) _b_st[i] -= mwoibn::PI; // change velocity sign
+  if(_resteer[i]) {
+    _b[i] -= mwoibn::PI;
+    mwoibn::eigen_utils::wrapToPi(_b[i]);
+  }// change velocity sign
+
+  _pb[i] = _b[i];
 
   _v[i] = _computeVelocity(i);
   _damp[i] = std::tanh(std::fabs(_v[i]) / _treshhold);
+
   SteeringReference::_merge(i);
 
-//  std::cout << _heading;
+  _raw[i] = _b[i];
+  _limited[i] = _b[i];
 
-//  std::cout << "\t" << _heading << std::endl;
+  limit2PI(_pb[i], _limited[i]);
 
-  _b_st[i] -= _heading;
-//  if(i == 1){
-//    std::cout << _b[i]*180/mwoibn::PI << ",\t" << _b_st[i]*180/mwoibn::PI;
-//  }
-  //  _b[i] += 6.28318531 * ( std::floor(_b_st[i] / 6.28318531) -  std::floor(_b[i] / 6.28318531));
+   _b[i] = _pb[i] + _damp[i] * (_limited[i] - _pb[i]); // do give the result in the world frame
 
-  mwoibn::eigen_utils::limitHalfPi(_b_st[i], _b[i]);
-  limit2PI(_b_st[i], _b[i]);
-//  if(i == 1){
-//    std::cout << ",\t" << _b_st[i]*180/mwoibn::PI;
-//    std::cout << ",\t" << _damp[i];
-//  }
-  //_b_st[i] = _b[i];
-  _b_st[i] += _damp[i] * (_b[i] - _b_st[i]); // do give the result in the world frame
-//  if(i == 1){
-//    std::cout << ",\t" << _b_st[i]*180/mwoibn::PI << std::endl;
-//  }
-  _b_st[i] += _heading;
+   _b_st[i] = _b[i] + _heading;
 }
 
 
@@ -84,19 +73,19 @@ void mgnss::events::Steering6::_ICM(mwoibn::Vector3 next_step)
     _steerICM(i, next_step);
     _velICM(i);
 
-//    std::cout << "icm " << _b_icm[i] << ", " << _pb_icm[i] << std::endl;
     int factor = mwoibn::eigen_utils::limitHalfPi(_pb_icm[i],_b_icm[i]);
     factor = limit2PI(_pb_icm[i], _b_icm[i], factor);
 
     _v_icm[i] = std::pow(-1,factor)*_v_icm[i]; // change sign to fit with steering
 
-//    std::cout << "factor " << factor << "-1, " << std::pow(-1,factor) << std::endl;
-
     _damp_icm[i] = std::tanh(std::fabs(_v_icm[i]) / _treshhold_icm);
-
 
     _b_icm[i] = _pb_icm[i] + _damp_icm[i] * (_b_icm[i] - _pb_icm[i]);
     _v_icm[i] = v_last + _damp_icm[i] * (_v_icm[i] - v_last);
+
+    factor = mwoibn::eigen_utils::limitHalfPi(_b[i],_b_icm[i]);
+    factor = limit2PI_v(_b[i], _b_icm[i], factor);
+    _v_icm[i] = std::pow(-1,factor)*_v_icm[i]; // change sign to fit with steering
 
   }
 }
@@ -117,6 +106,7 @@ void mgnss::events::Steering6::_PT(int i)
   _steerSP(i);
   _velSP(i);
 
+  _v_sp[i] = _v_icm[i]*_v_sp[i];
   int factor = mwoibn::eigen_utils::limitHalfPi(_pb_sp[i],_b_sp[i]);
   factor = limit2PI(_pb_sp[i], _b_sp[i], factor);
 
@@ -126,4 +116,9 @@ void mgnss::events::Steering6::_PT(int i)
   _damp_sp[i] = std::tanh(std::fabs(_v_sp[i]) / _treshhold_sp);
   _b_sp[i] = _pb_sp[i] + _damp_sp[i] *(_b_sp[i] - _pb_sp[i]);
   _v_sp[i] = v_last + _damp_sp[i] * (_v_sp[i] - v_last);
+
+  factor = mwoibn::eigen_utils::limitHalfPi(_b[i],_b_sp[i]);
+  factor = limit2PI_v(_b[i], _b_sp[i], factor);
+  _v_sp[i] = std::pow(-1,factor)*_v_sp[i]; // change sign to fit with steering
+
 }

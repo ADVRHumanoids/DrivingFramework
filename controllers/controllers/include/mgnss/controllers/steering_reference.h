@@ -70,6 +70,8 @@ public:
     _b.setZero(_size);
     _v.setZero(_size);
     _damp.setZero(_size);
+    _raw.setZero(_size);
+    _limited.setZero(_size);
     _b_st = init_pose;
     _plane_ref.setZero(2);
     _resteer.setConstant(_size, false);
@@ -93,13 +95,15 @@ public:
 
   const mwoibn::VectorN& getICM() { return _b_icm; }
   const mwoibn::VectorN& getSP() { return _b_sp; }
-  const mwoibn::VectorN& getRaw() { return _b; }
+  const mwoibn::VectorN& getLimited() { return _limited; }
   const mwoibn::VectorN& vICM() { return _v_icm; }
   const mwoibn::VectorN& vSP() { return _v_sp; }
   const mwoibn::VectorN& v() { return _v; }
   const mwoibn::VectorN& damp() { return _damp; }
   const mwoibn::VectorN& getDampingSP() { return _damp_sp; }
   const mwoibn::VectorN& getDampingICM() { return _damp_icm; }
+  const mwoibn::VectorN& getRaw() { return _raw; }
+
   void resteer(const mwoibn::VectorBool& steer)
   {
     for (int i = 0; i < _resteer.size(); i++)
@@ -153,6 +157,32 @@ public:
     }
   }
 
+  static int limit2PI_v(double ref, double& st, int factor){
+
+    if(st - ref > mwoibn::HALF_PI + 10.0/180.0*mwoibn::PI){
+      st -= mwoibn::PI;
+      factor -= 1;
+     limit2PI(ref, st, factor);
+    }
+    else if ((ref - st > mwoibn::HALF_PI + 10.0/180.0*mwoibn::PI)){
+      st += mwoibn::PI;
+      factor += 1;
+      limit2PI(ref, st, factor);
+    }
+    return factor;
+  }
+
+  static void limit2PI_v(double ref, double& st){
+
+    if(st - ref > mwoibn::HALF_PI + 10.0/180.0*mwoibn::PI){
+      st -= mwoibn::PI;
+     limit2PI(ref, st);
+    }
+    else if ((ref - st > mwoibn::HALF_PI + 10.0/180.0*mwoibn::PI)){
+      st += mwoibn::PI;
+      limit2PI(ref, st);
+    }
+  }
 
   static void limitPI(double ref, double& st){
 
@@ -169,7 +199,7 @@ public:
 protected:
   mwoibn::hierarchical_control::ContactPointTrackingTask& _plane;
   double _dt, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
-  mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp, _v, _damp;
+  mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp, _v, _damp, _raw, _limited;
   const mwoibn::VectorN& _state;
   mwoibn::VectorInt _dofs;
   mwoibn::VectorBool _resteer, _steer;

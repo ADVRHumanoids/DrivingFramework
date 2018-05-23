@@ -90,7 +90,8 @@ public:
   const mwoibn::VectorInt& countResteer(){return _reset_count;}
   const mwoibn::VectorN& getVel(){return _steering_ref_ptr->v();}
   const mwoibn::VectorN& getDamp(){return _steering_ref_ptr->damp();}
-  const mwoibn::VectorN& rawSteer(){ return _steering_ref_ptr->getRaw();}
+  const mwoibn::VectorN& rawSteer(){ return _steering_ref_ptr->getLimited();}
+  const mwoibn::VectorN& pureSteer(){ return _steering_ref_ptr->getRaw();}
 
 
 protected:

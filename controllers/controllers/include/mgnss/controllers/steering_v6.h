@@ -23,7 +23,7 @@ public:
 protected:
 
   virtual void _merge(int i);
-  mwoibn::VectorN _pb_icm, _pb_sp;
+  mwoibn::VectorN _pb_icm, _pb_sp, _pb;
   double _K_v, _treshhold_icm, _treshhold_sp;
   virtual void _ICM(mwoibn::Vector3 next_step);
 
