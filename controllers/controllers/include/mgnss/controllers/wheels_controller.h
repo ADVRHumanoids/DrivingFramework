@@ -99,10 +99,8 @@ public:
   virtual const mwoibn::Vector3& getLinVel(){ return _linear_vel;}
   virtual const mwoibn::Vector3& getAngVel(){ return _angular_vel;}
 
-  virtual void updateSupport(const mwoibn::VectorN& support)
-  {
-    _steering_ptr->setReference(support);
-  }
+  void setSupport(const mwoibn::VectorN& support){_support.noalias() = support;}
+  void setSupportVel(const mwoibn::VectorN& support_vel){_support_vel.noalias() = support_vel;}
 
   virtual double getBaseGroundX() = 0;
   virtual double getBaseGroundY() = 0;
@@ -112,7 +110,7 @@ public:
 
   virtual void updateBase() = 0;
 
-  virtual void stepBase();
+  virtual void step();
 
   virtual void steering();
 
@@ -154,13 +152,17 @@ public:
 
   virtual void nextStep();
 
-  virtual void update(const mwoibn::VectorN& support);
 
 protected:
   bool _isDone(mwoibn::hierarchical_control::ControllerTask& task,
                const double eps) const
   {
     return task.getError().cwiseAbs().maxCoeff() < eps;
+  }
+
+  virtual void _updateSupport()
+  {
+      _steering_ptr->setReference(_support);
   }
 
   std::unique_ptr<mwoibn::hierarchical_control::ConstraintsTask>
@@ -180,7 +182,7 @@ protected:
 
   double rate = 200;
   double _dt, orientation = 0, _heading;
-  mwoibn::VectorN steerings, _command, _previous_command;
+  mwoibn::VectorN steerings, _command, _previous_command, _support, _support_vel;
   mwoibn::Vector3 _position, _next_step, _angular_vel, _linear_vel;
   mwoibn::Axis _x, _y, _z;
 

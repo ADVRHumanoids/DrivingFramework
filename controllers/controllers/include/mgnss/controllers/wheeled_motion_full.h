@@ -19,7 +19,6 @@ public:
 
   void updateBase(){
 
-    stepBase();
     _pelvis_position_ptr->setReference(0, _position);
 
     _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*(mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate()))*(_orientation);

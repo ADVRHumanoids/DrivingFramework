@@ -28,6 +28,8 @@ mgnss::controllers::WheeledMotionEvent2::WheeledMotionEvent2(mwoibn::robot_class
 
 }
 
+
+
 void mgnss::controllers::WheeledMotionEvent2::_setInitialConditions(){
   WheelsControllerExtend::_setInitialConditions();
 
@@ -116,7 +118,8 @@ void mgnss::controllers::WheeledMotionEvent2::fullUpdate(const mwoibn::VectorN& 
   _full_robot.get();
   _full_robot.updateKinematics();
 
-  update(support);
+  setSupport(support);
+  update();
 
   _robot.send();
   _robot.wait();

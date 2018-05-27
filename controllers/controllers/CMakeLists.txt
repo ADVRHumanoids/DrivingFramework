@@ -48,6 +48,8 @@ add_library(wheeled_motion
    src/steering_v4.cpp
    src/steering_v5.cpp   
    src/steering_v6.cpp   
+   src/steering_v7.cpp  
+   src/steering_v8.cpp  
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp          

@@ -77,6 +77,7 @@ public:
   virtual void releaseContact(int i) { }
   virtual void claimContact(int i) { }
 
+  virtual int getFullTaskSize(){return getTaskSize();}
 
 protected:
   mwoibn::VectorN _state;

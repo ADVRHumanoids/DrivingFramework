@@ -68,10 +68,18 @@ bool mgnss::ros_callbacks::wheeled_motion_event::evenstHandler(custom_services::
 
 void mgnss::ros_callbacks::wheeled_motion_event::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheeledMotionEvent* controller_ptr)
  {
-    if(msg->position[12] == mwoibn::IS_VALID){
+    if(msg->position.size() > 12 && msg->position[12] == mwoibn::IS_VALID){
       for(int i = 0; i < 12; i++){
         (*support)[i] = msg->position[i];
       }
+      controller_ptr->setSupport(*support);
       }
-    controller_ptr->updateSupport(*support);
+
+    if(msg->velocity.size() > 12 && msg->velocity[12] == mwoibn::IS_VALID){
+      for(int i = 0; i < 12; i++){
+        (*support)[i] = msg->velocity[i];
+      }
+      controller_ptr->setSupportVel(*support);
+      }
+
   }

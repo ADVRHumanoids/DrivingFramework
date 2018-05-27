@@ -77,6 +77,8 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
   _steering_ptr->updateState();
 
   steerings.noalias() = _leg_steer_ptr->getCurrent();
+  _support.noalias() = _steering_ptr->getReference();
+  _support_vel.setZero();
 
   _leg_steer_ptr->setReference(steerings);
   _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());

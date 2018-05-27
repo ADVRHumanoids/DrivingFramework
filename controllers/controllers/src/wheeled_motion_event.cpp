@@ -1,5 +1,5 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
-#include <mgnss/controllers/steering_v6.h>
+#include <mgnss/controllers/steering_v8.h>
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v7.h>
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
@@ -16,8 +16,8 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _initIK(config);
   _allocate();
 
-  _steering_ref_ptr.reset(new mgnss::events::Steering6(
-      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
+  _steering_ref_ptr.reset(new mgnss::events::Steering8(
+      _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
@@ -28,8 +28,8 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
   _initIK(config);
   _allocate();
 
-  _steering_ref_ptr.reset(new mgnss::events::Steering6(
-      _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
+  _steering_ref_ptr.reset(new mgnss::events::Steering8(
+      _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
 
@@ -158,7 +158,8 @@ void mgnss::controllers::WheeledMotionEvent::fullUpdate(const mwoibn::VectorN& s
   _robot.get();
   _robot.updateKinematics();
 
-  update(support);
+  setSupport(support);
+  update();
 
   _robot.send();
   _robot.wait();
@@ -168,6 +169,7 @@ void mgnss::controllers::WheeledMotionEvent::compute()
   mgnss::controllers::WheelsController::compute();
   _correct();
 
+
 }
 
 void mgnss::controllers::WheeledMotionEvent::_correct(){
@@ -176,10 +178,6 @@ void mgnss::controllers::WheeledMotionEvent::_correct(){
                    mwoibn::robot_class::INTERFACE::POSITION);
   _robot.command.get(_test_steer, _select_steer,
                      mwoibn::robot_class::INTERFACE::POSITION);
-
-//  std::cout << "test_steer\t" << _test_steer.transpose() << std::endl;
-//  std::cout << "lower\t" << _l_limits.transpose() << std::endl;
-//  std::cout << "upper\t" << _u_limits.transpose() << std::endl;
 
   // RESTEER AND CHECK FOR LIMITS
   for (int i = 0; i < _test_steer.size(); i++)
@@ -339,30 +337,30 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("r_3", isResteer()[2]);
 //  logger.addField("r_4", isResteer()[3]);
 
-//  logger.addField("cp_1_x", getCp(0)[0]);
-//  logger.addField("cp_1_y", getCp(0)[1]);
+  logger.addField("cp_1_x", getCp(0)[0]);
+  logger.addField("cp_1_y", getCp(0)[1]);
 // _logger.addField("cp_1_z", getCp(0)[2]);
   logger.addField("cp_2_x", getCp(1)[0]);
   logger.addField("cp_2_y", getCp(1)[1]);
 //  _logger.addField("cp_2_z", getCp(1)[2]);
-//  logger.addField("cp_3_x", getCp(2)[0]);
-//  logger.addField("cp_3_y", getCp(2)[1]);
+  logger.addField("cp_3_x", getCp(2)[0]);
+  logger.addField("cp_3_y", getCp(2)[1]);
 //  _logger.addField("cp_3_z", getCp(2)[2]);
-//  logger.addField("cp_4_x", getCp(3)[0]);
-//  logger.addField("cp_4_y", getCp(3)[1]);
+  logger.addField("cp_4_x", getCp(3)[0]);
+  logger.addField("cp_4_y", getCp(3)[1]);
 //  logger.addField("cp_4_z", getCp(3)[2]);
 
-//  logger.addField("r_cp_1_x", refCp()[0]);
-//  logger.addField("r_cp_1_y", refCp()[1]);
+  logger.addField("r_cp_1_x", refCp()[0]);
+  logger.addField("r_cp_1_y", refCp()[1]);
 //  _logger.addField("r_cp_1_z", refCp()[2]);
   logger.addField("r_cp_2_x", refCp()[3]);
   logger.addField("r_cp_2_y", refCp()[4]);
 //  _logger.addField("r_cp_2_z", refCp()[5]);
-//  logger.addField("r_cp_3_x", refCp()[6]);
-//  logger.addField("r_cp_3_y", refCp()[7]);
+  logger.addField("r_cp_3_x", refCp()[6]);
+  logger.addField("r_cp_3_y", refCp()[7]);
 //  _logger.addField("r_cp_3_z", refCp()[8]);
-//  logger.addField("r_cp_4_x", refCp()[9]);
-//  logger.addField("r_cp_4_y", refCp()[10]);
+  logger.addField("r_cp_4_x", refCp()[9]);
+  logger.addField("r_cp_4_y", refCp()[10]);
 //  logger.addField("r_cp_4_z", refCp()[11]);
 
 //  logger.addField("st_icm_1", getSteerICM()[0]);
@@ -462,30 +460,30 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 //  logger.addEntry("r_3", isResteer()[2]);
 //  logger.addEntry("r_4", isResteer()[3]);
 
-//  logger.addEntry("cp_1_x", getCp(0)[0]);
-//  logger.addEntry("cp_1_y", getCp(0)[1]);
+  logger.addEntry("cp_1_x", getCp(0)[0]);
+  logger.addEntry("cp_1_y", getCp(0)[1]);
 // _logger.addEntry("cp_1_z", getCp(0)[2]);
   logger.addEntry("cp_2_x", getCp(1)[0]);
   logger.addEntry("cp_2_y", getCp(1)[1]);
 //  _logger.addEntry("cp_2_z", getCp(1)[2]);
-//  logger.addEntry("cp_3_x", getCp(2)[0]);
-//  logger.addEntry("cp_3_y", getCp(2)[1]);
+  logger.addEntry("cp_3_x", getCp(2)[0]);
+  logger.addEntry("cp_3_y", getCp(2)[1]);
 //  _logger.addEntry("cp_3_z", getCp(2)[2]);
-//  logger.addEntry("cp_4_x", getCp(3)[0]);
-//  logger.addEntry("cp_4_y", getCp(3)[1]);
+  logger.addEntry("cp_4_x", getCp(3)[0]);
+  logger.addEntry("cp_4_y", getCp(3)[1]);
 //  logger.addEntry("cp_4_z", getCp(3)[2]);
 
-//  logger.addEntry("r_cp_1_x", refCp()[0]);
-//  logger.addEntry("r_cp_1_y", refCp()[1]);
+  logger.addEntry("r_cp_1_x", refCp()[0]);
+  logger.addEntry("r_cp_1_y", refCp()[1]);
 //  _logger.addEntry("r_cp_1_z", refCp()[2]);
   logger.addEntry("r_cp_2_x", refCp()[3]);
   logger.addEntry("r_cp_2_y", refCp()[4]);
 //  _logger.addEntry("r_cp_2_z", refCp()[5]);
-//  logger.addEntry("r_cp_3_x", refCp()[6]);
-//  logger.addEntry("r_cp_3_y", refCp()[7]);
+  logger.addEntry("r_cp_3_x", refCp()[6]);
+  logger.addEntry("r_cp_3_y", refCp()[7]);
 //  _logger.addEntry("r_cp_3_z", refCp()[8]);
-//  logger.addEntry("r_cp_4_x", refCp()[9]);
-//  logger.addEntry("r_cp_4_y", refCp()[10]);
+  logger.addEntry("r_cp_4_x", refCp()[9]);
+  logger.addEntry("r_cp_4_y", refCp()[10]);
 //  logger.addEntry("r_cp_4_z", refCp()[11]);
 
 

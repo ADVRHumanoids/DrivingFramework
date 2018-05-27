@@ -39,7 +39,6 @@ public:
 
   void updateBase(){
 
-    stepBase();
     _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
     _com_ptr->setReference(_com_ref);
@@ -102,7 +101,6 @@ protected:
 
   mwoibn::VectorInt _select_wheel, _reset_count;
   mwoibn::VectorN _test_steer, _current_steer, _start_steer;
-
   mwoibn::VectorBool _resteer;
 
   mwoibn::VectorN  _com_ref;

@@ -26,6 +26,8 @@ mgnss::controllers::WheeledMotion::WheeledMotion(mwoibn::robot_class::Robot& rob
 void mgnss::controllers::WheeledMotion::_setInitialConditions(){
 
   _steering_ptr->init();
+  _support.noalias() = _steering_ptr->getReference();
+  _support_vel.setZero();
 
   for (int i = 0; i < _leg_z_ptr->points().size(); i++)
   {
@@ -128,8 +130,7 @@ void mgnss::controllers::WheeledMotion::update(const mwoibn::VectorN& support,
   _linear_vel = velocity;
   _angular_vel[2] = omega;
 
-  updateSupport(support);
-
+  setSupport(support);
   nextStep();
   compute();
 }
@@ -139,7 +140,8 @@ void mgnss::controllers::WheeledMotion::fullUpdate(const mwoibn::VectorN& suppor
   _robot.get();
   _robot.updateKinematics();
 
-  update(support);
+  setSupport(support);
+  update();
 
   _robot.send();
   _robot.wait();
@@ -152,8 +154,8 @@ void mgnss::controllers::WheeledMotion::fullUpdate(const mwoibn::VectorN& suppor
   _linear_vel = velocity;
   _angular_vel[2] = omega;
 
-  update(support);
-
+  setSupport(support);
+  update();
 }
 
 void mgnss::controllers::WheeledMotion::steering()

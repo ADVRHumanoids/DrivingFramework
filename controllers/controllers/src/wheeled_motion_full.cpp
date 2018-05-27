@@ -101,7 +101,8 @@ void mgnss::controllers::WheeledMotionFull::fullUpdate(const mwoibn::VectorN& su
   _robot.get();
   _robot.updateKinematics();
 
-  update(support);
+  setSupport(support);
+  update();
 
   _robot.send();
   _robot.wait();

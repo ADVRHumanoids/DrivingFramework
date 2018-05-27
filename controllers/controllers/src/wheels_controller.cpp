@@ -15,12 +15,12 @@ double mgnss::controllers::WheelsController::limit(const double th)
   return th - 6.28318531 * std::floor((th + 3.14159265) / 6.28318531);
 }
 
-void mgnss::controllers::WheelsController::update(const mwoibn::VectorN& support)
-{
-  updateSupport(support);
-  nextStep();
-  compute();
-}
+//void mgnss::controllers::WheelsController::update(const mwoibn::VectorN& support)
+//{
+//  updateSupport(support);
+//  nextStep();
+//  compute();
+//}
 
 void mgnss::controllers::WheelsController::compute()
 {
@@ -35,10 +35,11 @@ void mgnss::controllers::WheelsController::compute()
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
 }
 
-void mgnss::controllers::WheelsController::stepBase(){
-  _position += _linear_vel*_robot.rate();
-  _heading += _angular_vel[2] * _robot.rate();
-  _heading -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
+void mgnss::controllers::WheelsController::step(){
+  _support  += _support_vel * _robot.rate();
+  _position += _linear_vel  * _robot.rate();
+  _heading  += _angular_vel[2] * _robot.rate();
+  _heading  -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
 
 }
 
@@ -61,7 +62,10 @@ void mgnss::controllers::WheelsController::nextStep()
 {
   _robot.centerOfMass().update();
 
+  step();
+
   updateBase();
+  _updateSupport();
 
   _next_step[0] =
       (_linear_vel[0]);
@@ -90,6 +94,9 @@ void mgnss::controllers::WheelsController::_allocate(){
 
   _select_steer = _robot.getDof(_robot.getLinks("camber"));
    steerings.setZero(_select_steer.size());
+
+   _support.setZero(_steering_ptr->getFullTaskSize());
+   _support_vel.setZero(_steering_ptr->getFullTaskSize());
 
   _l_limits.setZero(_select_steer.size());
   _u_limits.setZero(_select_steer.size());

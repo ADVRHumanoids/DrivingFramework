@@ -73,5 +73,5 @@ void mgnss::ros_callbacks::wheeled_motion_world::supportHandler(const custom_mes
         (*support)[i] = msg->position[i];
       }
       }
-    controller_ptr->updateSupport(*support);
+    controller_ptr->setSupport(*support);
   }

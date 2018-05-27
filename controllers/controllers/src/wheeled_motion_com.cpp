@@ -22,6 +22,8 @@ mgnss::controllers::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robo
   init();
 }
 
+
+
 void mgnss::controllers::WheeledMotionCom::_createTasks(){
   // Set-up hierachical controller
   _constraints_ptr.reset(
@@ -104,7 +106,8 @@ void mgnss::controllers::WheeledMotionCom::fullUpdate(const mwoibn::VectorN& sup
   _robot.get();
   _robot.updateKinematics();
 
-  update(support);
+  setSupport(support);
+  update();
 
   _robot.send();
   _robot.wait();

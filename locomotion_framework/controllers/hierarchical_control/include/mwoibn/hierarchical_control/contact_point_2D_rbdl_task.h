@@ -123,6 +123,7 @@ public:
 
   virtual const mwoibn::Vector3& getPointStateReference(int i) = 0;
 
+  virtual int getFullTaskSize(){return _full_error.size();}
 
 protected:
   mwoibn::VectorN _height, _full_error, _directions;

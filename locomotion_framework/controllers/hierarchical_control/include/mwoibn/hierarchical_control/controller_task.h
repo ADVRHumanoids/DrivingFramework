@@ -48,9 +48,9 @@ namespace hierarchical_control
 			virtual void update(){updateError(); updateJacobian();}
 
       //! Returnes size of a defined task
-			double getTaskSize(){return _jacobian.rows();}
+      int getTaskSize(){return _jacobian.rows();}
       //! Returnes number of task dofs
-			double getTaskDofs(){return _jacobian.cols();}
+      int getTaskDofs(){return _jacobian.cols();}
 
       //! Allows to define the human readable name for the task
 			std::string name;

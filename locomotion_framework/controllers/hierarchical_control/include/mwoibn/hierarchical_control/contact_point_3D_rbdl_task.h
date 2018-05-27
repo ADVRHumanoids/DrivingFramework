@@ -195,6 +195,8 @@ public:
   virtual void releaseContact(int i) { _selector[i] = true; }
   virtual void claimContact(int i) { _selector[i] = false; }
 
+  virtual int getFullTaskSize(){return _full_error.size();}
+
 protected:
   std::vector<mwoibn::Axis> _axes, _axes_world, _x_world;
   mwoibn::VectorBool _selector;

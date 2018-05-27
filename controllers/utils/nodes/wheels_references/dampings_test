@@ -1,0 +1,114 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+import rospy
+from numpy import cos, sin
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_reference')
+    dt = 0.005
+    rate = rospy.Rate(1.0/dt)
+    #print(1.0/dt)
+    name = '/centauro/wheels_command'
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+
+    dx, dy = 0.0, 0.0
+    t, t_end = 0.0, 5.0
+    mode, steps = 0, 4
+   
+    while not rospy.is_shutdown():
+
+      if mode == 0:
+        dx, dy =  10.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+        steps += 4 if t > t_end*(mode+steps) else 0
+      elif mode == 1:
+        dx, dy = -10.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+        steps += 4 if t > t_end*(mode+steps) else 0
+      elif mode == 2:
+        dx, dy = 2.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 3:
+        dx, dy = 40.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 4: 
+        dx, dy = 80.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 5: 
+        dx, dy = 100.00,  0.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 6: 
+        dx, dy = 100.00,  20.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 7: 
+        dx, dy = 100.00, 40.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 8: 
+        dx, dy = 100.00,  60.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 9: 
+        dx, dy = 100.00,  80.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 10: 
+        dx, dy = 100.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 11: 
+        dx, dy = 80.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 12: 
+        dx, dy = 60.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 13: 
+        dx, dy = 40.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 14: 
+        dx, dy = 20.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 15: 
+        dx, dy = 0.00,  100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 16: 
+        dx, dy = 0.00,  60.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 17: 
+        dx, dy = 0.00,  30.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 18: 
+        dx, dy = 0.00,  -30.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 19: 
+        dx, dy = 0.00,  -60.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+      elif mode == 20: 
+        dx, dy = 0.00,  -100.00
+        mode += 1 if t > t_end*(mode+steps) else 0
+
+
+      try:
+        ref_service(1.0, 1.0, dx)
+        ref_service(1.0, 2.0, dy)
+
+      except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
+
+      t += dt
+
+      if (t%1 > 0.9999):
+        print("mode",mode, "t", t, "%", t%1)
+      rate.sleep()
+
+
+
+

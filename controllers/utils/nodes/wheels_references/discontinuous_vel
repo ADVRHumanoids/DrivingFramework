@@ -1,0 +1,83 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+from custom_messages.msg import CustomCmnd
+import rospy
+from numpy import cos, sin
+import numpy as np
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_reference')
+    dt = 0.005
+    rate = rospy.Rate(200)
+    #print(1.0/dt)
+    name = 'wheels_command'
+    
+    support = rospy.Publisher('wheels_support', CustomCmnd, queue_size=1)
+    msg = CustomCmnd()
+   
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+    
+    dx, dy, z, z_max = 0.0,  0.00, 0.93, 1.02
+     
+    dx_cp = np.array([0.02,  0.02,  -0.02, -0.02])
+    dy_cp = np.array([0.01,  -0.01,  0.01, -0.01])
+    dz_cp = np.array([0.0,  0.0,  0.0, 0.0])   
+     
+    t_end, mode, steps = 3.0, 0, 0.9
+    t = 0.0
+    while not rospy.is_shutdown() and mode < 8:
+#      th = th + dth * dt * magic
+	  
+      if mode < 5:
+		if t > t_end*(mode+steps):
+			dx_cp *= 0.9
+			mode += 1
+			steps -= 0.95
+      elif mode == 5:
+		if t > t_end*(mode+steps):
+			dx_cp = np.array([-0.01,  -0.01,  0.01, 0.01])
+			mode += 1
+			steps -= 0.5
+      elif mode == 6:
+		if t > t_end*(mode+steps):	
+			mode += 1
+			dx_cp = np.array([-0.04,  -0.04,  0.04, 0.04])
+			step -= 0.75
+      elif mode == 7:
+		if t > t_end*(mode+steps):	
+			mode += 1
+			
+      msg.velocity = list(sum(zip(dx_cp, dy_cp, dz_cp),())) + [2147483647]
+      support.publish(msg)
+				
+      if (t%0.2 > 0.1999 or t%0.2 < 0.0001):
+		print("mode", mode, "t", t, "t_end", t_end*(mode+steps), "vel", dx_cp)
+
+      try:
+        ref_service(1.0, 1.0, dx*100.0)
+        ref_service(2.0, 3.0, z*100.0)
+
+      except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
+
+      t += dt
+      rate.sleep()
+     
+    msg.velocity = [0] * 12 + [2147483647]
+    support.publish(msg)
+ 
+
+
+

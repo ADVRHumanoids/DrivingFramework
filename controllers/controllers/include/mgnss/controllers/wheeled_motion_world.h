@@ -38,8 +38,6 @@ public:
 
   void updateBase()
   {
-    stepBase();
-
     _com_ref << _position[0], _position[1];
     _pelvis_position_ptr->setReference(0, _position);
     _com_ptr->setReference(_com_ref);

@@ -50,7 +50,6 @@ protected:
     _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
         custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheeled_motion_event::evenstHandler,
                                                                                      _1, _2, static_cast<mgnss::controllers::WheeledMotionEvent*>(_controller_ptr.get())));
-//    _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, &mgnss::xbot_plugins::WheelsV2::supportHandler, this);
     _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheeled_motion_event::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheeledMotionEvent*>(_controller_ptr.get()))); }
 
 };

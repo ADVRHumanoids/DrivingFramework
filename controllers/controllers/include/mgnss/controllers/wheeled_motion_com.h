@@ -20,7 +20,6 @@ public:
 
   virtual void updateBase(){
 
-    stepBase();
 //    std::cout << "_heading\t" << _heading << std::endl;
 
     _pelvis_position_ptr->setReference(0, _position);

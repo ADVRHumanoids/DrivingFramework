@@ -22,7 +22,13 @@ public:
 
   virtual void updateBase()
   {
+    _pelvis_position_ptr->setReference(0, _position);
 
+    _pelvis_orientation_ptr->setReference(
+        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*_pelvis_orientation_ptr->getOffset(0));
+  }
+
+  virtual void step(){
     for (int i = 0; i < _position.size(); i++)
     {
       if (_previous_command[i] != _linear_vel[i])
@@ -30,13 +36,9 @@ public:
       _previous_command[i] = _linear_vel[i];
     }
 
-    stepBase();
-
-    _pelvis_position_ptr->setReference(0, _position);
-
-    _pelvis_orientation_ptr->setReference(
-        0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*_pelvis_orientation_ptr->getOffset(0));
+    WheelsController::step();
   }
+
 
   virtual void steering();
 
@@ -86,6 +88,7 @@ protected:
   virtual void _setInitialConditions();
   virtual void _createTasks();
   virtual void _initIK();
+
 };
 }
 }
