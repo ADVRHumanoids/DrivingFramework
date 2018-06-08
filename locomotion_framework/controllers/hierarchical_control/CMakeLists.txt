@@ -81,7 +81,8 @@ include_directories(
 
    add_library(hierarchical_controller
      src/hierarchical_controller.cpp
-#     src/hierarchical_controller_continous.cpp
+     src/hierarchical_controller_continous.cpp
+     src/hierarchical_controller_wheels.cpp
    )
 ##   Add cmake target dependencies of the library
 ##   as an example, code may need to be generated before libraries

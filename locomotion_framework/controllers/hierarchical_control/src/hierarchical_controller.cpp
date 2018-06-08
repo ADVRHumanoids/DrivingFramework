@@ -78,6 +78,7 @@ mwoibn::hierarchical_control::HierarchicalController::update()
     task->update();
   }
   compute();
+
   return getCommand();
 }
 
@@ -90,16 +91,20 @@ void mwoibn::hierarchical_control::HierarchicalController::compute()
 
   for (auto& task : _tasks_ptr)
   {
-    _errors[i].noalias() = -(_gains[i].asDiagonal() * task->getError());
-    _errors[i].noalias() -= task->getJacobian() * _command;
-
-    if (_errors[i].size())
-    {
-            _inversers_ptrs[i]->compute(task->getJacobian(), _P);
-            _command.noalias() += _inversers_ptrs[i]->get() * _errors[i];
-    }
+    _updateTask(i, task);
     ++i;
 
   }
 
+}
+
+void mwoibn::hierarchical_control::HierarchicalController::_updateTask(int i, mwoibn::hierarchical_control::ControllerTask* task){
+  _errors[i].noalias() = -(_gains[i].asDiagonal() * task->getError());
+  _errors[i].noalias() -= task->getJacobian() * _command;
+
+  if (_errors[i].size())
+  {
+          _inversers_ptrs[i]->compute(task->getJacobian(), _P);
+          _command.noalias() += _inversers_ptrs[i]->getInverse() * _errors[i];
+  }
 }

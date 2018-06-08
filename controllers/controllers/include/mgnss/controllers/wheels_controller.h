@@ -178,7 +178,8 @@ protected:
 
   std::unique_ptr<mgnss::events::SteeringReference> _steering_ref_ptr;
 
-  mwoibn::hierarchical_control::HierarchicalController _hierarchical_controller;
+  std::unique_ptr<mwoibn::hierarchical_control::HierarchicalController> _hierarchical_controller_ptr;
+
 
   double rate = 200;
   double _dt, orientation = 0, _heading;

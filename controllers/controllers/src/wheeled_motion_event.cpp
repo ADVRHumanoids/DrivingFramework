@@ -1,6 +1,7 @@
 #include <mgnss/controllers/wheeled_motion_event.h>
 #include <mgnss/controllers/steering_v8.h>
 #include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v7.h>
+#include <mwoibn/hierarchical_control/hierarchical_controller_wheels.h>
 
 mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
     mwoibn::robot_class::Robot& robot, std::string config_file)
@@ -8,6 +9,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
 {
   YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
   std::cout << "wheels allocate" << std::endl;
+
   _x << 1, 0, 0;
   _y << 0, 1, 0;
   _z << 0, 0, 1;
@@ -62,35 +64,41 @@ void mgnss::controllers::WheeledMotionEvent::_initIK(YAML::Node config){
   double damp = config["damping"].as<double>();
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
+
+  _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::HierarchicalControllerWheels(_robot, *_leg_camber_ptr, *_leg_castor_ptr, 500));
+
   gain << config["constraints"].as<double>();
-  _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
   gain << config["leg_steer"].as<double>() * ratio; // 30
 
-  _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
   gain << config["base_orinetation"].as<double>() * ratio; // 60
-  _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
   gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
-  _hierarchical_controller.addTask(_com_ptr.get(), gain_com, task, damp);
+  _hierarchical_controller_ptr->addTask(_com_ptr.get(), gain_com, task, damp);
   task++;
   gain << config["base_position"].as<double>() * ratio;
-  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
+
   gain << config["contact_point"].as<double>() * ratio; // 15
-  _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << config["camber"].as<double>() * ratio; // 40
-  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
-  task++;
-  gain << config["castor"].as<double>() * ratio; // 18
-  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
+  _hierarchical_controller_ptr->addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
   task++;
 
-  _hierarchical_controller.update();
+  gain << config["castor"].as<double>() * ratio; // 18
+  _hierarchical_controller_ptr->addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
+  task++;
+
+  _hierarchical_controller_ptr->init();
+  _hierarchical_controller_ptr->update();
 
 }
 
@@ -411,6 +419,12 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 }
 
 void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger, double time){
+//  std::cout << _leg_camber_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << "E\t" << _leg_camber_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << "C\t" << _leg_castor_ptr->getReference().transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << "Ce\t" << _leg_castor_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
+//  std::cout << "C\t" << _leg_camber_ptr->getCurrent().transpose()*180/mwoibn::PI << std::endl;
+
   logger.addEntry("time", time);
 //  logger.addEntry("state", _steering_ptr->getState()[2]);
 //  logger.addEntry("twist", _steering_ptr->getTwist());

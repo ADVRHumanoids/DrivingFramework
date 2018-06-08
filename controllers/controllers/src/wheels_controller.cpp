@@ -4,6 +4,9 @@
 mgnss::controllers::WheelsController::WheelsController(mwoibn::robot_class::Robot& robot)
     : mgnss::modules::Base(robot)
 {
+
+//  _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::HierarchicalController());
+  _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::HierarchicalController());
   _x << 1, 0, 0;
   _y << 0, 1, 0;
   _z << 0, 0, 1;
@@ -24,7 +27,7 @@ double mgnss::controllers::WheelsController::limit(const double th)
 
 void mgnss::controllers::WheelsController::compute()
 {
-  _command.noalias() = _hierarchical_controller.update();
+  _command.noalias() = _hierarchical_controller_ptr->update();
 
   _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
 

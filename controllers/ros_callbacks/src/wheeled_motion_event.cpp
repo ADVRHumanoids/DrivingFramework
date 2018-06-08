@@ -8,7 +8,7 @@ bool mgnss::ros_callbacks::wheeled_motion_event::evenstHandler(custom_services::
         if (req.d == 1)
           controller_ptr->setBaseDotX(req.nr / 100.0);
         else if (req.d == 2)
-          controller_ptr->setBaseDotY(req.nr / 100.0);
+          controller_ptr->setBaseDotY(req.nr / 1000.0);
         else if (req.d == 3)
           controller_ptr->setBaseDotZ(req.nr / 1000.0);
         else if (req.d == 4)
@@ -61,6 +61,24 @@ bool mgnss::ros_callbacks::wheeled_motion_event::evenstHandler(custom_services::
           controller_ptr->release(req.nr);
           res.success = true;
           return true;
+        }
+      }
+      else if (req.p == 4){
+        {
+          if (req.d >= 0 && req.d < 4){
+            controller_ptr->setCamber(req.d, req.nr*mwoibn::PI/180);
+            res.success = true;
+            return true;
+          }
+        }
+      }
+      else if (req.p == 5){
+        {
+          if (req.d >= 0 && req.d < 4){
+            controller_ptr->setCastor(req.d, req.nr*mwoibn::PI/180);
+            res.success = true;
+            return true;
+          }
         }
       }
       return false;

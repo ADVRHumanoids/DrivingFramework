@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 //  }
 
 //  leg_position.setHight(0.0*Eigen::VectorXd::Ones(4));
-  hierarchical_controller.update();
+  hierarchical_controller_ptr->update();
 
   // create trackers classes
   mwoibn::visualization_tools::RvizTrackPoint tracker("rviz/com_tracker");

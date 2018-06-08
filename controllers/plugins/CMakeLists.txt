@@ -93,7 +93,7 @@ if ( Xenomai_FOUND )
     set_xeno_flags(BasePlugin)
 endif()
 
-        target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(BasePlugin ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 
 LIST( APPEND INSTALL_TARGETS BasePlugin )
@@ -107,6 +107,12 @@ LIST( APPEND INSTALL_TARGETS BasePlugin )
    ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
    LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
    RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/bin/
+ )
+
+ install(TARGETS ${INSTALL_TARGETS}
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
 # Mark cpp header files for installation

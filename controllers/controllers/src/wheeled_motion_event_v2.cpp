@@ -54,29 +54,29 @@ void mgnss::controllers::WheeledMotionEvent2::_initIK(){
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << 1;
-  _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
   gain << 15 * ratio;
-  _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
   gain << 20 * ratio;
-  _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
   gain << 20 * ratio;
-  _hierarchical_controller.addTask(_com_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_com_ptr.get(), gain, task, damp);
   task++;
   gain << 10 * ratio;
-  _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << 15 * ratio;
-  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, 0.04);
+  _hierarchical_controller_ptr->addTask(_leg_camber_ptr.get(), gain, task, 0.04);
   task++;
   gain << 10 * ratio;
-  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, 0.1);
+  _hierarchical_controller_ptr->addTask(_leg_castor_ptr.get(), gain, task, 0.1);
   task++;
   gain << 25 * ratio;
-  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
 }

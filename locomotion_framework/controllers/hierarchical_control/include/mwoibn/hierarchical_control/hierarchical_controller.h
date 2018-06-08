@@ -39,6 +39,7 @@ class HierarchicalController : public mwoibn::basic_controllers::BasicController
 public:
   HierarchicalController() : mwoibn::basic_controllers::BasicController() { }
   virtual ~HierarchicalController() {}
+  virtual void init(){}
 
   /**
   * \brief The addition of a task to the stuck
@@ -51,10 +52,10 @@ public:
   *vector with maximum number of gains
   * \todo improve handling of size-variable tasks (adjust the gains size)
   */
-  void addTask(ControllerTask* new_task, mwoibn::VectorN gain,
+  virtual void addTask(ControllerTask* new_task, mwoibn::VectorN gain,
                int i = -1, double damping = 1e-8);
   //! Removes a task from the stack
-  void removeTask(int i);
+  virtual void removeTask(int i);
 
   /**
 * \see HierarchicalController#compute()
@@ -100,9 +101,9 @@ protected:
   std::vector<mwoibn::VectorN> _gains;
   std::vector<mwoibn::VectorN> _errors;
   std::vector<std::unique_ptr<mwoibn::Projection>> _inversers_ptrs;
+  virtual void _updateTask(int i, mwoibn::hierarchical_control::ControllerTask* task);
 
   mwoibn::Matrix _P;
-
   double _dofs;
 };
 } // namespace package

@@ -145,6 +145,7 @@ public:
       _inversed.noalias() = _squared * _transposed;
     else
       _inversed.noalias() = _transposed * _squared;
+
   }
 
   void init(const Dynamic_Matrix matrix,
@@ -207,26 +208,41 @@ public:
   {
     _jacobian.setZero(matrix.rows(), matrix.cols());
     _inverser.init(matrix, epsilon);
+//    _dets.setZero(matrix.rows());
   }
 
   void compute(const Dynamic_Matrix& jacobian, Dynamic_Matrix& P)
   {
 
     _jacobian.noalias() = jacobian * P;
+
+//    for(int i = 0; i < _jacobian.rows(); i++){
+//      for(int j = 0; j < _jacobian.cols(); j++){
+//        if (std::fabs(_jacobian(i,j)) < 1e-4) _jacobian(i,j) = 0.0;
+//      }
+//    }
     _inverser.compute(_jacobian);
 
     //std::cout << _jacobian << std::endl;
 
     P.noalias() -= _inverser.get() * _jacobian;
+
+//    for(int i = 0; i < _jacobian.rows(); i++){
+//      _dets[i] = _jacobian.row(i).cwiseAbs().maxCoeff();
+//    }
   }
 
-  const Dynamic_Matrix& get() { return _inverser.get(); }
+
+  const Dynamic_Matrix& getInverse() { return _inverser.get(); }
+  const Dynamic_Matrix& getJacobian() {return _jacobian;}
+//  const Dynamic_Matrix& getDets() {return _dets[i];}
 
   ~AgumentedNullSpaceProjection() {}
 
 protected:
-  Dynamic_Matrix _jacobian;
+  Dynamic_Matrix _jacobian, _projector;
   PseudoInverse2<Dynamic_Matrix> _inverser;
+//  Dynamic_Matrix _dets;
 };
 
 Eigen::Matrix<bool, Eigen::Dynamic, 1>

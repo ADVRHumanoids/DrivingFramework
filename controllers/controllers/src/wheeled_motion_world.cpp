@@ -82,36 +82,36 @@ void mgnss::controllers::WheeledMotionWorld::_initIK(YAML::Node config){
   // Set initaial HC tasks
   RigidBodyDynamics::Math::VectorNd gain(1);
   gain << config["constraints"].as<double>();
-  _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_constraints_ptr.get(), gain, task, damp);
   task++;
 /*  gain << config["leg_steer"].as<double>() * ratio; // 30
 
-  _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_leg_steer_ptr.get(), gain, task, damp);
   task++;
   */
   gain << config["base_orinetation"].as<double>() * ratio; // 60
-  _hierarchical_controller.addTask(_pelvis_orientation_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_orientation_ptr.get(), gain, task,
                                    damp);
   task++;
   gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
-  _hierarchical_controller.addTask(_com_ptr.get(), gain_com, task, damp);
+  _hierarchical_controller_ptr->addTask(_com_ptr.get(), gain_com, task, damp);
   task++;
   gain << config["base_position"].as<double>() * ratio;
-  _hierarchical_controller.addTask(_pelvis_position_ptr.get(), gain, task,
+  _hierarchical_controller_ptr->addTask(_pelvis_position_ptr.get(), gain, task,
                                    damp);
   task++;
   gain << config["contact_point"].as<double>() * ratio; // 15
-  _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
+  _hierarchical_controller_ptr->addTask(_steering_ptr.get(), gain, task, damp);
   task++;
   gain << config["camber"].as<double>() * ratio; // 40
-  _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
+  _hierarchical_controller_ptr->addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
   task++;
 
   gain << config["castor"].as<double>() * ratio; // 18
-  _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
+  _hierarchical_controller_ptr->addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
   task++;
 
-  _hierarchical_controller.update();
+  _hierarchical_controller_ptr->update();
 }
 
 void mgnss::controllers::WheeledMotionWorld::_allocate(){
