@@ -1,6 +1,6 @@
-#include "mgnss/ros_callbacks/wheeled_motion_world.h"
+#include "mgnss/ros_callbacks/wheels_controller_extend.h"
 
-bool mgnss::ros_callbacks::wheeled_motion_world::evenstHandler(custom_services::updatePDGains::Request& req, custom_services::updatePDGains::Response& res, mgnss::controllers::WheeledMotionWorld* controller_ptr){
+bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_services::updatePDGains::Request& req, custom_services::updatePDGains::Response& res, mgnss::controllers::WheelsControllerExtend* controller_ptr){
  // std::cout << "callback\t" << req.p << "\t" << req.d << std::endl;
 
       if (req.p == 1)
@@ -66,12 +66,20 @@ bool mgnss::ros_callbacks::wheeled_motion_world::evenstHandler(custom_services::
       return false;
   }
 
-void mgnss::ros_callbacks::wheeled_motion_world::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheeledMotionWorld* controller_ptr)
+void mgnss::ros_callbacks::wheels_controller_extend::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheelsControllerExtend* controller_ptr)
  {
-    if(msg->position[12] == mwoibn::IS_VALID){
+    if(msg->position.size() > 12 && msg->position[12] == mwoibn::IS_VALID){
       for(int i = 0; i < 12; i++){
         (*support)[i] = msg->position[i];
       }
+      controller_ptr->setSupport(*support);
       }
-    controller_ptr->setSupport(*support);
+
+    if(msg->velocity.size() > 12 && msg->velocity[12] == mwoibn::IS_VALID){
+      for(int i = 0; i < 12; i++){
+        (*support)[i] = msg->velocity[i];
+      }
+      controller_ptr->setSupportVel(*support);
+      }
+
   }

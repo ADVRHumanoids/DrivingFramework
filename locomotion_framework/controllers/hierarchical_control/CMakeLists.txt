@@ -59,6 +59,7 @@ include_directories(
 
 ## Declare a C++ library
    add_library(controller_tasks
+     src/aggravated_task.cpp
      src/controller_task.cpp
 #     src/self_collision_task.cpp
      src/cartesian_world_task.cpp

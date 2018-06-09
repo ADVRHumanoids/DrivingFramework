@@ -43,8 +43,7 @@ include_directories(
 
 add_library(ros_callbacks
    src/joint_states.cpp 
-   src/wheeled_motion_event.cpp
-   src/wheeled_motion_world.cpp
+   src/wheels_controller_extend.cpp
  )
 
 add_dependencies(ros_callbacks ${catkin_EXPORTED_TARGETS})

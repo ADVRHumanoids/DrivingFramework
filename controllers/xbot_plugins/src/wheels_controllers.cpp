@@ -1,14 +1,13 @@
-#include <mgnss/xbot_plugins/wheeled_controller_v2.h>
+#include <mgnss/xbot_plugins/wheels_controllers.h>
 
-REGISTER_XBOT_PLUGIN(WheelsV2, mgnss::xbot_plugins::WheelsV2)
 
-bool mgnss::xbot_plugins::WheelsV2::init_control_plugin(XBot::Handle::Ptr handle){
+bool mgnss::xbot_plugins::WheelsControllerExtend::init_control_plugin(XBot::Handle::Ptr handle){
   mgnss::plugins::XbotBase::init_control_plugin(handle);
   _support = get().getSupportReference();
   return true;
 }
 
-void mgnss::xbot_plugins::WheelsV2::on_start(double time)
+void mgnss::xbot_plugins::WheelsControllerExtend::on_start(double time)
 {
     mgnss::plugins::XbotBase::on_start(time);
     if (_valid)
@@ -16,7 +15,7 @@ void mgnss::xbot_plugins::WheelsV2::on_start(double time)
 
 }
 
-void mgnss::xbot_plugins::WheelsV2::control_loop(double time, double period)
+void mgnss::xbot_plugins::WheelsControllerExtend::control_loop(double time, double period)
 {
 
     _begin = std::chrono::high_resolution_clock::now();

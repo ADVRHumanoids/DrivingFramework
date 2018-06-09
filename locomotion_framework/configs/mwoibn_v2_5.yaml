@@ -607,14 +607,14 @@ mwoibn:
                                         damping: 0.0001
                                         constraints: 1
                                         leg_steer: 55
-                                        base_orinetation: 38
+                                        base_orinetation: 50
                                         centre_of_mass_x: 38
                                         centre_of_mass_y: 38
                                         base_position: 10
                                         contact_point: 18
-                                        camber: 95 # 100
+                                        camber: 50 # 100
                                         castor: 15 # 14
-                                        camber_damp: 0.08
+                                        camber_damp: 0.04
                                         castor_damp: 0.12
                                         steer_open_loop: 1.00 # 0.95
                                         steer_feedback: 0.001 # 0.05

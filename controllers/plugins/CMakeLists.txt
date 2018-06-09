@@ -101,7 +101,11 @@ LIST( APPEND INSTALL_TARGETS BasePlugin )
 #################################################
 #################### INSTALL ####################
 #################################################
-
+ install(TARGETS ${INSTALL_TARGETS}
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 ## Mark executables and/or libraries for installation
  install(TARGETS ${INSTALL_TARGETS}
    ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
