@@ -1,4 +1,4 @@
-#include "mwoibn/hierarchical_control/self_collisions_task.h"
+#include "mwoibn/hierarchical_control/tasks/self_collisions_task.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -25,16 +25,16 @@ TEST(ControlerTaskTest, initializationBaseClass)
   safety_limits[3] = 0.002;
   safety_limits[45] = 0.002;
 
-  EXPECT_NO_THROW(mwoibn::hierarchical_control::SelfCollisionsTask task(
+  EXPECT_NO_THROW(mwoibn::hierarchical_control::tasks::SelfCollisions task(
       collision, safety_limits));
 
   EXPECT_NO_THROW(
-      mwoibn::hierarchical_control::SelfCollisionsTask task(collision, {0.05}));
+      mwoibn::hierarchical_control::tasks::SelfCollisions task(collision, {0.05}));
 
   EXPECT_NO_THROW(
-      mwoibn::hierarchical_control::SelfCollisionsTask task(collision, 0.05));
+      mwoibn::hierarchical_control::tasks::SelfCollisions task(collision, 0.05));
 
-  EXPECT_THROW(mwoibn::hierarchical_control::SelfCollisionsTask task(
+  EXPECT_THROW(mwoibn::hierarchical_control::tasks::SelfCollisions task(
                    collision, {0.05, 0.05}),
                std::invalid_argument);
 }
@@ -53,7 +53,7 @@ TEST(ControlerTaskTest, initializationBaseClass)
   mwoibn::collision_model::RobotCollision& collision = *collision_ptr;
 
 
-  mwoibn::hierarchical_control::SelfCollisionsTask task(collision, 0.05);
+  mwoibn::hierarchical_control::tasks::SelfCollisions task(collision, 0.05);
 
   EXPECT_EQ(task.getTaskSize(),52);
   EXPECT_EQ(task.getTaskDofs(),15);

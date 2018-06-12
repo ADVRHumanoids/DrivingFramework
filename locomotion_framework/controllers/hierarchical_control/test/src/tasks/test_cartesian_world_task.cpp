@@ -1,4 +1,4 @@
-#include "mwoibn/hierarchical_control/cartesian_world_task.h"
+#include "mwoibn/hierarchical_control/tasks/cartesian_world_task.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,9 +19,9 @@ TEST(ControlerTaskTest, initializationBaseClass)
   mwoibn::point_handling::PositionsHandler ik_1("pelvis", robot, {"arm1_7"}, {P_1} );
   mwoibn::point_handling::PositionsHandler ik_2("pelvis", robot, {"arm1_7", "arm2_7"}, {P_1, P_1});
 
-  mwoibn::hierarchical_control::CartesianWorldTask cartesian_0(ik_1);
+  mwoibn::hierarchical_control::tasks::CartesianWorld cartesian_0(ik_1);
 
-  mwoibn::hierarchical_control::CartesianWorldTask cartesian_1(ik_2);
+  mwoibn::hierarchical_control::tasks::CartesianWorld cartesian_1(ik_2);
 
 }
 
@@ -36,7 +36,7 @@ TEST(ControlerTaskTest, methodsBaseClass)
 
   mwoibn::point_handling::PositionsHandler ik_2("pelvis" , robot, {"arm1_7", "arm2_7"}, {P_2, P_2} );
 
-  mwoibn::hierarchical_control::CartesianWorldTask task(ik_2);
+  mwoibn::hierarchical_control::tasks::CartesianWorld task(ik_2);
 
   EXPECT_EQ(task.getTaskSize(),6);
   EXPECT_EQ(task.getTaskDofs(),15);

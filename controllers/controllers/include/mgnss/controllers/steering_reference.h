@@ -2,7 +2,7 @@
 #define PROGRAM_STEERING_REFERENCE_H
 
 #include <mwoibn/robot_class/robot.h>
-#include <mwoibn/hierarchical_control/contact_point_tracking_task.h>
+#include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
 
 namespace mgnss {
 
@@ -58,7 +58,7 @@ class SteeringReference
 
 public:
   SteeringReference(mwoibn::robot_class::Robot& robot,
-           mwoibn::hierarchical_control::ContactPointTrackingTask& plane, mwoibn::VectorN init_pose,
+           mwoibn::hierarchical_control::tasks::ContactPointTracking& plane, mwoibn::VectorN init_pose,
            double K_icm, double K_sp, double dt, double margin = 0.04,
            double max = 2.79252680): _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt),
     _state(robot.state.state(mwoibn::robot_class::INTERFACE::POSITION))
@@ -197,7 +197,7 @@ public:
   }
 
 protected:
-  mwoibn::hierarchical_control::ContactPointTrackingTask& _plane;
+  mwoibn::hierarchical_control::tasks::ContactPointTracking& _plane;
   double _dt, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
   mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp, _v, _damp, _raw, _limited;
   const mwoibn::VectorN& _state;

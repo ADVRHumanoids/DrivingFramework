@@ -3,7 +3,7 @@
 
 #include <mgnss/controllers/wheels_controller_extend.h>
 
-#include <mwoibn/hierarchical_control/center_of_mass_task.h>
+#include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 
 namespace mgnss
 {
@@ -109,7 +109,7 @@ public:
   }
 
 protected:
-  std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask> _com_ptr;
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
 
   mwoibn::VectorN _com_ref;
   mwoibn::VectorInt _select_wheel;

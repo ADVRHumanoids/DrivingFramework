@@ -2,7 +2,7 @@
 
 mgnss::events::Steering8::Steering8(
     mwoibn::robot_class::Robot& robot,
-    mwoibn::hierarchical_control::ContactPointTrackingTask& plane,
+    mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
     const mwoibn::VectorN& contact_vel,
     mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
     double margin_icm, double margin_sp, double margin, double max)

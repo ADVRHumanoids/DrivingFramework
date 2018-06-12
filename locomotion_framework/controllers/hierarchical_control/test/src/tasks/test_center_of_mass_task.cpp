@@ -1,4 +1,4 @@
-#include "mwoibn/hierarchical_control/center_of_mass_task.h"
+#include "mwoibn/hierarchical_control/tasks/center_of_mass_task.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,7 +14,7 @@ TEST(CenterOfMassTask, initialization)
 
   mwoibn::robot_class::Robot& robot = *robot_ptr;
 
-  mwoibn::hierarchical_control::CenterOfMassTask com_task(robot);
+  mwoibn::hierarchical_control::tasks::CenterOfMass com_task(robot);
 
 }
 
@@ -27,7 +27,7 @@ TEST(ControlerTaskTest, methodsBaseClass)
   mwoibn::Vector3 P_2 = mwoibn::Vector3::Zero(3);
   P_2 << 0.0, 0.0, -0.13;
 
-  mwoibn::hierarchical_control::CenterOfMassTask task(robot);
+  mwoibn::hierarchical_control::tasks::CenterOfMass task(robot);
 
   EXPECT_EQ(task.getTaskSize(),2);
   EXPECT_EQ(task.getTaskDofs(),15);

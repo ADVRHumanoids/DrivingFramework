@@ -1,7 +1,7 @@
 #ifndef PROGRAMS_WHEELED_MOTION_H
 #define PROGRAMS_WHEELED_MOTION_H
 
-//#include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v3.h>
+//#include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v3.h>
 #include <mgnss/controllers/wheels_controller.h>
 
 namespace mgnss
@@ -80,9 +80,9 @@ public:
     return _steering_ptr->getState()[2];}
 
 protected:
-  std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective>
       _leg_xy_ptr;
-  std::unique_ptr<mwoibn::hierarchical_control::OrientationSelectiveTask>
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective>
       _leg_z_ptr;
 
   virtual void _setInitialConditions();

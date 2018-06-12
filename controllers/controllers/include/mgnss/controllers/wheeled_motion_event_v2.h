@@ -1,7 +1,7 @@
 #ifndef __MGNSS_CONTROLLERS_WHEELS_MOTION_EVENT_2_H
 #define __MGNSS_CONTROLLERS_WHEELS_MOTION_EVENT_2_H
 
-#include <mwoibn/hierarchical_control/center_of_mass_task_v2.h>
+#include <mwoibn/hierarchical_control/tasks/center_of_mass_task_v2.h>
 #include <mgnss/controllers/wheels_controller_extend.h>
 
 namespace mgnss
@@ -59,7 +59,7 @@ protected:
 
   mwoibn::robot_class::Robot& _full_robot;
 
-  std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask2>
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass2>
       _com_ptr;
 
   mwoibn::VectorN  _test_limits;

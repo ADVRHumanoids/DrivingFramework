@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(hierarchical_control)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -23,22 +23,22 @@ find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
 	include
 	${RBDL_INCLUDE_DIR}
-  LIBRARIES 
-	hierarchical_controller 
+  LIBRARIES
+	hierarchical_controller
 	controller_tasks
 	${RBDL_LIBRARY}
-  CATKIN_DEPENDS 
-	roscpp 
-	eigen_utils 
-#	collision_model 
+  CATKIN_DEPENDS
+	roscpp
+	eigen_utils
+#	collision_model
 	point_handling
 	robot_point_handling
         basic_controllers
         robot_class
-  DEPENDS 
+  DEPENDS
 	Eigen3
 )
 
@@ -59,15 +59,15 @@ include_directories(
 
 ## Declare a C++ library
    add_library(controller_tasks
-     src/controller_task.cpp
-#     src/self_collision_task.cpp
-     src/cartesian_world_task.cpp
-     src/orientation_world_task.cpp
-#     src/self_collisions_task.cpp
-     src/joint_positions_task.cpp
-     src/center_of_mass_task.cpp
-     src/center_of_mass_task_v2.cpp
-     src/constraints_task.cpp
+     src/tasks/controller_task.cpp
+#     src/tasks/self_collision_task.cpp
+     src/tasks/cartesian_world_task.cpp
+     src/tasks/orientation_world_task.cpp
+#     src/tasks/self_collisions_task.cpp
+     src/tasks/joint_positions_task.cpp
+     src/tasks/center_of_mass_task.cpp
+     src/tasks/center_of_mass_task_v2.cpp
+     src/tasks/constraints_task.cpp
 )
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -75,14 +75,15 @@ include_directories(
    add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
 
    target_link_libraries(controller_tasks
-     ${catkin_LIBRARIES} 
+     ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
    )
 
    add_library(hierarchical_controller
-     src/hierarchical_controller.cpp
-     src/hierarchical_controller_continous.cpp
-     src/hierarchical_controller_wheels.cpp
+     src/controllers/default.cpp
+     src/controllers/continous.cpp
+     src/controllers/wheels.cpp
+     src/controllers/actions.cpp
    )
 ##   Add cmake target dependencies of the library
 ##   as an example, code may need to be generated before libraries
@@ -91,7 +92,7 @@ include_directories(
    add_dependencies(hierarchical_controller ${catkin_EXPORTED_TARGETS})
 
    target_link_libraries(hierarchical_controller
-     ${catkin_LIBRARIES} 
+     ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
    )
 
@@ -207,4 +208,3 @@ if(CATKIN_ENABLE_TESTING)
  endif()
 
 endif(CATKIN_ENABLE_TESTING)
-

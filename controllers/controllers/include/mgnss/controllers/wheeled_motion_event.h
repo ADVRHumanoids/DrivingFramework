@@ -3,7 +3,7 @@
 
 #include <mgnss/controllers/wheels_controller_extend.h>
 
-#include <mwoibn/hierarchical_control/center_of_mass_task.h>
+#include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 
 namespace mgnss
 {
@@ -96,7 +96,7 @@ public:
 protected:
   void _allocate(YAML::Node config);
 
-  std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass>
       _com_ptr;
 
   mwoibn::VectorInt _select_wheel, _reset_count;

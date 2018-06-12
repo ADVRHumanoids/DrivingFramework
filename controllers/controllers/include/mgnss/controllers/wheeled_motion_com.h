@@ -2,7 +2,7 @@
 #define __MGNSS_CONTROLLERS_WHEELED_MOTION_COM_H
 
 #include <mgnss/controllers/wheels_controller_extend.h>
-#include <mwoibn/hierarchical_control/center_of_mass_task.h>
+#include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 
 namespace mgnss
 {
@@ -49,7 +49,7 @@ public:
 
 protected:
 
-  std::unique_ptr<mwoibn::hierarchical_control::CenterOfMassTask>
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass>
       _com_ptr;
 
   virtual void _setInitialConditions();
