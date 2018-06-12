@@ -1,21 +1,8 @@
 #define FULL_ROBOT
 
-#include <mgnss/nrt_software/plugins/wheeled_motion_event.h>
+#include <mgnss/nrt_software/plugins/wheels_controllers.h>
 #include <config.h>
 #include <mwoibn/loaders/robot.h>
-
-#include <mgnss/controllers/wheeled_motion_event.h>
-#include <mgnss/controllers/wheeled_references_v3.h>
-#include <custom_services/updatePDGains.h>
-
-// LOG
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <ctime>
-#include <chrono>
-// !LOG
-
 
 int main(int argc, char** argv)
 {

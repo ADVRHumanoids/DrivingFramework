@@ -134,6 +134,7 @@ if(WHEELS_MOTION)
     wheels_world
     wheels_support
     wheels
+    wheels_3
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -319,6 +320,13 @@ target_link_libraries(wheels_support
 add_executable(wheels src/exec/wheels.cpp)
 add_dependencies(wheels nrt_plugins ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wheels
+    nrt_plugins
+    ${catkin_LIBRARIES}
+ )
+
+add_executable(wheels_3 src/exec/wheels_3.cpp)
+add_dependencies(wheels_3 nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wheels_3
     nrt_plugins
     ${catkin_LIBRARIES}
  )

@@ -1,15 +1,13 @@
-#include <mgnss/controllers/wheeled_motion_event.h>
+#include <mgnss/controllers/wheeled_motion_event_v3.h>
 #include <mgnss/controllers/steering_v8.h>
 #include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v7.h>
-#include <mwoibn/hierarchical_control/controllers/wheels.h>
 
-mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
+mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         mwoibn::robot_class::Robot& robot, std::string config_file)
         : WheelsControllerExtend(robot)
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
         std::cout << "wheels allocate" << std::endl;
-
         _x << 1, 0, 0;
         _y << 0, 1, 0;
         _z << 0, 0, 1;
@@ -22,7 +20,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
-mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
+mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
@@ -35,7 +33,7 @@ mgnss::controllers::WheeledMotionEvent::WheeledMotionEvent(
 }
 
 
-void mgnss::controllers::WheeledMotionEvent::_allocate(){
+void mgnss::controllers::WheeledMotionEvent3::_allocate(){
 
         WheelsController::_allocate();
 
@@ -50,7 +48,7 @@ void mgnss::controllers::WheeledMotionEvent::_allocate(){
 
 }
 
-void mgnss::controllers::WheeledMotionEvent::_initIK(YAML::Node config){
+void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
         std::cout << "Wheeled Motion loaded " << config["tunning"] << " tunning." << std::endl;
 
         config = config["tunnings"][config["tunning"].as<std::string>()];
@@ -60,29 +58,27 @@ void mgnss::controllers::WheeledMotionEvent::_initIK(YAML::Node config){
 
         // int task = 0;
         double ratio = config["ratio"].as<double>(); // 4
-        mwoibn::VectorN gain_com(2);
         double damp = config["damping"].as<double>();
-
         // Set initaial HC tasks
-        //_hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Wheels(_robot, *_leg_camber_ptr, *_leg_castor_ptr, 500));
         _hierarchical_controller_ptr->addTask(*_constraints_ptr, config["constraints"].as<double>(), damp);
         _hierarchical_controller_ptr->addTask(*_leg_steer_ptr, config["leg_steer"].as<double>() * ratio, damp);
-        _hierarchical_controller_ptr->addTask(*_pelvis_orientation_ptr, config["base_orinetation"].as<double>() * ratio, damp);
 
-        gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
-        _hierarchical_controller_ptr->addTask(*_com_ptr, gain_com, damp);
+        mwoibn::VectorN gain_base(6);
+        gain_base.head<3>() = mwoibn::VectorN::Constant(3, config["base_orinetation"].as<double>() * ratio);
+        gain_base[3] = config["centre_of_mass_x"].as<double>() * ratio;
+        gain_base[4] = config["centre_of_mass_y"].as<double>() * ratio;
+        gain_base[5] = config["base_position"].as<double>() * ratio;
+        _hierarchical_controller_ptr->addTask(*_world_posture_ptr, gain_base,  damp);
 
-        _hierarchical_controller_ptr->addTask(*_pelvis_position_ptr, config["base_position"].as<double>() * ratio, damp);
         _hierarchical_controller_ptr->addTask(*_steering_ptr, config["contact_point"].as<double>() * ratio, damp);
         _hierarchical_controller_ptr->addTask(*_leg_camber_ptr, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
         _hierarchical_controller_ptr->addTask(*_leg_castor_ptr, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
-        _hierarchical_controller_ptr->init();
         _hierarchical_controller_ptr->update();
 
 }
 
-void mgnss::controllers::WheeledMotionEvent::_createTasks(){
+void mgnss::controllers::WheeledMotionEvent3::_createTasks(){
         // Set-up hierachical controller
         _constraints_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::Constraints(_robot));
@@ -109,12 +105,22 @@ void mgnss::controllers::WheeledMotionEvent::_createTasks(){
                 new mwoibn::hierarchical_control::tasks::CartesianFlatReference4(
                         mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                                  _robot.getLinks("wheels")),
-                        _robot, *_com_ptr));
+                        _robot, *_com_ptr.get()));
 
         _createAngleTasks();
+
+        _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
+
+        _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
+        _world_posture_ptr->addTask(*_com_ptr);
+
+        mwoibn::VectorBool select(3);
+        select << false, false, true;
+        _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
+
 }
 
-void mgnss::controllers::WheeledMotionEvent::init(){
+void mgnss::controllers::WheeledMotionEvent3::init(){
         _robot.wait();
         _robot.get();
         _robot.updateKinematics();
@@ -124,7 +130,7 @@ void mgnss::controllers::WheeledMotionEvent::init(){
 
 }
 
-void mgnss::controllers::WheeledMotionEvent::_setInitialConditions(){
+void mgnss::controllers::WheeledMotionEvent3::_setInitialConditions(){
 
         WheelsControllerExtend::_setInitialConditions();
 
@@ -141,7 +147,7 @@ void mgnss::controllers::WheeledMotionEvent::_setInitialConditions(){
 
 
 
-void mgnss::controllers::WheeledMotionEvent::fullUpdate(const mwoibn::VectorN& support)
+void mgnss::controllers::WheeledMotionEvent3::fullUpdate(const mwoibn::VectorN& support)
 {
         _robot.get();
         _robot.updateKinematics();
@@ -152,7 +158,7 @@ void mgnss::controllers::WheeledMotionEvent::fullUpdate(const mwoibn::VectorN& s
         _robot.send();
         _robot.wait();
 }
-void mgnss::controllers::WheeledMotionEvent::compute()
+void mgnss::controllers::WheeledMotionEvent3::compute()
 {
         mgnss::controllers::WheelsController::compute();
         _correct();
@@ -160,7 +166,7 @@ void mgnss::controllers::WheeledMotionEvent::compute()
 
 }
 
-void mgnss::controllers::WheeledMotionEvent::_correct(){
+void mgnss::controllers::WheeledMotionEvent3::_correct(){
 
         _robot.state.get(_current_steer, _select_steer,
                          mwoibn::robot_class::INTERFACE::POSITION);
@@ -223,7 +229,7 @@ void mgnss::controllers::WheeledMotionEvent::_correct(){
                            mwoibn::robot_class::INTERFACE::POSITION);
 }
 
-//void mgnss::controllers::WheeledMotionEvent::_correct(){
+//void mgnss::controllers::WheeledMotionEvent3::_correct(){
 
 //  _robot.state.get(_current_steer, _select_steer,
 //                   mwoibn::robot_class::INTERFACE::POSITION);
@@ -279,7 +285,7 @@ void mgnss::controllers::WheeledMotionEvent::_correct(){
 
 //}
 
-void mgnss::controllers::WheeledMotionEvent::steering()
+void mgnss::controllers::WheeledMotionEvent3::steering()
 {
 
         _steering_ref_ptr->compute(_next_step);
@@ -293,7 +299,7 @@ void mgnss::controllers::WheeledMotionEvent::steering()
 
 }
 
-void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& logger){
+void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& logger){
         logger.addField("time", 0.0);
 
 //  logger.addField("e_base_z", getBaseError()[2]);
@@ -398,13 +404,7 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
         logger.start();
 }
 
-void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger, double time){
-//  std::cout << _leg_camber_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
-//  std::cout << "E\t" << _leg_camber_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
-//  std::cout << "C\t" << _leg_castor_ptr->getReference().transpose()*180/mwoibn::PI << std::endl;
-//  std::cout << "Ce\t" << _leg_castor_ptr->getError().transpose()*180/mwoibn::PI << std::endl;
-//  std::cout << "C\t" << _leg_camber_ptr->getCurrent().transpose()*180/mwoibn::PI << std::endl;
-
+void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger, double time){
         logger.addEntry("time", time);
 //  logger.addEntry("state", _steering_ptr->getState()[2]);
 //  logger.addEntry("twist", _steering_ptr->getTwist());
