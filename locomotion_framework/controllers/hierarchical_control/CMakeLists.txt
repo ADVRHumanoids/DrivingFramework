@@ -73,14 +73,15 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-   add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
 
-   target_link_libraries(controller_tasks
+  add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(controller_tasks
      ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
-   )
+  )
 
-   add_library(hierarchical_controller
+
+  add_library(hierarchical_controller
      src/controllers/default.cpp
      src/controllers/continous.cpp
      src/controllers/wheels.cpp

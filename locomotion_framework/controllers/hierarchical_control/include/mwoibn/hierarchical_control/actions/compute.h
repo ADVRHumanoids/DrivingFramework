@@ -1,21 +1,25 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_COMPUTE_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_COMPUTE_H
 
-#include "mwoibn/hierarchical_control/actions/basic_action.h"
+#include "mwoibn/hierarchical_control/actions/primary.h"
+#include "mwoibn/hierarchical_control/tasks/controller_task.h"
 
 namespace mwoibn {
 namespace hierarchical_control {
 namespace actions {
 
 
-class Compute : public Basic {
+class Compute : public Primary {
 public:
-Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, mwoibn::VectorN gains, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command) : Basic(task), _gains(gains), _P(P), _command(command){
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Primary(task, memory),_gains(gains), _P(P), _command(command){
+        if(gains.size() != task.getTaskSize())
+                throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, wrong gains vector size."));
+
         _init(damping);
 }
 
-Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command) : Basic(task), _P(P), _command(command){
-        _gains.setConstant(_task.getTaskDofs());
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Primary(task, memory), _P(P), _command(command){
+        _gains.setConstant(_task.getTaskSize(), gain);
         _init(damping);
 }
 
@@ -30,8 +34,7 @@ virtual void run(){
         _command.noalias() += _inverser_ptr->getInverse() * _errors;
 }
 
-virtual actions::Compute& baseAction(){
-        return *this;
+virtual void release(){
 }
 
 bool updateGain(double gain){
@@ -45,6 +48,7 @@ bool updateGain(const mwoibn::VectorN& gain){
         _gains.noalias() = gain;
         return true;
 }
+
 
 protected:
 mwoibn::VectorN _gains, _errors, &_command;

@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_TASKS_STEERING_ANGLE_TASK_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_STEERING_ANGLE_TASK_H
 
-#include "mwoibn/hierarchical_control/controllers/hierarchical_control.h"
+#include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/point_handling/robot_points_handler.h"
 #include <rbdl/rbdl.h>
 //#include <mgnss/controllers/steering.h>

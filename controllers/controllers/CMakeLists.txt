@@ -44,17 +44,17 @@ include_directories(
 
 add_library(wheeled_motion
 
-   src/steering_v2.cpp                 
+   src/steering_v2.cpp
    src/steering_v4.cpp
-   src/steering_v5.cpp   
-   src/steering_v6.cpp   
-   src/steering_v7.cpp  
-   src/steering_v8.cpp  
+   src/steering_v5.cpp
+   src/steering_v6.cpp
+   src/steering_v7.cpp
+   src/steering_v8.cpp
 
    src/wheels_controller.cpp
-   src/wheels_controller_extend.cpp          
-   src/wheeled_motion.cpp     
-   src/wheeled_references.cpp 
+   src/wheels_controller_extend.cpp
+   src/wheeled_motion.cpp
+   src/wheeled_references.cpp
    src/wheeled_references_v2.cpp
    src/wheeled_references_v3.cpp
    src/wheeled_motion_full.cpp
@@ -62,6 +62,7 @@ add_library(wheeled_motion
    src/wheeled_motion_event.cpp
    src/wheeled_motion_event_v2.cpp
    src/wheeled_motion_event_v3.cpp
+   src/wheeled_motion_actions.cpp
 
    src/wheeled_motion_world.cpp
  )
@@ -85,7 +86,7 @@ target_link_libraries(centralized_controllers
 
 
 add_library(joint_space_controllers
-   src/joint_states.cpp 
+   src/joint_states.cpp
  )
 
 add_dependencies(joint_space_controllers wheeled_motion ${catkin_EXPORTED_TARGETS})

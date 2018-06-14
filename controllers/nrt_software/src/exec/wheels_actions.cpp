@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-        mgnss::nrt_software::plugins::WheeledMotionEvent3 controller(argc, argv);
+        mgnss::nrt_software::plugins::WheeledMotionActions controller(argc, argv);
 
         controller.init();
         controller.start(ros::Time::now().toSec());

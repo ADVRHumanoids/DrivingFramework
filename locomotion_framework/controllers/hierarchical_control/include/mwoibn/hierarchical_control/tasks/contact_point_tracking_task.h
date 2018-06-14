@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_TRACKING_TASK_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_TRACKING_TASK_H
 
-#include "mwoibn/hierarchical_control/controllers/hierarchical_control.h"
+#include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/tasks/cartesian_world_task.h"
 
 namespace mwoibn

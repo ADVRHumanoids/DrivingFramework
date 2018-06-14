@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_TASKS_JOINT_POSITIONS_TASK_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_JOINT_POSITIONS_TASK_H
 
-#include "mwoibn/hierarchical_control/controllers/hierarchical_control.h"
+#include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/robot_class/robot.h"
 #include <rbdl/rbdl.h>

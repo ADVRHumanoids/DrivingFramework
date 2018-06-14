@@ -58,7 +58,7 @@ if(TRAJECTORY_GENERATION)
 #find_package(MathGeoLib REQUIRED)
 
 LIST( APPEND INSTALL_TARGETS simple_trajectory )
-LIST( APPEND CATKIN_DEPENDS_SET 
+LIST( APPEND CATKIN_DEPENDS_SET
   roscpp
   robot_class_ros_extension
   visualization_tools
@@ -71,7 +71,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
 endif(TRAJECTORY_GENERATION)
 
 if(CENTRALIZED_CONTROLLER)
-  LIST( APPEND INSTALL_TARGETS 
+  LIST( APPEND INSTALL_TARGETS
     centralized_controller
     online_centralized_controller
   )
@@ -92,7 +92,7 @@ LIST( APPEND INSTALL_TARGETS
 #  hierarchical_controller_with_events
   com_test
 )
-LIST( APPEND CATKIN_DEPENDS_SET 
+LIST( APPEND CATKIN_DEPENDS_SET
   roscpp
   robot_class_ros_extension
   robot_class_xbot
@@ -107,10 +107,10 @@ endif(CENTER_OF_MASS_CONTROLLER)
 
 if(GRAVITY_TEST)
 
-LIST( APPEND INSTALL_TARGETS 
+LIST( APPEND INSTALL_TARGETS
   gravity_test
 )
-LIST( APPEND CATKIN_DEPENDS_SET 
+LIST( APPEND CATKIN_DEPENDS_SET
   roscpp
   robot_class_ros_extension
   robot_class_xbot
@@ -135,6 +135,7 @@ if(WHEELS_MOTION)
     wheels_support
     wheels
     wheels_3
+    wheels_actions
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -219,7 +220,7 @@ endif(COLLISION_CHECK)
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES nrt_plugins
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}
@@ -323,6 +324,13 @@ target_link_libraries(wheels
     nrt_plugins
     ${catkin_LIBRARIES}
  )
+
+ add_executable(wheels_actions src/exec/wheels_actions.cpp)
+ add_dependencies(wheels_actions nrt_plugins ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(wheels_actions
+     nrt_plugins
+     ${catkin_LIBRARIES}
+  )
 
 add_executable(wheels_3 src/exec/wheels_3.cpp)
 add_dependencies(wheels_3 nrt_plugins ${catkin_EXPORTED_TARGETS})

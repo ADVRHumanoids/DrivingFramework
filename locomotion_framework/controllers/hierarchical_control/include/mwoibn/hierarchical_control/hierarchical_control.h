@@ -4,12 +4,17 @@
 #include "mwoibn/simple_log/log.h"
 #include "mwoibn/common/types.h"
 #include <iostream>
-namespace mwoibn{
+namespace mwoibn {
 
-namespace hierarchical_control{
+namespace hierarchical_control {
 
-	const std::string PACKAGE  = "hierarchical_control";
+enum class ACTIONS {
+SNAP,
+REPLACE,
+};
+const std::string PACKAGE  = "hierarchical_control";
 } // namespace package
 } // namespace library
+
 
 #endif

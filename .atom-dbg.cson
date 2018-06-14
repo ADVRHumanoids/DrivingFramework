@@ -1,0 +1,24 @@
+"wheels_actions":
+	path: "/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_actions"
+	args: ["rosrun nrt_software wheels_actions  __ns:=centauro"]
+	cwd: "/home/malgorzata/catkin_ws"
+
+"wheels_3":
+	path: "/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_3"
+	args: ["rosrun nrt_software wheels_3 __ns:=centauto"]
+	cwd: "~/catkin_ws"
+
+"wheels_3 2":
+	path: "/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_3"
+	args: ["rosrun nrt_software wheels_3 __ns:=centauto"]
+	cwd: "/home/malgorzata/catkin_ws"
+
+"wheels_3 3":
+	path: "/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_3"
+	args: ["rosrun nrt_software wheels_3 __ns:=centauro"]
+	cwd: "/home/malgorzata/catkin_ws"
+
+"wheels_actions 2":
+	path: "/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_actions"
+	args: ["rosrun nrt_software wheels_actions __ns:=centauro"]
+	cwd: "/home/malgorzata/catkin_ws"

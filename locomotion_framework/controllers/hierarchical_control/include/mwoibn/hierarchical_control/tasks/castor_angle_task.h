@@ -2,7 +2,7 @@
 #define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CASTOR_ANGLE_TASK_H
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
-#include "mwoibn/hierarchical_control/controllers/hierarchical_control.h"
+#include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/point_handling/robot_points_handler.h"
 #include <rbdl/rbdl.h>
 
@@ -15,7 +15,7 @@ namespace tasks
 
 /**
  * @brief The CartesianWorld class Provides the inverse kinematics task
- ***to control the position of a point defined in one of a robot reference frames
+ ****to control the position of a point defined in one of a robot reference frames
  *
  */
 

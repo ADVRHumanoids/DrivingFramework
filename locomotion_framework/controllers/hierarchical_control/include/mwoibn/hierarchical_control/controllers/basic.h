@@ -2,7 +2,7 @@
 #define __MWOIBN_HIERARCHICAL_CONTROL_CONTROLLERS_BASIC_H
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
-#include "mwoibn/hierarchical_control/controllers/hierarchical_control.h"
+#include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/eigen_utils/eigen_utils.h"
 #include "mwoibn/basic_controllers/basic_controller.h"
 #include <functional>

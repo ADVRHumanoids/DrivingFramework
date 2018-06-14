@@ -11,9 +11,9 @@ namespace ros_callbacks
 {
 namespace wheels_controller_extend
 {
-  bool eventsHandler(custom_services::updatePDGains::Request& req,
-                               custom_services::updatePDGains::Response& res, mgnss::controllers::WheelsControllerExtend* controller_ptr);
-  void supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheelsControllerExtend* controller_ptr);
+bool eventsHandler(custom_services::updatePDGains::Request& req,
+                   custom_services::updatePDGains::Response& res, mgnss::controllers::WheelsControllerExtend* controller_ptr);
+void supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheelsControllerExtend* controller_ptr);
 
 }
 }

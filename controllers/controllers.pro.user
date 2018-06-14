@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.1.0, 2018-06-11T14:51:42. -->
+<!-- Written by QtCreator 4.1.0, 2018-06-14T14:40:31. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -66,7 +66,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{8afa9c82-bc4f-4930-a4ed-a356a656d512}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">1</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">8</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">9</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/malgorzata/catkin_ws/build_debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
@@ -902,7 +902,69 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
    </valuemap>
-   <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">9</value>
+   <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.9">
+    <value type="bool" key="Analyzer.QmlProfiler.AggregateTraces">false</value>
+    <value type="bool" key="Analyzer.QmlProfiler.FlushEnabled">false</value>
+    <value type="uint" key="Analyzer.QmlProfiler.FlushInterval">1000</value>
+    <value type="QString" key="Analyzer.QmlProfiler.LastTraceFile"></value>
+    <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
+    <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
+    <value type="bool" key="Analyzer.Valgrind.Callgrind.CollectBusEvents">false</value>
+    <value type="bool" key="Analyzer.Valgrind.Callgrind.CollectSystime">false</value>
+    <value type="bool" key="Analyzer.Valgrind.Callgrind.EnableBranchSim">false</value>
+    <value type="bool" key="Analyzer.Valgrind.Callgrind.EnableCacheSim">false</value>
+    <value type="bool" key="Analyzer.Valgrind.Callgrind.EnableEventToolTips">true</value>
+    <value type="double" key="Analyzer.Valgrind.Callgrind.MinimumCostRatio">0.01</value>
+    <value type="double" key="Analyzer.Valgrind.Callgrind.VisualisationMinimumCostRatio">10</value>
+    <value type="bool" key="Analyzer.Valgrind.FilterExternalIssues">true</value>
+    <value type="int" key="Analyzer.Valgrind.LeakCheckOnFinish">1</value>
+    <value type="int" key="Analyzer.Valgrind.NumCallers">25</value>
+    <valuelist type="QVariantList" key="Analyzer.Valgrind.RemovedSuppressionFiles"/>
+    <value type="int" key="Analyzer.Valgrind.SelfModifyingCodeDetection">1</value>
+    <value type="bool" key="Analyzer.Valgrind.Settings.UseGlobalSettings">true</value>
+    <value type="bool" key="Analyzer.Valgrind.ShowReachable">false</value>
+    <value type="bool" key="Analyzer.Valgrind.TrackOrigins">true</value>
+    <value type="QString" key="Analyzer.Valgrind.ValgrindExecutable">valgrind</value>
+    <valuelist type="QVariantList" key="Analyzer.Valgrind.VisibleErrorKinds">
+     <value type="int">0</value>
+     <value type="int">1</value>
+     <value type="int">2</value>
+     <value type="int">3</value>
+     <value type="int">4</value>
+     <value type="int">5</value>
+     <value type="int">6</value>
+     <value type="int">7</value>
+     <value type="int">8</value>
+     <value type="int">9</value>
+     <value type="int">10</value>
+     <value type="int">11</value>
+     <value type="int">12</value>
+     <value type="int">13</value>
+     <value type="int">14</value>
+    </valuelist>
+    <value type="int" key="PE.EnvironmentAspect.Base">2</value>
+    <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes">
+     <value type="QString">CMAKE_PREFIX_PATH=/home/malgorzata/catkin_ws/install_debug:/opt/ros/kinetic:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install:/home/malgorzata/catkin_ws/devel_debug</value>
+     <value type="QString">LD_LIBRARY_PATH=/opt/qt57/lib/x86_64-linux-gnu:/opt/qt57/lib:/home/malgorzata/catkin_ws/install_debug/lib:/opt/ros/kinetic/lib:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/lib:/home/malgorzata/catkin_ws/devel_debug/lib:/usr/lib/x86_64-linux-gnu/gazebo-7/plugins</value>
+     <value type="QString">PKG_CONFIG_PATH=/opt/qt57/lib/pkgconfig:/home/malgorzata/catkin_ws/install_debug/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/lib/pkgconfig:/home/malgorzata/catkin_ws/devel_debug/lib/pkgconfig</value>
+     <value type="QString">PYTHONPATH=/home/malgorzata/catkin_ws/install_debug/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/lib/python2.7/dist-packages:/home/malgorzata/catkin_ws/devel_release/lib/python2.7/dist-packages</value>
+     <value type="QString">ROS_PACKAGE_PATH=/home/malgorzata/catkin_ws/install_debug/share:/opt/ros/kinetic/share:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/share</value>
+    </valuelist>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">rosrun nrt_software wheels_actions  __ns:=centauro</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_actions</value>
+    <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">/home/malgorzata/catkin_ws</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run /home/malgorzata/catkin_ws/install_debug/lib/nrt_software/wheels_actions</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">wheels_actions</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
+    <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
+    <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseMultiProcess">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
+    <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+   </valuemap>
+   <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">10</value>
   </valuemap>
  </data>
  <data>
