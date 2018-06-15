@@ -57,13 +57,13 @@ void mgnss::controllers::WheeledMotionCom::_initIK(){
         double damp = 1e-4;
 
         _hierarchical_controller_ptr->addTask(*_constraints_ptr, 1.0, damp);
-        _hierarchical_controller_ptr->addTask(*_leg_steer_ptr, 15.0*ratio, damp);
+        _hierarchical_controller_ptr->addTask(_leg_steer, 15.0*ratio, damp);
         _hierarchical_controller_ptr->addTask(*_pelvis_orientation_ptr, 20.0*ratio, damp);
         _hierarchical_controller_ptr->addTask(*_com_ptr, 20.0*ratio, damp);
         _hierarchical_controller_ptr->addTask(*_pelvis_position_ptr, 20.0*ratio, damp);
         _hierarchical_controller_ptr->addTask(*_steering_ptr, 10.0*ratio, damp);
-        _hierarchical_controller_ptr->addTask(*_leg_camber_ptr, 15.0*ratio, 0.04);
-        _hierarchical_controller_ptr->addTask(*_leg_castor_ptr, 10.0*ratio, 0.1);
+        _hierarchical_controller_ptr->addTask(_leg_camber, 15.0*ratio, 0.04);
+        _hierarchical_controller_ptr->addTask(_leg_castor, 10.0*ratio, 0.1);
 }
 
 void mgnss::controllers::WheeledMotionCom::_setInitialConditions(){

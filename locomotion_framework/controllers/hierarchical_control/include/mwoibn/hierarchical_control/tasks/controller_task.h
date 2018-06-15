@@ -30,20 +30,20 @@ BasicTask(int i, int dof){
 }
 
 //! Returnes task Jacobian
-const mwoibn::Matrix& getJacobian(){
+const mwoibn::Matrix& getJacobian() const {
         return _jacobian;
 }
 //! Returnes previous task Jacobian
-const mwoibn::Matrix& getPreviousJacobian(){
+const mwoibn::Matrix& getPreviousJacobian() const {
         return _last_jacobian;
 }
 
 //! Returnes task error
-const mwoibn::VectorN& getError(){
+const mwoibn::VectorN& getError() const {
         return _error;
 }
 //! Returnes previous task error
-const mwoibn::VectorN& getPreviousError(){
+const mwoibn::VectorN& getPreviousError() const {
         return _last_error;
 }
 

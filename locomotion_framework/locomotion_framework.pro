@@ -207,7 +207,53 @@ HEADERS += common/include/mwoibn/common/ros.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_2D_rbdl_task.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_3D_rbdl_task.h \
     controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_rbdl_task.h \
-    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_tracking_task.h
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/contact_point_tracking_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/basic_action.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/compute.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/controller.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/idle.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/primary.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/replace.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/secondary.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/snap.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/actions/task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/actions.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/basic.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/continous.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/default.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/memory_manager.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/controllers/wheels.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/aggravated.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/angle.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/camber_angle_task_2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_reference_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_selective_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v3.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v4.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v5.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v6.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v7.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_world.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/cartesian_world_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/castor_angle_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/castor_angle_task0.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/center_of_mass_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/center_of_mass_task_v2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/center_of_mass_task_v3.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/constraints_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/constraints_task_v2.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/contact_point_2D_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/contact_point_3D_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/contact_point_rbdl_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/controller_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/joint_positions_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/orientation_selective_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/orientation_world_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/self_collision_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/self_collisions_task.h \
+    controllers/hierarchical_control/include/mwoibn/hierarchical_control/tasks/steering_angle_task.h
 SOURCES += point_handling/devel_tests/simple_test.cpp \
            point_handling/src/base_points_handler.cpp \
            point_handling/src/point.cpp \
@@ -353,7 +399,25 @@ SOURCES += point_handling/devel_tests/simple_test.cpp \
     xbot/robot_class_xbot/src/robot_xbot_rt.cpp \
     xbot/robot_class_xbot/src/contact_ros.cpp \
     ros/communication_modules_ros_extension/src/velocity_controller.cpp \
-    controllers/hierarchical_control/src/center_of_mass_task_v2.cpp
+    controllers/hierarchical_control/src/center_of_mass_task_v2.cpp \
+    controllers/hierarchical_control/src/tasks/angle.cpp \
+    controllers/hierarchical_control/src/controllers/actions.cpp \
+    controllers/hierarchical_control/src/controllers/continous.cpp \
+    controllers/hierarchical_control/src/controllers/default.cpp \
+    controllers/hierarchical_control/src/controllers/wheels.cpp \
+    controllers/hierarchical_control/src/tasks/aggravated.cpp \
+    controllers/hierarchical_control/src/tasks/cartesian_world_task.cpp \
+    controllers/hierarchical_control/src/tasks/center_of_mass_task.cpp \
+    controllers/hierarchical_control/src/tasks/center_of_mass_task_v2.cpp \
+    controllers/hierarchical_control/src/tasks/center_of_mass_task_v3.cpp \
+    controllers/hierarchical_control/src/tasks/constraints_task.cpp \
+    controllers/hierarchical_control/src/tasks/controller_task.cpp \
+    controllers/hierarchical_control/src/tasks/controller_task_v2.cpp \
+    controllers/hierarchical_control/src/tasks/controller_task_v2_copy.cpp \
+    controllers/hierarchical_control/src/tasks/joint_positions_task.cpp \
+    controllers/hierarchical_control/src/tasks/orientation_world_task.cpp \
+    controllers/hierarchical_control/src/tasks/self_collision_task.cpp \
+    controllers/hierarchical_control/src/tasks/self_collisions_task.cpp
 
 DISTFILES += \
     controllers/motor_side_reference/test/launch/test_motor_side_reference.test \

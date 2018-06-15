@@ -196,10 +196,21 @@ virtual void nextStep();
 
 
 protected:
-bool _isDone(mwoibn::hierarchical_control::tasks::BasicTask& task,
+bool _isDone(const mwoibn::hierarchical_control::tasks::BasicTask& task,
              const double eps) const
 {
         return task.getError().cwiseAbs().maxCoeff() < eps;
+}
+
+template<typename Task>
+bool _isDone(const std::vector<Task>& tasks,
+             const double eps) const
+{
+        bool done = true;
+        for(auto& task : tasks) {
+                done = _isDone(task, eps) && done;
+        }
+        return done;
 }
 
 virtual void _updateSupport()

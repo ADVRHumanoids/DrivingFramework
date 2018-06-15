@@ -64,9 +64,8 @@ void mgnss::controllers::WheeledMotionEvent::_initIK(YAML::Node config){
         double damp = config["damping"].as<double>();
 
         // Set initaial HC tasks
-        //_hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Wheels(_robot, *_leg_camber_ptr, *_leg_castor_ptr, 500));
         _hierarchical_controller_ptr->addTask(*_constraints_ptr, config["constraints"].as<double>(), damp);
-        _hierarchical_controller_ptr->addTask(*_leg_steer_ptr, config["leg_steer"].as<double>() * ratio, damp);
+        _hierarchical_controller_ptr->addTask(_leg_steer, config["leg_steer"].as<double>() * ratio, damp);
         _hierarchical_controller_ptr->addTask(*_pelvis_orientation_ptr, config["base_orinetation"].as<double>() * ratio, damp);
 
         gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
@@ -74,8 +73,8 @@ void mgnss::controllers::WheeledMotionEvent::_initIK(YAML::Node config){
 
         _hierarchical_controller_ptr->addTask(*_pelvis_position_ptr, config["base_position"].as<double>() * ratio, damp);
         _hierarchical_controller_ptr->addTask(*_steering_ptr, config["contact_point"].as<double>() * ratio, damp);
-        _hierarchical_controller_ptr->addTask(*_leg_camber_ptr, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
-        _hierarchical_controller_ptr->addTask(*_leg_castor_ptr, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_camber, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
         _hierarchical_controller_ptr->init();
         _hierarchical_controller_ptr->update();
@@ -366,7 +365,7 @@ void mgnss::controllers::WheeledMotionEvent::startLog(mwoibn::common::Logger& lo
 //  logger.addField("r_st_3", refSteer()[2]);
 //  logger.addField("r_st_4", refSteer()[3]);
 //  logger.addField("st_1", getSteer()[0]);
-        logger.addField("st_2", getSteer()[1]);
+        logger.addField("st_2", getSteer(1));
 //  logger.addField("st_3", getSteer()[2]);
 //  logger.addField("st_4", getSteer()[3]);
 
@@ -497,7 +496,7 @@ void mgnss::controllers::WheeledMotionEvent::log(mwoibn::common::Logger& logger,
 //  logger.addEntry("r_st_3", refSteer()[2]);
 //  logger.addEntry("r_st_4", refSteer()[3]);
 //  logger.addEntry("st_1", getSteer()[0]);
-        logger.addEntry("st_2", getSteer()[1]);
+        logger.addEntry("st_2", getSteer(1));
 //  logger.addEntry("st_3", getSteer()[2]);
 //  logger.addEntry("st_4", getSteer()[3]);
 

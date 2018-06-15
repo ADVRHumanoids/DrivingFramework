@@ -61,7 +61,7 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
         double damp = config["damping"].as<double>();
         // Set initaial HC tasks
         _hierarchical_controller_ptr->addTask(*_constraints_ptr, config["constraints"].as<double>(), damp);
-        _hierarchical_controller_ptr->addTask(*_leg_steer_ptr, config["leg_steer"].as<double>() * ratio, damp);
+        _hierarchical_controller_ptr->addTask(_leg_steer, config["leg_steer"].as<double>() * ratio, damp);
 
         mwoibn::VectorN gain_base(6);
         gain_base.head<3>() = mwoibn::VectorN::Constant(3, config["base_orinetation"].as<double>() * ratio);
@@ -71,8 +71,8 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
         _hierarchical_controller_ptr->addTask(*_world_posture_ptr, gain_base,  damp);
 
         _hierarchical_controller_ptr->addTask(*_steering_ptr, config["contact_point"].as<double>() * ratio, damp);
-        _hierarchical_controller_ptr->addTask(*_leg_camber_ptr, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
-        _hierarchical_controller_ptr->addTask(*_leg_castor_ptr, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_camber, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
         _hierarchical_controller_ptr->update();
 
@@ -372,7 +372,7 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
 //  logger.addField("r_st_3", refSteer()[2]);
 //  logger.addField("r_st_4", refSteer()[3]);
 //  logger.addField("st_1", getSteer()[0]);
-        logger.addField("st_2", getSteer()[1]);
+        logger.addField("st_2", getSteer(1));
 //  logger.addField("st_3", getSteer()[2]);
 //  logger.addField("st_4", getSteer()[3]);
 
@@ -497,7 +497,7 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 //  logger.addEntry("r_st_3", refSteer()[2]);
 //  logger.addEntry("r_st_4", refSteer()[3]);
 //  logger.addEntry("st_1", getSteer()[0]);
-        logger.addEntry("st_2", getSteer()[1]);
+        logger.addEntry("st_2", getSteer(1));
 //  logger.addEntry("st_3", getSteer()[2]);
 //  logger.addEntry("st_4", getSteer()[3]);
 

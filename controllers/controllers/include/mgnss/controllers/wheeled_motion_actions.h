@@ -4,7 +4,6 @@
 #include <mgnss/controllers/wheels_controller_extend.h>
 
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
-#include <mwoibn/hierarchical_control/tasks/aggravated.h>
 #include <mwoibn/hierarchical_control/controllers/actions.h>
 
 namespace mgnss
@@ -54,12 +53,12 @@ void compute();
 
 void switchToCastor(double mu){
         std::cout << "switchToCastor" << std::endl;
-        _actions_ptr->replace(*_leg_castor_ptr, mu);
+        _actions_ptr->replace(_leg_castor, mu);
 }
 
 void switchToCamber(double mu){
         std::cout << "switchToCamber" << std::endl;
-        _actions_ptr->replace(*_leg_camber_ptr, mu);
+        _actions_ptr->replace(_leg_camber, mu);
 }
 
 
@@ -97,11 +96,11 @@ virtual double getBaseGroundZ()
 virtual double getBaseGroundRz(){
         return _steering_ptr->getState()[2];
 }
-const mwoibn::VectorN& getSteer(){
-        return _leg_steer_ptr->getCurrent();
+double getSteer(int i){
+        return _steer_task[i].getCurrent();
 }
 const mwoibn::VectorN& errorSteer(){
-        return _leg_steer_ptr->getError();
+        return _leg_steer.getError();
 }
 const mwoibn::VectorN& getSteerICM(){
         return _steering_ref_ptr->getICM();

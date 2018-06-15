@@ -10,7 +10,7 @@ void mgnss::controllers::WheelsControllerExtend::resetSteering()
 {
         for (int i = 0; i < 4; i++)
         {
-                _leg_steer_ptr->setReference(i, 0);
+                _steer_task[i].setReference(0);
         }
 }
 
@@ -19,49 +19,42 @@ void mgnss::controllers::WheelsControllerExtend::_createAngleTasks(){
 
         mwoibn::Axis ax;
         ax << 0, 1, 0;
-        mwoibn::robot_class::angles::Caster caster1(
-                _robot, mwoibn::point_handling::Point("ankle2_1", _robot.getModel()), ax);
-        ax <<  0,  0,  1;
-        mwoibn::robot_class::angles::Camber camber1(
-                _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax);
-        ax <<  0,  0,  1;
-        mwoibn::robot_class::angles::Steering steer1(
-                _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax);
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_1", _robot.getModel()), ax));
+        ax << 0, -1, 0;
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_2", _robot.getModel()), ax));
         ax << 0, 1, 0;
-        mwoibn::robot_class::angles::Caster caster3(
-                _robot, mwoibn::point_handling::Point("ankle2_3", _robot.getModel()), ax);
-        ax <<  0,  0,  1;
-        mwoibn::robot_class::angles::Camber camber3(
-                _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax);
-        ax <<  0,  0,  1;
-        mwoibn::robot_class::angles::Steering steer3(
-                _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax);
-
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_3", _robot.getModel()), ax));
         ax << 0, -1, 0;
-        mwoibn::robot_class::angles::Caster caster2(
-                _robot, mwoibn::point_handling::Point("ankle2_2", _robot.getModel()), ax);
-        ax <<  0,  0,  -1;
-        mwoibn::robot_class::angles::Camber camber2(
-                _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax);
-        ax <<  0,  0,  -1;
-        mwoibn::robot_class::angles::Steering steer2(
-                _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax);
-        ax << 0, -1, 0;
-        mwoibn::robot_class::angles::Caster caster4(
-                _robot, mwoibn::point_handling::Point("ankle2_4", _robot.getModel()), ax);
-        ax <<  0,  0,  -1;
-        mwoibn::robot_class::angles::Camber camber4(
-                _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax);
-        ax <<  0,  0,  -1;
-        mwoibn::robot_class::angles::Steering steer4(
-                _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax);
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_4", _robot.getModel()), ax));
 
-        _leg_steer_ptr.reset(new mwoibn::hierarchical_control::tasks::SteeringAngleTask(
-                                     {steer1, steer2, steer3, steer4}, _robot));
-        _leg_camber_ptr.reset(new mwoibn::hierarchical_control::tasks::CamberAngleTask(
-                                      {camber1, camber2, camber3, camber4}, _robot));
-        _leg_castor_ptr.reset(new mwoibn::hierarchical_control::tasks::CastorAngleTask(
-                                      {caster1, caster2, caster3, caster4}, _robot));
+        ax <<  0,  0,  1;
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax));
+        ax <<  0,  0,  -1;
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax));
+        ax <<  0,  0,  1;
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax));
+        ax <<  0,  0,  -1;
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax));
+
+        for(auto& angle : _caster)
+                _caster_task.push_back(mwoibn::hierarchical_control::tasks::Angle(angle, _robot));
+
+        for(auto& task : _caster_task) _leg_castor.addTask(task);
+
+
+        for(auto& angle : _steer)
+                _steer_task.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(angle, _robot));
+
+        for(auto& task : _steer_task) _leg_steer.addTask(task);
+
+        for(auto& angle : _camber)
+                _camber_task.push_back(mwoibn::hierarchical_control::tasks::Angle(angle, _robot));
+
+        for(auto& task : _camber_task) _leg_camber.addTask(task);
 
 }
 
@@ -71,17 +64,22 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
 
         _dt = _robot.rate();
 
-        _leg_steer_ptr->updateError();
-        _leg_camber_ptr->updateError();
-        _leg_castor_ptr->updateError();
+        _leg_steer.updateError();
+        _leg_camber.updateError();
+        _leg_castor.updateError();
         _steering_ptr->updateState();
 
-        steerings.noalias() = _leg_steer_ptr->getCurrent();
+        for(int i = 0; i < _steer_task.size(); i++)
+                steerings[i] = _steer_task[i].getCurrent();
+
         _support.noalias() = _steering_ptr->getReference();
         _support_vel.setZero();
 
-        _leg_steer_ptr->setReference(steerings);
-        _leg_camber_ptr->setReference(_leg_camber_ptr->getCurrent());
-        _leg_castor_ptr->setReference(_leg_castor_ptr->getCurrent());
+
+        for(int i = 0; i < _steer_task.size(); i++) {
+                _steer_task[i].setReference(steerings[i]);
+                _camber_task[i].setReference(_camber_task[i].getCurrent());
+                _caster_task[i].setReference(_caster_task[i].getCurrent());
+        }
 
 }

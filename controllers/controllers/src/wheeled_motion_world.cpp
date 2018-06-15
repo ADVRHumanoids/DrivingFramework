@@ -81,15 +81,15 @@ void mgnss::controllers::WheeledMotionWorld::_initIK(YAML::Node config){
 
         _hierarchical_controller_ptr->addTask(*_constraints_ptr, config["constraints"].as<double>(), damp);
 /*  gain << config["leg_steer"].as<double>() * ratio; // 30
-   _hierarchical_controller_ptr->addTask(*_leg_steer_ptr, gain, task, damp);
+   _hierarchical_controller_ptr->addTask(_leg_steer, gain, task, damp);
  */
         _hierarchical_controller_ptr->addTask(*_pelvis_orientation_ptr, config["base_orinetation"].as<double>() * ratio, damp);
         gain_com << config["centre_of_mass_x"].as<double>() * ratio, config["centre_of_mass_y"].as<double>() * ratio;
         _hierarchical_controller_ptr->addTask(*_com_ptr, gain_com, damp);
         _hierarchical_controller_ptr->addTask(*_pelvis_position_ptr,  config["base_position"].as<double>() * ratio, damp);
         _hierarchical_controller_ptr->addTask(*_steering_ptr, config["contact_point"].as<double>() * ratio, damp);
-        _hierarchical_controller_ptr->addTask(*_leg_camber_ptr, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
-        _hierarchical_controller_ptr->addTask(*_leg_castor_ptr, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_camber, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
+        _hierarchical_controller_ptr->addTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
         _hierarchical_controller_ptr->update();
 }
