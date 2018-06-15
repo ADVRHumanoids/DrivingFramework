@@ -19,41 +19,41 @@ void mgnss::controllers::WheelsControllerExtend::_createAngleTasks(){
 
         mwoibn::Axis ax;
         ax << 0, 1, 0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor1(
+        mwoibn::robot_class::angles::Caster caster1(
                 _robot, mwoibn::point_handling::Point("ankle2_1", _robot.getModel()), ax);
         ax <<  0,  0,  1;
-        mwoibn::hierarchical_control::tasks::CamberAngle camber1(
+        mwoibn::robot_class::angles::Camber camber1(
                 _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax);
         ax <<  0,  0,  1;
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer1(
+        mwoibn::robot_class::angles::Steering steer1(
                 _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax);
         ax << 0, 1, 0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor3(
+        mwoibn::robot_class::angles::Caster caster3(
                 _robot, mwoibn::point_handling::Point("ankle2_3", _robot.getModel()), ax);
         ax <<  0,  0,  1;
-        mwoibn::hierarchical_control::tasks::CamberAngle camber3(
+        mwoibn::robot_class::angles::Camber camber3(
                 _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax);
         ax <<  0,  0,  1;
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer3(
+        mwoibn::robot_class::angles::Steering steer3(
                 _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax);
 
         ax << 0, -1, 0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor2(
+        mwoibn::robot_class::angles::Caster caster2(
                 _robot, mwoibn::point_handling::Point("ankle2_2", _robot.getModel()), ax);
         ax <<  0,  0,  -1;
-        mwoibn::hierarchical_control::tasks::CamberAngle camber2(
+        mwoibn::robot_class::angles::Camber camber2(
                 _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax);
         ax <<  0,  0,  -1;
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer2(
+        mwoibn::robot_class::angles::Steering steer2(
                 _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax);
         ax << 0, -1, 0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor4(
+        mwoibn::robot_class::angles::Caster caster4(
                 _robot, mwoibn::point_handling::Point("ankle2_4", _robot.getModel()), ax);
         ax <<  0,  0,  -1;
-        mwoibn::hierarchical_control::tasks::CamberAngle camber4(
+        mwoibn::robot_class::angles::Camber camber4(
                 _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax);
         ax <<  0,  0,  -1;
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer4(
+        mwoibn::robot_class::angles::Steering steer4(
                 _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax);
 
         _leg_steer_ptr.reset(new mwoibn::hierarchical_control::tasks::SteeringAngleTask(
@@ -61,7 +61,7 @@ void mgnss::controllers::WheelsControllerExtend::_createAngleTasks(){
         _leg_camber_ptr.reset(new mwoibn::hierarchical_control::tasks::CamberAngleTask(
                                       {camber1, camber2, camber3, camber4}, _robot));
         _leg_castor_ptr.reset(new mwoibn::hierarchical_control::tasks::CastorAngleTask(
-                                      {castor1, castor2, castor3, castor4}, _robot));
+                                      {caster1, caster2, caster3, caster4}, _robot));
 
 }
 

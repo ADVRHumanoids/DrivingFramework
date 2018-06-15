@@ -464,7 +464,7 @@ mwoibn:
                         robot: default
                         mode: "full"
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: odom_NRT_5
+                        tunning: odom_NRT_7
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0
@@ -602,6 +602,26 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.01
+                                odom_NRT_7: # circular - odom,
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 55
+                                        base_orinetation: 50
+                                        centre_of_mass_x: 38
+                                        centre_of_mass_y: 38
+                                        base_position: 10
+                                        contact_point: 18
+                                        camber: 40 # 95-100
+                                        castor: 20 # 14-30
+                                        camber_damp: 0.005
+                                        castor_damp: 0.005
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 0.001 # 0.05
+                                        steer_damp: 0.015
+                                        damp_icm: 0.00000000001
+                                        damp_sp: 0.015
+                                        tracking_gain: 200.0
                                 odom_NRT_6: # smooth tasks
                                         ratio: 1.0
                                         damping: 0.0001

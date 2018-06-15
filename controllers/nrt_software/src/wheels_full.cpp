@@ -58,53 +58,53 @@ int main(int argc, char** argv)
         x << -1, 0, 0;
         ax << 0, 0, 1;
 
-        mwoibn::hierarchical_control::tasks::CastorAngle castor1(
+        mwoibn::robot_class::angles::Caster caster1(
                 robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::CamberAngle camber1(
+        mwoibn::robot_class::angles::Camber camber1(
                 robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer1(
+        mwoibn::robot_class::angles::Steering steer1(
                 robot, mwoibn::point_handling::Point("ankle2_1", robot.getModel()), x, y,
                 z, ax);
         z << 0,  0, -1;
         y << 0, -1,  0;
         x << 1,  0,  0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor2(
+        mwoibn::robot_class::angles::Caster caster2(
                 robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::CamberAngle camber2(
+        mwoibn::robot_class::angles::Camber camber2(
                 robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer2(
+        mwoibn::robot_class::angles::Steering steer2(
                 robot, mwoibn::point_handling::Point("ankle2_2", robot.getModel()), x, y,
                 z, ax);
         z << 0,  0, -1;
         y << 0, -1,  0;
         x << 1,  0,  0;
-        mwoibn::hierarchical_control::tasks::CastorAngle castor3(
+        mwoibn::robot_class::angles::Caster caster3(
                 robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::CamberAngle camber3(
+        mwoibn::robot_class::angles::Camber camber3(
                 robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
                 z, ax);
         robot, mwoibn::point_handling::Point("ankle2_3", robot.getModel()), x, y,
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer3(
+        mwoibn::robot_class::angles::Steering steer3(
                 z, ax);
         z <<  0,  0, -1;
         y <<  0,  1,  0;
         x << -1,  0,  0;
         robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
-        mwoibn::hierarchical_control::tasks::CastorAngle castor4(
+        mwoibn::robot_class::angles::Caster caster4(
                 z, ax);
-        mwoibn::hierarchical_control::tasks::CamberAngle camber4(
+        mwoibn::robot_class::angles::Camber camber4(
                 robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
                 z, ax);
-        mwoibn::hierarchical_control::tasks::SteeringAngle steer4(
+        mwoibn::robot_class::angles::Steering steer4(
                 robot, mwoibn::point_handling::Point("ankle2_4", robot.getModel()), x, y,
                 z, ax);
 
-        mwoibn::hierarchical_control::tasks::CastorAngleTask castor({castor1, castor2, castor3, castor4}, robot);
+        mwoibn::hierarchical_control::tasks::CastorAngleTask castor({caster1, caster2, caster3, caster4}, robot);
         mwoibn::hierarchical_control::tasks::CamberAngleTask camber({camber1, camber2, camber3, camber4}, robot);
         mwoibn::hierarchical_control::tasks::SteeringAngleTask steer({steer1, steer2, steer3, steer4}, robot);
         mwoibn::hierarchical_control::tasks::Constraints constraints(robot);
