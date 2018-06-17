@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_TASK_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_TASK_H
 
-#include <mwoibn/hierarchical_control/actions/basic_action.h>
+#include "mwoibn/hierarchical_control/actions/basic_action.h"
 
 namespace mwoibn {
 namespace hierarchical_control {

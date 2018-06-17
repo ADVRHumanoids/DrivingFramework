@@ -1,5 +1,5 @@
 #include "mwoibn/hierarchical_control/controllers/wheels.h"
-#include <mwoibn/hierarchical_control/tasks/castor_angle_task.h>
+#include "mwoibn/hierarchical_control/tasks/castor_angle_task.h"
 #include <boost/range/adaptor/reversed.hpp>
 
 bool mwoibn::hierarchical_control::controllers::Wheels::_checkStack()

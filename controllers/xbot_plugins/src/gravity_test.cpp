@@ -1,4 +1,4 @@
-#include <mgnss/xbot_plugins/gravity_test.h>
+#include "mgnss/xbot_plugins/gravity_test.h"
 
 REGISTER_XBOT_PLUGIN(GravityTest, mgnss::xbot_plugins::GravityTest)
 

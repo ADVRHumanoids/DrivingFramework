@@ -1,6 +1,6 @@
 #define FULL_ROBOT
 
-#include <mgnss/nrt_software/plugins/wheels_controllers.h>
+#include "mgnss/nrt_software/plugins/wheels_controllers.h"
 #include <config.h>
 #include <mwoibn/loaders/robot.h>
 

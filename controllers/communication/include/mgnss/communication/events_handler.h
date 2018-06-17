@@ -7,7 +7,7 @@
 
 #include <mwoibn/point_handling/robot_points_handler.h>
 // trajectory generation
-#include <mgnss/communication/basic_handler.h>
+#include "mgnss/communication/basic_handler.h"
 
 namespace events
 {

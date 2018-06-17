@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_ROBOT_CLASS_CASTER_H
 #define __MWOIBN_ROBOT_CLASS_CASTER_H
 
-#include <mwoibn/robot_class/angles/basic.h>
+#include "mwoibn/robot_class/angles/basic.h"
 
 namespace mwoibn
 {
@@ -11,7 +11,7 @@ namespace angles {
 
 /**
  * @brief The CartesianWorld class Provides the inverse kinematics task
- ********************to control the position of a point defined in one of a robot reference frames
+ * to control the position of a point defined in one of a robot reference frames
  *
  */
 
