@@ -47,6 +47,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateJacobian(){
         _last_jacobian.noalias() = _jacobian;
         int row = 0;
         for(auto& task : _tasks_ptrs) {
+                task.second.updateJacobian();
                 for(int i = 0; i < task.first.size(); i++) {
                         if(!task.first[i]) continue;
                         _jacobian.row(row) = task.second.getJacobian().row(i);
@@ -57,9 +58,11 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateJacobian(){
 //! generic function to provide the same syntax for error update of all
 //derived classes
 void mwoibn::hierarchical_control::tasks::Aggravated::updateError(){
+
         _last_error.noalias() = _error;
         int row = 0;
         for(auto& task : _tasks_ptrs) {
+                task.second.updateError();
                 for(int i = 0; i < task.first.size(); i++) {
                         if(!task.first[i]) continue;
                         _error[row] = task.second.getError()[i];
@@ -71,9 +74,6 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateError(){
 //that order
 
 void mwoibn::hierarchical_control::tasks::Aggravated::update(){
-        for(auto& task : _tasks_ptrs) {
-                task.second.update();
-        }
         updateError();
         updateJacobian();
 }
