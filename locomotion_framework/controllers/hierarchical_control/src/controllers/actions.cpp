@@ -5,26 +5,15 @@
 mwoibn::hierarchical_control::controllers::Actions::Actions(double dt, unsigned int dofs) : Basic(), _dt(dt), _dofs(dofs) {
         _command = mwoibn::VectorN::Zero(_dofs);
         _P = mwoibn::Matrix::Identity(_dofs, _dofs);
-        //
-        // preallocate three snap actions
+
         int snap = 4, replace = 1, secondary = 8;
-        _snap.reserve(snap);
 
-        for(int i = 0; i < snap; i++)
-                _snap.push_back(actions::Snap(_P, _command, _memory));
+        _snap.assign(snap, actions::Snap(_P, _command, _memory));
+        _replace.assign(replace, actions::Replace(_P, _command, 5, _dt, _memory, _map));
+        _secondary.assign(secondary,actions::Secondary(_memory, _map));
+
         _memory.release(_snap);
-
-        _replace.reserve(replace);
-
-        for(int i = 0; i < replace; i++)
-                _replace.push_back(actions::Replace(_P, _command, 5, _dt, _memory, _map));
         _memory.release(_replace);
-
-        _secondary.reserve(secondary);
-
-        for(int i = 0; i < secondary; i++)
-                _secondary.push_back(actions::Secondary(_memory, _map));
-
         _memory.release(_secondary);
 
 }
@@ -122,15 +111,11 @@ void mwoibn::hierarchical_control::controllers::Actions::removeTask(unsigned int
 //         return snap;
 // }
 
-bool mwoibn::hierarchical_control::controllers::Actions::replace(tasks::BasicTask& task, double mu){
+mwoibn::hierarchical_control::actions::Replace* mwoibn::hierarchical_control::controllers::Actions::replace(tasks::BasicTask& task, double mu){
 
-        std::cout << "replace" << std::endl;
-        if(!_memory.isReplace()) return false;
-        std::cout << "it's free!" << std::endl;
-        if(!_memory.isSnap()) return false;
-        // std::cout << "snap's there!" << std::endl;
-        if(!_memory.isSecondary()) return false;
-        // std::cout << "free secondary!" << std::endl;
+        if(!_memory.isReplace()) return nullptr;
+        if(!_memory.isSnap()) return nullptr;
+        if(!_memory.isSecondary()) return nullptr;
 
         actions::Replace* ptr = _memory.getReplace();
         tasks::BasicTask& task_old = _active_stack.back()->baseAction().getTask();
@@ -141,7 +126,7 @@ bool mwoibn::hierarchical_control::controllers::Actions::replace(tasks::BasicTas
 
         _setIdle(_active_stack.back()->baseAction().getTask());
 
-        return true;
+        return ptr;
 }
 
 void mwoibn::hierarchical_control::controllers::Actions::removeTask(tasks::BasicTask& task){
