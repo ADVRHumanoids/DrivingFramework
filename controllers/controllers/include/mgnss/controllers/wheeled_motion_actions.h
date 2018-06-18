@@ -1,10 +1,12 @@
 #ifndef __MGNSS_CONTROLLERS_WHEELED_MOTION_ACTIONS_H
 #define __MGNSS_CONTROLLERS_WHEELED_MOTION_ACTIONS_H
 
-#include <mgnss/controllers/wheels_controller_extend.h>
+#include "mgnss/controllers/wheels_controller_extend.h"
 
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 #include <mwoibn/hierarchical_control/controllers/actions.h>
+
+#include <mwoibn/hierarchical_control/actions/merge.h>
 
 namespace mgnss
 {
