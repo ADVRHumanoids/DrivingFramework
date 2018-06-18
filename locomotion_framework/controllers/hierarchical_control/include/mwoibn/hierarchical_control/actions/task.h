@@ -14,7 +14,12 @@ public:
 Task(memory::Manager& memory) : Basic(memory){
         _next = this;
 }
-
+Task(const Task& other) : Basic(other){
+        _next = this;
+}
+const Task& operator=(const Task& task){
+        return task;
+}
 ~Task(){
 }
 

@@ -12,6 +12,10 @@ class Primary : public Task {
 public:
 Primary(tasks::BasicTask& task, memory::Manager& memory) : Task(memory), _task(task){
 }
+Primary(const Primary& other) : Task(other), _task(other._task){
+}
+
+
 ~Primary(){
 }
 

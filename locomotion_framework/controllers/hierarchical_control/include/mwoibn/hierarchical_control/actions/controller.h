@@ -12,6 +12,13 @@ class Controller : public Basic {
 public:
 Controller(memory::Manager& memory) : Basic(memory){
 }
+
+Controller(Controller& other) : Basic(other){
+}
+
+Controller(const Controller& other) : Basic(other){
+}
+
 ~Controller(){
 }
 

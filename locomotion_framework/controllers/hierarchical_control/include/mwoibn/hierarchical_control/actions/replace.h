@@ -32,6 +32,11 @@ Replace(mwoibn::Matrix& P, mwoibn::VectorN& command, double mu, double dt, memor
         _setLimit();
 }
 
+const Replace& operator=(const Replace& replace){
+        return replace;
+}
+
+
 ~Replace(){
 }
 
@@ -98,10 +103,10 @@ virtual actions::Task& next() {
 }
 
 virtual void release(){
-        std::cout << "release" << std::endl;
+        // std::cout << "release" << std::endl;
         _memory.release(*_snap);
         _memory.release(*this);
-        _snap = NULL;
+        _snap = nullptr;
         _map[&_action->baseAction().getTask()] = _action;
         // _task_old->release();
 }

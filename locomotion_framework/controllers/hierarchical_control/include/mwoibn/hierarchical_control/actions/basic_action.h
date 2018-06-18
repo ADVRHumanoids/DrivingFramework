@@ -15,6 +15,14 @@ class Basic {
 public:
 Basic(memory::Manager& memory) : _memory(memory){
 }
+
+const Basic& operator=(const Basic& action){
+        return action;
+}
+
+Basic(const Basic& other) : _memory(other._memory){
+}
+
 ~Basic(){
 }
 
