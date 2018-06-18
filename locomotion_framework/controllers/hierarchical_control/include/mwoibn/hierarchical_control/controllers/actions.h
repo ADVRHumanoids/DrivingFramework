@@ -13,33 +13,11 @@
 #include "mwoibn/hierarchical_control/controllers/memory_manager.h"
 
 
-// temporary libraries
-// #include <iostream>
-// #include <fstream>
-// #include <ctime>
-// #include <chrono>
-/**
- * \todo change the package name to hierarchical_control
- * \todo add to the naming convention do not name the package and internal class
- *******************************the same
- *
- */
 namespace mwoibn {
 namespace hierarchical_control {
 namespace controllers {
 
-//! Implementation of a hierarchical controller
-/**
- * \todo add a reference to the paper about the implemented controller
- * \todo add task names for convenience
- * \todo add some utility functions, so that the user can get some information
- *******************************about tasks (combined with the name utility)
- * \todo add basic cartesian position task
- * \todo add a constructor taking the tasks (with variable number of arguments)
- * \todo **extract the continous adjustement to the task change as an inheriting
- *******************************class**
- *
- */
+
 class Actions : public Basic
 {
 public:
@@ -66,7 +44,7 @@ virtual void idleTask(tasks::BasicTask& new_task, mwoibn::VectorN gain,
 virtual void idleTask(tasks::BasicTask& new_task, double gain,
                       double damping = 1e-8);
 
-virtual bool replace(tasks::BasicTask& task, double mu);
+virtual actions::Replace* replace(tasks::BasicTask& task, double mu);
 
 //! Removes a task from the stack
 virtual void removeTask(unsigned int i);
@@ -112,12 +90,6 @@ std::vector<std::unique_ptr<actions::Task> > _actions_set;
 
 TaskMap _map;
 memory::Manager _memory;
-// std::vector<actions::Snap* > _idle_snap;
-// std::vector<actions::Replace* > _idle_replace;
-// std::vector<actions::Secondary* > _idle_secondary;
-
-// actions::Idle _idle;
-// tasks::BasicTask _idleTask;
 
 mwoibn::Matrix _P;
 double _dofs, _dt;
