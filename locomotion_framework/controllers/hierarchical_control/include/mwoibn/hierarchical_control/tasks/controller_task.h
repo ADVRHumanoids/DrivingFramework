@@ -75,9 +75,9 @@ int getTaskDofs(){
         return _jacobian.cols();
 }
 
-virtual double det(){
-        return _jacobian.determinant();
-}
+// virtual double det(){
+//         return _jacobian.determinant();
+// }
 //! Allows to define the human readable name for the task
 std::string name;
 

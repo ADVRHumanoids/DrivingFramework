@@ -36,6 +36,9 @@ void mwoibn::hierarchical_control::tasks::Angle::setReference(double reference) 
         _ref = reference;
 }
 
+// double mwoibn::hierarchical_control::tasks::Angle::det(){
+//         return _jacobian.cwiseAbs().maxCoeff();
+// }
 
 mwoibn::hierarchical_control::tasks::SoftAngle::SoftAngle(robot_class::angles::Basic& angle, mwoibn::robot_class::Robot& robot)
         : Angle(angle, robot)

@@ -26,8 +26,9 @@ double getCurrent();
 virtual void updateJacobian();
 
 virtual double getReference() const;
-
 virtual void setReference(double reference);
+
+// virtual double det();
 
 protected:
 double _ref;
