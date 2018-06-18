@@ -1,5 +1,5 @@
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
-#include "mgnss/controllers/steering_v8.h"
+#include "mgnss/higher_level/steering_v8.h"
 #include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v7.h>
 
 mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
@@ -16,7 +16,7 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering8(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
@@ -28,7 +28,7 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering8(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 

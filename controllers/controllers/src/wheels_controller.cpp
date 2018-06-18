@@ -1,5 +1,5 @@
 #include "mgnss/controllers/wheels_controller.h"
-#include "mgnss/controllers/steering_v4.h"
+#include "mgnss/higher_level/steering_v4.h"
 #include <mwoibn/hierarchical_control/controllers/default.h>
 
 mgnss::controllers::WheelsController::WheelsController(mwoibn::robot_class::Robot& robot)

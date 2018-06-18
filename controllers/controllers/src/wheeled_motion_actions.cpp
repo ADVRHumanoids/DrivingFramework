@@ -1,5 +1,5 @@
 #include "mgnss/controllers/wheeled_motion_actions.h"
-#include "mgnss/controllers/steering_v8.h"
+#include "mgnss/higher_level/steering_v8.h"
 #include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v7.h>
 #include <mwoibn/hierarchical_control/controllers/actions.h>
 
@@ -8,6 +8,7 @@ mgnss::controllers::WheeledMotionActions::WheeledMotionActions(
         mwoibn::robot_class::Robot& robot, std::string config_file)
         : WheelsControllerExtend(robot)
 {
+
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
         std::cout << "wheels allocate" << std::endl;
         _x << 1, 0, 0;
@@ -18,7 +19,7 @@ mgnss::controllers::WheeledMotionActions::WheeledMotionActions(
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering8(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
@@ -26,11 +27,12 @@ mgnss::controllers::WheeledMotionActions::WheeledMotionActions(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
+
         _createTasks();
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering8(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
@@ -81,6 +83,8 @@ void mgnss::controllers::WheeledMotionActions::_initIK(YAML::Node config){
         _actions_ptr->idleTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
         _hierarchical_controller_ptr->update();
+
+        // mwoibn::hierarchical_control::tasks::Merge(_leg_castor, _leg_camber);
 
 }
 

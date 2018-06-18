@@ -16,7 +16,7 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers joint_space_controllers)
-LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules)
+LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules mgnss_higher_level)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -43,13 +43,6 @@ include_directories(
 
 
 add_library(wheeled_motion
-
-   src/steering_v2.cpp
-   src/steering_v4.cpp
-   src/steering_v5.cpp
-   src/steering_v6.cpp
-   src/steering_v7.cpp
-   src/steering_v8.cpp
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp

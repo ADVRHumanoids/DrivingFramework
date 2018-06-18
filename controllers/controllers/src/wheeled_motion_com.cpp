@@ -1,5 +1,5 @@
 #include "mgnss/controllers/wheeled_motion_com.h"
-#include "mgnss/controllers/steering_v2.h"
+#include "mgnss/higher_level/steering_v2.h"
 #include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v4.h>
 
 mgnss::controllers::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robot& robot)
@@ -15,7 +15,7 @@ mgnss::controllers::WheeledMotionCom::WheeledMotionCom(mwoibn::robot_class::Robo
 
         mwoibn::VectorN init_steer;
         init_steer.setZero(4);
-        _steering_ref_ptr.reset(new mgnss::events::Steering2(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering2(
                                         _robot, *_steering_ptr, init_steer, 0.7, 0.3, _robot.rate(), 0.05));
 
         _allocate();

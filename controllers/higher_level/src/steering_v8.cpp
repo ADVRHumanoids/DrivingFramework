@@ -1,6 +1,6 @@
-#include "mgnss/controllers/steering_v8.h"
+#include "mgnss/higher_level/steering_v8.h"
 
-mgnss::events::Steering8::Steering8(
+mgnss::higher_level::Steering8::Steering8(
         mwoibn::robot_class::Robot& robot,
         mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
         const mwoibn::VectorN& contact_vel,
@@ -20,14 +20,14 @@ mgnss::events::Steering8::Steering8(
 
 }
 
-void mgnss::events::Steering8::_resetTreshhold(){
+void mgnss::higher_level::Steering8::_resetTreshhold(){
         _treshhold = _treshhold*_dt;
 
         _treshhold_icm = _treshhold_icm*_dt;
         _treshhold_sp = _treshhold_sp*_dt;
 }
 
-void mgnss::events::Steering8::_computeTreshhold(){
+void mgnss::higher_level::Steering8::_computeTreshhold(){
         _treshhold = _treshhold/_dt;
 
         _treshhold_icm = _treshhold_icm/_dt;
@@ -36,7 +36,7 @@ void mgnss::events::Steering8::_computeTreshhold(){
 }
 
 
-void mgnss::events::Steering8::_merge(int i){
+void mgnss::higher_level::Steering8::_merge(int i){
         if(_resteer[i]) {
                 _b[i] -= mwoibn::PI;
                 mwoibn::eigen_utils::wrapToPi(_b[i]);
@@ -64,7 +64,7 @@ void mgnss::events::Steering8::_merge(int i){
         _b_st[i] = _b[i] + _heading;
 }
 
-void mgnss::events::Steering8::_steerICM(int i, const mwoibn::Vector3 next_step){
+void mgnss::higher_level::Steering8::_steerICM(int i, const mwoibn::Vector3 next_step){
 
         SteeringReference::_steerICM(i, next_step);
 
@@ -76,7 +76,7 @@ void mgnss::events::Steering8::_steerICM(int i, const mwoibn::Vector3 next_step)
 }
 
 
-void mgnss::events::Steering8::_ICM(mwoibn::Vector3 next_step)
+void mgnss::higher_level::Steering8::_ICM(mwoibn::Vector3 next_step)
 {
 
         _pb_icm.noalias() = _b_icm;
@@ -105,11 +105,11 @@ void mgnss::events::Steering8::_ICM(mwoibn::Vector3 next_step)
         }
 }
 
-void mgnss::events::Steering8::_velSP(int i){
+void mgnss::higher_level::Steering8::_velSP(int i){
         _v_sp[i] = _K_v*_plane_ref.norm();
 }
 
-void mgnss::events::Steering8::_PT(int i)
+void mgnss::higher_level::Steering8::_PT(int i)
 {
         // Desired state
 

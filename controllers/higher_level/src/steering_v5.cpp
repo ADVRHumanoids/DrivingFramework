@@ -1,6 +1,6 @@
-#include "mgnss/controllers/steering_v5.h"
+#include "mgnss/higher_level/steering_v5.h"
 
-mgnss::events::Steering5::Steering5(
+mgnss::higher_level::Steering5::Steering5(
         mwoibn::robot_class::Robot& robot,
         mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
         mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
@@ -18,15 +18,15 @@ mgnss::events::Steering5::Steering5(
 
 }
 
-void mgnss::events::Steering5::_computeTreshhold(){
+void mgnss::higher_level::Steering5::_computeTreshhold(){
         _treshhold = _treshhold/_dt;
 }
 
-void mgnss::events::Steering5::_resetTreshhold(){
+void mgnss::higher_level::Steering5::_resetTreshhold(){
         _treshhold = _treshhold*_dt;
 }
 
-void mgnss::events::Steering5::_merge(int i){
+void mgnss::higher_level::Steering5::_merge(int i){
         if(_resteer[i]) _b_st[i] -= mwoibn::PI;  // change velocity sign
 
         double vel = _computeVelocity(i);
@@ -43,7 +43,7 @@ void mgnss::events::Steering5::_merge(int i){
 
 }
 
-void mgnss::events::Steering5::_ICM(mwoibn::Vector3 next_step)
+void mgnss::higher_level::Steering5::_ICM(mwoibn::Vector3 next_step)
 {
 
         _pb_icm.noalias() = _b_icm;
@@ -67,7 +67,7 @@ void mgnss::events::Steering5::_ICM(mwoibn::Vector3 next_step)
         }
 }
 
-void mgnss::events::Steering5::_PT(int i)
+void mgnss::higher_level::Steering5::_PT(int i)
 {
         // Desired state
 

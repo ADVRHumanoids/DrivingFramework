@@ -7,7 +7,7 @@
 #include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
-#include "mgnss/controllers/steering_reference.h"
+#include "mgnss/higher_level/steering_reference.h"
 
 #include <mwoibn/hierarchical_control/tasks/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/tasks/orientation_selective_task.h>
@@ -229,7 +229,7 @@ _pelvis_orientation_ptr;
 std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointTracking>
 _steering_ptr;
 
-std::unique_ptr<mgnss::events::SteeringReference> _steering_ref_ptr;
+std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
 
 std::unique_ptr<mwoibn::hierarchical_control::controllers::Basic> _hierarchical_controller_ptr;
 

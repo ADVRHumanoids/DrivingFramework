@@ -1,12 +1,12 @@
-#ifndef PROGRAM_STEERING_V5_H
-#define PROGRAM_STEERING_V5_H
+#ifndef __MGNSS_HIGHER_LEVEL_STEERING_V5_H
+#define __MGNSS_HIGHER_LEVEL_STEERING_V5_H
 
-#include "mgnss/controllers/steering_reference.h"
+#include "mgnss/higher_level/steering_reference.h"
 
 namespace mgnss
 {
 
-namespace events
+namespace higher_level
 {
 
 class Steering5 : public SteeringReference

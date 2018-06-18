@@ -1,24 +1,24 @@
-#ifndef __MGNSS_CONTROLLERS_STEERING_V6_H
-#define __MGNSS_CONTROLLERS_STEERING_V6_H
+#ifndef __MGNSS_HIGHER_LEVEL_STEERING_V7_H
+#define __MGNSS_HIGHER_LEVEL_STEERING_V7_H
 
-#include "mgnss/controllers/steering_reference.h"
+#include "mgnss/higher_level/steering_reference.h"
 
 namespace mgnss
 {
 
-namespace events
+namespace higher_level
 {
 
-class Steering6 : public SteeringReference
+class Steering7 : public SteeringReference
 {
 
 public:
-Steering6(mwoibn::robot_class::Robot& robot,
+Steering7(mwoibn::robot_class::Robot& robot,
           mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
           mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
           double margin_icm, double margin_sp, double margin = 0.04, double max = 2.79252680);
 
-~Steering6() {
+~Steering7() {
 }
 
 protected:

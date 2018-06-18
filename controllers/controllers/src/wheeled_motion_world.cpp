@@ -1,5 +1,5 @@
 #include "mgnss/controllers/wheeled_motion_world.h"
-#include "mgnss/controllers/steering_v5.h"
+#include "mgnss/higher_level/steering_v5.h"
 #include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_world.h>
 
 
@@ -13,7 +13,7 @@ mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering5(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering5(
                                         _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
 
 }
@@ -26,7 +26,7 @@ mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::events::Steering5(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering5(
                                         _robot, *_steering_ptr, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
 }
 

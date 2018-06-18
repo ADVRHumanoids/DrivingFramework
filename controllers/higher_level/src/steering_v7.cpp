@@ -1,6 +1,6 @@
-#include "mgnss/controllers/steering_v6.h"
+#include "mgnss/higher_level/steering_v7.h"
 
-mgnss::events::Steering6::Steering6(
+mgnss::higher_level::Steering7::Steering7(
         mwoibn::robot_class::Robot& robot,
         mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
         mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
@@ -19,14 +19,14 @@ mgnss::events::Steering6::Steering6(
 
 }
 
-void mgnss::events::Steering6::_resetTreshhold(){
+void mgnss::higher_level::Steering7::_resetTreshhold(){
         _treshhold = _treshhold*_dt;
 
         _treshhold_icm = _treshhold_icm*_dt;
         _treshhold_sp = _treshhold_sp*_dt;
 }
 
-void mgnss::events::Steering6::_computeTreshhold(){
+void mgnss::higher_level::Steering7::_computeTreshhold(){
         _treshhold = _treshhold/_dt;
 
         _treshhold_icm = _treshhold_icm/_dt;
@@ -35,7 +35,7 @@ void mgnss::events::Steering6::_computeTreshhold(){
 }
 
 
-void mgnss::events::Steering6::_merge(int i){
+void mgnss::higher_level::Steering7::_merge(int i){
         if(_resteer[i]) {
                 _b[i] -= mwoibn::PI;
                 mwoibn::eigen_utils::wrapToPi(_b[i]);
@@ -44,9 +44,14 @@ void mgnss::events::Steering6::_merge(int i){
         _pb[i] = _b[i];
 
         _v[i] = _computeVelocity(i);
-        _damp[i] = std::tanh(std::fabs(_v[i]) / _treshhold);
+        _damp[i] = std::tanh(std::fabs(_v[i]*_v_icm[i]) /_treshhold/ _treshhold_icm);
 
-        SteeringReference::_merge(i);
+
+        _b[i] = std::atan2(  _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::sin(_b_icm[i]) +
+                             _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::sin(_b_sp[i]),
+                             _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::cos(_b_icm[i]) +
+                             _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::cos(_b_sp[i]));
+
 
         _raw[i] = _b[i];
         _limited[i] = _b[i];
@@ -61,7 +66,7 @@ void mgnss::events::Steering6::_merge(int i){
 
 
 
-void mgnss::events::Steering6::_ICM(mwoibn::Vector3 next_step)
+void mgnss::higher_level::Steering7::_ICM(mwoibn::Vector3 next_step)
 {
 
         _pb_icm.noalias() = _b_icm;
@@ -78,7 +83,7 @@ void mgnss::events::Steering6::_ICM(mwoibn::Vector3 next_step)
 
                 _v_icm[i] = std::pow(-1,factor)*_v_icm[i]; // change sign to fit with steering
 
-                _damp_icm[i] = std::tanh(std::fabs(_v_icm[i]) / _treshhold_icm);
+                _damp_icm[i] = std::tanh(std::fabs(_v_icm[i])/_treshhold_icm);
 
                 _b_icm[i] = _pb_icm[i] + _damp_icm[i] * (_b_icm[i] - _pb_icm[i]);
                 _v_icm[i] = v_last + _damp_icm[i] * (_v_icm[i] - v_last);
@@ -90,11 +95,11 @@ void mgnss::events::Steering6::_ICM(mwoibn::Vector3 next_step)
         }
 }
 
-void mgnss::events::Steering6::_velSP(int i){
+void mgnss::higher_level::Steering7::_velSP(int i){
         _v_sp[i] = _K_v*_plane_ref.norm();
 }
 
-void mgnss::events::Steering6::_PT(int i)
+void mgnss::higher_level::Steering7::_PT(int i)
 {
         // Desired state
 
@@ -106,14 +111,15 @@ void mgnss::events::Steering6::_PT(int i)
         _steerSP(i);
         _velSP(i);
 
-        _v_sp[i] = _v_icm[i]*_v_sp[i];
+        //_v_sp[i] = _v_icm[i]*_v_sp[i];
+
         int factor = mwoibn::eigen_utils::limitHalfPi(_pb_sp[i],_b_sp[i]);
         factor = limit2PI(_pb_sp[i], _b_sp[i], factor);
 
         //limit2PI(_b_sp[i], _pb_sp[i]);
         _v_sp[i] = std::pow(-1,factor)*_v_sp[i]; // change sign to fit with steering
 
-        _damp_sp[i] = std::tanh(std::fabs(_v_sp[i]) / _treshhold_sp);
+        _damp_sp[i] = std::tanh(std::fabs(_v_sp[i]) /_treshhold_sp);
         _b_sp[i] = _pb_sp[i] + _damp_sp[i] *(_b_sp[i] - _pb_sp[i]);
         _v_sp[i] = v_last + _damp_sp[i] * (_v_sp[i] - v_last);
 
