@@ -17,50 +17,53 @@ class CenterOfMass3 : public BasicTask
 {
 
 public:
-  /**
-   * @param[in] ik_ptr pointer to the point handler mamber that defines which
-   * point is controlled by this task instance
-   */
-  CenterOfMass3(mwoibn::robot_class::Robot& robot, mwoibn::VectorBool which,
-                   mwoibn::VectorN reference =
-                       mwoibn::VectorN::Zero(2))
-      : BasicTask(), _robot(robot), _reference(reference), _which(which)
-  {
-    int size;
+/**
+ * @param[in] ik_ptr pointer to the point handler mamber that defines which
+ * point is controlled by this task instance
+ */
+CenterOfMass3(mwoibn::robot_class::Robot& robot, mwoibn::VectorBool which,
+              mwoibn::VectorN reference =
+                      mwoibn::VectorN::Zero(2))
+        : BasicTask(), _robot(robot), _reference(reference), _which(which)
+{
+        int size;
 
-    for(int i = 0; i < _which.size(); i++)
-        if(_which[i]) size++;
+        for(int i = 0; i < _which.size(); i++)
+                if(_which[i]) size++;
 
-    _init(2, size);
-    _robot.centerOfMass().update(true);
-  }
+        _init(2, size);
+        _robot.centerOfMass().update(true);
+}
 
-  ~CenterOfMass3() {}
+virtual ~CenterOfMass3() {
+}
 
-  //! updates task error based on the current state of the robot and task
-  // reference position
-  virtual void updateError();
-  //! updates task Jacobian based on the current state of the robot
-  virtual void updateJacobian();
+//! updates task error based on the current state of the robot and task
+// reference position
+virtual void updateError();
+//! updates task Jacobian based on the current state of the robot
+virtual void updateJacobian();
 
-  //! updates task current state of the robot
-  virtual void update();
+//! updates task current state of the robot
+virtual void update();
 
-  //! sets task reference
-  virtual void setReference(mwoibn::VectorN reference)
-  {
-    _reference = reference;
-  }
-  //! returnes task reference
-  mwoibn::Matrix getReference() { return _reference; }
+//! sets task reference
+virtual void setReference(mwoibn::VectorN reference)
+{
+        _reference = reference;
+}
+//! returnes task reference
+mwoibn::Matrix getReference() {
+        return _reference;
+}
 
 protected:
-  //!pointer to the point handler mamber for point controlled by this task
-  // instance
-  mwoibn::robot_class::Robot& _robot;
-  //! task reference position of a controlled point
-  mwoibn::VectorN _reference;
-  mwoibn::VectorBool _which;
+//!pointer to the point handler mamber for point controlled by this task
+// instance
+mwoibn::robot_class::Robot& _robot;
+//! task reference position of a controlled point
+mwoibn::VectorN _reference;
+mwoibn::VectorBool _which;
 };
 }
 } // namespace package

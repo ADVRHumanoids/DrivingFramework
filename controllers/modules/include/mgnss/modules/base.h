@@ -12,22 +12,24 @@ class Base
 {
 
 public:
-  Base(mwoibn::robot_class::Robot& robot): _robot(robot){}
+Base(mwoibn::robot_class::Robot& robot) : _robot(robot){
+}
 
-  ~Base() {}
+virtual ~Base() {
+}
 
-  virtual void init() = 0;
-  virtual void update() = 0;
-  virtual void send() = 0;
-  virtual void stop() = 0;
-  virtual void close() = 0;
-  virtual void setRate(double rate){
-    _robot.setRate(rate);
-  }
-  virtual void startLog(mwoibn::common::Logger& logger) = 0;
-  virtual void log(mwoibn::common::Logger& logger, double time) = 0;
+virtual void init() = 0;
+virtual void update() = 0;
+virtual void send() = 0;
+virtual void stop() = 0;
+virtual void close() = 0;
+virtual void setRate(double rate){
+        _robot.setRate(rate);
+}
+virtual void startLog(mwoibn::common::Logger& logger) = 0;
+virtual void log(mwoibn::common::Logger& logger, double time) = 0;
 protected:
-  mwoibn::robot_class::Robot& _robot;
+mwoibn::robot_class::Robot& _robot;
 };
 }
 }

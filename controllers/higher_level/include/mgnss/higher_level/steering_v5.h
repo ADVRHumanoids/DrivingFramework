@@ -18,7 +18,7 @@ Steering5(mwoibn::robot_class::Robot& robot,
           mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
           double margin = 0.04, double max = 2.79252680);
 
-~Steering5() {
+virtual ~Steering5() {
 }
 
 protected:

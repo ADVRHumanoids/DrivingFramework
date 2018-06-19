@@ -15,7 +15,7 @@ namespace tasks
 
 /**
  * @brief The CartesianWorld class Provides the inverse kinematics task
- ****to control the position of a point defined in one of a robot reference frames
+ *****to control the position of a point defined in one of a robot reference frames
  *
  */
 
@@ -33,7 +33,7 @@ CastorAngle(mwoibn::robot_class::Robot& robot,
 
 }   // for now just support major axes
 
-~CastorAngle() {
+virtual ~CastorAngle() {
 }
 
 void update()

@@ -23,7 +23,7 @@ class WheelsController : public mgnss::modules::Base
 public:
 WheelsController(mwoibn::robot_class::Robot& robot);
 
-~WheelsController() {
+virtual ~WheelsController() {
 }
 
 virtual void init() {

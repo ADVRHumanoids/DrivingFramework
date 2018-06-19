@@ -35,7 +35,7 @@ Contact(double dt)
 
 }
 
-~Contact() {
+virtual ~Contact() {
 }
 
 void setVelX(double vx) {

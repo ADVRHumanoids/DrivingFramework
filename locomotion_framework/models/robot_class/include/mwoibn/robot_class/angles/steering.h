@@ -10,7 +10,7 @@ namespace robot_class
 namespace angles {
 /**
  * @brief The CartesianWorld class Provides the inverse kinematics task
- ******************to control the position of a point defined in one of a robot reference frames
+ *******************to control the position of a point defined in one of a robot reference frames
  *
  */
 
@@ -29,7 +29,7 @@ Steering(mwoibn::robot_class::Robot& robot,
 
 }   // for now just support major axes
 
-~Steering() {
+virtual ~Steering() {
 }
 
 virtual void update()

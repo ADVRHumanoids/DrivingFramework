@@ -32,7 +32,7 @@ Robot(std::string config_file, std::string config_name,
         _robot.reset(create(config_file, config_name, secondary_file).release());
 }
 
-~Robot(){
+virtual ~Robot(){
 }
 
 mwoibn::robot_class::Robot& get(){

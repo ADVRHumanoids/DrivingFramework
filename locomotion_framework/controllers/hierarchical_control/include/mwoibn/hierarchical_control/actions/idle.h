@@ -12,7 +12,7 @@ public:
 Idle(tasks::BasicTask& task, memory::Manager& memory) : Primary(task, memory){
 }
 
-~Idle(){
+virtual ~Idle(){
 }
 
 virtual void run(){

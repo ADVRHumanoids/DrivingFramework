@@ -14,7 +14,7 @@ class WheeledMotionFull : public WheelsControllerExtend
 public:
 WheeledMotionFull(mwoibn::robot_class::Robot& robot);
 
-~WheeledMotionFull() {
+virtual ~WheeledMotionFull() {
 }
 
 

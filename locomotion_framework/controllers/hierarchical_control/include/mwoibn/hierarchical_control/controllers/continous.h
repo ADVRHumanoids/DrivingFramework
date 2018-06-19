@@ -17,7 +17,7 @@ Continous(mwoibn::robot_class::Robot& robot, double mu = 10000000) : Default(), 
 								__n_by_n2 = mwoibn::Matrix::Identity(_robot.getDofs(), _robot.getDofs());
 								_g_it = mwoibn::Matrix::Identity(_robot.getDofs(), _robot.getDofs());
 }
-~Continous(){
+virtual ~Continous(){
 }
 // void addTask(tasks::BasicTask& new_task, mwoibn::VectorN gain, int i = -1, double damp = 1e-8);
 virtual void addTask(tasks::BasicTask& new_task, mwoibn::VectorN gain,

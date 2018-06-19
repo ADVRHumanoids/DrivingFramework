@@ -20,7 +20,7 @@ Task(const Task& other) : Basic(other){
 const Task& operator=(const Task& task){
         return task;
 }
-~Task(){
+virtual ~Task(){
 }
 
 virtual actions::Primary& baseAction() = 0;

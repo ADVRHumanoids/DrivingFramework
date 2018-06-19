@@ -22,7 +22,7 @@ class WheelsControllerExtend : public WheelsController
 public:
 WheelsControllerExtend(mwoibn::robot_class::Robot& robot);
 
-~WheelsControllerExtend() {
+virtual ~WheelsControllerExtend() {
 }
 
 void resetSteering();

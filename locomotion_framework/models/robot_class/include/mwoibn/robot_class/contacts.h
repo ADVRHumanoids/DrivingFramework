@@ -22,7 +22,7 @@ Contacts(unsigned int dofs) : _dofs(dofs) {
         _boolean_checks.setConstant(false, _dofs);
 
 }
-~Contacts() {
+virtual ~Contacts() {
 }
 
 virtual void add(std::unique_ptr<ContactV2> contact)
@@ -40,13 +40,13 @@ virtual void resize(){
  * @brief removes contact from a stack
  *
  * function returnes false if given number is negative or it is bigger that
- ***current stack size
+ ****current stack size
  *
  * @param i - contact ID number
  *
  * @return whether a contact was removed succesfully, false will be returned
- ***if given reference number exceeds size of contacts vector, or negative value
- ***was send
+ ****if given reference number exceeds size of contacts vector, or negative value
+ ****was send
  *
  */
 virtual bool remove(int i);   // NRT

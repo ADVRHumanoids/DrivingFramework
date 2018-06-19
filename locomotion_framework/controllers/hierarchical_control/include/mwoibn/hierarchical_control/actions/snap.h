@@ -29,7 +29,7 @@ Snap& operator=(Snap& snap){
         return snap;
 }
 
-~Snap(){
+virtual ~Snap(){
 }
 
 virtual void run(){

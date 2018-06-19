@@ -26,7 +26,7 @@ BasicTask(int i, int dof){
         _init(i, dof);
 }
 
-~BasicTask(){
+virtual ~BasicTask(){
 }
 
 //! Returnes task Jacobian

@@ -16,7 +16,7 @@ class WheeledMotionEvent2 : public WheelsControllerExtend
 public:
 WheeledMotionEvent2(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& full_robot);
 
-~WheeledMotionEvent2() {
+virtual ~WheeledMotionEvent2() {
 }
 
 void updateBase(){

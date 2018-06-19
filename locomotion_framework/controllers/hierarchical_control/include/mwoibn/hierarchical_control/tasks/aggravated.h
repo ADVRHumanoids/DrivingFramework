@@ -19,7 +19,7 @@ public:
 Aggravated() : BasicTask() {
 }
 
-~Aggravated() {
+virtual ~Aggravated() {
 }
 
 //  //   add task at the end of the stack

@@ -43,7 +43,7 @@ mwoibn::robot_class::Robot& robot(){
         return *_robot_ptr;
 }
 
-~WheelsControllerExtend(){
+virtual ~WheelsControllerExtend(){
 }
 
 
@@ -73,7 +73,7 @@ class WheeledMotionEvent : public WheelsControllerExtend
 public:
 WheeledMotionEvent(int argc, char** argv) : WheelsControllerExtend(argc, argv){
 }
-~WheeledMotionEvent(){
+virtual ~WheeledMotionEvent(){
 }
 
 protected:
@@ -86,7 +86,7 @@ class WheeledMotionEvent3 : public WheelsControllerExtend {
 public:
 WheeledMotionEvent3(int argc, char** argv) : WheelsControllerExtend(argc, argv){
 }
-~WheeledMotionEvent3(){
+virtual ~WheeledMotionEvent3(){
 }
 
 protected:
@@ -99,7 +99,7 @@ class WheeledMotionWorld : public WheelsControllerExtend {
 public:
 WheeledMotionWorld(int argc, char** argv) : WheelsControllerExtend(argc, argv){
 }
-~WheeledMotionWorld(){
+virtual ~WheeledMotionWorld(){
 }
 
 protected:
@@ -114,7 +114,7 @@ public:
 WheeledMotionActions(int argc, char** argv) : WheelsControllerExtend(argc, argv){
 
 }
-~WheeledMotionActions(){
+virtual ~WheeledMotionActions(){
 }
 
 protected:

@@ -80,7 +80,7 @@ SteeringReference(mwoibn::robot_class::Robot& robot,
 
 }
 
-~SteeringReference() {
+virtual ~SteeringReference() {
 }
 
 const mwoibn::VectorN& get() {

@@ -16,7 +16,7 @@ class WheeledMotionCom : public WheelsControllerExtend
 public:
 WheeledMotionCom(mwoibn::robot_class::Robot& robot);
 
-~WheeledMotionCom() {
+virtual ~WheeledMotionCom() {
 }
 
 virtual void updateBase(){

@@ -29,7 +29,7 @@ Constraints(mwoibn::robot_class::Robot& robot)
         update();
 }
 
-~Constraints() {
+virtual ~Constraints() {
 }
 
 //! updates task error based on the current state of the robot and task reference position

@@ -44,7 +44,7 @@ Compute(Compute&& other) : Primary(std::move(other)), _gains(other._gains), _P(o
 
 }
 
-~Compute(){
+virtual ~Compute(){
 }
 
 virtual void run(){

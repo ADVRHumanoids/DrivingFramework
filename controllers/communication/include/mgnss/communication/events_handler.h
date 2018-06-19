@@ -22,7 +22,7 @@ EventHandler(mwoibn::hierarchical_control::tasks::CartesianSelective& tasks,
              mwoibn::point_handling::PositionsHandler& phs,
              mwoibn::hierarchical_control::controllers::Basic& controller,
              mwoibn::robot_class::Robot& robot);
-~EventHandler() {
+virtual ~EventHandler() {
 }
 
 bool claim(int i);

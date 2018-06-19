@@ -29,7 +29,7 @@ Camber(mwoibn::robot_class::Robot& robot,
 
 }   // for now just support major axes
 
-~Camber() {
+virtual ~Camber() {
 }
 
 virtual void update()

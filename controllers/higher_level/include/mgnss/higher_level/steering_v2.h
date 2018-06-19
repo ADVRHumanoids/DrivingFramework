@@ -17,7 +17,7 @@ Steering2(mwoibn::robot_class::Robot& robot,
           double K_icm, double K_sp, double dt, double margin = 0.04,
           double max = 2.79252680);
 
-~Steering2() {
+virtual ~Steering2() {
 }
 
 protected:

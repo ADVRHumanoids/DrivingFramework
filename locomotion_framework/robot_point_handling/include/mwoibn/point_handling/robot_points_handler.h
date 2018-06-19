@@ -7,7 +7,7 @@
 #include "mwoibn/point_handling/raw_orientations_handler.h"
 #include "mwoibn/point_handling/raw_full_states_handler.h"
 
-namespace mwoibn{
+namespace mwoibn {
 
 namespace point_handling
 {
@@ -16,94 +16,96 @@ namespace point_handling
 template <typename rawHandler, typename State> class RobotPointsHandler : public StatePointsHandler<rawHandler, State>
 {
 public:
-  RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot)
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
-  {
-  }
+RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot)
+        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
+{
+}
 
-  RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot)
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
-  {
-  }
+RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot)
+        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
+{
+}
 
-  RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot,
-                     std::vector<Point> points)
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
-  {
-  }
+RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot,
+                   std::vector<Point> points)
+        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
+{
+}
 
-  RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot,
-                     std::vector<Point> points)
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
-  {
-  }
+RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot,
+                   std::vector<Point> points)
+        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
+{
+}
 
-  template <typename Type, typename Vector>
-  RobotPointsHandler(Type chain_origin, mwoibn::robot_class::Robot& robot,
-                     Vector reference_frames,
-                     std::vector<State> states = {},
-                     std::vector<std::string> names = {})
-      : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), reference_frames,
-                   states, names)
-  {
-  }
+template <typename Type, typename Vector>
+RobotPointsHandler(Type chain_origin, mwoibn::robot_class::Robot& robot,
+                   Vector reference_frames,
+                   std::vector<State> states = {
+                   },
+                   std::vector<std::string> names = {})
+        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), reference_frames,
+                                                states, names)
+{
+}
 
-  RobotPointsHandler(RobotPointsHandler& other)
-      : StatePointsHandler<rawHandler, State>(other)
-  {
-  }
+RobotPointsHandler(RobotPointsHandler& other)
+        : StatePointsHandler<rawHandler, State>(other)
+{
+}
 
-  RobotPointsHandler(RobotPointsHandler&& other)
-      : StatePointsHandler<rawHandler, State>(std::move(other))
-  {
-  }
+RobotPointsHandler(RobotPointsHandler&& other)
+        : StatePointsHandler<rawHandler, State>(std::move(other))
+{
+}
 };
 
 //specific implementations
-class PositionsHandler: public RobotPointsHandler<RawPositionsHandler, Point::Position>{
+class PositionsHandler : public RobotPointsHandler<RawPositionsHandler, Point::Position>{
 public:
 
-  using RobotPointsHandler::RobotPointsHandler;
+using RobotPointsHandler::RobotPointsHandler;
 
-  PositionsHandler(PositionsHandler&& other)
-      : RobotPointsHandler<RawPositionsHandler, Point::Position>(std::move(other))
-  {
-  }
-  PositionsHandler(PositionsHandler& other)
-      : RobotPointsHandler<RawPositionsHandler, Point::Position>(other)
-  {
-  }
-  ~PositionsHandler(){}
+PositionsHandler(PositionsHandler&& other)
+        : RobotPointsHandler<RawPositionsHandler, Point::Position>(std::move(other))
+{
+}
+PositionsHandler(PositionsHandler& other)
+        : RobotPointsHandler<RawPositionsHandler, Point::Position>(other)
+{
+}
+virtual ~PositionsHandler(){
+}
 };
 
-class OrientationsHandler: public RobotPointsHandler<RawOrientationsHandler, Point::Orientation>{
+class OrientationsHandler : public RobotPointsHandler<RawOrientationsHandler, Point::Orientation>{
 public:
-  using RobotPointsHandler::RobotPointsHandler;
-  OrientationsHandler(OrientationsHandler&& other)
-      : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(std::move(other))
-  {
-  }
-  OrientationsHandler(OrientationsHandler& other)
-      : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(other)
-  {
-  }
-  ~OrientationsHandler(){}
+using RobotPointsHandler::RobotPointsHandler;
+OrientationsHandler(OrientationsHandler&& other)
+        : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(std::move(other))
+{
+}
+OrientationsHandler(OrientationsHandler& other)
+        : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(other)
+{
+}
+virtual ~OrientationsHandler(){
+}
 };
-class FullStatesHandler: public RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>{
+class FullStatesHandler : public RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>{
 public:
-  using RobotPointsHandler::RobotPointsHandler;
-  FullStatesHandler(FullStatesHandler&& other)
-      : RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>(std::move(other))
-  {
-  }
-  FullStatesHandler(FullStatesHandler& other)
-      : RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>(other)
-  {
-  }
-  ~FullStatesHandler(){}
+using RobotPointsHandler::RobotPointsHandler;
+FullStatesHandler(FullStatesHandler&& other)
+        : RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>(std::move(other))
+{
+}
+FullStatesHandler(FullStatesHandler& other)
+        : RobotPointsHandler<RawFullStatesHandler, mwoibn::Vector7>(other)
+{
+}
+virtual ~FullStatesHandler(){
+}
 };
 } // namespace package
 } // namespace library
 #endif // ROBOT_POINTS_HANDLER_H
-
-

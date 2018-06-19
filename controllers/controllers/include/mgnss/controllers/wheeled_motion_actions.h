@@ -20,7 +20,7 @@ public:
 WheeledMotionActions(mwoibn::robot_class::Robot& robot, std::string config_file);
 WheeledMotionActions(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
-~WheeledMotionActions() {
+virtual ~WheeledMotionActions() {
 }
 
 virtual void init();

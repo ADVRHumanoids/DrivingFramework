@@ -17,93 +17,96 @@ class CenterOfMass : public BasicTask
 {
 
 public:
-  /**
-   * @param[in] ik_ptr pointer to the point handler mamber that defines which
-   * point is controlled by this task instance
-   */
-  CenterOfMass(mwoibn::robot_class::Robot& robot,
-                   mwoibn::VectorN reference =
-                       mwoibn::VectorN::Zero(2))
-      : BasicTask(), _robot(robot), _reference(reference)
-  {
-    _init(2, robot.getDofs());
-    _robot.centerOfMass().update(true);
-    _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true);
-    _selector_dof = mwoibn::VectorBool::Constant(_robot.getDofs(), true);
+/**
+ * @param[in] ik_ptr pointer to the point handler mamber that defines which
+ * point is controlled by this task instance
+ */
+CenterOfMass(mwoibn::robot_class::Robot& robot,
+             mwoibn::VectorN reference =
+                     mwoibn::VectorN::Zero(2))
+        : BasicTask(), _robot(robot), _reference(reference)
+{
+        _init(2, robot.getDofs());
+        _robot.centerOfMass().update(true);
+        _selector = mwoibn::VectorBool::Constant(_robot.contacts().size(), true);
+        _selector_dof = mwoibn::VectorBool::Constant(_robot.getDofs(), true);
 //    _updateSelection();
 
-    //    _selector.resize(robot.getDofs(), true);
-    //    _updateSelection();
-  }
+        //    _selector.resize(robot.getDofs(), true);
+        //    _updateSelection();
+}
 
-  ~CenterOfMass() {}
+virtual ~CenterOfMass() {
+}
 
-  //! updates task error based on the current state of the robot and task
-  // reference position
-  virtual void updateError();
-  //! updates task Jacobian based on the current state of the robot
-  virtual void updateJacobian();
+//! updates task error based on the current state of the robot and task
+// reference position
+virtual void updateError();
+//! updates task Jacobian based on the current state of the robot
+virtual void updateJacobian();
 
-  //! updates task current state of the robot
-  virtual void update();
+//! updates task current state of the robot
+virtual void update();
 
-  //! sets task reference
-  template<typename Vector>
-  void setReference(const Vector& reference)
-  {
-    _reference[0] = reference[0];
-    _reference[1] = reference[1];
-  }
-  //! returnes task reference
-  const mwoibn::VectorN& getReference() { return _reference; }
+//! sets task reference
+template<typename Vector>
+void setReference(const Vector& reference)
+{
+        _reference[0] = reference[0];
+        _reference[1] = reference[1];
+}
+//! returnes task reference
+const mwoibn::VectorN& getReference() {
+        return _reference;
+}
 
-  //! returns chain associated with a specific contact to a Jacobian pool
-  virtual void releaseContact(int i)
-  {
-    _selector[i] = true;
-    _updateSelection();
-  }
+//! returns chain associated with a specific contact to a Jacobian pool
+virtual void releaseContact(int i)
+{
+        _selector[i] = true;
+        _updateSelection();
+}
 
-  //!
-  virtual void claimContact(int i)
-  {
-    _selector[i] = false;
-    _updateSelection();
-  }
+//!
+virtual void claimContact(int i)
+{
+        _selector[i] = false;
+        _updateSelection();
+}
 
-  virtual void setDofs(const mwoibn::VectorBool& dofs){
-    _selector_dof = dofs;
-  }
+virtual void setDofs(const mwoibn::VectorBool& dofs){
+        _selector_dof = dofs;
+}
 
 protected:
-  //!pointer to the point handler mamber for point controlled by this task
-  // instance
-  mwoibn::robot_class::Robot& _robot;
-  //! task reference position of a controlled point
-  mwoibn::VectorN _reference;
-  mwoibn::VectorBool _selector;
-  mwoibn::VectorBool _selector_dof;
+//!pointer to the point handler mamber for point controlled by this task
+// instance
+mwoibn::robot_class::Robot& _robot;
+//! task reference position of a controlled point
+mwoibn::VectorN _reference;
+mwoibn::VectorBool _selector;
+mwoibn::VectorBool _selector_dof;
 
-  void _updateSelection()
-  {
-    _selector_dof.setConstant(false);
+void _updateSelection()
+{
+        _selector_dof.setConstant(false);
 //    std::fill(_selector_dof.begin(), _selector_dof.end(), false);
-    for (int i = 0; i < _selector.size(); i++)
-    {
-      if (!_selector[i])
-        continue;
+        for (int i = 0; i < _selector.size(); i++)
+        {
+                if (!_selector[i])
+                        continue;
 
 
-      for (int k = 0; k < _robot.contacts().contact(i).getChain().size(); k++)
-        _selector_dof[_robot.contacts().contact(i).getChain()[k]] = true;
-    }
+                for (int k = 0; k < _robot.contacts().contact(i).getChain().size(); k++)
+                        _selector_dof[_robot.contacts().contact(i).getChain()[k]] = true;
+        }
 
-    //    for (int i = 0; i < _selector.size(); i++)
-    //      std::cout << i << "\t" << _selector[i] << "\n";
-    //    std::cout << std::endl;
+        //    for (int i = 0; i < _selector.size(); i++)
+        //      std::cout << i << "\t" << _selector[i] << "\n";
+        //    std::cout << std::endl;
 
-  } // in this case only contacts that are constraint are involved in a CoM
-  //  scheme
+}   // in this case only contacts that are constraint are involved in a CoM
+    //  scheme
 };
 }
 } // namespace package

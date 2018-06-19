@@ -50,14 +50,14 @@ Chain(mwoibn::robot_class::ContactV2& contact)
         //    }
 }
 
-~Chain() {
+virtual ~Chain() {
 }
 
 /**
  * @brief setAction sets new action for a chain
  * @param new_action
  * @return true if new action was properly set, false if new action
- ****contradicts current status or it is already set
+ *****contradicts current status or it is already set
  *
  */
 bool setAction(ACTION new_action)
@@ -177,7 +177,7 @@ BasicHandler(mwoibn::hierarchical_control::tasks::Constraints& constraints,
              mwoibn::robot_class::Robot& robot
              );
 
-~BasicHandler(){
+virtual ~BasicHandler(){
 }
 
 bool reset();
@@ -234,7 +234,7 @@ TrajectoryGenerator(mwoibn::point_handling::PositionsHandler& points) : _points(
         stop();
 
 }
-~TrajectoryGenerator(){
+virtual ~TrajectoryGenerator(){
 }
 
 bool circle(double r, double p2);

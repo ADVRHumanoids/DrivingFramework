@@ -17,7 +17,7 @@ public:
 WheeledMotionEvent(mwoibn::robot_class::Robot& robot, std::string config_file);
 WheeledMotionEvent(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
-~WheeledMotionEvent() {
+virtual ~WheeledMotionEvent() {
 }
 
 virtual void init();

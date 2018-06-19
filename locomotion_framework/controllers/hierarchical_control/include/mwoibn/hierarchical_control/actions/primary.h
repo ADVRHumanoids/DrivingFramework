@@ -16,7 +16,7 @@ Primary(const Primary& other) : Task(other), _task(other._task){
 }
 
 
-~Primary(){
+virtual ~Primary(){
 }
 
 virtual actions::Primary& baseAction() {

@@ -109,7 +109,7 @@ void init(const Dynamic_Matrix matrix,
 const Dynamic_Matrix& get() {
         return _inversedMatrix;
 }
-~PseudoInverse() {
+virtual ~PseudoInverse() {
 }
 
 protected:
@@ -192,7 +192,7 @@ Scalar damping(int i){
 const Dynamic_Matrix& get() const {
         return _inversed;
 }
-~PseudoInverse2() {
+virtual ~PseudoInverse2() {
 }
 
 protected:
@@ -279,7 +279,7 @@ const Dynamic_Matrix& getJacobian() const {
 }
 //  const Dynamic_Matrix& getDets() {return _dets[i];}
 
-~AgumentedNullSpaceProjection() {
+virtual ~AgumentedNullSpaceProjection() {
 }
 
 

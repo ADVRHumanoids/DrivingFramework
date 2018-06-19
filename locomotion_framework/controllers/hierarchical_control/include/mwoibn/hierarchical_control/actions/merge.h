@@ -49,7 +49,7 @@ Merge(actions::Compute& main_task, actions::Compute& secondary_task, TaskMap& ma
 
 }
 
-~Merge() {
+virtual ~Merge() {
 }
 
 virtual void run(){
@@ -75,7 +75,7 @@ mwoibn::VectorBool _current_id;
 std::vector<tasks::BasicTask> _support_tasks;
 std::unordered_map<mwoibn::VectorBool, actions::Compute, mwoibn::eigen_utils::Hasher> _support_actions;
 
-// std::vector<mwoibn::hierarchical_control::actions::Replace*> _active_stack; // how can I check active actions?
+std::vector<mwoibn::hierarchical_control::actions::Replace*> _active_stack; // how can I check active actions?
 actions::Snap _snap;
 std::vector<actions::Replace > _replace;
 TaskMap _map;

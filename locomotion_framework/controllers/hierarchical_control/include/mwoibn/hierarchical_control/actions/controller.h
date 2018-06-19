@@ -19,7 +19,7 @@ Controller(Controller& other) : Basic(other){
 Controller(const Controller& other) : Basic(other){
 }
 
-~Controller(){
+virtual ~Controller(){
 }
 
 };

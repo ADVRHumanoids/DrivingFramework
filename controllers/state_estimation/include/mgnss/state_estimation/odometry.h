@@ -20,7 +20,7 @@ Odometry(mwoibn::robot_class::Robot& robot, std::vector<std::string> names, doub
 Odometry(mwoibn::robot_class::Robot& robot, std::string config_file);
 Odometry(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
-~Odometry(){
+virtual ~Odometry(){
 }
 
 virtual void setRate(double rate){

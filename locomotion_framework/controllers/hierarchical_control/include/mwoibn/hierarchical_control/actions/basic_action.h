@@ -23,7 +23,7 @@ const Basic& operator=(const Basic& action){
 Basic(const Basic& other) : _memory(other._memory){
 }
 
-~Basic(){
+virtual ~Basic(){
 }
 
 virtual void run() = 0;

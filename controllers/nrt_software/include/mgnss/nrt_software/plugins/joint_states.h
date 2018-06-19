@@ -18,7 +18,7 @@ JointStates(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv){
         _init(argc, argv);
 }
 
-~JointStates(){
+virtual ~JointStates(){
 }
 
 protected:

@@ -24,7 +24,7 @@ virtual void init(){
         _findTasks();
 }
 
-~Wheels() {
+virtual ~Wheels() {
 }
 virtual void compute();
 

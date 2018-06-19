@@ -20,7 +20,7 @@ Odometry(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv){
 //  mgnss::modules::Base& get(){return *_controller_ptr;}
 //  mwoibn::robot_class::Robot& robot(){return *_robot_ptr;}
 
-~Odometry(){
+virtual ~Odometry(){
 }
 
 

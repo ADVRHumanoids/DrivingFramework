@@ -25,7 +25,7 @@ Basic(mwoibn::robot_class::Robot& robot,
         : _axis(axis), _point(point), _robot(robot){
 }    // for now just support major axes
 
-~Basic() {
+virtual ~Basic() {
 }
 
 virtual void update() = 0;

@@ -17,7 +17,7 @@ Secondary(memory::Manager& memory, TaskMap& map) : Task(memory), _map(map){
 const Secondary& operator=(const Secondary& secondary){
         return secondary;
 }
-~Secondary(){
+virtual ~Secondary(){
 }
 
 virtual void assign(actions::Task& action){

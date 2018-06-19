@@ -29,7 +29,7 @@ Caster(mwoibn::robot_class::Robot& robot,
 
 }   // for now just support major axes
 
-~Caster() {
+virtual ~Caster() {
 }
 
 virtual void update()

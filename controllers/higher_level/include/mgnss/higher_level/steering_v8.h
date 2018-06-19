@@ -18,7 +18,7 @@ Steering8(mwoibn::robot_class::Robot& robot,
           mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
           double margin_icm, double margin_sp, double margin = 0.04, double max = 2.79252680);
 
-~Steering8() {
+virtual ~Steering8() {
 }
 
 protected:

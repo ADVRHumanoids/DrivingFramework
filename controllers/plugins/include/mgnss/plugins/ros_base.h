@@ -15,7 +15,7 @@ class RosBase
 
 public:
 RosBase(int argc, char** argv);
-~RosBase(){
+virtual ~RosBase(){
 }
 
 virtual bool init();

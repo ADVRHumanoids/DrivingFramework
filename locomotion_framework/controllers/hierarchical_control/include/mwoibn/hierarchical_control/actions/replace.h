@@ -37,7 +37,7 @@ const Replace& operator=(const Replace& replace){
 }
 
 
-~Replace(){
+virtual ~Replace(){
 }
 
 void assign(actions::Task& task_new, actions::Task& task_old, actions::Snap& snap){

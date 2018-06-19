@@ -17,7 +17,7 @@ Steering4(mwoibn::robot_class::Robot& robot,
           double K_icm, double K_sp, double dt, double margin = 0.04,
           double max = 2.79252680);
 
-~Steering4() {
+virtual ~Steering4() {
 }
 
 //virtual void compute(const mwoibn::Vector3 next_step);

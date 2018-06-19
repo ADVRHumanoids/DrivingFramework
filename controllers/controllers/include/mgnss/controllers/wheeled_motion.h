@@ -16,7 +16,7 @@ class WheeledMotion : public mgnss::controllers::WheelsController
 public:
 WheeledMotion(mwoibn::robot_class::Robot& robot);
 
-~WheeledMotion() {
+virtual ~WheeledMotion() {
 }
 
 virtual void resetSteering();

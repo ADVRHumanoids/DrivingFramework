@@ -20,7 +20,7 @@ SupportPolygon2(double x, double y, double z) : Reference(12) {
 SupportPolygon2() : Reference(12) {
         _error.setZero(8);
 }
-~SupportPolygon2() {
+virtual ~SupportPolygon2() {
 }
 
 bool update()

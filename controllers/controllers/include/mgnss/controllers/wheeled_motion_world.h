@@ -18,7 +18,7 @@ WheeledMotionWorld(mwoibn::robot_class::Robot& robot,
                    std::string config_file);
 WheeledMotionWorld(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
-~WheeledMotionWorld() {
+virtual ~WheeledMotionWorld() {
 }
 
 virtual void init();

@@ -15,7 +15,7 @@ class JointStates : public mgnss::modules::Base
 public:
 JointStates(mwoibn::robot_class::Robot& robot);
 
-~JointStates() {
+virtual ~JointStates() {
 }
 
 bool setVelocity(std::string name, double vel);
