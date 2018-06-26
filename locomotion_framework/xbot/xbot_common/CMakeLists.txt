@@ -31,22 +31,27 @@ find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
   ${CATKIN_DEPENDS_BUILD}
 )
+find_package(matio REQUIRED)
+
+message(WARNING "MATIO_LIBRARY: " ${MATIO_LIBRARIES})
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS} ${XBotInterface_INCLUDE_DIRS} ${MATIO_INCLUDE_DIRS}
   LIBRARIES
         xbot_logger
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}
-        XBotInterface
+	XBotInterface
+	MATIO
 )
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${XBotInterface_INCLUDE_DIRS}
+  ${MATIO_INCLUDE_DIRS}
 )
 
 add_library(xbot_logger
@@ -61,6 +66,7 @@ add_dependencies(xbot_logger
 target_link_libraries(xbot_logger
    ${catkin_LIBRARIES}
    ${XBotInterface_LIBRARIES}
+   ${MATIO_LIBRARIES}
 )
 
 ## Mark executables and/or libraries for installation

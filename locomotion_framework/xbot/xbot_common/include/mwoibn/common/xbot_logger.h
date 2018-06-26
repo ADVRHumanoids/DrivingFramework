@@ -2,6 +2,7 @@
 #define __MWOIBN_COMMON_XBOT_LOGGER_H
 
 #include "mwoibn/common/logger.h"
+#include <matio.h>
 #include "XBotInterface/MatLogger.hpp"
 #include <iostream>
 #include <fstream>

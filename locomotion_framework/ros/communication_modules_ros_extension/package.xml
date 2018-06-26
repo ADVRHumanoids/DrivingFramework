@@ -20,7 +20,7 @@
   <depend>simple_log</depend> <!-- ALL -->
   <depend>robot_class</depend> <!-- ALL -->
 
-  <depend>custom_controller</depend>
+  <!--<depend>custom_controller</depend>-->
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -26,10 +26,10 @@ public:
 
   void addTask(ControllerTask& task, mwoibn::VectorBool selector);
   // add task at the end of the stack
-  void addTask(ControllerTask& task, int i);
+  void addTask(ControllerTask& task, unsigned int i);
 
 //  // i - zero based
-  void addTask(ControllerTask& task, mwoibn::VectorBool selector, int i);
+  void addTask(ControllerTask& task, mwoibn::VectorBool selector, unsigned int i);
 
   virtual void updateJacobian();
   //! generic function to provide the same syntax for error update of all

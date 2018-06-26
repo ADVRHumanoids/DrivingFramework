@@ -44,9 +44,8 @@ void mgnss::state_estimation::Odometry::_initConfig(YAML::Node config){
    _r = config["wheel_radius"].as<double>();
    _allocate(names);
    _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
-
-
 }
+
 void mgnss::state_estimation::Odometry::_checkConfig(YAML::Node config){
 
    if (!config["chain"])

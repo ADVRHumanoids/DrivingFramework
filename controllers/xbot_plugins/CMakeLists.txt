@@ -5,16 +5,19 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
-    message(WARNING "MO enable_xeno")
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+#LIST( APPEND CMAKE_MODULE_PATH ${YCM} )
+#LIST( APPEND CMAKE_MODULE_PATH ${DXBOTCORE} )
+
+#message(WARNING "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
 
 
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
    message(WARNING "enable_xeno")
-   find_package(Xenomai)
-   find_package(RTnet)
+   find_package(Xenomai REQUIRED)
+   find_package(RTnet REQUIRED)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -56,7 +59,6 @@ find_package(catkin REQUIRED COMPONENTS
 set(MASTER_PATH ${CMAKE_INSTALL_PREFIX})
 set(CMAKE_INSTALL_PREFIX ${ADVR_SUPERBUILD_DIR})
 
-message(WARNING "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
@@ -92,16 +94,16 @@ add_library(JointStates SHARED
     src/joint_states.cpp
 )
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(JointStates)
-endif()
+
 
 target_link_libraries(JointStates ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(JointStates ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 ycm_library_install(JointStates 1 0 0)
 
 LIST( APPEND INSTALL_TARGETS JointStates )
-
+if ( Xenomai_FOUND )
+    set_xeno_flags(JointStates)
+endif()
 ################################################
 ################### ODOMETRY ###################
 ################################################
@@ -110,78 +112,112 @@ add_library(Odometry SHARED
     src/odometry.cpp
 )
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(Odometry)
-endif()
-
 target_link_libraries(Odometry ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(Odometry ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 ycm_library_install(Odometry 1 0 0)
 
 LIST( APPEND INSTALL_TARGETS Odometry )
-
+if ( Xenomai_FOUND )
+    set_xeno_flags(Odometry)
+endif()
 ################################################
 ################## WHEELS NEW ##################
 ################################################
 
-add_library(WheelsV2 SHARED
-    src/wheels_controllers.cpp
-)
+#add_library(WheelsV2 SHARED
+#    src/wheels_controllers.cpp
+#)
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(WheelsV2)
-endif()
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsV2)
+#endif()
 
-target_link_libraries(WheelsV2 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
-add_dependencies(WheelsV2 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(WheelsV2 1 0 0)
+#target_link_libraries(WheelsEvents ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsEvents ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsEvents 1 0 0)
 
-LIST( APPEND INSTALL_TARGETS WheelsV2 )
-
-
-add_library(WheelsEvents SHARED
-    src/wheeled_motion_event.cpp
-)
-
-if ( Xenomai_FOUND )
-    set_xeno_flags(WheelsEvents)
-endif()
-
-target_link_libraries(WheelsEvents ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-add_dependencies(WheelsEvents ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(WheelsEvents 1 0 0)
-
-LIST( APPEND INSTALL_TARGETS WheelsEvents )
+#LIST( APPEND INSTALL_TARGETS WheelsEvents )
 
 
-add_library(WheelsEvents3 SHARED
-    src/wheeled_motion_event_3.cpp
-)
+#add_library(WheelsEvents3 SHARED
+#    src/wheeled_motion_event_3.cpp
+#)
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(WheelsEvents3)
-endif()
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsEvents3)
+#endif()
 
-target_link_libraries(WheelsEvents3 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-add_dependencies(WheelsEvents3 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(WheelsEvents3 1 0 0)
+#target_link_libraries(WheelsEvents3 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsEvents3 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsEvents3 1 0 0)
 
-LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
+#LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
 
 
-add_library(WheelsWorld SHARED
-    src/wheeled_motion_world.cpp
-)
+#add_library(WheelsWorld SHARED
+#    src/wheeled_motion_world.cpp
+#)
 
-if ( Xenomai_FOUND )
-    set_xeno_flags(WheelsWorld)
-endif()
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsWorld)
+#endif()
 
-target_link_libraries(WheelsWorld ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-add_dependencies(WheelsWorld ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(WheelsWorld 1 0 0)
+#target_link_libraries(WheelsWorld ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsWorld ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsWorld 1 0 0)
 
-LIST( APPEND INSTALL_TARGETS WheelsWorld )
+#LIST( APPEND INSTALL_TARGETS WheelsWorld )
+
+#target_link_libraries(WheelsV2 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+#add_dependencies(WheelsV2 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsV2 1 0 0)
+
+#LIST( APPEND INSTALL_TARGETS WheelsV2 )
+
+
+#add_library(WheelsEvents SHARED
+#    src/wheeled_motion_event.cpp
+#)
+
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsEvents)
+#endif()
+
+#target_link_libraries(WheelsEvents ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsEvents ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsEvents 1 0 0)
+
+#LIST( APPEND INSTALL_TARGETS WheelsEvents )
+
+
+#add_library(WheelsEvents3 SHARED
+#    src/wheeled_motion_event_3.cpp
+#)
+
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsEvents3)
+#endif()
+
+#target_link_libraries(WheelsEvents3 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsEvents3 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsEvents3 1 0 0)
+
+#LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
+
+
+#add_library(WheelsWorld SHARED
+#    src/wheeled_motion_world.cpp
+#)
+
+#if ( Xenomai_FOUND )
+#    set_xeno_flags(WheelsWorld)
+#endif()
+
+#target_link_libraries(WheelsWorld ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
+#add_dependencies(WheelsWorld ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
+#ycm_library_install(WheelsWorld 1 0 0)
+
+#LIST( APPEND INSTALL_TARGETS WheelsWorld )
 
 #################################################
 ###### GENERAL CNETRALIZED CONTROLLER plugin ####
@@ -237,11 +273,16 @@ LIST( APPEND INSTALL_TARGETS WheelsWorld )
 #################### INSTALL ####################
 #################################################
 
+message(WARNING "CMAKE_INSTALL_PREFIX: " ${ADVR_SUPERBUILD_DIR}/build/install/lib/)
+message(WARNING "INSTALL_TARGETS: " ${INSTALL_TARGETS})
+
+
+
 # Mark executables and/or libraries for installation
  install(TARGETS ${INSTALL_TARGETS}
-   ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
-   LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
-   RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/bin/
+   ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/lib/
+   LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/lib/
+   RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/bin/
  )
 
 # Mark cpp header files for installation

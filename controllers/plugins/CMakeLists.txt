@@ -6,16 +6,19 @@ set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+#LIST( APPEND CMAKE_MODULE_PATH ${XBOTCORE} )
+
+message(WARNING "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
 
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
-   find_package(Xenomai)
-   find_package(RTnet)
+   find_package(Xenomai REQUIRED)
+   find_package(RTnet REQUIRED)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 
 include_directories(${CMAKE_BINARY_DIR})
 configure_file(
@@ -37,6 +40,10 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   modules
   roscpp
+  mwoibn_xbot_common
+  mwoibn_ros_common
+  loaders
+
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -93,7 +100,7 @@ if ( Xenomai_FOUND )
     set_xeno_flags(BasePlugin)
 endif()
 
-        target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(BasePlugin ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 
 LIST( APPEND INSTALL_TARGETS BasePlugin )

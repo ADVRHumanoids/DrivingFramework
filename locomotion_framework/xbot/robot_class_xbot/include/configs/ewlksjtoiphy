@@ -18,14 +18,13 @@ MasterCommunicationInterface:
 
 XBotRTPlugins:
 #  plugins: ["Odometry", "JointStates", "WheelsV2"]
-  plugins: ["JointStates", "Odometry", "WheelsV2"]
+  plugins: ["JointStates"]
 #  plugins: ["JointStates", "Odometry"]
   io_plugins: []
   
 NRTPlugins:
 #  plugins: ["HomingExample"]
   plugins: []
-
 WebServer:
   enable: "false"
   address: "127.0.0.1"
@@ -76,25 +75,6 @@ GazeboXBotPlugin:
     j_wheel_2: *wheel
     j_wheel_3: *wheel
     j_wheel_4: *wheel
-
-#mwoibnRobot:
-#  robot:
-#        config_file: &config /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
-#        config_name: default
-#        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-#  robot2:
-#        config_file: *config
-#        config_name: odometry
-#        secondary_file: *config_lower
-#  robot3:
-#        config_file: *config
-#        config_name: joint_space
-#  higher_scheme:
-#        config_file: *config
-#        config_name: higher_scheme
-#  default:
-#        config_file: *config
-#        config_name: default
 
 mwoibn:
    config_file: &config /home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2_5.yaml
