@@ -41,9 +41,10 @@ include_directories(
 
 add_library(odometry
    src/odometry.cpp
+   src/odometry_v2.cpp
 )
 
-add_dependencies(odometry 
+add_dependencies(odometry
    ${catkin_EXPORTED_TARGETS}
 )
 

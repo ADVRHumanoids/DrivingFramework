@@ -187,6 +187,7 @@ endif(TEST_TEMP)
 if(ODOMETRY)
   LIST( APPEND INSTALL_TARGETS
     odometry
+    odometry2
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -362,6 +363,13 @@ target_link_libraries(odometry
     nrt_plugins
     ${catkin_LIBRARIES}
  )
+
+ add_executable(odometry2 src/exec/odometry_2.cpp)
+ add_dependencies(odometry2 nrt_plugins ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(odometry2
+     nrt_plugins
+     ${catkin_LIBRARIES}
+  )
 endif(ODOMETRY)
 
 if(TEST_TEMP)

@@ -147,46 +147,57 @@ void mgnss::state_estimation::Odometry::init(){
 
 void mgnss::state_estimation::Odometry::update()
 {
-        //_begin = std::chrono::high_resolution_clock::now();
+        //Get wheels position
         _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
 
+        // Compute a difference
         _error.noalias() = _state - _previous_state;
 
+        // which legs are in ground contact
         _selector.noalias() = _contacts;
+
         // estimate postion of each wheel
         for (int i = 0; i < _state.size(); i++)
         {
+                // compute world position of the wheel axis
                 _directions[i] = _wheels_ph.point(i)
                                  .getRotationWorld(_robot.state.get(
                                                            mwoibn::robot_class::INTERFACE::POSITION))
                                  .col(2); // z axis
 
-                _directions[i] = _directions[i].cross(_axes[i]); //?
+                // compute the wheel direction of motion
+                _directions[i] = _directions[i].cross(_axes[i]);
+
                 _directions[i].normalize();
-
+                // compute the distance travelled
                 _error[i] *= _r;
-
+                // estimate current contact point position
                 _estimated[i] += _directions[i] * _error[i];
 
         }
 
         for (int i = 0; i < _wheels_ph.size(); i++) {
+                // compute the distance between the contact point and base origin
                 _contact_points[i] = _wheels_ph.getPointStateWorld(i);
+                // estimate the state for each leg
                 _pelvis[i] = _estimated[i] - _contact_points[i];
         }
 
+        // choose the solution
         _compute2(); // this seems to be the best
 
+        // add imu reading
         _base.tail(3) =
                 _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
 
+        // clear estimation based on a final result
         for(int i = 0; i < _wheels_ph.size(); i++)
                 _estimated[i] = _base.head<3>() + _contact_points[i];
 
         _base_pos = _base.head(3);
-
         _base_raw = _base;
 
+        // filter the results
         _filter_ptr->update(_base_pos);
 
         _base.head(3) = _base_pos;
