@@ -248,7 +248,7 @@ Mappings<MapState> _group_states;
  *  unactuated joints: 0
  *
  * More specialized classes may add more specific infomration (reference
- **controller, broken joints)
+ ***controller, broken joints)
  */
 Eigen::VectorXi _actuation;
 
@@ -271,7 +271,6 @@ virtual void _initModel(bool is_static, const std::string& source, RigidBodyDyna
 
 virtual void _loadContacts(YAML::Node contacts_config);
 virtual void _loadActuators(YAML::Node actuators_config);
-//  virtual void _loadFeedback(YAML::Node config, YAML::Node robot);
 virtual void _loadConfig(YAML::Node config, YAML::Node robot);
 
 virtual void _loadFeedbacks(YAML::Node config) {

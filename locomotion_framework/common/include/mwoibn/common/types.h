@@ -12,6 +12,7 @@
 
 #include <rbdl/rbdl.h>
 
+#include "mwoibn/std_utils/std_utils.h"
 
 #ifdef QUATERNION_RBDL
   #include "mwoibn/rbdl_utils/rbdl_utils.h"
