@@ -20,7 +20,7 @@ FIND_PATH (RBDL_INCLUDE_DIR rbdl/rbdl.h
 	$ENV{RBDL_PATH}/src
 	$ENV{RBDL_PATH}/include
 	$ENV{RBDL_INCLUDE_PATH}
-	${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/include
+	${ADVR_SUPERBUILD_DIR}/build/install/include
 	/usr/local/include
 	/usr/include
 	)
@@ -35,7 +35,7 @@ FIND_LIBRARY (RBDL_LIBRARY NAMES rbdl
 	/usr/local/lib/x86_64-linux-gnu
 	/usr/lib
 	/usr/lib/x86_64-linux-gnu
-        ${ADVR_SUPERBUILD_DIR}/advr-superbuild/build/install/lib
+        ${ADVR_SUPERBUILD_DIR}/build/install/lib
 	)
 
 FIND_PATH (RBDL_LuaModel_INCLUDE_DIR rbdl/addons/luamodel/luamodel.h

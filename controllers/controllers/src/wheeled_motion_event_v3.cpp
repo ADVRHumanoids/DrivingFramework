@@ -1,6 +1,6 @@
-#include "mgnss/controllers/wheeled_motion_event_v3.h"
-#include "mgnss/higher_level/steering_v8.h"
-#include <mwoibn/hierarchical_control/tasks/cartesian_simplified_pelvis_task_v7.h>
+#include <mgnss/controllers/wheeled_motion_event_v3.h>
+#include <mgnss/controllers/steering_v8.h>
+#include <mwoibn/hierarchical_control/cartesian_simplified_pelvis_task_v7.h>
 
 mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         mwoibn::robot_class::Robot& robot, std::string config_file)
@@ -12,11 +12,11 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         _y << 0, 1, 0;
         _z << 0, 0, 1;
 
-        _createTasks(config);
+        _createTasks();
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
+        _steering_ref_ptr.reset(new mgnss::events::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
@@ -24,11 +24,11 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
-        _createTasks(config);
+        _createTasks();
         _initIK(config);
         _allocate();
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
+        _steering_ref_ptr.reset(new mgnss::events::Steering8(
                                         _robot, *_steering_ptr, _support_vel, _test_steer, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
 }
 
@@ -56,60 +56,74 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
-        // int task = 0;
-        double ratio = config["ratio"].as<double>(); // 4
+        int task = 0;
+        double ratio = config["ratio"].as<double>(); //
+
         double damp = config["damping"].as<double>();
         // Set initaial HC tasks
-        _hierarchical_controller_ptr->addTask(*_constraints_ptr, config["constraints"].as<double>(), damp);
-        _hierarchical_controller_ptr->addTask(_leg_steer, config["leg_steer"].as<double>() * ratio, damp);
+        mwoibn::VectorN gain(1);
+        gain << config["constraints"].as<double>();
+        _hierarchical_controller.addTask(_constraints_ptr.get(), gain, task, damp);
+        task++;
+        gain << config["leg_steer"].as<double>() * ratio; // 30
+
+        _hierarchical_controller.addTask(_leg_steer_ptr.get(), gain, task, damp);
+        task++;
 
         mwoibn::VectorN gain_base(6);
         gain_base.head<3>() = mwoibn::VectorN::Constant(3, config["base_orinetation"].as<double>() * ratio);
         gain_base[3] = config["centre_of_mass_x"].as<double>() * ratio;
         gain_base[4] = config["centre_of_mass_y"].as<double>() * ratio;
         gain_base[5] = config["base_position"].as<double>() * ratio;
-        _hierarchical_controller_ptr->addTask(*_world_posture_ptr, gain_base,  damp);
 
-        _hierarchical_controller_ptr->addTask(*_steering_ptr, config["contact_point"].as<double>() * ratio, damp);
-        _hierarchical_controller_ptr->addTask(_leg_camber, config["camber"].as<double>() * ratio, config["camber_damp"].as<double>());
-        _hierarchical_controller_ptr->addTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
+        _hierarchical_controller.addTask(_world_posture_ptr.get(), gain_base, task,  damp);
+        task++;
+        gain << config["contact_point"].as<double>() * ratio; // 15
+        _hierarchical_controller.addTask(_steering_ptr.get(), gain, task, damp);
+        task++;
+        gain << config["camber"].as<double>() * ratio; // 40
+        _hierarchical_controller.addTask(_leg_camber_ptr.get(), gain, task, config["camber_damp"].as<double>());
+        task++;
+        gain << config["castor"].as<double>() * ratio; // 18
+        _hierarchical_controller.addTask(_leg_castor_ptr.get(), gain, task, config["castor_damp"].as<double>());
+        task++;
 
-        _hierarchical_controller_ptr->update();
+        _hierarchical_controller.update();
 
 }
 
-void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
+void mgnss::controllers::WheeledMotionEvent3::_createTasks(){
         // Set-up hierachical controller
         _constraints_ptr.reset(
-                new mwoibn::hierarchical_control::tasks::Constraints(_robot));
+                new mwoibn::hierarchical_control::ConstraintsTask(_robot));
         mwoibn::Vector3 pelvis;
         pelvis << 0, 0, 1;
         mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
                                                            _robot.getLinks("base"));
         _pelvis_position_ptr.reset(
-                new mwoibn::hierarchical_control::tasks::CartesianSelective(pelvis_ph,
-                                                                            pelvis));
+                new mwoibn::hierarchical_control::CartesianSelectiveTask(pelvis_ph,
+                                                                         pelvis));
         pelvis << 1, 1, 1;
         _pelvis_orientation_ptr.reset(
-                new mwoibn::hierarchical_control::tasks::OrientationSelective(
+                new mwoibn::hierarchical_control::OrientationSelectiveTask(
                         mwoibn::point_handling::OrientationsHandler("ROOT", _robot,
                                                                     _robot.getLinks("base")),
                         pelvis, _robot));
 
 
-        _com_ptr.reset(new mwoibn::hierarchical_control::tasks::CenterOfMass(_robot));
+        _com_ptr.reset(new mwoibn::hierarchical_control::CenterOfMassTask(_robot));
 
         _com_ptr->setDofs(_robot.selectors().get("lower_body").getBool());
 
         _steering_ptr.reset(
-                new mwoibn::hierarchical_control::tasks::CartesianFlatReference4(
+                new mwoibn::hierarchical_control::CartesianFlatReferenceTask4(
                         mwoibn::point_handling::PositionsHandler("ROOT", _robot,
                                                                  _robot.getLinks("wheels")),
                         _robot, *_com_ptr.get()));
 
         _createAngleTasks();
 
-        _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
+        _world_posture_ptr.reset(new mwoibn::hierarchical_control::AggravatedTask());
 
         _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
         _world_posture_ptr->addTask(*_com_ptr);
@@ -372,7 +386,7 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
 //  logger.addField("r_st_3", refSteer()[2]);
 //  logger.addField("r_st_4", refSteer()[3]);
 //  logger.addField("st_1", getSteer()[0]);
-        logger.addField("st_2", getSteer(1));
+        logger.addField("st_2", getSteer()[1]);
 //  logger.addField("st_3", getSteer()[2]);
 //  logger.addField("st_4", getSteer()[3]);
 
@@ -497,7 +511,7 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 //  logger.addEntry("r_st_3", refSteer()[2]);
 //  logger.addEntry("r_st_4", refSteer()[3]);
 //  logger.addEntry("st_1", getSteer()[0]);
-        logger.addEntry("st_2", getSteer(1));
+        logger.addEntry("st_2", getSteer()[1]);
 //  logger.addEntry("st_3", getSteer()[2]);
 //  logger.addEntry("st_4", getSteer()[3]);
 
