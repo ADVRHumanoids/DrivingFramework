@@ -37,6 +37,9 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   modules
   roscpp
+  mwoibn_xbot_common
+  mwoibn_ros_common
+  loaders
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -67,14 +70,14 @@ include_directories(
 )
 
 catkin_package(
-  INCLUDE_DIRS 
-        include 
-        ${catkin_INCLUDE_DIRS}   
+  INCLUDE_DIRS
+        include
+        ${catkin_INCLUDE_DIRS}
         ${XCM_INCLUDE_DIRS}
-  LIBRARIES 
+  LIBRARIES
         BasePlugin
         ${XCM_LIBRARIES}
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}

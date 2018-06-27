@@ -136,6 +136,7 @@ if(WHEELS_MOTION)
     wheels
     wheels_3
     wheels_actions
+    wheels_merge_1
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -345,6 +346,13 @@ target_link_libraries(wheels_world
     nrt_plugins
     ${catkin_LIBRARIES}
  )
+
+ add_executable(wheels_merge_1 src/exec/wheels_merge_1.cpp)
+ add_dependencies(wheels_merge_1 nrt_plugins ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(wheels_merge_1
+     nrt_plugins
+     ${catkin_LIBRARIES}
+  )
 endif(WHEELS_MOTION)#############
 
 if(ODOMETRY)

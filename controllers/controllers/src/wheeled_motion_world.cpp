@@ -9,7 +9,7 @@ mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
 
-        _createTasks();
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -22,7 +22,7 @@ mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
-        _createTasks();
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -31,7 +31,7 @@ mgnss::controllers::WheeledMotionWorld::WheeledMotionWorld(
 }
 
 
-void mgnss::controllers::WheeledMotionWorld::_createTasks(){
+void mgnss::controllers::WheeledMotionWorld::_createTasks(YAML::Node config){
 
 
         // Set-up hierachical controller

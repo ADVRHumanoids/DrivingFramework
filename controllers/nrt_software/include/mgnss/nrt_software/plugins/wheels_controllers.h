@@ -8,9 +8,11 @@
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/controllers/wheeled_motion_world.h"
 #include "mgnss/controllers/wheeled_motion_actions.h"
+#include "mgnss/controllers/wheeled_motion_merge_v1.h"
 
 #include "mgnss/ros_callbacks/wheels_controller_extend.h"
 #include "mgnss/ros_callbacks/wheels_controller_actions.h"
+
 
 namespace mgnss {
 namespace nrt_software {
@@ -126,6 +128,19 @@ virtual void _initCallbacks(){
                                        custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_actions::eventsHandler,
                                                                                                                _1, _2, static_cast<mgnss::controllers::WheeledMotionActions*>(_controller_ptr.get())));
         _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+}
+};
+
+class WheeledMotionMergeV1 : public WheeledMotionActions {
+public:
+WheeledMotionMergeV1(int argc, char** argv) : WheeledMotionActions(argc, argv){
+}
+virtual ~WheeledMotionMergeV1(){
+}
+
+protected:
+virtual void _resetPrt(YAML::Node config){
+        _controller_ptr.reset(new mgnss::controllers::WheeledMotionMergeV1(*_robot_ptr, config));
 }
 };
 

@@ -3,6 +3,8 @@
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/hierarchical_control/actions/task.h"
+#include "mwoibn/hierarchical_control/maps/task_map.h"
+#include "mwoibn/hierarchical_control/actions/primary.h"
 
 namespace mwoibn {
 namespace hierarchical_control {
@@ -10,9 +12,9 @@ namespace actions {
 
 class Secondary : public Task {
 public:
-Secondary(actions::Task& action, memory::Manager& memory, TaskMap& map) : Task(memory), _action(&action), _map(map){
+Secondary(actions::Task& action, memory::Manager& memory, maps::TaskMap& map) : Task(memory), _action(&action), _map(map){
 }
-Secondary(memory::Manager& memory, TaskMap& map) : Task(memory), _map(map){
+Secondary(memory::Manager& memory, maps::TaskMap& map) : Task(memory), _map(map){
 }
 const Secondary& operator=(const Secondary& secondary){
         return secondary;
@@ -27,7 +29,7 @@ virtual void assign(actions::Task& action){
 
 virtual void release(){
         _next = _action;
-        _map[&_action->baseAction().getTask()] = _action;
+        _map.swap(_action->baseAction().getTask(), *_action); // should this be a swap or operator
         _memory.release(*this);
 }
 
@@ -53,7 +55,7 @@ protected:
 // }
 actions::Task* _action;
 //actions::Task* _next;
-TaskMap& _map;
+maps::TaskMap& _map;
 };
 
 }

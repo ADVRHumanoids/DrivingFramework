@@ -1,27 +1,30 @@
-#ifndef __MWOIBN_HIERARCHICAL_CONTROL_CONTROLLERS_ACTIONS_H
-#define __MWOIBN_HIERARCHICAL_CONTROL_CONTROLLERS_ACTIONS_H
+#ifndef __MWOIBN_HIERARCHICAL_CONTROL_CONTROLLERS__ACTIONS_H
+#define __MWOIBN_HIERARCHICAL_CONTROL_CONTROLLERS__ACTIONS_H
 
 
 #include "mwoibn/hierarchical_control/controllers/basic.h"
 
-#include "mwoibn/hierarchical_control/actions/basic_action.h"
+#include "mwoibn/hierarchical_control/actions/basic.h"
 #include "mwoibn/hierarchical_control/actions/task.h"
+#include "mwoibn/hierarchical_control/maps/actions_map.h"
 
 #include "mwoibn/hierarchical_control/actions/idle.h"
 #include "mwoibn/hierarchical_control/actions/snap.h"
 #include "mwoibn/hierarchical_control/actions/replace.h"
-#include "mwoibn/hierarchical_control/controllers/memory_manager.h"
+#include "mwoibn/hierarchical_control/actions/static_replace.h"
+
+#include "mwoibn/hierarchical_control/memory/manager.h"
+#include "mwoibn/hierarchical_control/state.h"
 
 
 namespace mwoibn {
 namespace hierarchical_control {
 namespace controllers {
 
-
 class Actions : public Basic
 {
 public:
-Actions(double dt, unsigned int dofs);
+Actions(double dt, unsigned int dofs); // what should be allocated should come from external sources, also type of the action
 virtual ~Actions() {
 }
 virtual void init(){
@@ -43,6 +46,7 @@ virtual void idleTask(tasks::BasicTask& new_task, mwoibn::VectorN gain,
                       double damping = 1e-8);
 virtual void idleTask(tasks::BasicTask& new_task, double gain,
                       double damping = 1e-8);
+
 
 virtual actions::Replace* replace(tasks::BasicTask& task, double mu);
 
@@ -67,6 +71,30 @@ bool updateGain(tasks::BasicTask& task, double gain);
 virtual int size(){
         return _active_stack.size();
 }
+
+// add action ad the end of the stack
+virtual void addAction(actions::Task& task){
+        if(_map.exist(task.baseAction().getTask()))
+                _map[task.baseAction().getTask()]->swap(task);
+        else
+                _map.swap(task.baseAction().getTask(), task);
+        _active_stack.push_back(&task);
+
+        std::cout << "hierarchical_control::addAction: added action at the end of the stack" << std::endl;
+}
+
+maps::ActionsMap& map(){
+        return _map;
+}
+
+State& state(){
+        return _state;
+}
+
+actions::Task& getAction(tasks::BasicTask& task){
+        return *_map[task];
+}
+
 protected:
 /** \brief Comprises pointers to all of the tasks,
  * in the priority order.
@@ -83,16 +111,18 @@ bool _setIdle(tasks::BasicTask& new_task);
 std::vector<actions::Task* > _active_stack;
 
 std::vector<actions::Snap > _snap;
-std::vector<actions::Replace > _replace;
+std::vector<actions::StaticReplace > _replace;
 std::vector<actions::Secondary > _secondary;
 
 std::vector<std::unique_ptr<actions::Task> > _actions_set;
 
-TaskMap _map;
+maps::ActionsMap _map;
 memory::Manager _memory;
 
 mwoibn::Matrix _P;
 double _dofs, _dt;
+
+State _state;
 
 };
 }

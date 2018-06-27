@@ -622,6 +622,7 @@ mwoibn:
                                         damp_icm: 0.00000000001
                                         damp_sp: 0.015
                                         tracking_gain: 200.0
+                                        camber_tolerance: 0.005
                                 odom_NRT_6: # smooth tasks
                                         ratio: 1.0
                                         damping: 0.0001

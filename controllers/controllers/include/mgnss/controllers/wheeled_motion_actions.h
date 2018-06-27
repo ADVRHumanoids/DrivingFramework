@@ -6,7 +6,7 @@
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 #include <mwoibn/hierarchical_control/controllers/actions.h>
 
-#include <mwoibn/hierarchical_control/actions/merge.h>
+// #include <mwoibn/hierarchical_control/actions/merge.h>
 
 namespace mgnss
 {
@@ -152,7 +152,12 @@ const mwoibn::VectorN& pureSteer(){
 }
 
 
+
+
 protected:
+WheeledMotionActions(mwoibn::robot_class::Robot& robot) : WheelsControllerExtend(robot){
+}
+
 void _allocate(YAML::Node config);
 
 std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
@@ -166,10 +171,10 @@ mwoibn::VectorBool _resteer;
 mwoibn::VectorN _com_ref;
 
 virtual void _correct();
-
+void _createAngleTasks(YAML::Node config);
 virtual void _setInitialConditions();
 virtual void _allocate();
-virtual void _createTasks();
+virtual void _createTasks(YAML::Node config);
 virtual void _initIK(YAML::Node config);
 
 

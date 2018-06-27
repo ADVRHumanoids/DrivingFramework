@@ -12,7 +12,7 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         _y << 0, 1, 0;
         _z << 0, 0, 1;
 
-        _createTasks();
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -24,7 +24,7 @@ mgnss::controllers::WheeledMotionEvent3::WheeledMotionEvent3(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
-        _createTasks();
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -78,7 +78,7 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
 
 }
 
-void mgnss::controllers::WheeledMotionEvent3::_createTasks(){
+void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         // Set-up hierachical controller
         _constraints_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::Constraints(_robot));

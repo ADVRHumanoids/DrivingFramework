@@ -18,9 +18,9 @@ Snap(mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Con
         _P_snap = _P;
         _command_snap = _command;
 }
-Snap(Snap& other) : Controller(other), _P(other._P), _command(other._command){
+Snap(Snap& other) : Controller(other), _P(other._P), _command(other._command), _command_snap(other._command_snap){
 }
-Snap(const Snap& other) : Controller(other), _P(other._P), _command(other._command){
+Snap(const Snap& other) : Controller(other), _P(other._P), _command(other._command), _command_snap(other._command_snap){
 }
 const Snap& operator=(const Snap& snap){
         return snap;

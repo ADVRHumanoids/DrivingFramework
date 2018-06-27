@@ -2,7 +2,7 @@
 #define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_CONTROLLER_H
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
-#include "mwoibn/hierarchical_control/actions/basic_action.h"
+#include "mwoibn/hierarchical_control/actions/basic.h"
 
 namespace mwoibn {
 namespace hierarchical_control {

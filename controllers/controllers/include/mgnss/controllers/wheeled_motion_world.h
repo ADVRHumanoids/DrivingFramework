@@ -155,7 +155,7 @@ mwoibn::VectorBool _resteer;
 
 virtual void _setInitialConditions();
 virtual void _allocate();
-virtual void _createTasks();
+virtual void _createTasks(YAML::Node config);
 virtual void _initIK(YAML::Node config);
 
 virtual void _correct();

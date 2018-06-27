@@ -95,8 +95,8 @@ mwoibn::hierarchical_control::tasks::Aggravated _leg_camber;
 mwoibn::hierarchical_control::tasks::Aggravated _leg_castor;
 mwoibn::hierarchical_control::tasks::Aggravated _leg_steer;
 
-void _createAngleTasks();
-void _setInitialConditions();
+virtual void _createAngleTasks();
+virtual void _setInitialConditions();
 
 };
 }

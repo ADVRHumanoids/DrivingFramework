@@ -1,7 +1,7 @@
-#ifndef __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_BASIC_ACTION_H
-#define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_BASIC_ACTION_H
+#ifndef __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS__BASIC_H
+#define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS__BASIC_H
 
-#include "mwoibn/hierarchical_control/controllers/memory_manager.h"
+#include "mwoibn/hierarchical_control/memory/manager.h"
 
 namespace mwoibn {
 namespace hierarchical_control {

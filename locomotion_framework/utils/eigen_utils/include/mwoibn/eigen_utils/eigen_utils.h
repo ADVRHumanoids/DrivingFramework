@@ -134,6 +134,19 @@ PseudoInverse2(const Dynamic_Matrix matrix,
         init(matrix, damping);
         // compute(matrix);
 }
+
+PseudoInverse2(
+        const PseudoInverse2 &other) : _inverse_ptr(std::move(other._inverse_ptr)), _damping(other._damping),  _transposed(other._transposed), _inversed(other._inversed), _squared(other._squared), _identity(other._identity), _type(other._type)
+{
+}
+
+PseudoInverse2(
+        PseudoInverse2&& other) : _inverse_ptr(std::move(other._inverse_ptr)), _damping(other._damping),  _transposed(other._transposed), _inversed(other._inversed), _squared(other._squared), _identity(other._identity), _type(other._type)
+{
+
+}
+
+
 PseudoInverse2() {
 }
 
@@ -165,6 +178,7 @@ void init(const Dynamic_Matrix matrix, Scalar damping){
 void init(const Dynamic_Matrix matrix, Eigen::Matrix<Scalar, 1, Eigen::Dynamic> damping){
         if(damping.size() != std::min(matrix.rows(), matrix.cols()))
                 throw(std::invalid_argument("Couldn't initialize pseudo inverse, incompatibile damping size"));
+        _damping = damping;
         init(matrix);
 }
 
@@ -244,6 +258,16 @@ AgumentedNullSpaceProjection(
         _jacobian.setZero(matrix.rows(), matrix.cols());
         _inverser.init(matrix, damping);
 //    _dets.setZero(matrix.rows());
+}
+
+AgumentedNullSpaceProjection(
+        const AgumentedNullSpaceProjection& other) : _jacobian(other._jacobian), _projector(other._projector), _inverser(other._inverser)
+{
+}
+
+AgumentedNullSpaceProjection(
+        AgumentedNullSpaceProjection&& other) : _jacobian(other._jacobian), _projector(other._projector), _inverser(other._inverser)
+{
 }
 
 void compute(const Dynamic_Matrix& jacobian, Dynamic_Matrix& P)

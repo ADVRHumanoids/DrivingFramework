@@ -24,22 +24,24 @@ find_package(Eigen3 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
-	include
-	${RBDL_INCLUDE_DIR}
+	    include
+	    ${RBDL_INCLUDE_DIR}
   LIBRARIES
-	hierarchical_controller
-	controller_tasks
-	${RBDL_LIBRARY}
+	    hierarchical_controller
+      controller_tasks
+      controller_actions
+	    ${RBDL_LIBRARY}
   CATKIN_DEPENDS
-	roscpp
-	eigen_utils
-#	collision_model
-	point_handling
-	robot_point_handling
-        basic_controllers
-        robot_class
+    	roscpp
+    	eigen_utils
+      mwoibn_std_utils
+    #	collision_model
+    	point_handling
+    	robot_point_handling
+      basic_controllers
+      robot_class
   DEPENDS
-	Eigen3
+	   Eigen3
 )
 
 ###########
@@ -71,12 +73,39 @@ include_directories(
      src/tasks/center_of_mass_task_v2.cpp
      src/tasks/constraints_task.cpp
 )
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
 
   add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
   target_link_libraries(controller_tasks
+     ${catkin_LIBRARIES}
+     ${RBDL_LIBRARY}
+  )
+
+
+
+  add_library(controller_actions
+    src/actions/merge.cpp
+    src/actions/merge/end.cpp
+    src/actions/merge/front.cpp
+    src/actions/merge/local.cpp
+    src/actions/merge/replace.cpp
+)
+ add_dependencies(controller_actions ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(controller_actions
+    ${catkin_LIBRARIES}
+    ${RBDL_LIBRARY}
+ )
+
+
+
+  add_library(actions_merge
+     src/actions/merge/front.cpp
+     src/actions/merge/end.cpp
+     src/actions/merge/local.cpp
+#     src/actions/merge/replace_map.cpp
+     src/actions/merge/replace.cpp
+ )
+  add_dependencies(actions_merge ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(actions_merge
      ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
   )
@@ -88,10 +117,6 @@ include_directories(
      src/controllers/wheels.cpp
      src/controllers/actions.cpp
    )
-##   Add cmake target dependencies of the library
-##   as an example, code may need to be generated before libraries
-##   either from message generation or dynamic reconfigure
-
    add_dependencies(hierarchical_controller ${catkin_EXPORTED_TARGETS})
 
    target_link_libraries(hierarchical_controller
@@ -105,7 +130,7 @@ include_directories(
 #############
 
 # Mark executables and/or libraries for installation
- install(TARGETS controller_tasks hierarchical_controller
+ install(TARGETS controller_tasks hierarchical_controller controller_actions
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

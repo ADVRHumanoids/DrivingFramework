@@ -14,8 +14,9 @@ mgnss::controllers::WheeledMotionActions::WheeledMotionActions(
         _x << 1, 0, 0;
         _y << 0, 1, 0;
         _z << 0, 0, 1;
-
-        _createTasks();
+        _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
+        _actions_ptr = dynamic_cast<mwoibn::hierarchical_control::controllers::Actions*>(_hierarchical_controller_ptr.get());
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -27,8 +28,9 @@ mgnss::controllers::WheeledMotionActions::WheeledMotionActions(
         mwoibn::robot_class::Robot& robot, YAML::Node config)
         : WheelsControllerExtend(robot)
 {
-
-        _createTasks();
+        _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
+        _actions_ptr = dynamic_cast<mwoibn::hierarchical_control::controllers::Actions*>(_hierarchical_controller_ptr.get());
+        _createTasks(config);
         _initIK(config);
         _allocate();
 
@@ -55,8 +57,7 @@ void mgnss::controllers::WheeledMotionActions::_allocate(){
 void mgnss::controllers::WheeledMotionActions::_initIK(YAML::Node config){
         std::cout << "Wheeled Motion loaded " << config["tunning"] << " tunning." << std::endl;
 
-        _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
-        _actions_ptr = dynamic_cast<mwoibn::hierarchical_control::controllers::Actions*>(_hierarchical_controller_ptr.get());
+
         config = config["tunnings"][config["tunning"].as<std::string>()];
 
         for(auto entry : config)
@@ -88,7 +89,7 @@ void mgnss::controllers::WheeledMotionActions::_initIK(YAML::Node config){
 
 }
 
-void mgnss::controllers::WheeledMotionActions::_createTasks(){
+void mgnss::controllers::WheeledMotionActions::_createTasks(YAML::Node config){
         // Set-up hierachical controller
         _constraints_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::Constraints(_robot));
@@ -117,7 +118,7 @@ void mgnss::controllers::WheeledMotionActions::_createTasks(){
                                                                  _robot.getLinks("wheels")),
                         _robot, *_com_ptr.get()));
 
-        _createAngleTasks();
+        _createAngleTasks(config);
 
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
@@ -129,6 +130,11 @@ void mgnss::controllers::WheeledMotionActions::_createTasks(){
         _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
 
 }
+
+void mgnss::controllers::WheeledMotionActions::_createAngleTasks(YAML::Node config){
+        WheelsControllerExtend::_createAngleTasks();
+}
+
 
 void mgnss::controllers::WheeledMotionActions::init(){
         _robot.wait();

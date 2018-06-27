@@ -1,7 +1,7 @@
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_TASK_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_ACTIONS_TASK_H
 
-#include "mwoibn/hierarchical_control/actions/basic_action.h"
+#include "mwoibn/hierarchical_control/actions/basic.h"
 
 namespace mwoibn {
 namespace hierarchical_control {
@@ -14,7 +14,7 @@ public:
 Task(memory::Manager& memory) : Basic(memory){
         _next = this;
 }
-Task(const Task& other) : Basic(other){
+Task(const Task& other) : Basic(other), _next(other._next){
         _next = this;
 }
 const Task& operator=(const Task& task){
@@ -45,7 +45,7 @@ actions::Task* _next;
 };
 
 }
-typedef std::map<tasks::BasicTask*, actions::Task* > TaskMap;
+//typedef std::map<tasks::BasicTask*, actions::Task* > maps::TaskMap;
 
 } // namespace package
 } // namespace library

@@ -56,7 +56,7 @@ add_library(wheeled_motion
    src/wheeled_motion_event_v2.cpp
    src/wheeled_motion_event_v3.cpp
    src/wheeled_motion_actions.cpp
-
+   src/wheeled_motion_merge_v1.cpp
    src/wheeled_motion_world.cpp
  )
 

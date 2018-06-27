@@ -34,13 +34,12 @@ Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, doubl
         _init(damping);
 }
 
-Compute(const Compute& other) : Primary(other), _gains(other._gains), _P(other._P), _command(other._command){
+Compute(const Compute& other) : Primary(other), _gains(other._gains), _P(other._P), _command(other._command), _errors(other._errors), _inverser_ptr(std::move(other._inverser_ptr.get())){
 }
-
-// Compute(Compute& other) : Primary(other), _gains(other._gains), _P(other._P), _command(other._command){
-//
+// Compute(Compute& other) : Primary(other), _gains(other._gains), _P(other._P), _command(other._command), _errors(other._errors), _inverser_ptr(other._inverser_ptr){
 // }
-Compute(Compute&& other) : Primary(std::move(other)), _gains(other._gains), _P(other._P), _command(other._command){
+
+Compute(Compute&& other) : Primary(std::move(other)), _gains(other._gains), _P(other._P), _command(other._command), _errors(other._errors), _inverser_ptr(std::move(other._inverser_ptr)){
 
 }
 
