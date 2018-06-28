@@ -12,7 +12,7 @@
 
 #include <rbdl/rbdl.h>
 
-
+#include "mwoibn/std_utils/std_utils.h"
 #ifdef QUATERNION_RBDL
   #include "mwoibn/rbdl_utils/rbdl_utils.h"
   #include "mwoibn/rbdl_utils/quaternion.h"
@@ -76,4 +76,3 @@ const int INVALID = 0;
 const int rt_size = RT_SIZE;
 }
 #endif
-
