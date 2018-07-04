@@ -31,8 +31,8 @@ virtual void log(mwoibn::common::Logger& logger, double time);
 void resteer(int i){
         _resteer[i] = true;
         _start_steer[i] = _test_steer[i];
-
 }
+
 void stopResteer(int i){
         _resteer[i] = false;
         _start_steer[i] = _test_steer[i];
@@ -53,12 +53,12 @@ void steering();
 void fullUpdate(const mwoibn::VectorN& support);
 void compute();
 
-void switchToCastor(double mu){
+virtual void switchToCastor(double mu){
         std::cout << "switchToCastor" << std::endl;
         _actions_ptr->replace(_leg_castor, mu);
 }
 
-void switchToCamber(double mu){
+virtual void switchToCamber(double mu){
         std::cout << "switchToCamber" << std::endl;
         _actions_ptr->replace(_leg_camber, mu);
 }

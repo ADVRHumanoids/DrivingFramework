@@ -1,0 +1,271 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+from custom_messages.msg import CustomCmnd
+from custom_messages.msg import StateMsg
+
+import rospy
+from numpy import cos, sin
+import numpy as np
+
+class Reference:
+    def __init__(self, service):
+        self.service = service
+        # base initial state
+        self.base_now = np.array([0.0, 0.0, 0.93, 0.0])
+        self.d_base = np.array([0.0, 0.0, 0.0, 0.0])
+
+        # max height
+        self.z_max = 1.02
+        # default velocity, controller step
+        self.d, self.dt = 0.001, 0.005
+
+        # initial support velocity
+        self.dx_cp = np.array([0.0,  0.0,  0.0, 0.0])
+        self.dy_cp = np.array([0.0,  0.0,  0.0, 0.0])
+        self.dz_cp = np.array([0.0,  0.0,  0.0, 0.0])
+        # initial support position
+        self.x_cp = np.array([0.47  ,  0.47  , -0.66  , -0.66  ])
+        self.y_cp = np.array([0.25 , -0.25 ,  0.25 , -0.25 ])
+        self.z_cp = np.array([0.3035,  0.3035,  0.3035,  0.3035])
+        # following predefined x references
+        self.x_cp_ref = np.array([[0.47, 0.47, -0.66, -0.66],
+  							     [0.30, 0.30, -0.55, -0.55 ],
+   							     [0.50, 0.20, -0.40, -0.75 ],
+							  ])
+        # following predefined y references
+        self.y_cp_ref = np.array([[0.15,  -0.15,  0.15, -0.15],
+							   [0.25 ,  -0.25 ,  0.25 , -0.25 ],
+                               [0.0 ,  -0.35 ,  0.35 , -0.0 ], ])
+        # following predefined z references
+        self.z_cp_ref = np.array([[0.3035,  0.3035,  0.3035, 0.3035],
+							   [0.3035,  0.3035,  0.3035, 0.50],
+							   [0.3035,  0.3035,  0.3035, 0.32],
+							   [0.5,  0.3035,  0.3035, 0.3035]])
+
+		# self.z_bs_ref = np.array([[self.z_bs], [self.z_max], [self.z_max+0.12], [self.z_max+0.05]])
+        self.vel = np.full(16,self.d)
+
+        self.base_ref = np.array([[0.0, 0.0, 0.93, 0.0], [1.000, 0.0, 0.93, 0.0], [0.00, 0.5, 0.93, 0.0], [0.800, -0.5, 1.02, 0.0], [0.000, 0.0, 0.93, 6.28], [1.64 , 0.0, 0.93, 6.28]]);
+        # self.base_ref = np.array([[0.0, 0.0, 0.93, 0.0], [1.000, 0.0, 0.93, 0.0], [0.000, 0.4, 0.93, 0.0], [0.400, -0.2, 0.93, 0.0]]);
+
+        self.pattern = [(self.move,[0,1,0,0]), (self.speed, [[3,0,0.0], [3,1,0.1], [3,2,0.1]]), (self.move,[1,0,0,2]),      (self.wait, [200]),  (self.speed, [[3,0,0.05], [3,1,0.05]]), (self.move,[0,1,0,3]), (self.speed, [[3,3,0.05], [3,2,0.0]]), (self.turn,[2,2,0, 1.0, 0.05]), (self.wait, [200]), (self.circle,[2,2,0, 0.005, 0.4]), (self.speed, [[3,0,0.05], [3,1,0.02], [3,3,0.05]]), (self.wait, [400]), (self.move,[0,0,0,4])]
+
+        #
+        # self.pattern = [(self.speed, [[3,0,0.05], [3,1,0.05], [3,3,0.1]]), (self.move,[0,0,0,5])]
+
+        self.step = 0
+        self.msg = CustomCmnd()
+        self.base_msg = StateMsg()
+
+        self.endStep = len(self.pattern)
+        self.timer = 0
+        self.conds = {self.move: self.condMove, self.wait: self.condWait, self.claim: self.condPass, self.release: self.condPass, self.speed: self.condPass, self.turn: self.condTurn, self.circle: self.condTurn}
+        self.condFunc = self.conds[self.getType()]
+
+    def speed(self):
+        # print("speed", self.vel)
+        for i in self.pattern[self.step][1]:
+            # print(i)
+            self.vel[i[0]*4+i[1]] = i[2]
+
+    def move(self):
+    	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
+    	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
+    	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
+    	self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
+
+    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
+    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
+    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+    	#self.d_base[np.abs(self.getBase() - self.base_now) < 1e-3] = 0
+
+    	self.x_cp += self.dx_cp*self.dt
+    	self.y_cp += self.dy_cp*self.dt
+    	self.z_cp += self.dz_cp*self.dt
+    	self.base_now += self.d_base*self.dt
+
+    	self.timer += 1
+
+    # [th, v]
+    def turn(self):
+
+        self.d_base[3] = self.vel[15]*np.sign(self.get(3) - self.base_now[3])
+        self.base_now[3] += self.d_base[3]*self.dt;
+        self.d_base[0] = self.get(4)*np.cos(self.base_now[3]);
+        self.d_base[1] = self.get(4)*np.sin(self.base_now[3]);
+        self.d_base[2] = self.vel[14]
+        self.base_now[0] += self.d_base[0]*self.dt;
+        self.base_now[1] += self.d_base[1]*self.dt;
+        self.base_now[1] += self.d_base[2]*self.dt;
+
+    	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
+    	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
+    	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
+
+    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
+    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
+    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+
+    	self.x_cp += self.dx_cp*self.dt
+    	self.y_cp += self.dy_cp*self.dt
+    	self.z_cp += self.dz_cp*self.dt
+
+    	self.timer += 1
+        # print("turn", self.d_base, self.base_now)
+
+    def condTurn(self):
+
+        # print(self.getZ()- self.z_cp)
+        # print(self.getBase()-self.base_now, self.getBase(), self.base_now)
+        # print(self.get(3), self.base_now[3], self.get(3)-self.base_now[3])
+        return np.allclose(self.get(3), self.base_now[3], 1e-02, 1e-02)
+
+    def circle(self):
+        self.d_base[3] = self.vel[15]*np.sign(self.get(3) - self.base_now[3])
+        self.base_now[3] += self.d_base[3]*self.dt;
+
+        self.d_base[0] =  -self.d_base[3]*self.get(4)*np.cos(self.base_now[3]);
+        self.d_base[1] =  -self.d_base[3]*self.get(4)*np.sin(self.base_now[3]);
+
+    	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
+    	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
+    	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
+
+    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
+    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
+    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+
+    	self.x_cp += self.dx_cp*self.dt
+    	self.y_cp += self.dy_cp*self.dt
+    	self.z_cp += self.dz_cp*self.dt
+
+    	self.timer += 1
+        print("circle", self.base_now)
+
+
+
+    def condMove(self):
+        print("move")
+        print(self.getX(), self.x_cp, self.getX()- self.x_cp)
+        print(self.getY(), self.y_cp, self.getY()- self.y_cp)
+        # print(self.getZ()- self.z_cp)
+        # print(self.getBase()-self.base_now, self.getBase(), self.base_now)
+        return np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03) and np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03) and np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03) and np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03)
+
+    def condPass(self):
+        return True
+
+    def condWait(self):
+        return self.timer > self.get(0)
+
+    def wait(self):
+        self.timer += 1
+
+    # def getBaseX(self):
+	# 	return self.base_now[0]
+	# def getBaseY(self):
+	# 	return self.base_now[1]
+	# def getBaseZ(self):
+	# 	return self.base_now[2]
+
+    def claim(self):
+        self.service(3, 1, self.get(0))
+
+    def release(self):
+        self.service(3, 0, self.get(0))
+
+    def get(self, i):
+        return self.pattern[self.step][1][i]
+
+    def getType(self):
+        return self.pattern[self.step][0]
+
+    def getX(self):
+        return self.x_cp_ref[self.get(0)]
+
+    def getY(self):
+        return self.y_cp_ref[self.get(1)]
+
+    def getZ(self):
+        return self.z_cp_ref[self.get(2)]
+
+    def getBase(self):
+        return self.base_ref[self.get(3)]
+
+    def condition(self):
+#			print(self.condFunc.__name__, np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
+        return self.condFunc()
+
+    def increment(self):
+		self.step += 1
+		if not self.isRunning(): return
+		self.timer = 0
+		self.condFunc = self.conds[self.getType()]
+		# print(self.step, self.getType().__name__)
+
+    def update(self):
+		self.getType()()
+
+    def send(self):
+		self.msg.velocity = list(sum(zip(self.dx_cp, self.dy_cp, self.dz_cp),())) + [2147483647]
+
+		#if self.timer%100 < 0.0001:
+		#	print(self.step, self.msg.velocity, self.dz_bs)
+
+		return self.msg
+
+    def base(self):
+        self.base_msg.x, self.base_msg.y, self.base_msg.z, self.base_msg.rz = self.d_base
+        return self.base_msg
+
+    def end(self):
+        self.msg.velocity = [0] * 12 + [2147483647]
+        self.d_base = np.full(4,0)
+        return self.msg
+
+    def isRunning(self):
+		return self.step < self.endStep
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_reference')
+    rate = rospy.Rate(200)
+    #print(1.0/dt)
+    name = 'wheels_command'
+
+    support = rospy.Publisher('wheels_support', CustomCmnd, queue_size=1)
+    state = rospy.Publisher('wheels_state', StateMsg, queue_size=1)
+
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+    ref = Reference(ref_service)
+
+    # try:
+    #     ref_service(1.0, 1.0, ref.getBaseX()*100.0)
+    #     ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
+    # except rospy.ServiceException as exc:
+    #     print("Service did not process request: " + str(exc))
+
+    while not rospy.is_shutdown() and ref.isRunning():
+        ref.update()
+        if ref.condition():
+            ref.increment()
+
+        support.publish(ref.send())
+        state.publish(ref.base())
+#	  ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
+
+        rate.sleep()
+
+    support.publish(ref.end())
+    state.publish(ref.base())

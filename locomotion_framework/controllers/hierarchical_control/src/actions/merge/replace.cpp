@@ -12,6 +12,21 @@ mwoibn::hierarchical_control::actions::merge::Replace::~Replace(){
 //         _parent = &parent;
 // }
 
+void mwoibn::hierarchical_control::actions::merge::Replace::run(){
+        // std::cout << "replace" << std::endl;
+        progress();
+        _this.run();
+}
+
+void mwoibn::hierarchical_control::actions::merge::Replace::progress(){
+
+        _t += _dt;
+        updateGain();
+        // std::cout << "dt " << _dt << std::endl;
+        std::cout << "rep_p " << _p << std::endl;
+
+}
+
 mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_control::actions::merge::Replace::swapToEnd(Local& high){
         actions::merge::Replace* _rep_1  = _merge_memory.local_replace.get();
         actions::merge::End* _end_1 = _merge_memory.local_end.get();

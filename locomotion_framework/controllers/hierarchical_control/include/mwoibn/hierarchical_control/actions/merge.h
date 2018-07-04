@@ -53,6 +53,12 @@ virtual actions::Task& next(){
 }
 
 virtual void release();
+void secondary(int i){
+        _current_id[i] = false;
+}
+void primary(int i){
+        _current_id[i] = true;
+}
 
 protected:
 merge::MergeManager _merge_memory;
@@ -76,7 +82,7 @@ merge::Local* _last;
 std::vector<tasks::BasicTask> _support_tasks;
 std::unordered_map<mwoibn::VectorBool, actions::Compute,
                    mwoibn::eigen_utils::Hasher> _support_actions;
-mwoibn::Scalar _eps, _p = 5;
+mwoibn::Scalar _eps, _p = 2;
 
 
 // actions::Snap _snap;

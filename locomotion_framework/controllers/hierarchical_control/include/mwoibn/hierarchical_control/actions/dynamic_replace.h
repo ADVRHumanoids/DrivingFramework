@@ -61,7 +61,11 @@ virtual ~DynamicReplace(){
 
 // finish when all elements are done
 virtual bool isDone(){
-        return _gains.cwiseAbs().maxCoeff() < _cut_off;
+        // std::cout << "isDone" << std::endl;
+        // std::cout << _gains.cwiseAbs().maxCoeff() << std::endl;
+        // std::cout << (_gains.cwiseAbs().maxCoeff() < _cut_off) << std::endl;
+
+        return _gains.cwiseAbs().minCoeff() > _cut_off;
 }
 
 protected:

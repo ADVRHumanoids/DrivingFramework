@@ -6,9 +6,9 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
         if (req.p == 1)
         { // base
                 if (req.d == 1)
-                        controller_ptr->setBaseDotX(req.nr / 100.0);
+                        controller_ptr->setBaseDotX(req.nr / 1000.0);
                 else if (req.d == 2)
-                        controller_ptr->setBaseDotY(req.nr / 100.0);
+                        controller_ptr->setBaseDotY(req.nr / 1000.0);
                 else if (req.d == 3)
                         controller_ptr->setBaseDotZ(req.nr / 1000.0);
                 else if (req.d == 4)
@@ -92,6 +92,7 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
         }
         return false;
 }
+
 
 void mgnss::ros_callbacks::wheels_controller_extend::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheelsControllerExtend* controller_ptr)
 {

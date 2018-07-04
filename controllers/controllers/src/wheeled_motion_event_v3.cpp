@@ -216,10 +216,10 @@ void mgnss::controllers::WheeledMotionEvent3::_correct(){
                         std::fabs(_start_steer[i] - steer) < 2.8; // I could add a wheel velocity condition here
 
                 if( _resteer[i] && _start_steer[i] < 0) {
-                        _test_steer[i] = _current_steer[i] + 2.0*mwoibn::PI/180;
+                        _test_steer[i] = _current_steer[i] + 3.0*mwoibn::PI/180;
                 }
                 else if ( _resteer[i] &&  _start_steer[i] > 0) {
-                        _test_steer[i] = _current_steer[i] - 2.0*mwoibn::PI/180;
+                        _test_steer[i] = _current_steer[i] - 3.0*mwoibn::PI/180;
                 }
 
         }
@@ -357,42 +357,42 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
         logger.addField("r_cp_4_y", refCp()[10]);
 //  logger.addField("r_cp_4_z", refCp()[11]);
 
-//  logger.addField("st_icm_1", getSteerICM()[0]);
+        logger.addField("st_icm_1", getSteerICM()[0]);
         logger.addField("st_icm_2", getSteerICM()[1]);
 
-//  logger.addField("st_sp_1", getSteerSP()[0]);
+        logger.addField("st_sp_1", getSteerSP()[0]);
         logger.addField("st_sp_2", getSteerSP()[1]);
 
-//  logger.addField("st_raw_1", rawSteer()[0]);
+        logger.addField("st_raw_1", rawSteer()[0]);
         logger.addField("st_raw_2", rawSteer()[1]);
         logger.addField("st_org_2", pureSteer()[1]);
 
-//  logger.addField("r_st_1", refSteer()[0]);
+        logger.addField("r_st_1", refSteer()[0]);
         logger.addField("r_st_2", refSteer()[1]);
-//  logger.addField("r_st_3", refSteer()[2]);
-//  logger.addField("r_st_4", refSteer()[3]);
-//  logger.addField("st_1", getSteer()[0]);
+        logger.addField("r_st_3", refSteer()[2]);
+        logger.addField("r_st_4", refSteer()[3]);
+        logger.addField("st_1", getSteer(0));
         logger.addField("st_2", getSteer(1));
-//  logger.addField("st_3", getSteer()[2]);
-//  logger.addField("st_4", getSteer()[3]);
+        logger.addField("st_3", getSteer(2));
+        logger.addField("st_4", getSteer(3));
 
-//  logger.addField("tan_sp_1", getDampingSP()[0]);
+        logger.addField("tan_sp_1", getDampingSP()[0]);
         logger.addField("tan_sp_2", getDampingSP()[1]);
-//  logger.addField("tan_sp_3", getDampingSP()[2]);
-//  logger.addField("tan_sp_4", getDampingSP()[3]);
-//  logger.addField("tan_icm_1", getDampingICM()[0]);
+        logger.addField("tan_sp_3", getDampingSP()[2]);
+        logger.addField("tan_sp_4", getDampingSP()[3]);
+        logger.addField("tan_icm_1", getDampingICM()[0]);
         logger.addField("tan_icm_2", getDampingICM()[1]);
-//  logger.addField("tan_icm_3", getDampingICM()[2]);
-//  logger.addField("tan_icm_4", getDampingICM()[3]);
+        logger.addField("tan_icm_3", getDampingICM()[2]);
+        logger.addField("tan_icm_4", getDampingICM()[3]);
 
-//  logger.addField("v_icm_1", getVelICM()[0]);
+        logger.addField("v_icm_1", getVelICM()[0]);
         logger.addField("v_icm_2", getVelICM()[1]);
-//  logger.addField("v_sp_1", getVelSP()[0]);
+        logger.addField("v_sp_1", getVelSP()[0]);
         logger.addField("v_sp_2", getVelSP()[1]);
-//  logger.addField("v_1", getVel()[0]);
+        logger.addField("v_1", getVel()[0]);
         logger.addField("v_2", getVel()[1]);
-//  logger.addField("d_1", getDamp()[0]);
-        logger.addField("d_2", getDamp()[1]);
+        // logger.addField("d_1", getDamp()[0]);
+        // logger.addField("d_2", getDamp()[1]);
 //  logger.addField("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addField("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addField("ankle_yaw_3", _robot.state.get()[22]);
@@ -481,44 +481,44 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 //  logger.addEntry("r_cp_4_z", refCp()[11]);
 
 
-//  logger.addEntry("st_icm_1", getSteerICM()[0]);
+        logger.addEntry("st_icm_1", getSteerICM()[0]);
         logger.addEntry("st_icm_2", getSteerICM()[1]);
 
-//  logger.addEntry("st_sp_1", getSteerSP()[0]);
+        logger.addEntry("st_sp_1", getSteerSP()[0]);
         logger.addEntry("st_sp_2", getSteerSP()[1]);
 
-//  logger.addEntry("st_raw_1", rawSteer()[0]);
+        logger.addEntry("st_raw_1", rawSteer()[0]);
         logger.addEntry("st_raw_2", rawSteer()[1]);
         logger.addEntry("st_org_2", pureSteer()[1]);
 
 
-//  logger.addEntry("r_st_1", refSteer()[0]);
+        logger.addEntry("r_st_1", refSteer()[0]);
         logger.addEntry("r_st_2", refSteer()[1]);
-//  logger.addEntry("r_st_3", refSteer()[2]);
-//  logger.addEntry("r_st_4", refSteer()[3]);
-//  logger.addEntry("st_1", getSteer()[0]);
+        logger.addEntry("r_st_3", refSteer()[2]);
+        logger.addEntry("r_st_4", refSteer()[3]);
+        logger.addEntry("st_1", getSteer(0));
         logger.addEntry("st_2", getSteer(1));
-//  logger.addEntry("st_3", getSteer()[2]);
-//  logger.addEntry("st_4", getSteer()[3]);
+        logger.addEntry("st_3", getSteer(2));
+        logger.addEntry("st_4", getSteer(3));
 
-//  logger.addEntry("tan_sp_1", getDampingSP()[0]);
+        logger.addEntry("tan_sp_1", getDampingSP()[0]);
         logger.addEntry("tan_sp_2", getDampingSP()[1]);
-//  logger.addEntry("tan_sp_3", getDampingSP()[2]);
-//  logger.addEntry("tan_sp_4", getDampingSP()[3]);
-//  logger.addEntry("tan_icm_1", getDampingICM()[0]);
+        logger.addEntry("tan_sp_3", getDampingSP()[2]);
+        logger.addEntry("tan_sp_4", getDampingSP()[3]);
+        logger.addEntry("tan_icm_1", getDampingICM()[0]);
         logger.addEntry("tan_icm_2", getDampingICM()[1]);
-//  logger.addEntry("tan_icm_3", getDampingICM()[2]);
-//  logger.addEntry("tan_icm_4", getDampingICM()[3]);
+        logger.addEntry("tan_icm_3", getDampingICM()[2]);
+        logger.addEntry("tan_icm_4", getDampingICM()[3]);
 
 
-//  logger.addEntry("v_icm_1", getVelICM()[0]);
+        logger.addEntry("v_icm_1", getVelICM()[0]);
         logger.addEntry("v_icm_2", getVelICM()[1]);
-//  logger.addEntry("v_sp_1", getVelSP()[0]);
+        logger.addEntry("v_sp_1", getVelSP()[0]);
         logger.addEntry("v_sp_2", getVelSP()[1]);
-//  logger.addEntry("v_1", getVel()[0]);
+        logger.addEntry("v_1", getVel()[0]);
         logger.addEntry("v_2", getVel()[1]);
-//  logger.addEntry("d_1", getDamp()[0]);
-        logger.addEntry("d_2", getDamp()[1]);
+        // logger.addEntry("d_1", getDamp()[0]);
+        // logger.addEntry("d_2", getDamp()[1]);
 //  logger.addEntry("ankle_yaw_1", _robot.state.get()[10]);
 //  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
 //  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);

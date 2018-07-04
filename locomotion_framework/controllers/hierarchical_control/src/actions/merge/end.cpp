@@ -25,6 +25,7 @@ const double mwoibn::hierarchical_control::actions::merge::End::getGain(){
 
 void mwoibn::hierarchical_control::actions::merge::End::updateGain(){
         _p = std::tanh(_mu*_t);
+        // std::cout << "_p " << _p << std::endl;
         _gain.setConstant(_p);
 }
 
@@ -37,6 +38,9 @@ void mwoibn::hierarchical_control::actions::merge::End::reset(){
 void mwoibn::hierarchical_control::actions::merge::End::progress(){
         _t += _dt;
         updateGain();
+        // std::cout << "dt " << _dt << std::endl;
+//        std::cout << "_p " << _p << std::endl;
+
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::setProgress(double p){
@@ -47,7 +51,7 @@ void mwoibn::hierarchical_control::actions::merge::End::setProgress(double p){
 void mwoibn::hierarchical_control::actions::merge::End::_setLimit(){
         _t = _dt;
         progress();
-        _this.setCondition(_p);         // set end to the same step as the first one
+        _this.setCondition(1-_p);         // set end to the same step as the first one
         reset();
 }
 
@@ -81,6 +85,7 @@ mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_contro
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::_end(){
+        // std::cout << "_end" << std::endl;
         _this.secondAction().release(); // this should release pointer
         _map.erase(_this.secondAction().baseAction().getTask());
 
@@ -108,6 +113,7 @@ void mwoibn::hierarchical_control::actions::merge::End::assign(actions::Task& t_
         _this_memory.replace.get();
         _this.start(t_new, t_old, *_memory.snap.get());
         _map[t_new.baseAction().getTask()] = this;
+        _setLimit();
         reset();
 }
 
@@ -130,11 +136,14 @@ void mwoibn::hierarchical_control::actions::merge::End::push(Local& parent){
 mwoibn::hierarchical_control::actions::Task& mwoibn::hierarchical_control::actions::merge::End::next(){
         actions::Task& ptr = _this.next();
 
-        if (&ptr == &_this) return *this;
+        if (&ptr != &_this || _this.isDone()) {
+                release();
+                return *_map[_this.baseAction().getTask()];
+        }
 
-        release();
+        return *this;
 
-        return *_map[_this.baseAction().getTask()];
+
 }
 
 mwoibn::hierarchical_control::actions::Primary& mwoibn::hierarchical_control::actions::merge::End::baseAction(){

@@ -46,6 +46,7 @@ void mwoibn::hierarchical_control::actions::merge::Front::setParent(Local& paren
 }
 
 void mwoibn::hierarchical_control::actions::merge::Front::run(){
+        // std::cout << "front" << std::endl;
         _this->run();
 }
 

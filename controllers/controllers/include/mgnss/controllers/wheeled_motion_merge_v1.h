@@ -24,6 +24,16 @@ WheeledMotionMergeV1(mwoibn::robot_class::Robot& robot, YAML::Node config);
 virtual ~WheeledMotionMergeV1() {
 }
 
+virtual void switchToCastor(int i, double mu){
+        std::cout << "switchToCastor" << std::endl;
+        _leg_merge_ptr->secondary(i);
+}
+
+virtual void switchToCamber(int i, double mu){
+        std::cout << "switchToCamber" << std::endl;
+        _leg_merge_ptr->primary(i);
+}
+
 
 protected:
 

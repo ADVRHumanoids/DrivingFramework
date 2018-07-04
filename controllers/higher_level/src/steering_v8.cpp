@@ -47,11 +47,14 @@ void mgnss::higher_level::Steering8::_merge(int i){
         _v[i] = _computeVelocity(i);
         _damp[i] = std::tanh(std::fabs(_v[i]*_v_icm[i]) /_treshhold/ _treshhold_icm);
 
-
-        _b[i] = std::atan2(  _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::sin(_b_icm[i]) +
+        _b[i] = std::atan2(  _K_icm * _v_icm[i]  * std::sin(_b_icm[i]) +
                              _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::sin(_b_sp[i]),
-                             _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::cos(_b_icm[i]) +
+                             _K_icm * _v_icm[i]  * std::cos(_b_icm[i]) +
                              _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::cos(_b_sp[i]));
+        // _b[i] = std::atan2(  _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::sin(_b_icm[i]) +
+        //                      _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::sin(_b_sp[i]),
+        //                      _K_icm * std::fabs(_v_icm[i]) * _v_icm[i]  * std::cos(_b_icm[i]) +
+        //                      _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::cos(_b_sp[i]));
 
 
         _raw[i] = _b[i];

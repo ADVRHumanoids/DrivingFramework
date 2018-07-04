@@ -464,7 +464,7 @@ mwoibn:
                         robot: default
                         mode: "full"
                         secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-                        tunning: odom_NRT_7
+                        tunning: odom_NRT_5
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
                                         ratio: 1.0
@@ -612,17 +612,17 @@ mwoibn:
                                         centre_of_mass_y: 38
                                         base_position: 10
                                         contact_point: 18
-                                        camber: 40 # 95-100
-                                        castor: 20 # 14-30
-                                        camber_damp: 0.005
-                                        castor_damp: 0.005
+                                        camber: 5 # 95-100
+                                        castor: 5 # 14-30
+                                        camber_damp: 0.003
+                                        castor_damp: 0.003
                                         steer_open_loop: 1.00 # 0.95
-                                        steer_feedback: 0.001 # 0.05
+                                        steer_feedback: 0.2 # 0.05
                                         steer_damp: 0.015
                                         damp_icm: 0.00000000001
                                         damp_sp: 0.015
-                                        tracking_gain: 200.0
-                                        camber_tolerance: 0.005
+                                        tracking_gain: 1.0
+                                        camber_tolerance: 0.01
                                 odom_NRT_6: # smooth tasks
                                         ratio: 1.0
                                         damping: 0.0001
@@ -647,22 +647,22 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 55
-                                        base_orinetation: 50
-                                        centre_of_mass_x: 38
-                                        centre_of_mass_y: 38
+                                        leg_steer: 90
+                                        base_orinetation: 60 # 40
+                                        centre_of_mass_x: 40 # 30
+                                        centre_of_mass_y: 40 # 30
                                         base_position: 10
                                         contact_point: 18
-                                        camber: 50 # 95-100
-                                        castor: 30 # 14-30
+                                        camber: 10 # 95-100
+                                        castor: 20 # 14-30
                                         camber_damp: 0.08
                                         castor_damp: 0.12
                                         steer_open_loop: 1.00 # 0.95
-                                        steer_feedback: 0.001 # 0.05
-                                        steer_damp: 0.015
-                                        damp_icm: 0.00000000001
-                                        damp_sp: 0.015
-                                        tracking_gain: 200.0
+                                        steer_feedback: 10.0 # 0.8/ 0.2
+                                        steer_damp: 0.001 # 0.001
+                                        damp_icm: 0.0008 # 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                 odom_NRT_4: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001

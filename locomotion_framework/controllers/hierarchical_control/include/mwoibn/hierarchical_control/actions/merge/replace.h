@@ -25,12 +25,14 @@ virtual Local& pull();
 virtual void push(Local& parent);
 
 virtual void assign(actions::Task& t_new, actions::Task* t_old, Local* parent);
+virtual void progress();
 
 virtual Local& swapFromFront(Local& lower);
 virtual Local& swapFromReplace(Local& lower);
 virtual Local& swapToReplace(Local& high, Local& high_parent);
 virtual Local& swapToEnd(Local& high);
 // virtual void setParent(Local& parent);
+virtual void run();
 
 virtual bool isParent(actions::Task& task);
 

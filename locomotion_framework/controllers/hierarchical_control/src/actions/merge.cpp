@@ -36,10 +36,14 @@ mwoibn::hierarchical_control::actions::Merge::Merge(actions::Compute& main_task,
         _merge_memory.release(_replace_tasks);
         _merge_memory.release(_snaps);
 
+        mwoibn::VectorBool ones;
+        ones.setConstant(_task.getTaskSize(), true);
         merge::Front *ptr = _merge_memory.local_front.get();
-        ptr->assign(_primary, nullptr);
+
+        ptr->assign(_support_actions.at(ones), nullptr);
         _last = ptr;
-        // _map[_primary.baseAction().getTask()] = ptr;
+
+        _local_map[_support_actions.at(ones).getTask()] = ptr;
         _running_id.setOnes(_task.getTaskSize());
         _current_id.setOnes(_task.getTaskSize());
 
@@ -54,31 +58,35 @@ void mwoibn::hierarchical_control::actions::Merge::run(){
         _primary.run();
         _secondary.getTask().update();
         _check();
+//        std::cout << "stack " << _local_map.size() << std::endl;
+//        std::cout << "runnung " << _running_id.transpose() << std::endl;
+
         if (_current_id.all() && &_last->action() == &_primary) return;
         _snap.restore();
         if (_current_id == _running_id ) {
                 _updateTasks();
                 _last->run();
-                //_last = _last->next();
+              //_last = _last->next();
                 return;
         }
+//        std::cout << _current_id.transpose() << "\t" <<   _running_id.transpose() << std::endl;
+//        actions::Task* action = &_support_actions.at(_current_id);
+//        if(_local_map.exist(action->baseAction().getTask())) {
+//                std::cout << "swap" << std::endl;
+//                _local_map[action->baseAction().getTask()]->swap(_last->baseAction());
+//        }
+//        else{
+//                std::cout << "end" << std::endl;
+//                merge::End* _end =  _merge_memory.local_end.get();
+//                _end->assign(*action, *_last);
+//                _last->push(*_end);
+//                _last = _end;
+//        }
 
-//        actions::Task& action_ref = _support_actions.at(_current_id);
-        actions::Task* action = &_support_actions.at(_current_id);
-        if(_local_map.exist(action->baseAction().getTask())) {
-                _local_map[action->baseAction().getTask()]->swap(_last->baseAction());
-        }
-        else{
-                merge::End* _end =  _merge_memory.local_end.get();
-                _end->assign(*action, *_last);
-                _last->push(*_end);
-                _last = _end;
-        }
-        //_last = _local_map[action->baseAction().getTask()];
-        _updateTasks();
-        _running_id.noalias() = _current_id;
-        _last->run();
-        //_last = _last->next();
+//        _updateTasks();
+//        _running_id.noalias() = _current_id;
+//        _last->run();
+
 }
 
 void mwoibn::hierarchical_control::actions::Merge::_updateTasks(){
@@ -99,14 +107,16 @@ void mwoibn::hierarchical_control::actions::Merge::_updateTasks(){
         }
 }
 
+
+
 void mwoibn::hierarchical_control::actions::Merge::_check(){
 //        std::cout << "max coeffs" << std::endl;
-        for(int i = 0; i < _task.getTaskSize(); i++) {
-                _current_id[i] = _primary.getJacobian().row(i).cwiseAbs().maxCoeff() > _eps;
+//        for(int i = 0; i < _task.getTaskSize(); i++) {
+//                _current_id[i] = _primary.getJacobian().row(i).cwiseAbs().maxCoeff() > _eps;
 //                std::cout << _primary.getJacobian().row(i).cwiseAbs().maxCoeff() << std::endl;
 //                std::cout << _primary.getJacobian().row(i).cwiseAbs().transpose() << std::endl;
-          }
-        std::cout << _current_id.transpose() << std::endl;
+// }
+// std::cout << _current_id.transpose() << std::endl;
 }
 
 void mwoibn::hierarchical_control::actions::Merge::release(){
