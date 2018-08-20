@@ -15,6 +15,7 @@ class XbotBase : public XBot::XBotControlPlugin
 {
 
 public:
+
 virtual bool init_control_plugin(XBot::Handle::Ptr handle);
 
 virtual bool close();

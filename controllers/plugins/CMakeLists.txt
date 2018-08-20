@@ -58,9 +58,6 @@ find_package(catkin REQUIRED COMPONENTS
 #set(MASTER_PATH ${CMAKE_INSTALL_PREFIX})
 #set(CMAKE_INSTALL_PREFIX ${ADVR_SUPERBUILD_DIR})
 
-set(MASTER_PATH ${CMAKE_INSTALL_PREFIX})
-set(CMAKE_INSTALL_PREFIX ${ADVR_SUPERBUILD_DIR})
-
 #message(WARNING "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 
 ## Specify additional locations of header files
@@ -74,22 +71,18 @@ include_directories(
 )
 
 catkin_package(
-  INCLUDE_DIRS 
-        include 
-        ${catkin_INCLUDE_DIRS}   
+  INCLUDE_DIRS
+        include
+        ${catkin_INCLUDE_DIRS}
         ${XCM_INCLUDE_DIRS}
-  LIBRARIES 
+  LIBRARIES
         BasePlugin
         ${XCM_LIBRARIES}
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
 	${DEPENDS_OPTIONAL}
 )
-################################################
-############## CONSTANT REFERENCE  #############
-################################################
-
 add_library(BasePlugin SHARED
     src/xbot_base.cpp
     src/ros_base.cpp
