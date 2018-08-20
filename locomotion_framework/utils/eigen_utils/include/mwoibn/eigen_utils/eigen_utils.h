@@ -122,14 +122,14 @@ template <typename Dynamic_Matrix, typename Scalar> class PseudoInverse2
 {
 
 public:
-PseudoInverse2(const Dynamic_Matrix matrix,
+PseudoInverse2(const Dynamic_Matrix& matrix,
                Scalar damping = std::numeric_limits<Scalar>::epsilon())
 {
         init(matrix, damping);
         // compute(matrix);
 }
-PseudoInverse2(const Dynamic_Matrix matrix,
-               Eigen::Matrix<Scalar, 1, Eigen::Dynamic> damping)
+PseudoInverse2(const Dynamic_Matrix& matrix,
+               const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping)
 {
         init(matrix, damping);
         // compute(matrix);
@@ -170,19 +170,19 @@ void compute(const Dynamic_Matrix& matrix)
                 _inversed.noalias() = _transposed * _squared;
 
 }
-void init(const Dynamic_Matrix matrix, Scalar damping){
+void init(const Dynamic_Matrix& matrix, Scalar damping){
         _damping.setConstant(std::min(matrix.rows(), matrix.cols()), damping);
         init(matrix);
 }
 
-void init(const Dynamic_Matrix matrix, Eigen::Matrix<Scalar, 1, Eigen::Dynamic> damping){
+void init(const Dynamic_Matrix& matrix, const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping){
         if(damping.size() != std::min(matrix.rows(), matrix.cols()))
                 throw(std::invalid_argument("Couldn't initialize pseudo inverse, incompatibile damping size"));
         _damping = damping;
         init(matrix);
 }
 
-void init(const Dynamic_Matrix matrix)
+void init(const Dynamic_Matrix& matrix)
 {
         _inversed.setZero(matrix.cols(), matrix.rows());
         _transposed.setZero(matrix.cols(), matrix.rows());
@@ -211,7 +211,7 @@ virtual ~PseudoInverse2() {
 
 protected:
 std::unique_ptr<Eigen::LDLT<Dynamic_Matrix> > _inverse_ptr;
-Eigen::Matrix<Scalar, 1, Eigen::Dynamic> _damping;
+Eigen::Matrix<Scalar, Eigen::Dynamic, 1> _damping;
 Dynamic_Matrix _transposed, _inversed, _squared, _identity;
 bool _type;
 };
@@ -243,7 +243,7 @@ template <typename Dynamic_Matrix, typename Scalar> class AgumentedNullSpaceProj
 
 public:
 AgumentedNullSpaceProjection(
-        const Dynamic_Matrix matrix,
+        const Dynamic_Matrix& matrix,
         Scalar damping = std::numeric_limits<Scalar>::epsilon())
 {
         _jacobian.setZero(matrix.rows(), matrix.cols());
@@ -252,8 +252,8 @@ AgumentedNullSpaceProjection(
 }
 
 AgumentedNullSpaceProjection(
-        const Dynamic_Matrix matrix,
-        Eigen::Matrix<Scalar, 1, Eigen::Dynamic> damping)
+        const Dynamic_Matrix& matrix,
+        const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping)
 {
         _jacobian.setZero(matrix.rows(), matrix.cols());
         _inverser.init(matrix, damping);
