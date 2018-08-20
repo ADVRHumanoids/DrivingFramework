@@ -1,5 +1,5 @@
-driving_path: &driving  "/home/embedded/malgorzata_exp/ws/src/"
-simulator_path: &simulator "/home/embedded/malgorzata_exp/ws/src/"
+driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
+simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
 mwoibn:
         middleware: "ROS"
         system: "SM" # SM
@@ -395,10 +395,10 @@ mwoibn:
                                 file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
                         actuators: 
                                 path: *simulator
-                                file: "DrivingFramework/locomotion_framework/configs/actuators.yaml"
+                                file: "centauro-simulator/centauro/centauro_config/config/actuators_new.yaml"
                         contacts: 
                                 path: *simulator 
-                                file: "DrivingFramework/locomotion_framework/configs/contacts.yaml"
+                                file: "centauro-simulator/centauro/centauro_config/config/contacts.yaml"
                         controller: 
                                 path: *driving
                                 file: "" 
@@ -438,7 +438,7 @@ mwoibn:
                                 layer: NRT
                                 source: "desired_state"
                         odometry: 
-                                layer: RT
+                                layer: NRT
                                 source: "base_odometry"
                 controller:
                         position_controller:
@@ -456,14 +456,14 @@ mwoibn:
                                 layer: NRT
                                 sink: "desired_state"
                         odometry:
-                                layer: RT
+                                layer: NRT
                                 sink: "base_odometry"
         modules:
                 wheeled_motion:
-                        layer: "RT"
+                        layer: "NRT"
                         robot: default
                         mode: "full"
-                        secondary_file: &config_lower "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml"
+                        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
                         tunning: odom_NRT_5
                         tunnings:
                                 HW_low: # a bit undertunned/ good to check if it doesn't go super unstable
@@ -602,7 +602,7 @@ mwoibn:
                                         steer_open_loop: 0.85
                                         steer_feedback: 0.15
                                         steer_damp: 0.01    
-                                odom_NRT_5: # circular - odom, 
+                                odom_NRT_7: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
@@ -612,16 +612,57 @@ mwoibn:
                                         centre_of_mass_y: 38
                                         base_position: 10
                                         contact_point: 18
-                                        camber: 50 # 100
-                                        castor: 15 # 14
-                                        camber_damp: 0.04
-                                        castor_damp: 0.12
+                                        camber: 15 # 95-100
+                                        castor: 15 # 14-30
+                                        camber_damp: 0.003
+                                        castor_damp: 0.003
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 0.2 # 0.05
+                                        steer_damp: 0.015
+                                        damp_icm: 0.00000000001
+                                        damp_sp: 0.015
+                                        tracking_gain: 1.0
+                                        camber_tolerance: 0.01
+                                odom_NRT_6: # smooth tasks
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 30
+                                        base_orinetation: 38
+                                        centre_of_mass_x: 38
+                                        centre_of_mass_y: 38
+                                        base_position: 10
+                                        contact_point: 18
+                                        camber: 15 # 95-100
+                                        castor: 40 # 14-30
+                                        camber_damp: 0.004
+                                        castor_damp: 0.002
                                         steer_open_loop: 1.00 # 0.95
                                         steer_feedback: 0.001 # 0.05
                                         steer_damp: 0.015
                                         damp_icm: 0.00000000001
                                         damp_sp: 0.015
                                         tracking_gain: 200.0                              
+                                odom_NRT_5: # circular - odom,
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        constraints: 1
+                                        leg_steer: 90
+                                        base_orinetation: 55 # 40
+                                        centre_of_mass_x: 35 # 30
+                                        centre_of_mass_y: 35 # 30
+                                        base_position: 10
+                                        contact_point: 18
+                                        camber: 15 # 95-100
+                                        castor: 30 # 14-30
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.8/ 0.2
+                                        steer_damp: 0.001 # 0.001
+                                        damp_icm: 0.0008 # 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                 odom_NRT_4: # circular - odom, 
                                         ratio: 1.0
                                         damping: 0.0001
@@ -888,13 +929,13 @@ mwoibn:
                                         steer_feedback: 0.15
                                         steer_damp: 0.01                                                                                                                    
                 joint_states:
-                        layer: "RT"
+                        layer: "NRT"
                         robot: joint_space
                         mode: "full"
                 odometry:
-                        layer: "RT"
+                        layer: "NRT"
                         robot: odometry
-                        secondary_file: "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/odometry.yaml"
+                        secondary_file: /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/odometry.yaml
                         mode: "full"
                         wheel_radius: 0.078
                         chain: "wheels"

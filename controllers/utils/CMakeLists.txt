@@ -35,9 +35,14 @@ if(ROS_CONTROL)
 endif(ROS_CONTROL)
 endif(VISUALIZATION_TOOLS)
 
- LIST( APPEND PYTHON_INSTALL circular square support discontinuous discontinuous_odom turn_iit straight_iit support_iit turn_iit_odom turn_iit_rt straight_iit_rt support_iit_rt circular_RT support_RT dampings_test discontinuous_vel events_vel)
+# LIST( APPEND PYTHON_INSTALL circular square support discontinuous discontinuous_odom turn_iit straight_iit support_iit turn_iit_odom turn_iit_rt straight_iit_rt support_iit_rt circular_RT support_RT dampings_test discontinuous_vel events_vel straight_iit_july)
+# prepend_paths(PYTHON_INSTALL wheels_references)
+# LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
+
+ LIST( APPEND PYTHON_INSTALL events_vel straight_iit_july reference try)
  prepend_paths(PYTHON_INSTALL wheels_references)
  LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
+
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -89,4 +94,3 @@ prepend_paths(PYTHON_INSTALL nodes)
 
 catkin_install_python(PROGRAMS ${PYTHON_INSTALL}
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-

@@ -57,9 +57,9 @@ typedef Eigen::Matrix<double, 6, 1> Vector6;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 0, RT_SIZE, RT_SIZE> MatrixLimited; //???
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 
-typedef eigen_utils::PseudoInverse2<mwoibn::Matrix> PseudoInverse;
-typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited> PseudoInverseLimited;
-typedef mwoibn::eigen_utils::AgumentedNullSpaceProjection<mwoibn::Matrix> Projection;
+typedef eigen_utils::PseudoInverse2<mwoibn::Matrix, mwoibn::Scalar> PseudoInverse;
+typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited, mwoibn::Scalar> PseudoInverseLimited;
+typedef mwoibn::eigen_utils::AgumentedNullSpaceProjection<mwoibn::Matrix, mwoibn::Scalar> Projection;
 
 const double PI= M_PI;
 const double HALF_PI= M_PI_2;

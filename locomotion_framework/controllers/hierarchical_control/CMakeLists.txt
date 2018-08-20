@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(hierarchical_control)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -23,23 +23,25 @@ find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
-	include
-	${RBDL_INCLUDE_DIR}
-  LIBRARIES 
-	hierarchical_controller 
-	controller_tasks
-	${RBDL_LIBRARY}
-  CATKIN_DEPENDS 
-	roscpp 
-	eigen_utils 
-#	collision_model 
-	point_handling
-	robot_point_handling
-        basic_controllers
-        robot_class
-  DEPENDS 
-	Eigen3
+  INCLUDE_DIRS
+	    include
+	    ${RBDL_INCLUDE_DIR}
+  LIBRARIES
+	    hierarchical_controller
+      controller_tasks
+      controller_actions
+	    ${RBDL_LIBRARY}
+  CATKIN_DEPENDS
+    	roscpp
+    	eigen_utils
+      mwoibn_std_utils
+    #	collision_model
+    	point_handling
+    	robot_point_handling
+      basic_controllers
+      robot_class
+  DEPENDS
+	   Eigen3
 )
 
 ###########
@@ -59,39 +61,66 @@ include_directories(
 
 ## Declare a C++ library
    add_library(controller_tasks
-     src/aggravated_task.cpp
-     src/controller_task.cpp
-#     src/self_collision_task.cpp
-     src/cartesian_world_task.cpp
-     src/orientation_world_task.cpp
-#     src/self_collisions_task.cpp
-     src/joint_positions_task.cpp
-     src/center_of_mass_task.cpp
-     src/center_of_mass_task_v2.cpp
-     src/constraints_task.cpp
+     src/tasks/angle.cpp
+     src/tasks/aggravated.cpp
+     src/tasks/controller_task.cpp
+#     src/tasks/self_collision_task.cpp
+     src/tasks/cartesian_world_task.cpp
+     src/tasks/orientation_world_task.cpp
+#     src/tasks/self_collisions_task.cpp
+     src/tasks/joint_positions_task.cpp
+     src/tasks/center_of_mass_task.cpp
+     src/tasks/center_of_mass_task_v2.cpp
+     src/tasks/constraints_task.cpp
 )
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-   add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
 
-   target_link_libraries(controller_tasks
-     ${catkin_LIBRARIES} 
+  add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(controller_tasks
+     ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
-   )
+  )
 
-   add_library(hierarchical_controller
-     src/hierarchical_controller.cpp
-#     src/hierarchical_controller_continous.cpp
-   )
-##   Add cmake target dependencies of the library
-##   as an example, code may need to be generated before libraries
-##   either from message generation or dynamic reconfigure
 
+
+  add_library(controller_actions
+    src/actions/merge.cpp
+    src/actions/merge/end.cpp
+    src/actions/merge/front.cpp
+    src/actions/merge/local.cpp
+    src/actions/merge/replace.cpp
+)
+ add_dependencies(controller_actions ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(controller_actions
+    ${catkin_LIBRARIES}
+    ${RBDL_LIBRARY}
+ )
+
+
+
+  add_library(actions_merge
+     src/actions/merge/front.cpp
+     src/actions/merge/end.cpp
+     src/actions/merge/local.cpp
+#     src/actions/merge/replace_map.cpp
+     src/actions/merge/replace.cpp
+ )
+  add_dependencies(actions_merge ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(actions_merge
+     ${catkin_LIBRARIES}
+     ${RBDL_LIBRARY}
+  )
+
+
+  add_library(hierarchical_controller
+     src/controllers/default.cpp
+     src/controllers/continous.cpp
+     src/controllers/wheels.cpp
+     src/controllers/actions.cpp
+   )
    add_dependencies(hierarchical_controller ${catkin_EXPORTED_TARGETS})
 
    target_link_libraries(hierarchical_controller
-     ${catkin_LIBRARIES} 
+     ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
    )
 
@@ -101,7 +130,7 @@ include_directories(
 #############
 
 # Mark executables and/or libraries for installation
- install(TARGETS controller_tasks hierarchical_controller
+ install(TARGETS controller_tasks hierarchical_controller controller_actions
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -207,4 +236,3 @@ if(CATKIN_ENABLE_TESTING)
  endif()
 
 endif(CATKIN_ENABLE_TESTING)
-

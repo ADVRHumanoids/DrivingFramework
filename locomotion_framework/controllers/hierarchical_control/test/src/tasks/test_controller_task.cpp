@@ -3,7 +3,7 @@
 
 #include <rbdl/rbdl.h>
 
-#include "mwoibn/hierarchical_control/controller_task.h"
+#include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,13 +11,13 @@
 // Check if all compiled robot instances initializes propoerly
 TEST(ControlerTaskTest, initializationBaseClass)
 {
-  mwoibn::hierarchical_control::ControllerTask(8, 15);
+  mwoibn::hierarchical_control::tasks::BasicTask(8, 15);
 }
 
 // Check all basic robot methods (get/set/update joint_state/velocity)
 TEST(ControlerTaskTest, methodsBaseClass)
 {
-  mwoibn::hierarchical_control::ControllerTask task(8, 15);
+  mwoibn::hierarchical_control::tasks::BasicTask task(8, 15);
 
   EXPECT_EQ(task.getTaskSize(),8);
   EXPECT_EQ(task.getTaskDofs(),15);

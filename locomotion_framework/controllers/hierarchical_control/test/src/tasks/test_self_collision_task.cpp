@@ -1,4 +1,4 @@
-#include "mwoibn/hierarchical_control/self_collision_task.h"
+#include "mwoibn/hierarchical_control/tasks/self_collision_task.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -26,11 +26,11 @@ TEST(ControlerTaskTest, initializationBaseClass)
   safety_limits[3] = 0.002;
   safety_limits[45] = 0.002;
 
-  EXPECT_NO_THROW(mwoibn::hierarchical_control::SelfCollisionTask task(collision, safety_limits));
-  EXPECT_NO_THROW(mwoibn::hierarchical_control::SelfCollisionTask task(collision, {0.05}));
-  EXPECT_NO_THROW(mwoibn::hierarchical_control::SelfCollisionTask task(collision, 0.05));
+  EXPECT_NO_THROW(mwoibn::hierarchical_control::tasks::SelfCollision task(collision, safety_limits));
+  EXPECT_NO_THROW(mwoibn::hierarchical_control::tasks::SelfCollision task(collision, {0.05}));
+  EXPECT_NO_THROW(mwoibn::hierarchical_control::tasks::SelfCollision task(collision, 0.05));
 
-  EXPECT_THROW(mwoibn::hierarchical_control::SelfCollisionTask task(collision, {0.05, 0.05}),std::invalid_argument) ;
+  EXPECT_THROW(mwoibn::hierarchical_control::tasks::SelfCollision task(collision, {0.05, 0.05}),std::invalid_argument) ;
 
 }
 
@@ -42,7 +42,7 @@ TEST(ControlerTaskTest, methodsBaseClass)
   std::unique_ptr<mwoibn::collision_model::RobotCollision> collision_ptr = mwoibn::tests_common::_initTestCollisionModel(robot);
   mwoibn::collision_model::RobotCollision& collision = *collision_ptr;
 
-  mwoibn::hierarchical_control::SelfCollisionTask task(collision, 0.05);
+  mwoibn::hierarchical_control::tasks::SelfCollision task(collision, 0.05);
 
 
   EXPECT_EQ(task.getTaskSize(),1);

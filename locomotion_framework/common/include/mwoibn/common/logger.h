@@ -6,27 +6,28 @@
 namespace mwoibn
 {
 
-namespace common{
+namespace common {
 
-class Logger{
+class Logger {
 
 public:
- Logger(){}
-~Logger(){}
+Logger(){
+}
+virtual ~Logger(){
+}
 
- virtual void addField(std::string name, double init_value) = 0;
- virtual void addEntry(std::string name, double value) = 0;
+virtual void addField(std::string name, double init_value) = 0;
+virtual void addEntry(std::string name, double value) = 0;
 
- virtual void write() = 0;
+virtual void write() = 0;
 
- virtual void flush() = 0;
- virtual void close() = 0;
+virtual void flush() = 0;
+virtual void close() = 0;
 
- virtual void start() = 0;
+virtual void start() = 0;
 };
 
 }
 
 }
 #endif
-

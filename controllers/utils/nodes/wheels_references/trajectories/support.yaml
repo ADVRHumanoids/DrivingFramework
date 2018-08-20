@@ -1,0 +1,71 @@
+base now: [0.0, 0.0,  0.93, 0.0]
+base_const_vel: [0.2, 0.0, 0.0, 0.0]
+
+# default velocity, controller step
+vel:  0.0010
+dt:   0.005
+
+# initial support position
+x cp: [0.47,    0.47,   -0.66,  -0.66 ]
+y cp: [0.25,   -0.25,   0.25,   -0.25 ]
+z cp: [0.3035,  0.3035, 0.3035, 0.3035]
+
+# predefined x references
+x cp ref:
+  - [0.47, 0.47, -0.66, -0.66]
+  - [0.27, 0.27, -0.50, -0.50 ]
+  - [0.60, 0.60, -0.80, -0.80 ]
+  - [0.30, 0.30, -0.48, -0.48 ]
+
+# predefined y references
+y cp ref:
+  - [0.25 ,  -0.25 ,  0.25 , -0.25 ]
+  - [0.30 ,  -0.30 ,  0.30 , -0.30 ]
+  - [0.40 ,  -0.40 ,  0.40 , -0.40 ]
+
+# predefined z references
+z cp ref:
+  - [0.3035,  0.3035,  0.3035, 0.3035]
+
+# predefined base references
+base ref:
+  - [0.0, 0.0, 0.93, 0.0]
+
+# pattern
+pattern:
+  1:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  2:
+    type: wait
+    steps: 200
+  3:
+    type: move
+    x_cp: 1
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  4:
+    type: wait
+    steps: 200
+  5:
+    type: move
+    x_cp: 2
+    y_cp: 1
+    z_cp: 0
+    base: 0
+  6:
+    type: wait
+    steps: 200
+  7:
+    type: move
+    x_cp: 3
+    y_cp: 2
+    z_cp: 0
+    base: 0
+  8:
+    type: wait
+    steps: 200

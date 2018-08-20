@@ -94,8 +94,6 @@ add_library(JointStates SHARED
     src/joint_states.cpp
 )
 
-
-
 target_link_libraries(JointStates ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
 add_dependencies(JointStates ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 ycm_library_install(JointStates 1 0 0)
@@ -174,6 +172,9 @@ endif()
 
 #LIST( APPEND INSTALL_TARGETS WheelsV2 )
 
+if ( Xenomai_FOUND )
+    set_xeno_flags(WheelsWorld)
+endif()
 
 #add_library(WheelsEvents SHARED
 #    src/wheeled_motion_event.cpp
