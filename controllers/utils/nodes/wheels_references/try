@@ -1,0 +1,43 @@
+#!/usr/bin/env python2.7
+from custom_services.srv import updatePDGains
+from custom_messages.msg import CustomCmnd
+from custom_messages.msg import StateMsg
+import yaml
+
+import rospy
+from numpy import cos, sin
+import numpy as np
+
+class Reference:
+    def __init__(self, service, file):
+        self.service = service
+        with open(file, 'r') as stream:
+            try:
+                print(yaml.load(stream))
+            except yaml.YAMLError as exc:
+                print(exc)
+
+
+if __name__ == '__main__':
+    rospy.init_node('wheel_reference')
+    rate = rospy.Rate(200)
+    #print(1.0/dt)
+    name = 'wheels_command'
+
+    support = rospy.Publisher('wheels_support', CustomCmnd, queue_size=1)
+    state = rospy.Publisher('wheels_state', StateMsg, queue_size=1)
+
+    service_ok = False
+    while (not rospy.is_shutdown() and not service_ok):
+      try:
+        print('wait for service: update_links')
+        rospy.wait_for_service(name, 0.5)
+        service_ok = True
+        print('service found')
+      except:
+        pass
+
+    rate.sleep()
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+    ref = Reference(ref_service, '/home/malgorzata/catkin_ws/src/DrivingFramework/controllers/utils/nodes/wheels_references/trajectories/straight.yaml')

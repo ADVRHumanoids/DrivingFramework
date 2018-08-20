@@ -6,63 +6,115 @@ from custom_messages.msg import StateMsg
 import rospy
 from numpy import cos, sin
 import numpy as np
+import yaml
+
+from argparse import ArgumentParser
 
 class Reference:
-    def __init__(self, service):
+    def check_key(self, key, dict):
+        try:
+            dict[key]
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    def check_keys(self, keys, dict):
+        for key in keys:
+            self.check_key(key, dict)
+
+    def __init__(self, service, file):
         self.service = service
-        # base initial state
-        self.base_now = np.array([0.0, 0.0, 0.93, 0.0])
-        self.d_base = np.array([0.0, 0.0, 0.0, 0.0])
 
-        # max height
-        self.z_max = 1.02
-        # default velocity, controller step
-        self.d, self.dt = 0.001, 0.005
+        self.timer = 0
+        self.conds = {self.move: self.condMove, self.wait: self.condWait, self.claim: self.condPass, self.release: self.condPass, self.speed: self.condPass, self.turn: self.condTurn, self.circle: self.condTurn}
 
+        self.readPatterns = {"move": self.readMove, "speed": self.readSpeed, "turn": self.readTurn, "circle": self.readCircle, "wait": self.readWait, "claim": self.readClaim, "release": self.readRelease}
+
+        with open(file, 'r') as stream:
+            try:
+                yaml_file = yaml.load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+        #yaml_file["dsfknl"]
+        self.check_keys(["x cp", "y cp", "z cp", "base now", "vel", "dt", "x cp ref", "y cp ref", "z cp ref", "base ref", "pattern", "base_const_vel"], yaml_file)
+
+        self.base_offset = np.array(yaml_file["base_const_vel"])
         # initial support velocity
         self.dx_cp = np.array([0.0,  0.0,  0.0, 0.0])
         self.dy_cp = np.array([0.0,  0.0,  0.0, 0.0])
         self.dz_cp = np.array([0.0,  0.0,  0.0, 0.0])
+
+        # initial base velocity
+        self.d_base = np.array([0.0, 0.0, 0.0, 0.0])
+
+        # base initial state
+        self.base_now = np.array(yaml_file["base now"])
+
+        # default velocity, controller step
+        self.d, self.dt = yaml_file["vel"], yaml_file["dt"]
+
         # initial support position
-        self.x_cp = np.array([0.47  ,  0.47  , -0.66  , -0.66  ])
-        self.y_cp = np.array([0.25 , -0.25 ,  0.25 , -0.25 ])
-        self.z_cp = np.array([0.3035,  0.3035,  0.3035,  0.3035])
+        self.x_cp = np.array(yaml_file["x cp"])
+        self.y_cp = np.array(yaml_file["y cp"])
+        self.z_cp = np.array(yaml_file["z cp"])
+
         # following predefined x references
-        self.x_cp_ref = np.array([[0.47, 0.47, -0.66, -0.66],
-  							     [0.30, 0.30, -0.55, -0.55 ],
-                                 [0.40, 0.25, -0.45, -0.65 ],
-   							     [0.50, 0.20, -0.40, -0.75 ],
-							  ])
+        self.x_cp_ref = np.array(yaml_file["x cp ref"])
         # following predefined y references
-        self.y_cp_ref = np.array([[0.15,  -0.15,  0.15, -0.15],
-							   [0.25 ,  -0.25 ,  0.25 , -0.25 ],
-                               [0.05 ,  -0.35 ,  0.35 , -0.05 ],
-                               [0.0 ,  -0.35 ,  0.35 , -0.0 ], ])
+        self.y_cp_ref = np.array(yaml_file["y cp ref"])
         # following predefined z references
-        self.z_cp_ref = np.array([[0.3035,  0.3035,  0.3035, 0.3035],
-							   [0.3035,  0.3035,  0.3035, 0.50],
-							   [0.3035,  0.3035,  0.3035, 0.32],
-							   [0.5,  0.3035,  0.3035, 0.3035]])
+        self.z_cp_ref = np.array(yaml_file["z cp ref"])
 
-		# self.z_bs_ref = np.array([[self.z_bs], [self.z_max], [self.z_max+0.12], [self.z_max+0.05]])
+        self.base_ref = np.array(yaml_file["base ref"]);
+
+        id = 1
+        self.pattern = []
+        done = False
+        while not done:
+            try:
+                pattern = yaml_file["pattern"][id]
+                self.pattern.append(self.readPatterns[pattern["type"]](pattern))
+            except:
+                done = True
+
+            id = id + 1
+
         self.vel = np.full(16,self.d)
-
-        self.base_ref = np.array([[0.0, 0.0, 0.93, 0.0], [1.000, 0.0, 0.93, 0.0], [0.00, 0.5, 0.93, 0.0], [0.800, -0.5, 1.02, 0.0], [0.800, -0.5, 0.85, 0.0], [-0.6, -0.6, 0.93, -0.41], [1.64 , 0.0, 0.93, 6.28]]);
-        # self.base_ref = np.array([[0.0, 0.0, 0.93, 0.0], [1.000, 0.0, 0.93, 0.0], [0.000, 0.4, 0.93, 0.0], [0.400, -0.2, 0.93, 0.0]]);
-
-        self.pattern = [(self.move,[0,1,0,0]), (self.speed, [[3,0,0.0], [3,1,0.1], [3,2,0.1]]), (self.move,[1,0,0,2]), (self.wait, [200]),  (self.speed, [[3,0,0.05], [3,1,0.05]]), (self.move,[0,1,0,3]), (self.move,[0,1,0,4]), (self.speed, [[3,3,0.05], [3,2,0.0]]), (self.turn,[2,2,0, 1.0, 0.05]), (self.wait, [2000]), (self.circle,[2,2,0, 0.005, 0.4]), (self.speed, [[3,0,0.05], [3,1,0.02], [3,3,0.05]]), (self.wait, [400]), (self.move,[0,0,0,5])]
-
-        #
-        # self.pattern = [(self.speed, [[3,0,0.05], [3,1,0.05], [3,3,0.1]]), (self.move,[0,0,0,5])]
 
         self.step = 0
         self.msg = CustomCmnd()
         self.base_msg = StateMsg()
+        self.condFunc = self.conds[self.getType()]
 
         self.endStep = len(self.pattern)
-        self.timer = 0
-        self.conds = {self.move: self.condMove, self.wait: self.condWait, self.claim: self.condPass, self.release: self.condPass, self.speed: self.condPass, self.turn: self.condTurn, self.circle: self.condTurn}
-        self.condFunc = self.conds[self.getType()]
+
+
+    def readMove(self, pattern):
+        self.check_keys(["x_cp", "y_cp", "z_cp", "base"], pattern)
+        return (self.move, [pattern["x_cp"], pattern["y_cp"], pattern["z_cp"], pattern["base"]])
+
+    def readSpeed(self, pattern):
+        self.check_keys(["motions"], pattern)
+        return (self.speed, pattern["motions"])
+
+    def readTurn(self, pattern):
+        self.check_keys(["x_cp", "y_cp", "z_cp", "radius", "angle"], pattern)
+        return (self.turn, [pattern["x_cp"], pattern["y_cp"], pattern["z_cp"], pattern["radius"], pattern["angle"]])
+
+    def readCircle(self, pattern):
+        self.check_keys(["x_cp", "y_cp", "z_cp", "radius", "angle", "x_sign", "y_sign"], pattern)
+        return (self.circle, [pattern["x_cp"], pattern["y_cp"], pattern["z_cp"], pattern["angle"], pattern["radius"], pattern["x_sign"], pattern["y_sign"]])
+
+    def readWait(self, pattern):
+        self.check_keys(["steps"], pattern)
+        return (self.wait, [pattern["steps"]])
+
+    def readClaim(self, pattern):
+        self.check_keys(["leg"], pattern)
+        return (self.claim, [pattern["leg"]])
+
+    def readRelease(self, pattern):
+        self.check_keys(["leg"], pattern)
+        return (self.release, [pattern["leg"]])
 
     def speed(self):
         # print("speed", self.vel)
@@ -79,7 +131,7 @@ class Reference:
     	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
     	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
     	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
-    	#self.d_base[np.abs(self.getBase() - self.base_now) < 1e-3] = 0
+    	self.d_base[np.abs(self.getBase() - self.base_now) < 1e-4] = 0
 
     	self.x_cp += self.dx_cp*self.dt
     	self.y_cp += self.dy_cp*self.dt
@@ -98,7 +150,7 @@ class Reference:
         self.d_base[2] = self.vel[14]
         self.base_now[0] += self.d_base[0]*self.dt;
         self.base_now[1] += self.d_base[1]*self.dt;
-        self.base_now[1] += self.d_base[2]*self.dt;
+        self.base_now[2] += self.d_base[2]*self.dt;
 
     	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
     	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
@@ -107,6 +159,7 @@ class Reference:
     	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
     	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
     	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+        self.d_base[np.abs(self.d_base) < 1e-3] = 0
 
     	self.x_cp += self.dx_cp*self.dt
     	self.y_cp += self.dy_cp*self.dt
@@ -116,18 +169,23 @@ class Reference:
         # print("turn", self.d_base, self.base_now)
 
     def condTurn(self):
-
+        done = np.allclose(self.get(3), self.base_now[3], 1e-02, 1e-02)
+        if done:
+            self.d_base.fill(0)
         # print(self.getZ()- self.z_cp)
         # print(self.getBase()-self.base_now, self.getBase(), self.base_now)
         # print(self.get(3), self.base_now[3], self.get(3)-self.base_now[3])
-        return np.allclose(self.get(3), self.base_now[3], 1e-02, 1e-02)
+        return done
 
     def circle(self):
         self.d_base[3] = self.vel[15]*np.sign(self.get(3) - self.base_now[3])
         self.base_now[3] += self.d_base[3]*self.dt;
 
-        self.d_base[0] =  -self.d_base[3]*self.get(4)*np.cos(self.base_now[3]);
-        self.d_base[1] =  -self.d_base[3]*self.get(4)*np.sin(self.base_now[3]);
+        self.d_base[0] =  self.get(5)*self.d_base[3]*self.get(4)*np.cos(self.base_now[3]);
+        self.d_base[1] =  self.get(6)*self.d_base[3]*self.get(4)*np.sin(self.base_now[3]);
+        self.base_now[0] += self.d_base[0]*self.dt;
+        self.base_now[1] += self.d_base[1]*self.dt;
+        self.base_now[2] += self.d_base[2]*self.dt;
 
     	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
     	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
@@ -136,22 +194,23 @@ class Reference:
     	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
     	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
     	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+        self.d_base[np.abs(self.d_base) < 1e-3] = 0
 
     	self.x_cp += self.dx_cp*self.dt
     	self.y_cp += self.dy_cp*self.dt
     	self.z_cp += self.dz_cp*self.dt
 
     	self.timer += 1
-        print("circle", self.base_now)
+        print("circle", np.sqrt(self.d_base[0]**2+self.d_base[1]**2) )
 
 
 
     def condMove(self):
-        print("move")
+        #print("move")
         #print(self.getX(), self.x_cp, self.getX()- self.x_cp)
         #print(self.getY(), self.y_cp, self.getY()- self.y_cp)
         # print(self.getZ()- self.z_cp)
-        print(self.getBase()-self.base_now, self.getBase(), self.base_now)
+        #print(self.d_base, self.getBase(), self.base_now)
         return np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03) and np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03) and np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03) and np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03)
 
     def condPass(self):
@@ -161,14 +220,8 @@ class Reference:
         return self.timer > self.get(0)
 
     def wait(self):
+        #print("wait", self.timer)
         self.timer += 1
-
-    # def getBaseX(self):
-	# 	return self.base_now[0]
-	# def getBaseY(self):
-	# 	return self.base_now[1]
-	# def getBaseZ(self):
-	# 	return self.base_now[2]
 
     def claim(self):
         self.service(3, 1, self.get(0))
@@ -200,6 +253,7 @@ class Reference:
 
     def increment(self):
 		self.step += 1
+		print(self.step)
 		if not self.isRunning(): return
 		self.timer = 0
 		self.condFunc = self.conds[self.getType()]
@@ -217,7 +271,7 @@ class Reference:
 		return self.msg
 
     def base(self):
-        self.base_msg.x, self.base_msg.y, self.base_msg.z, self.base_msg.rz = self.d_base
+        self.base_msg.x, self.base_msg.y, self.base_msg.z, self.base_msg.rz = self.d_base + self.base_offset
         return self.base_msg
 
     def end(self):
@@ -228,8 +282,17 @@ class Reference:
     def isRunning(self):
 		return self.step < self.endStep
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 if __name__ == '__main__':
     rospy.init_node('wheel_reference')
+
     rate = rospy.Rate(200)
     #print(1.0/dt)
     name = 'wheels_command'
@@ -249,25 +312,34 @@ if __name__ == '__main__':
 
     rate.sleep()
 
-    ref_service = rospy.ServiceProxy(name, updatePDGains)
-    ref = Reference(ref_service)
 
-    # try:
-    #     ref_service(1.0, 1.0, ref.getBaseX()*100.0)
-    #     ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
-    # except rospy.ServiceException as exc:
-    #     print("Service did not process request: " + str(exc))
+    parser = ArgumentParser(description="pass file name")
+    parser.add_argument("-f", "--file", help="read parm from file", metavar="FILE")
+    parser.add_argument("-b", "--base", help="send base referrence", metavar="BASE", type=str2bool, default=True)
+    parser.add_argument("-s", "--support", help="send support referrence", metavar="SUPPORT", type=str2bool, default=True)
+    #parser.add_argument("__ns", help="ros namespace", default="")
+
+    args, unknown = parser.parse_known_args()
+    args = vars(args)
+
+    ref_service = rospy.ServiceProxy(name, updatePDGains)
+    ref = Reference(ref_service, args['file'])
+    is_base = args['base']
+    is_support = args['support']
 
     while not rospy.is_shutdown() and ref.isRunning():
         ref.update()
         if ref.condition():
             ref.increment()
 
-        support.publish(ref.send())
-        state.publish(ref.base())
+        if is_support:
+            support.publish(ref.send())
+        if is_base:
+            state.publish(ref.base())
 #	  ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
 
         rate.sleep()
 
+    print("end")
     support.publish(ref.end())
     state.publish(ref.base())

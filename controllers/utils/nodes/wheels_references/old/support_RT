@@ -25,7 +25,7 @@ if __name__ == '__main__':
     ref_service = rospy.ServiceProxy(name, updatePDGains)
 
     x, y = 0, 0
-    
+
     mode = 0
 
     vel = 0.02 # 0.009 # 0.05
@@ -55,12 +55,12 @@ if __name__ == '__main__':
 #      elif mode == 1 and x[1] > 0.01 and x[1] < 0.02:
 #         dx[2] = -vel
 #      elif (mode == 1 and x[1] > 0.02):
-#         dx[1], dx[2] =  0.00,  -vel        
+#         dx[1], dx[2] =  0.00,  -vel
 #         mode += 1
 #      elif mode == 2 and x[2] < -0.01  and  x[2] > -0.025:
 #         dx[3] = -vel
 #      elif (mode == 2 and x[2] < -0.025):
-#         dx[2], dx[3] =  0.00,  -vel        
+#         dx[2], dx[3] =  0.00,  -vel
 #         mode += 1
       if (mode == 0):
          dx =  -vel*dir_x
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
       x += dx*0.005*2
       y += dy*0.005*2
-      
+
       print("dx\t", dx, "dy\t", dy,  "x\t", x,  "y\t", y)
 
       try:
@@ -112,7 +112,3 @@ if __name__ == '__main__':
 
 
       rate.sleep()
-
-
-
-
