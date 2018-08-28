@@ -25,7 +25,7 @@ bool setPosition(std::string name, double pos);
 bool setFullPosition(std::string name);
 
 void step(double step) {
-        _step = std::max(_max_vel*_robot.rate(), std::min(step, _max_vel*_robot.rate()));
+        _step = std::min(step, _max_vel*_robot.rate());
 }
 virtual void init();
 virtual void update();
@@ -50,7 +50,7 @@ mwoibn::Vector3 _error, _last;
 mwoibn::point_handling::PositionsHandler _wheels;
 //  std::vector<mwoibn::Vector3> _wheels_positions;
 //mwoibn::robot_class::Robot& _robot;
-double _step, _dt, _max_vel = 1.0;
+double _step, _dt, _max_vel = 0.5;
 bool _init;
 
 

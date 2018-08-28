@@ -53,8 +53,6 @@ virtual std::string _setName(){
         return "wheeled_motion";
 }
 
-private:
-
 XBot::RosUtils::ServiceServerWrapper::Ptr _srv_rt;
 XBot::RosUtils::SubscriberWrapper::Ptr _sub_rt;
 

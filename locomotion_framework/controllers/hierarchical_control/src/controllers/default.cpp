@@ -107,8 +107,9 @@ mwoibn::hierarchical_control::controllers::Default::update()
         {
                 task.get().update();
         }
+		
         compute();
-
+		
         return getCommand();
 }
 

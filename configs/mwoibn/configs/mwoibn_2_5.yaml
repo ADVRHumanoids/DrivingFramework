@@ -1,24 +1,25 @@
 driving_path: &driving  "/home/embedded/malgorzata_exp/ws/src/"
 simulator_path: &simulator "/home/embedded/malgorzata_exp/ws/src/"
+config_path: &config "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/"
 mwoibn:
         middleware: "XBOT"
         system: "HW" # SM
         layers:
             RT:
-                        path: *driving
-                        file: "DrivingFramework/locomotion_framework/configs/RT.yaml"
+                        path: *config
+                        file: "mwoibn/configs/support/RT.yaml"
             NRT:
-                        path: *driving
-                        file: "DrivingFramework/locomotion_framework/configs/NRT.yaml"
+                        path: *config
+                        file: "mwoibn/configs/support/NRT.yaml"
         robot:
                 name: "centauro"
                 systems:
                         HW: 
-                                path: *driving
-                                file: "DrivingFramework/locomotion_framework/configs/hardware.yaml"
+                                path: *config
+                                file: "mwoibn/configs/support/hardware.yaml"
                         SM: 
-                                path: *driving
-                                file: "DrivingFramework/locomotion_framework/configs/simulation.yaml"
+                                path: *config
+                                file: "mwoibn/configs/support/simulation.yaml"
                 default:
                         controller: 
                                 list: [position_controller, velocity_controller]
@@ -88,6 +89,9 @@ mwoibn:
 #                                list: []
                                 list: [odometry]
                         feedback: 
+#                                list: []
+#                                list: []
+#                                list: []
 #                                list: []
                                 list: [link_side_online, imu_base]
                         actuators: 
@@ -338,9 +342,6 @@ mwoibn:
                                 reference: centauro::pelvis
                                 initialize: true
                         floating_base: 
-                                source: "/gazebo/link_states"
-                                message: gazebo_msgs::LinkStates
-                                reference: centauro::pelvis
                                 initialize: true
                         imu_base: 
                                 source: "/gazebo/link_states"
@@ -388,15 +389,14 @@ mwoibn:
         xbot:
                 source:
                         config: 
-                                path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/centauro_working_jan_2018.yaml"
+                                path: *config
+                                file: "xbot/higher/centauro_working_aug_2018.yaml"
                         urdf: 
-                                path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro.urdf"
-#                        urdf: "/home/user/malgorzata/workspace/src/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_full_wheels.urdf"
+                                path: *config
+                                file: "mwoibn/urdf/centauro.urdf"
                         srdf:
-                                path: *driving
-                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+                                path: *config
+                                file: "mwoibn/srdf/centauro_full_wheels.srdf"
                         actuators: 
                                 path: *simulator
                                 file: "DrivingFramework/locomotion_framework/configs/actuators.yaml"
@@ -404,14 +404,14 @@ mwoibn:
                                 path: *simulator 
                                 file: "DrivingFramework/locomotion_framework/configs/contacts.yaml"
                         controller: 
-                                path: *driving
+                                path: *config
                                 file: "" 
                 mapping:
                         RBDL_LOWER:
                                 loading: model
                                 urdf: 
-                                        path: *driving
-                                        file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+                                        path: *config
+                                        file: "mwoibn/urdf/centauro_lower_body.urdf"
                 feedback:
                         link_side_online:
                                 layer: online
@@ -467,66 +467,69 @@ mwoibn:
                         layer: "RT"
                         robot: default
                         mode: "full"
-                        secondary_file: &config_lower "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml"
-                        tunning: HW_str_1
+                        secondary_file: &config_lower "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/support/lower_body.yaml"
+                        tunning: odom_NRT_5
                         tunnings:
                                 HW_str_1:
                                         ratio: 1.15
                                         damping: 0.0001
                                         constraints: 1
                                         leg_steer: 70 # 20
-                                        base_orinetation: 100
-                                        centre_of_mass_x: 30
-                                        centre_of_mass_y: 30
-                                        base_position: 30
-                                        contact_point: 8.0
-                                        camber: 60
-                                        castor: 30
-                                        camber_damp: 0.1
-                                        castor_damp: 0.15
+                                        base_orinetation: 80
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 25
+                                        contact_point: 22.0
+                                        camber: 50
+                                        castor: 15
+                                        camber_damp: 0.04
+                                        castor_damp: 0.12
                                         steer_open_loop: 1.0
-                                        steer_feedback: 0.01
+                                        steer_feedback: 10.0
                                         steer_damp: 0.001
                                         damp_icm: 0.0008
                                         damp_sp: 0.001
                                         tracking_gain: 1.0 
-                                HW_static_1:
-                                        ratio: 1.15
+                                HW_1: 
+                                        ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 80 # 20
-                                        base_orinetation: 120
-                                        centre_of_mass_x: 40
-                                        centre_of_mass_y: 40
-                                        base_position: 30
-                                        contact_point: 9.2
-                                        camber: 60
-                                        castor: 30
-                                        camber_damp: 0.1
-                                        castor_damp: 0.15
+                                        leg_steer: 90
+                                        base_orinetation: 45
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 10
+                                        contact_point: 18
+                                        camber: 15 # 100
+                                        castor: 30 # 14
+                                        camber_damp: 0.08
+                                        castor_damp: 0.12
                                         steer_open_loop: 1.00 # 0.95
-                                        steer_feedback: 0.001 # 0.05
-                                        steer_damp: 0.02
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0   
                                 odom_NRT_5: # circular - odom, 
                                         ratio: 1.0
                                         damping: 0.0001
                                         constraints: 1
-                                        leg_steer: 55
+                                        leg_steer: 90
                                         base_orinetation: 50
-                                        centre_of_mass_x: 38
-                                        centre_of_mass_y: 38
-                                        base_position: 10
+                                        centre_of_mass_x: 35
+                                        centre_of_mass_y: 35
+                                        base_position: 20
                                         contact_point: 18
-                                        camber: 50 # 100
-                                        castor: 15 # 14
-                                        camber_damp: 0.04
+                                        camber: 15 # 100
+                                        castor: 30 # 14
+                                        camber_damp: 0.08
                                         castor_damp: 0.12
                                         steer_open_loop: 1.00 # 0.95
-                                        steer_feedback: 0.001 # 0.05
-                                        steer_damp: 0.015
-                                        damp_icm: 0.00000000001
-                                        damp_sp: 0.015
-                                        tracking_gain: 200.0                                                                                                                                         
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0                                                                                                                                         
                 joint_states:
                         layer: "RT"
                         robot: joint_space
@@ -534,7 +537,7 @@ mwoibn:
                 odometry:
                         layer: "RT"
                         robot: odometry
-                        secondary_file: "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/odometry.yaml"
+                        secondary_file: "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/support/odometry.yaml"
 #                        mode: "full"
                         mode: "full"
                         wheel_radius: 0.078

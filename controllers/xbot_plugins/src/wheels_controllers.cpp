@@ -41,10 +41,11 @@ void mgnss::xbot_plugins::WheelsControllerExtend::control_loop(double time, doub
         _controller_ptr->send();
 
         _end = std::chrono::high_resolution_clock::now();
-        _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+       _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
 
         _controller_ptr->log(*_logger_ptr.get(), time-_start);
-}
+
+  }
 
 //}
 /*

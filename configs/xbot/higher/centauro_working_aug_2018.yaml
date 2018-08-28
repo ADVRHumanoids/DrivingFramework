@@ -1,10 +1,10 @@
 XBotCore:
-  config_path: "configs/ADVR_shared/centauro/configs/centauro.yaml"
+  config_path: "../malgorzata_exp/ws/src/DrivingFramework/configs/xbot/lower/centauro.yaml"
 
 XBotInterface:
-  urdf_path: "configs/ADVR_shared/centauro/urdf/centauro.urdf"
-  srdf_path: "configs/ADVR_shared/centauro/srdf/centauro.srdf"
-  joint_map_path: "configs/ADVR_shared/centauro/joint_map/centauro_joint_map.yaml"
+  urdf_path: "../malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/urdf/centauro.urdf"
+  srdf_path: "../malgorzata_exp/ws/src/DrivingFramework/configs/xbot/centauro.srdf"
+  joint_map_path: "../malgorzata_exp/ws/src/DrivingFramework/configs/xbot/joint_map/centauro.yaml"
 
 RobotInterface:
   framework_name: "ROS"
@@ -12,14 +12,18 @@ RobotInterface:
 ModelInterface:
   model_type: "RBDL"
   is_model_floating_base: "true"
+
+RobotInterfaceROS:
+  publish_tf: true
   
 MasterCommunicationInterface:
   framework_name: "ROS"
 
 XBotRTPlugins:
 #  plugins: ["Odometry", "JointStates", "WheelsV2"]
-  plugins: ["JointStates", "Odometry", "WheelsV2"]
-#  plugins: ["JointStates", "Odometry"]
+#  plugins: ["JointStates", "Odometry", "WheelsV2"]
+  plugins: ["JointStates", "Odometry", "WheelsEvents3"]
+#  plugins: ["HomingExample"]
   io_plugins: []
   
 NRTPlugins:
@@ -27,8 +31,8 @@ NRTPlugins:
   plugins: []
 
 WebServer:
-  enable: "false"
-  address: "127.0.0.1"
+  enable: "true"
+  address: "10.24.4.100"
   port: "8081"
 
 SimulationOptions:
@@ -77,24 +81,5 @@ GazeboXBotPlugin:
     j_wheel_3: *wheel
     j_wheel_4: *wheel
 
-#mwoibnRobot:
-#  robot:
-#        config_file: &config /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2.yaml
-#        config_name: default
-#        secondary_file: &config_lower /home/malgorzata/catkin_ws/src/DrivingFramework/locomotion_framework/configs/lower_body.yaml
-#  robot2:
-#        config_file: *config
-#        config_name: odometry
-#        secondary_file: *config_lower
-#  robot3:
-#        config_file: *config
-#        config_name: joint_space
-#  higher_scheme:
-#        config_file: *config
-#        config_name: higher_scheme
-#  default:
-#        config_file: *config
-#        config_name: default
-
 mwoibn:
-   config_file: &config /home/embedded/malgorzata_exp/ws/src/DrivingFramework/locomotion_framework/configs/mwoibn_v2_5.yaml
+   config_file: /home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml

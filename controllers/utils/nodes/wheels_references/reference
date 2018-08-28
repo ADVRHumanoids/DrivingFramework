@@ -7,6 +7,9 @@ import rospy
 from numpy import cos, sin
 import numpy as np
 import yaml
+	
+import signal
+import time
 
 from argparse import ArgumentParser
 
@@ -123,22 +126,23 @@ class Reference:
             self.vel[i[0]*4+i[1]] = i[2]
 
     def move(self):
-    	self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
-    	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
-    	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
-    	self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
+		self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
+		self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
+		self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
+		self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
 
-    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
-    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
-    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
-    	self.d_base[np.abs(self.getBase() - self.base_now) < 1e-4] = 0
+		self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
+		self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
+		self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
+		self.d_base[np.abs(self.getBase() - self.base_now) < 1e-4] = 0
 
-    	self.x_cp += self.dx_cp*self.dt
-    	self.y_cp += self.dy_cp*self.dt
-    	self.z_cp += self.dz_cp*self.dt
-    	self.base_now += self.d_base*self.dt
+		self.x_cp += self.dx_cp*self.dt
+		self.y_cp += self.dy_cp*self.dt
+		self.z_cp += self.dz_cp*self.dt
+		self.base_now += self.d_base*self.dt
+		#print(self.base_now)
 
-    	self.timer += 1
+		self.timer += 1
 
     # [th, v]
     def turn(self):
@@ -171,7 +175,7 @@ class Reference:
     def condTurn(self):
         done = np.allclose(self.get(3), self.base_now[3], 1e-02, 1e-02)
         if done:
-            self.d_base.fill(0)
+            self.d_base.fill(0.0)
         # print(self.getZ()- self.z_cp)
         # print(self.getBase()-self.base_now, self.getBase(), self.base_now)
         # print(self.get(3), self.base_now[3], self.get(3)-self.base_now[3])
@@ -201,7 +205,7 @@ class Reference:
     	self.z_cp += self.dz_cp*self.dt
 
     	self.timer += 1
-        print("circle", np.sqrt(self.d_base[0]**2+self.d_base[1]**2) )
+        #print("circle", np.sqrt(self.d_base[0]**2+self.d_base[1]**2) )
 
 
 
@@ -247,13 +251,16 @@ class Reference:
     def getBase(self):
         return self.base_ref[self.get(3)]
 
+    def getBaseEstimate(self):
+	    return self.base_now
+		
     def condition(self):
 #			print(self.condFunc.__name__, np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
         return self.condFunc()
 
     def increment(self):
 		self.step += 1
-		print(self.step)
+#		print(self.step)
 		if not self.isRunning(): return
 		self.timer = 0
 		self.condFunc = self.conds[self.getType()]
@@ -276,7 +283,11 @@ class Reference:
 
     def end(self):
         self.msg.velocity = [0] * 12 + [2147483647]
-        self.d_base = np.full(4,0)
+        self.d_base = np.full(4,0.0)
+        #print(self.x_cp)
+        #print(self.y_cp)
+        #print(self.z_cp)
+
         return self.msg
 
     def isRunning(self):
@@ -290,10 +301,21 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+class GracefulKiller:
+  kill_now = False
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+	
+
+  def exit_gracefully(self,signum, frame):
+    self.kill_now = True
+	
+	
 if __name__ == '__main__':
     rospy.init_node('wheel_reference')
 
-    rate = rospy.Rate(200)
+    rate = rospy.Rate(100)
     #print(1.0/dt)
     name = 'wheels_command'
 
@@ -303,10 +325,10 @@ if __name__ == '__main__':
     service_ok = False
     while (not rospy.is_shutdown() and not service_ok):
       try:
-        print('wait for service: update_links')
+#        print('wait for service: update_links')
         rospy.wait_for_service(name, 0.5)
         service_ok = True
-        print('service found')
+#        print('service found')
       except:
         pass
 
@@ -326,8 +348,10 @@ if __name__ == '__main__':
     ref = Reference(ref_service, args['file'])
     is_base = args['base']
     is_support = args['support']
-
-    while not rospy.is_shutdown() and ref.isRunning():
+    killer = GracefulKiller()
+	
+    while not rospy.is_shutdown() and ref.isRunning() and not killer.kill_now:
+        
         ref.update()
         if ref.condition():
             ref.increment()
@@ -337,9 +361,9 @@ if __name__ == '__main__':
         if is_base:
             state.publish(ref.base())
 #	  ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
-
+		
         rate.sleep()
 
-    print("end")
+#    print(ref.getBaseEstimate())
     support.publish(ref.end())
     state.publish(ref.base())

@@ -21,7 +21,7 @@ void mgnss::plugins::RosBase::_init(int argc, char** argv)
 bool mgnss::plugins::RosBase::init()
 {
 
-        std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/locomotion_framework/configs/mwoibn_v2_5.yaml"; // for now, later take it as a parameter
+        std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/configs/mwoibn/mwoibn_v2_5.yaml"; // for now, later take it as a parameter
 
         // Read MWOIBN config file
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);

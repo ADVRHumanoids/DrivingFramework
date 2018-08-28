@@ -32,6 +32,8 @@ public:
       : ContactPoint3DRbdl(ik, robot), _com(com)
   {
     _contact_j.setZero(3, _robot.getDofs());
+	    _contact_k.setZero(3, _robot.getDofs());
+
     init();
   }
 
@@ -46,32 +48,39 @@ public:
   }
 
   const mwoibn::Matrix& computeContactJacobian(int i){
-    double norm = 1/(_ground_normal - _axes_world[i]*_ground_normal.transpose()*_axes_world[i]).norm();
+ 
+	double scalar = _ground_normal.transpose()*_axes_world[i];
+	_point = _axes_world[i]*scalar;
 
-    _point = _axes_world[i]*_ground_normal.transpose()*_axes_world[i];
+   double norm = 1/(_ground_normal - _point).norm();
+
 
     mwoibn::eigen_utils::skew(_point, _contact_1);
     mwoibn::eigen_utils::skew(_axes_world[i], _contact_2);
 
-    _contact_1 += (_axes_world[i]*_ground_normal.transpose()*_contact_2);
+	_contact_3 = _axes_world[i]*_ground_normal.transpose();
+    _contact_1 += (_contact_3*_contact_2);
 
     _contact_2 = 0.5*norm*norm*_ground_normal*_ground_normal.transpose();
     _contact_2 -= mwoibn::Matrix3::Identity();
-    _contact_2 -= 0.5*norm*norm*_axes_world[i]*_axes_world[i].transpose()*_ground_normal*_ground_normal.transpose();
 
-    _contact_j = _contact_2*_contact_1*_wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
+	_contact_2 -= 0.5*norm*norm*_point*_ground_normal.transpose();
+	_contact_3 = _contact_2*_contact_1;
+	
+    _contact_k.noalias() = _wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
+	_contact_j.noalias() = _contact_3*_contact_k;
 
     return _contact_j;
   }
 
   virtual void updateState(){
-
+	
     ContactPoint3DRbdl::updateState();
 
     q_twist = _pelvis_ptr->point(0).getOrientationWorld(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
     q_twist = q_twist.twistSwing(_ground_normal);
     angle_twist = q_twist.toAxisAngle(axis_twist);
-
+	
   }
 
   double getTwist() const {return angle_twist;}
@@ -101,8 +110,8 @@ protected:
   mwoibn::Quaternion q_twist;
   double angle_twist;
   mwoibn::Vector3 axis_twist;
-  mwoibn::Matrix3 _contact_1, _contact_2;
-  mwoibn::Matrix  _contact_j;
+  mwoibn::Matrix3 _contact_1, _contact_2, _contact_3;
+  mwoibn::Matrix  _contact_j, _contact_k;
 
 
   double R = 0.01, r = 0.068;

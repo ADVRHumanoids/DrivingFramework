@@ -1145,11 +1145,11 @@ void mwoibn::robot_class::Robot::_initModel(bool is_static,
                                             RigidBodyDynamics::Model& model)
 {
         // RigidBodyDynamics::Model model;
-
         if (!RigidBodyDynamics::Addons::URDFReadFromFile(source.c_str(), &model,
-                                                         !is_static, false))
+                                                         !is_static, false))									 
                 throw std::invalid_argument(
                               std::string("Error loading model from file  for mapping "));
+														 
 }
 
 void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)

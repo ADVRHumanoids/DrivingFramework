@@ -37,6 +37,7 @@ void mgnss::controllers::WheelsController::compute()
                 _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
 
         _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
+
 }
 
 void mgnss::controllers::WheelsController::step(){

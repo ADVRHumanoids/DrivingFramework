@@ -1,0 +1,48 @@
+base now: [0.0, 0.0,  0.0, 0.0]
+base_const_vel: [0.0, 0.0, 0.0, 0.0]
+
+# default velocity, controller step
+vel:  0.004
+dt:   0.01
+
+# initial support position
+x cp: [0.0,    0.0,   -0.0,  -0.0 ]
+y cp: [0.0,    -0.0,   0.0,   -0.0 ]
+z cp: [0.0,  0.0, 0.0, 0.0]
+
+# predefined x references
+x cp ref:
+  - [ 0.00,  0.00, -0.00, -0.00 ]
+  - [ 0.05,  0.05, -0.05, -0.05 ]
+  - [-0.05, -0.05,  0.05,  0.05 ]
+# predefined y references
+y cp ref:
+  - [ 0.00, -0.00,  0.00, -0.00 ]
+  - [ 0.05, -0.05,  0.05, -0.05 ]  
+  - [-0.05,  0.05, -0.05,  0.05 ]  
+# predefined z references
+z cp ref:
+  - [0.0,  0.0,  0.0, 0.0]
+
+# predefined base references
+base ref:
+  - [0.0, 0.0, 0.0, 0.0]
+  - [0.1, 0.0, 0.0, 0.0]
+  - [0.0, -0.0, 0.04, -0.5]
+  - [-0.15, 0.00, 0.0, 0.0]
+  - [ 0.5, 0.00,  0.06,  0.2]
+
+pattern:
+  1:
+    type: speed
+    motions:
+      - [3, 0, 0.02]
+      - [3, 1, 0.02]
+      - [3, 2, 0.02]
+      - [3, 3, 0.02]
+  2:
+    type: move
+    x_cp: 2
+    y_cp: 0
+    z_cp: 0
+    base: 4
