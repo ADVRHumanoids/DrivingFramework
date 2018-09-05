@@ -7,7 +7,7 @@ import rospy
 from numpy import cos, sin
 import numpy as np
 import yaml
-	
+
 import signal
 import time
 
@@ -253,7 +253,7 @@ class Reference:
 
     def getBaseEstimate(self):
 	    return self.base_now
-		
+
     def condition(self):
 #			print(self.condFunc.__name__, np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
         return self.condFunc()
@@ -282,8 +282,12 @@ class Reference:
         return self.base_msg
 
     def end(self):
-        self.msg.velocity = [0] * 12 + [2147483647]
+        self.msg.velocity = [0.0] * 12 + [2147483647]
         self.d_base = np.full(4,0.0)
+        #print(np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
+        #print(np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03))
+        #print(np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03))
+        #print(np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03))
         #print(self.x_cp)
         #print(self.y_cp)
         #print(self.z_cp)
@@ -306,12 +310,12 @@ class GracefulKiller:
   def __init__(self):
     signal.signal(signal.SIGINT, self.exit_gracefully)
     signal.signal(signal.SIGTERM, self.exit_gracefully)
-	
+
 
   def exit_gracefully(self,signum, frame):
     self.kill_now = True
-	
-	
+
+
 if __name__ == '__main__':
     rospy.init_node('wheel_reference')
 
@@ -349,9 +353,9 @@ if __name__ == '__main__':
     is_base = args['base']
     is_support = args['support']
     killer = GracefulKiller()
-	
+
     while not rospy.is_shutdown() and ref.isRunning() and not killer.kill_now:
-        
+
         ref.update()
         if ref.condition():
             ref.increment()
@@ -361,7 +365,7 @@ if __name__ == '__main__':
         if is_base:
             state.publish(ref.base())
 #	  ref_service(2.0, 3.0, ref.getBaseZ()*100.0)
-		
+
         rate.sleep()
 
 #    print(ref.getBaseEstimate())
