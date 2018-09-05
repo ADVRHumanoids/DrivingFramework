@@ -264,7 +264,7 @@ class Reference:
 		if not self.isRunning(): return
 		self.timer = 0
 		self.condFunc = self.conds[self.getType()]
-		# print(self.step, self.getType().__name__)
+#		print(self.step, self.getType().__name__)
 
     def update(self):
 		self.getType()()
@@ -283,7 +283,7 @@ class Reference:
 
     def end(self):
         self.msg.velocity = [0.0] * 12 + [2147483647]
-        self.d_base = np.full(4,0.0)
+        self.d_base = -self.base_offset
         #print(np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03))
