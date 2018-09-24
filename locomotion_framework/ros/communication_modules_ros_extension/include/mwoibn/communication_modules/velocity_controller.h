@@ -5,6 +5,10 @@
 #include "mwoibn/communication_modules/basic_controller.h"
 #include "ros/ros.h"
 #include <custom_messages/CustomCmnd.h>
+#include <custom_services/loadGains.h>
+#include <custom_services/getJointNames.h>
+#include <custom_services/updateGains.h>
+
 #include <std_srvs/SetBool.h>
 #include <custom_controller/controller_utils.h>
 
@@ -30,6 +34,8 @@ public:
     if(!config["name"])
       throw(std::invalid_argument("Required argument \"name\" is missing."));
 
+    _name = config["name"].as<std::string>();
+
     std::string sink = (config["sink"]) ? config["sink"].as<std::string>() : "/command";
 
     _init(map.reversed(), map.getDofs(), config["name"].as<std::string>(), sink);
@@ -42,6 +48,7 @@ public:
   virtual ~VelocityController() {}
 
   virtual bool send();
+  bool loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res);
 
   //  ros::ServiceClient set_feed_forward;
 
@@ -51,6 +58,8 @@ protected:
 
   ros::Publisher _command_pub;
   custom_messages::CustomCmnd _des_q;
+  ros::ServiceServer _load_gains_srv;
+  std::string _name;
 
   template <typename Vector> void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs, std::string name, std::string command = "/command")
   {
@@ -80,6 +89,14 @@ protected:
       if (urdf_rbdl[i] != mwoibn::robot_class::NON_EXISTING)
         rbdl_controller[urdf_rbdl[i]] = urdf[i];
     }
+
+
+    _load_gains_srv =
+                _node.advertiseService<custom_services::loadGains::Request,
+                                   custom_services::loadGains::Response>(
+                        name+"/load_gains",
+                        boost::bind(&VelocityController::loadGains, this, _1, _2));
+
 
     _map = mwoibn::robot_class::BiMap(name, rbdl_controller);
   }

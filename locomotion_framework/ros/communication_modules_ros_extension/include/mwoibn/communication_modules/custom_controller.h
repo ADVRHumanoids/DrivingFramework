@@ -5,6 +5,10 @@
 #include "mwoibn/communication_modules/basic_controller.h"
 #include "ros/ros.h"
 #include <custom_messages/CustomCmnd.h>
+#include <custom_services/loadGains.h>
+#include <custom_services/getJointNames.h>
+#include <custom_services/updateGains.h>
+
 #include <std_srvs/SetBool.h>
 #include <custom_controller/controller_utils.h>
 #include "mwoibn/communication_modules/ros_feedback.h"
@@ -39,6 +43,7 @@ public:
     if (!config["name"])
       throw(std::invalid_argument("Required argument \"name\" is missing."));
 
+    _name = config["name"].as<std::string>();
     std::string sink =
         (config["sink"]) ? config["sink"].as<std::string>() : "/command";
     std::string service = (config["ff_service"])
@@ -69,12 +74,16 @@ public:
     else
       throw(std::runtime_error("Couldn't initialize robot state"));
 
+
+
     std::cout << "Loaded direct controller " << config["name"] << std::endl;
   }
 
   virtual ~CustomController() {}
 
   virtual bool send();
+
+  bool loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res);
 
   //  ros::ServiceClient set_feed_forward;
 
@@ -84,6 +93,8 @@ protected:
 
   ros::Publisher _command_pub;
   custom_messages::CustomCmnd _des_q;
+  ros::ServiceServer _load_gains_srv;
+  std::string _name;
 
   template <typename Vector>
   void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs,
@@ -96,6 +107,8 @@ protected:
 
     ros::ServiceClient set_feed_forward =
         _node.serviceClient<std_srvs::SetBool>(name + service);
+
+
     std_srvs::SetBool srv;
     srv.request.data = true;
 
@@ -104,6 +117,12 @@ protected:
       std::cout << "WARNING: Couldn't initialize a feed forward term from "
                    "service:\n\t " << name << service << std::endl;
     }
+
+    _load_gains_srv =
+            _node.advertiseService<custom_services::loadGains::Request,
+                               custom_services::loadGains::Response>(
+                    name+"/load_gains",
+                    boost::bind(&CustomController::loadGains, this, _1, _2));
 
     _map = _initMap(urdf_rbdl, rbdl_dofs);
   }
