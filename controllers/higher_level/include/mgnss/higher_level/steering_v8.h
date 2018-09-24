@@ -9,6 +9,10 @@ namespace mgnss
 namespace higher_level
 {
 
+/*
+ *  Steering version with contact point open-loop reference
+ *
+ */
 class Steering8 : public SteeringReference
 {
 

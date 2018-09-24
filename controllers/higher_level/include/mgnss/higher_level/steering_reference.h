@@ -152,7 +152,6 @@ virtual void compute(const mwoibn::Vector3 next_step){
         _SPT(); // returns a velue in a robot space
 
         for (int i = 0; i < _size; i++) _merge(i);
-//    std::cout << std::endl;
 }
 
 static int limit2PI(double ref, double& st, int factor){
