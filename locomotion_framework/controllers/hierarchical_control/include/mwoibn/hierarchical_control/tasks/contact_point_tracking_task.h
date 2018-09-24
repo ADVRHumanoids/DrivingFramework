@@ -13,7 +13,7 @@ namespace tasks
 
 /**
  * @brief The CartesianWorld class Provides the inverse kinematics task
- ***to control the position of a point defined in one of a robot reference frames
+ ********to control the position of a point defined in one of a robot reference frames
  *
  */
 class ContactPointTracking : public CartesianWorld
@@ -22,8 +22,8 @@ class ContactPointTracking : public CartesianWorld
 public:
 /**
  * @param[in] ik the point handler mamber that defines which point is
- ***controlled by this task instance it makes a local copy of a point handler to
- ***prevent outside user from modifying a controlled point
+ ********controlled by this task instance it makes a local copy of a point handler to
+ ********prevent outside user from modifying a controlled point
  *
  */
 ContactPointTracking(point_handling::PositionsHandler ik,
@@ -66,12 +66,6 @@ virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference, bool upd
 virtual mwoibn::Vector3
 getReferenceWorld(int i) = 0;
 
-virtual mwoibn::Vector3
-getTestReference(int i){
-        mwoibn::Vector3 test = _getTransform()*_reference.segment(i * 3, 3);
-        return test;
-}
-
 virtual const mwoibn::Vector3& getPointStateReference(int i) = 0;
 
 const mwoibn::VectorN& getState() const {
@@ -85,6 +79,7 @@ virtual const mwoibn::Vector3& getReferenceError(int i) = 0;
 
 virtual void releaseContact(int i) {
 }
+
 virtual void claimContact(int i) {
 }
 

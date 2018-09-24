@@ -98,7 +98,7 @@ public:
 
   virtual void updateError()
   {
-	  
+
     _last_error.noalias() = _error; // save previous state
 
     for (int i = 0; i < _ik.size(); i++)
@@ -118,15 +118,17 @@ public:
         _error.segment<3>(3 * i) = _full_error.segment<3>(
             3 * i); // here I should change to keep the first task the same
       }
-	   
+
     }
-	 
+
+    //std::cout << _error.transpose() << std::endl;
+
   }
 
 
   virtual void updateJacobian()
   {
-	  
+
     _last_jacobian.noalias() = _jacobian;
 
     for (int i = 0; i < _ik.size(); i++)
@@ -134,7 +136,7 @@ public:
 
       _point_jacobian.noalias() = _referenceJacobian(i);
       _point_jacobian -= _contactJacobian(i);
-		
+
       if (_selector[i])
       {
         _jacobian.row(3 * i).noalias() =
@@ -147,7 +149,7 @@ public:
         _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = _point_jacobian;
       }
     }
-	
+
   }
 
   using CartesianWorld::getReference;

@@ -20,62 +20,66 @@ class BasicModel
 {
 
 public:
-  BasicModel(mwoibn::robot_class::Robot& robot) : _robot(robot) {
+BasicModel(mwoibn::robot_class::Robot& robot) : _robot(robot) {
 
-    _zero.setZero(_robot.getDofs());
-    _gravity.setZero( _robot.getDofs());
-    _non_linear.setZero(_robot.getDofs());
-    _inertia.setZero(_robot.getDofs(),
-                     _robot.getDofs());
+        _zero.setZero(_robot.getDofs());
+        _gravity.setZero( _robot.getDofs());
+        _non_linear.setZero(_robot.getDofs());
+        _inertia.setZero(_robot.getDofs(),
+                         _robot.getDofs());
 
-  }
+}
 
-  virtual ~BasicModel() {
-  }
+virtual ~BasicModel() {
+}
 
-  /** @brief returns gravity effect computed **/
-  virtual const mwoibn::VectorN& getGravity()
-  {
+/** @brief returns gravity effect computed **/
+virtual const mwoibn::VectorN& getGravity()
+{
 
-    _gravity.setZero();
-    RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
-                                        _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _zero, _gravity);
+        _gravity.setZero();
+        RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
+                                            _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _zero, _gravity);
 
-    return _gravity;
-  }
+        //std::cout << "basic model gravity\t" << _gravity.transpose() << std::endl;
+        return _gravity;
+}
 
-  /** @brief returns all modeled nonlinear effects including gravity in robots
-   * dynamic **/
-  virtual const mwoibn::VectorN& getNonlinearEffects()
-  {
+/** @brief returns all modeled nonlinear effects including gravity in robots
+ * dynamic **/
+virtual const mwoibn::VectorN& getNonlinearEffects()
+{
 
-    _non_linear.setZero();
-    RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
-                                        _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                                        _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY), _non_linear);
+        _non_linear.setZero();
+        RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
+                                            _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
+                                            _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY), _non_linear);
 
-    return _non_linear;
-  }
+        return _non_linear;
+}
 
-  /** @brief returns inertia matrix**/
-  virtual const mwoibn::Matrix& getInertia()
-  {
-    _inertia.setZero();
+/** @brief returns inertia matrix**/
+virtual const mwoibn::Matrix& getInertia()
+{
+        _inertia.setZero();
 
-    RigidBodyDynamics::CompositeRigidBodyAlgorithm(
-        _robot.getModel(), _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _inertia, false);
+        RigidBodyDynamics::CompositeRigidBodyAlgorithm(
+                _robot.getModel(), _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _inertia, false);
 
-    return _inertia;
-  }
+        return _inertia;
+}
 
-  virtual void update() {}
+virtual void update() {
+}
 
-  mwoibn::robot_class::Robot& getRobot() const { return _robot; }
+mwoibn::robot_class::Robot& getRobot() const {
+        return _robot;
+}
 
 protected:
-  mwoibn::robot_class::Robot& _robot;
-  mwoibn::VectorN _gravity, _non_linear, _zero;
-  mwoibn::Matrix _inertia;
+mwoibn::robot_class::Robot& _robot;
+mwoibn::VectorN _gravity, _non_linear, _zero;
+mwoibn::Matrix _inertia;
 
 
 };
