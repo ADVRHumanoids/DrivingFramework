@@ -51,7 +51,7 @@ LIST( APPEND CATKIN_DEPENDS_SET roscpp)
 
 
 if(ROS_CONTROL)
-	LIST( APPEND CATKIN_DEPENDS_SET custom_controller)
+	LIST( APPEND CATKIN_DEPENDS_SET custom_controller custom_services custom_messages)
         LIST( APPEND SOURCE_FILES src/custom_controller.cpp  src/velocity_controller.cpp)
 endif(ROS_CONTROL)
 
@@ -114,4 +114,3 @@ target_link_libraries(communication_modules_ros
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
