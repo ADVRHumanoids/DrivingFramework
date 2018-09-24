@@ -1,0 +1,150 @@
+#!/usr/bin/env python2.7
+from gazebo_msgs.srv import ApplyBodyWrench
+
+import rospy
+from numpy import cos, sin
+import numpy as np
+import yaml
+
+import signal
+import time
+
+import sys
+
+from argparse import ArgumentParser
+
+class ApplyForce:
+      def __init__(self, command, time_step):
+
+          if len(command) < 8:
+              print("Unexpected command type. Excpected input: body_name time[s] f_x f_y f_z m_x m_y m_z")
+              return
+          print("init", command)
+
+          #self.name = command[0]
+          self.time = float(command[1])
+          self.f = [float(x) for x in command[2:5]]
+          self.m = [float(x) for x in command[5:8]]
+          self.time_step = time_step
+
+          self.msg = ApplyBodyWrench()
+          self.msg.body_name = command[0]
+          
+
+      def step(self):
+          self.time -= self.time_step
+          print(self.time)
+
+      def get(self):
+          return self.msg
+
+      def end(self):
+          return self.time <= 0
+          #print(self.name, self.time, self.f, self.m)
+
+class ApplyForces:
+      def __init__(self, time_step):
+          self.applyForces = []
+          self.time_step = time_step
+          name = '/gazebo/apply_body_wrench'
+          #self.rate(1/time_step)
+          service_ok = False
+          while (not rospy.is_shutdown() and not service_ok):
+              try:
+                  rospy.wait_for_service(name, 0.5)
+                  service_ok = True
+          #        print('service found')
+              except:
+                  pass
+
+              rate.sleep()
+              self.srv = rospy.ServiceProxy(name, ApplyBodyWrench)
+
+      def add(self, command):
+#          try:
+          force = ApplyForce(command, self.time_step)
+          self.applyForces.append(force)
+#          except:
+#              return
+
+      def execute(self):
+          while not rospy.is_shutdown() and not killer.kill_now and self.applyForces:
+              self.send()
+              rate.sleep()
+
+      def send(self):
+          list(map(lambda x:x.step(),self.applyForces))
+          #print("list lenght", len(self.applyForces))
+          self.applyForces = [x for x in self.applyForces if not x.end()]
+          [self.srv.send(x.get()) for x in self.applyForces]
+          #print("end lenght", len(self.applyForces))
+
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+class GracefulKiller:
+  kill_now = False
+  def __init__(self):
+    signal.signal(signal.SIGINT, self.exit_gracefully)
+    signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+
+  def exit_gracefully(self,signum, frame):
+    self.kill_now = True
+
+if __name__ == '__main__':
+    killer = GracefulKiller()
+    rospy.init_node('apply_force')
+
+    fq = 100.0
+    rate = rospy.Rate(fq)
+    #print(1.0/dt)
+    forces = ApplyForces(1/fq)
+
+
+    #parser = ArgumentParser(description="pass file name")
+    #parser.add_argument("-f", "--file", help="read parm from file", metavar="FILE")
+    #parser.add_argument("-b", "--base", help="send base referrence", metavar="BASE", type=str2bool, default=True)
+    #parser.add_argument("-s", "--support", help="send support referrence", metavar="SUPPORT", type=str2bool, default=True)
+    #parser.add_argument("__ns", help="ros namespace", default="")
+
+    #args, unknown = parser.parse_known_args()
+    #args = vars(args)
+
+    #ref = Reference(ref_service, args['file'])
+    #is_base = args['base']
+    #is_support = args['support']
+
+    while not rospy.is_shutdown() and not killer.kill_now:
+
+      command = raw_input("Waiting for command...").split()
+      forces.add(command)
+
+      forces.execute()
+#      if command == '' and i < len(idx):
+#        map.update(idx[i])
+#        i = i+1
+#        print('collision ' + str(i+1) + '/' + str(len(idx)))
+#      elif command == '':
+#        break
+#      elif command == 'z':
+#        i = i-1
+#        print('collision ' + str(i+1) + '/' + str(len(idx)))
+#        map.update(idx[i])
+#      else:
+#        try:
+#          int(command)
+#          if int(command) > -1 and int(command) < len(idx):
+#                map.update(int(command))
+#          else:
+#                print("Unknown command")
+#        except:
+#                print("Unknown command")
+#      map.publish()
+      rate.sleep()
