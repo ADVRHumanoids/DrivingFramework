@@ -1195,12 +1195,12 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
                 std::string name = link.first;
 
                 mwoibn::VectorInt dofs = getDof(name);
-
+                if(dofs.size() == 0) continue;
                 if (model.IsFixedBodyId(link.second))
                         continue;
                 RigidBodyDynamics::Joint joint = model.mJoints[link.second];
 
-                if (!_is_static && joint.q_index < 6 &&
+                if (!is_static && joint.q_index < 6 &&
                     joint.q_index + joint.mDoFCount == 6)
                 {
 
@@ -1229,4 +1229,6 @@ void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
         }
 
         biMaps().add(BiMap(config["name"].as<std::string>(), mapNew));
+
+        std::cout << config["name"].as<std::string>() << "\t" << mapNew.transpose() << std::endl;
 }
