@@ -172,31 +172,14 @@ void compute(const Dynamic_Matrix& matrix)
 }
 void init(const Dynamic_Matrix& matrix, Scalar damping){
         _damping.setConstant(std::min(matrix.rows(), matrix.cols()), damping);
-        init(matrix);
+        _init(matrix);
 }
 
 void init(const Dynamic_Matrix& matrix, const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping){
         if(damping.size() != std::min(matrix.rows(), matrix.cols()))
                 throw(std::invalid_argument("Couldn't initialize pseudo inverse, incompatibile damping size"));
         _damping = damping;
-        init(matrix);
-}
-
-void init(const Dynamic_Matrix& matrix)
-{
-        _inversed.setZero(matrix.cols(), matrix.rows());
-        _transposed.setZero(matrix.cols(), matrix.rows());
-
-        _type = (matrix.rows() > matrix.cols()) ? true : false;
-        int size = (_type) ? matrix.rows() : matrix.cols();
-        int other =  (_type) ? matrix.cols() : matrix.rows();
-        _squared.setZero(other, other);
-        _inverse_ptr.reset(new Eigen::LDLT<Dynamic_Matrix>(size));
-        _damping = _damping.cwiseProduct(_damping);
-        _identity.setIdentity(other, other);
-
-//    std::cout << _type << std::endl;
-//    std::cout << matrix.rows() << "\t" << matrix.cols() << std::endl;
+        _init(matrix);
 }
 
 Scalar damping(int i){
@@ -214,6 +197,23 @@ std::unique_ptr<Eigen::LDLT<Dynamic_Matrix> > _inverse_ptr;
 Eigen::Matrix<Scalar, Eigen::Dynamic, 1> _damping;
 Dynamic_Matrix _transposed, _inversed, _squared, _identity;
 bool _type;
+
+void _init(const Dynamic_Matrix& matrix)
+{
+        _inversed.setZero(matrix.cols(), matrix.rows());
+        _transposed.setZero(matrix.cols(), matrix.rows());
+
+        _type = (matrix.rows() > matrix.cols()) ? true : false;
+        int size = (_type) ? matrix.rows() : matrix.cols();
+        int other =  (_type) ? matrix.cols() : matrix.rows();
+        _squared.setZero(other, other);
+        _inverse_ptr.reset(new Eigen::LDLT<Dynamic_Matrix>(size));
+        _damping = _damping.cwiseProduct(_damping);
+        _identity.setIdentity(other, other);
+
+//    std::cout << _type << std::endl;
+//    std::cout << matrix.rows() << "\t" << matrix.cols() << std::endl;
+}
 };
 
 //! Provides the computation of a step of a recursive algorithm for a null-space
