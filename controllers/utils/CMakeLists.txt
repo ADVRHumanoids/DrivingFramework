@@ -39,7 +39,7 @@ endif(VISUALIZATION_TOOLS)
 # prepend_paths(PYTHON_INSTALL wheels_references)
 # LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 
- LIST( APPEND PYTHON_INSTALL events_vel straight_iit_july reference try)
+ LIST( APPEND PYTHON_INSTALL events_vel straight_iit_july reference try apply_force)
  prepend_paths(PYTHON_INSTALL wheels_references)
  LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 

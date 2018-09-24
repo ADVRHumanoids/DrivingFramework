@@ -6,6 +6,7 @@
 #include "mgnss/controllers/wheels_controller_extend.h"
 #include "mgnss/controllers/wheeled_motion_event.h"
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
+#include "mgnss/controllers/wheels_reactif.h"
 #include "mgnss/controllers/wheeled_motion_world.h"
 #include "mgnss/controllers/wheeled_motion_actions.h"
 #include "mgnss/controllers/wheeled_motion_merge_v1.h"
@@ -121,6 +122,20 @@ virtual void _initCallbacks(){
 
 }
 ros::Subscriber _state_rt;
+
+};
+
+class WheelsReactif : public WheeledMotionEvent3 {
+public:
+WheelsReactif(int argc, char** argv) : WheeledMotionEvent3(argc, argv){
+}
+virtual ~WheelsReactif(){
+}
+
+protected:
+virtual void _resetPrt(YAML::Node config){
+        _controller_ptr.reset(new mgnss::controllers::WheelsReactif(*_robot_ptr, config));
+}
 
 };
 

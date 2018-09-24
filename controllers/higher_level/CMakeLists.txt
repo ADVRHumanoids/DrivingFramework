@@ -46,6 +46,7 @@ add_library(steering
    src/steering_v6.cpp
    src/steering_v7.cpp
    src/steering_v8.cpp
+   src/steering_reactif.cpp
  )
 
 add_dependencies(steering ${catkin_EXPORTED_TARGETS})
