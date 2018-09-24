@@ -13,10 +13,10 @@ option(TRAJECTORY_GENERATION OFF)
 option(CENTRALIZED_CONTROLLER ON)
 option(CENTER_OF_MASS_CONTROLLER ON)
 option(WHEELS_MOTION ON)
-option(TEST_TEMP ON)
 option(JOINT_STATES ON)
 option(GRAVITY_TEST ON)
 option(ODOMETRY ON)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -72,8 +72,7 @@ endif(TRAJECTORY_GENERATION)
 
 if(CENTRALIZED_CONTROLLER)
   LIST( APPEND INSTALL_TARGETS
-    centralized_controller
-    online_centralized_controller
+    centralized
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -89,7 +88,6 @@ endif(CENTRALIZED_CONTROLLER)
 if(CENTER_OF_MASS_CONTROLLER)
 
 LIST( APPEND INSTALL_TARGETS
-#  hierarchical_controller_with_events
   com_test
 )
 LIST( APPEND CATKIN_DEPENDS_SET
@@ -98,7 +96,6 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   hierarchical_control
   custom_services
-#  reference_generation
   communication
   visualization_tools
 )
@@ -116,7 +113,6 @@ LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
   hierarchical_control
   custom_services
-#  reference_generation
 )
 
 endif(GRAVITY_TEST)
@@ -125,16 +121,9 @@ endif(GRAVITY_TEST)
 if(WHEELS_MOTION)
 
   LIST( APPEND INSTALL_TARGETS
-#    wheeled_locomotion_6
-#    wheels_cut
-#    wheels_cut_v2
-    wheels_event
-#    wheels_full
-#    wheeled_motion_run
     wheels_world
-    wheels_support
-    wheels
     wheels_3
+    wheels_reactif
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -143,7 +132,6 @@ if(WHEELS_MOTION)
     hierarchical_control
     custom_services
     custom_messages
-#    reference_generation
     controllers
     communication
 
@@ -154,8 +142,6 @@ endif(WHEELS_MOTION)
 if(JOINT_STATES)
 
   LIST( APPEND INSTALL_TARGETS
-    my_test
-#    contact_test
     joint_states
   )
   LIST( APPEND CATKIN_DEPENDS_SET
@@ -166,21 +152,8 @@ if(JOINT_STATES)
     custom_services
 #    reference_generation
   )
-#  LIST( APPEND CATKIN_DEPENDS_SET
-#    visualization_tools
-#  )
 
 endif(JOINT_STATES)
-
-if(TEST_TEMP)
-  LIST( APPEND INSTALL_TARGETS
-    test_swing_twist
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    common
-  )
-
-endif(TEST_TEMP)
 
 if(ODOMETRY)
   LIST( APPEND INSTALL_TARGETS
@@ -234,6 +207,7 @@ include_directories(
 
 add_library(nrt_plugins
    src/plugins/joint_states.cpp
+#	 src/plugins/centralized.cpp
 #   src/plugins/odometry.cpp
  )
 
@@ -259,21 +233,6 @@ target_link_libraries(simple_trajectory
     ${catkin_LIBRARIES}
  )
 endif(TRAJECTORY_GENERATION)
-
-if(CENTRALIZED_CONTROLLER)
-add_executable(centralized_controller src/centralized_controller.cpp)
-add_dependencies(centralized_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(centralized_controller
-    ${catkin_LIBRARIES}
- )
-
-add_executable(online_centralized_controller src/online_centralized_controller.cpp)
-add_dependencies(online_centralized_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(online_centralized_controller
-    ${catkin_LIBRARIES}
- )
-
-endif(CENTRALIZED_CONTROLLER)
 
 
 if(CENTER_OF_MASS_CONTROLLER)
@@ -301,29 +260,18 @@ target_link_libraries(gravity_test
  )
 endif(GRAVITY_TEST)
 
+if(CENTRALIZED_CONTROLLER)
 
+add_executable(centralized src/exec/centralized.cpp)
+add_dependencies(centralized nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(centralized nrt_plugins
+    ${catkin_LIBRARIES}
+ )
+
+endif(CENTRALIZED_CONTROLLER)
 
 
 if(WHEELS_MOTION)
-
-add_executable(wheels_event src/wheels_event.cpp)
-add_dependencies(wheels_event ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_event
-    ${catkin_LIBRARIES}
- )
-
-add_executable(wheels_support src/wheels_support.cpp)
-add_dependencies(wheels_support ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_support
-    ${catkin_LIBRARIES}
- )
-
-add_executable(wheels src/exec/wheels.cpp)
-add_dependencies(wheels nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
 
 add_executable(wheels_3 src/exec/wheels_3.cpp)
 add_dependencies(wheels_3 nrt_plugins ${catkin_EXPORTED_TARGETS})
@@ -331,6 +279,13 @@ target_link_libraries(wheels_3
     nrt_plugins
     ${catkin_LIBRARIES}
  )
+
+ add_executable(wheels_reactif src/exec/wheels_reactif.cpp)
+ add_dependencies(wheels_reactif nrt_plugins ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(wheels_reactif
+     nrt_plugins
+     ${catkin_LIBRARIES}
+  )
 
 add_executable(wheels_world src/exec/wheels_world.cpp)
 add_dependencies(wheels_world nrt_plugins ${catkin_EXPORTED_TARGETS})
@@ -357,20 +312,8 @@ target_link_libraries(odometry
   )
 endif(ODOMETRY)
 
-if(TEST_TEMP)
-add_executable(test_swing_twist test/swing_twist.cpp)
-add_dependencies(test_swing_twist nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(test_swing_twist
-    ${catkin_LIBRARIES}
- )
-endif(TEST_TEMP)
 
 if(JOINT_STATES)
-add_executable(my_test src/my_test.cpp)
-add_dependencies(my_test ${catkin_EXPORTED_TARGETS})
-target_link_libraries(my_test
-    ${catkin_LIBRARIES}
- )
 
 add_executable(joint_states src/exec/joint_states.cpp)
 add_dependencies(joint_states nrt_plugins ${catkin_EXPORTED_TARGETS})

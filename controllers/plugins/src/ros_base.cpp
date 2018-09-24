@@ -18,17 +18,8 @@ void mgnss::plugins::RosBase::_init(int argc, char** argv)
         // ros::NodeHandle n;
 }
 
-bool mgnss::plugins::RosBase::init()
+std::string mgnss::plugins::RosBase::_checkConfig(YAML::Node plugin_config, std::string config_file)
 {
-
-        std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/configs/mwoibn/mwoibn_v2_5.yaml"; // for now, later take it as a parameter
-
-        // Read MWOIBN config file
-        YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
-
-        YAML::Node plugin_config = mwoibn::robot_class::Robot::getConfig(config_file);
-
-
         if (!plugin_config["modules"])
                 throw std::invalid_argument(config_file +
                                             std::string("\t Could not find modules configuration."));
@@ -55,13 +46,20 @@ bool mgnss::plugins::RosBase::init()
 
         std::cout << "secondary file " << secondary_file << std::endl;
 
+        return secondary_file;
+
+}
+
+void mgnss::plugins::RosBase::_loadRobot(std::string config_file, std::string secondary_file, YAML::Node config, YAML::Node plugin_config){
         config = mwoibn::robot_class::Robot::getConfig(config_file, secondary_file);
 
         config["robot"]["layer"] = plugin_config["layer"].as<std::string>();
         config["robot"]["mode"] = plugin_config["mode"].as<std::string>();
 
         _robot_ptr.reset(mwoibn::loaders::Robot::create(config,  plugin_config["robot"].as<std::string>()).release());
+}
 
+void mgnss::plugins::RosBase::_initModule(YAML::Node config, YAML::Node plugin_config){
         config = mwoibn::robot_class::Robot::readFullConfig(config, plugin_config["robot"].as<std::string>());
         config = config["modules"][_name];
 
@@ -73,6 +71,34 @@ bool mgnss::plugins::RosBase::init()
 
         _robot_ptr->get();
         _robot_ptr->updateKinematics();
+}
+
+
+std::string mgnss::plugins::RosBase::_loadConfig(YAML::Node& config, YAML::Node& plugin_config)
+{
+
+        std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml"; // for now, later take it as a parameter
+
+        // Read MWOIBN config file
+        config = mwoibn::robot_class::Robot::getConfig(config_file);
+
+        plugin_config = mwoibn::robot_class::Robot::getConfig(config_file);
+
+        return config_file;
+}
+
+
+bool mgnss::plugins::RosBase::init()
+{
+        YAML::Node config, plugin_config;
+
+        std::string config_file = _loadConfig(config, plugin_config);
+
+        std::string secondary_file = _checkConfig(plugin_config, config_file);
+
+        _loadRobot(config_file, secondary_file, config, plugin_config);
+
+        _initModule(config, plugin_config);
 
         return true;
 }

@@ -38,6 +38,12 @@ std::unique_ptr<mgnss::modules::Base> _controller_ptr;
 std::unique_ptr<mwoibn::robot_class::Robot> _robot_ptr;
 std::unique_ptr<mwoibn::common::Logger> _logger_ptr;
 
+virtual std::string _loadConfig(YAML::Node& config, YAML::Node& plugin_config);
+virtual void _initModule(YAML::Node config, YAML::Node plugin_config);
+virtual void _loadRobot(std::string config_file, std::string secondary_file, YAML::Node config, YAML::Node plugin_config);
+virtual std::string _checkConfig(YAML::Node plugin_config, std::string config_file);
+
+
 virtual void _init(int argc, char** argv);
 std::unique_ptr<ros::NodeHandle> _n;
 

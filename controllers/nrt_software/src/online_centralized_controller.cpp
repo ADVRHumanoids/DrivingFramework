@@ -37,6 +37,7 @@ void setReference(RigidBodyDynamics::Math::VectorNd* state_ptr,
                 robot_ptr->command.set(*state_ptr,
                                        mwoibn::robot_class::INTERFACE::POSITION);
 }
+
 bool setMotorSideReference(std_srvs::SetBool::Request& req,
                            std_srvs::SetBool::Response& res,
                            mwoibn::robot_class::Robot* robot_ptr,
@@ -107,9 +108,8 @@ int main(int argc, char** argv)
         bool motor_side = false;
         std::string path = std::string(DRIVING_FRAMEWORK_WORKSPACE);
         // init real robot
-        mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/locomotion_framework/configs/"
-                                                "mwoibn_v2.yaml",
-                                                "default", path+"DrivingFramework/controllers/nrt_software/configs/centralized_controller.yaml");
+        mwoibn::robot_class::RobotXBotNRT robot(path+"DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml",
+                                                "default", path+"DrivingFramework/configs/mwoibn/configs/support/centralized_controller.yaml");
         mwoibn::robot_class::RobotXBotNRT robot_ref(
                 path+"DrivingFramework/locomotion_framework/configs/"
                 "mwoibn_v2.yaml",
