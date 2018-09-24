@@ -156,16 +156,6 @@ if ( Xenomai_FOUND )
     set_xeno_flags(WheelsV2)
 endif()
 
-add_library(WheelsEvents SHARED
-    src/wheeled_motion_event.cpp
-)
-target_link_libraries(WheelsEvents ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-add_dependencies(WheelsEvents ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-ycm_library_install(WheelsEvents 1 0 0)
-
-LIST( APPEND INSTALL_TARGETS WheelsEvents )
-
-
 add_library(WheelsEvents3 SHARED
     src/wheeled_motion_event_3.cpp
 )
@@ -195,44 +185,6 @@ LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
 
 #LIST( APPEND INSTALL_TARGETS WheelsWorld )
 
-
-#add_library(WheelsEvents SHARED
-#    src/wheeled_motion_event.cpp
-#)
-
-#if ( Xenomai_FOUND )
-#    set_xeno_flags(WheelsEvents)
-#endif()
-
-#target_link_libraries(WheelsEvents ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-#add_dependencies(WheelsEvents ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-#ycm_library_install(WheelsEvents 1 0 0)
-
-#LIST( APPEND INSTALL_TARGETS WheelsEvents )
-
-
-#add_library(WheelsEvents3 SHARED
-#    src/wheeled_motion_event_3.cpp
-#)
-
-#if ( Xenomai_FOUND )
-#    set_xeno_flags(WheelsEvents3)
-#endif()
-
-#target_link_libraries(WheelsEvents3 ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
-#add_dependencies(WheelsEvents3 ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
-#ycm_library_install(WheelsEvents3 1 0 0)
-
-#LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
-
-
-#add_library(WheelsWorld SHARED
-#    src/wheeled_motion_world.cpp
-#)
-
-#if ( Xenomai_FOUND )
-#    set_xeno_flags(WheelsWorld)
-#endif()
 
 #target_link_libraries(WheelsWorld ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} WheelsV2)
 #add_dependencies(WheelsWorld ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})

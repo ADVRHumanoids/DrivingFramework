@@ -46,18 +46,11 @@ add_library(wheeled_motion
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp
-   src/wheeled_motion.cpp
-   src/wheeled_references.cpp
-   src/wheeled_references_v2.cpp
-   src/wheeled_references_v3.cpp
-   src/wheeled_motion_full.cpp
-   src/wheeled_motion_com.cpp
-   src/wheeled_motion_event.cpp
-   src/wheeled_motion_event_v2.cpp
    src/wheeled_motion_event_v3.cpp
    src/wheeled_motion_actions.cpp
    src/wheeled_motion_merge_v1.cpp
    src/wheeled_motion_world.cpp
+   src/wheels_reactif.cpp
  )
 
 add_dependencies(wheeled_motion ${catkin_EXPORTED_TARGETS})
