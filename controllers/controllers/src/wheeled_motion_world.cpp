@@ -72,6 +72,11 @@ void mgnss::controllers::WheeledMotionWorld::_initIK(YAML::Node config){
 
         config = config["tunnings"][config["tunning"].as<std::string>()];
 
+        if(!config["chain"])
+                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
+        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
+
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
@@ -102,7 +107,7 @@ void mgnss::controllers::WheeledMotionWorld::_allocate(){
         _start_steer.setZero(_select_steer.size());
         _resteer.setConstant(_select_steer.size(), false);
         _current_steer.setZero(_select_steer.size());
-
+        // _select_ik = _robot.getDof(_robot.getLinks();
         _test_steer.setZero(_select_steer.size());
 
         _com_ref.setZero(2);

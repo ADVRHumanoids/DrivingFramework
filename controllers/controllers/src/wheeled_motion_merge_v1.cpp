@@ -52,6 +52,11 @@ void mgnss::controllers::WheeledMotionMergeV1::_initIK(YAML::Node config){
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
+        if(!config["chain"])
+                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
+        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
+
         // int task = 0;
         double ratio = config["ratio"].as<double>(); // 4
         double damp = config["damping"].as<double>();

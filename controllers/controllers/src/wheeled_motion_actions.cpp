@@ -63,6 +63,10 @@ void mgnss::controllers::WheeledMotionActions::_initIK(YAML::Node config){
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
+        if(!config["chain"])
+                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
+        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
         // int task = 0;
         double ratio = config["ratio"].as<double>(); // 4
         double damp = config["damping"].as<double>();
@@ -425,22 +429,6 @@ void mgnss::controllers::WheeledMotionActions::log(mwoibn::common::Logger& logge
 //  logger.addEntry("state", _steering_ptr->getState()[2]);
 //  logger.addEntry("twist", _steering_ptr->getTwist());
 
-/*
-   mwoibn::Vector3 test;
-
-   test = _steering_ptr->getTestReference(0);
-
-   logger.addEntry("ref_0_0", test[0]);
-   logger.addEntry("ref_0_1", test[1]);
-   logger.addEntry("ref_0_2", test[2]);
-
-   test = _steering_ptr->twistReference(0);
-
-   logger.addEntry("tref_0_0", test[0]);
-   logger.addEntry("tref_0_1", test[1]);
-   logger.addEntry("tref_0_2", test[2]);
-
- */
 //  logger.addEntry("e_base_z", getBaseError()[2]);
 //  logger.addEntry("r_base_z", getBodyPosition()[2]);
 

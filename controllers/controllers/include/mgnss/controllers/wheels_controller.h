@@ -242,7 +242,7 @@ mwoibn::Axis _x, _y, _z;
 
 mwoibn::Quaternion _orientation;
 bool _reference = false;
-mwoibn::VectorInt _select_steer;
+mwoibn::VectorInt _select_steer, _select_ik;
 mwoibn::VectorN _l_limits, _u_limits;
 int count = 0;
 

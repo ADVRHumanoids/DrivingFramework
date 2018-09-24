@@ -30,13 +30,14 @@ void mgnss::controllers::WheelsController::compute()
 {
         _command.noalias() = _hierarchical_controller_ptr->update();
 
-        _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.set(_command, _select_ik, mwoibn::robot_class::INTERFACE::VELOCITY);
 
+//        std::cout << "velocity " << _command.transpose() << std::endl;
         _command.noalias() = _command * _robot.rate();
         _command.noalias() +=
                 _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
-
-        _robot.command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
+//        std::cout << "position " << _command.transpose() << std::endl;
+        _robot.command.set(_command, _select_ik, mwoibn::robot_class::INTERFACE::POSITION);
 
 }
 
@@ -79,16 +80,6 @@ void mgnss::controllers::WheelsController::nextStep()
         _next_step[2] =
                 (_angular_vel[2]); // just limit the difference
 
-//  _next_step[0] =
-//      (_position[0] - getBaseGroundX()) / _robot.rate();
-//  _next_step[1] =
-//      (_position[1] - getBaseGroundY()) / _robot.rate();
-//  _next_step[2] =
-//      (_heading - getBaseGroundRz()); // just limit the difference
-
-//  _next_step[2] -= 6.28318531 * std::floor((_next_step[2] + 3.14159265) /
-//                                           6.28318531); // limit -pi:pi, this may cause problems
-//  _next_step[2] = _next_step[2] / _robot.rate();
         steering();
 }
 
