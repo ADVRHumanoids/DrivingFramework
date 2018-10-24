@@ -110,6 +110,7 @@
                    INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)
         "/>
   <param name="robot_srdf" textfile="$(find configs)/mgnss/configs/mwoibn/srdf/centauro_full_wheels.srdf"/>
+  <param name="mwoibn_config" value="$(find configs)/mgnss/configs/mwoibn/configs/mwoibn_2_5.yaml"/>
 
   <!-- run gazebo -->
   <group if="$(arg gazebo)">

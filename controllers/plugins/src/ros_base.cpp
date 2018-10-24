@@ -76,8 +76,12 @@ void mgnss::plugins::RosBase::_initModule(YAML::Node config, YAML::Node plugin_c
 
 std::string mgnss::plugins::RosBase::_loadConfig(YAML::Node& config, YAML::Node& plugin_config)
 {
+        std::string config_file;
+        
+        if (!_n->getParam("/mwoibn_config", config_file) && !_n->getParam("mwoibn_config", config_file))
+            throw std::invalid_argument(std::string("ROS plugin init: couldn't read path to configuration file. Please define 'mwoibn_config'."));
 
-        std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml"; // for now, later take it as a parameter
+        //std::string config_file = std::string(DRIVING_FRAMEWORK_WORKSPACE) + "DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml"; // for now, later take it as a parameter
 
         // Read MWOIBN config file
         config = mwoibn::robot_class::Robot::getConfig(config_file);
