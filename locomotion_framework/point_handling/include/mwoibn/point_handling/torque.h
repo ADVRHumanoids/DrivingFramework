@@ -16,33 +16,31 @@ class Torque: public State
 public:
 
 
-  template<typename Body>
-  Torque(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Force& force, std::string name = "")
-      : State(body_id, model, state, force.position(), 3, name), _rotation(force.rotation()), _force(force)
+  Torque(point_handling::Force& force, std::string name = "")
+      : State(force.frame, 3, name), force(force)
   {  }
 
-  template<typename Body>
-  Torque(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
+  Torque(Point::Current current,
         point_handling::Force& force, std::string name = "")
-      : State(current, body_id, model, state, force.position(), 3, name), _rotation(force.rotation()), _force(force)
-  { }
+      : State(current, force.frame, name), force(force)
+  {
+    _size = 3;
+  }
 
   Torque(const Torque&& other)
-      : State(other), _rotation(other._rotation), _force(other._force)
+      : State(other), force(other.force)
   {  }
 
   Torque(const Torque& other)
-      : State(other), _rotation(other._rotation), _force(other._force)
+      : State(other), force(other.force)
   {  }
 
   Torque(const Torque&& other, point_handling::Force& force)
-      : State(other, force.position()), _rotation(force.rotation()), _force(force)
+      : State(other, force.frame), force(force)
   {  }
 
   Torque(const Torque& other, point_handling::Force& force)
-      : State(other, force.position()), _rotation(force.rotation()), _force(force)
+      : State(other, force.frame), force(force)
   {  }
 
   virtual ~Torque() {}
@@ -72,11 +70,7 @@ public:
   using State::getReference;
   using State::setReference;
 
-  Force& force() {return _force;}
-
-  protected:
-    Rotation& _rotation;
-    Force& _force;
+  Force& force;
 
 };
 

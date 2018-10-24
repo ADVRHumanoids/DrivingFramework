@@ -26,7 +26,6 @@ public:
   {
   }
 
-
   TempBase(const TempBase&& other)
       : _name(other._name), _model(other._model), _body_id(other._body_id), _state(other._state), _size(other._size)
   {  }
@@ -34,6 +33,18 @@ public:
   TempBase(const TempBase& other)
       : _name(other._name), _model(other._model), _body_id(other._body_id), _state(other._state), _size(other._size)
   {  }
+
+
+
+    template<typename Source>
+    TempBase(const Source&& other, int size, std::string name = "")
+        : _name(name), _model(other.getModel()), _state(other.getState()), _body_id(other.getBodyId()), _size(size)
+    {  }
+
+    template<typename Source>
+    TempBase(const Source& other, int size, std::string name = "")
+        : _name(name), _model(other.getModel()), _state(other.getState()), _body_id(other.getBodyId()), _size(size)
+    {  }
 
   virtual ~TempBase() {}
 
@@ -45,6 +56,15 @@ public:
 
   virtual int size() const { return _size; }
   virtual int dofs() const { return _state.size(); }
+
+  RigidBodyDynamics::Model& getModel() const{
+    return _model;
+  }
+
+  const mwoibn::robot_class::State& getState() const{
+    return _state;
+  }
+
 
 protected:
   /** human-readable name of a point*/

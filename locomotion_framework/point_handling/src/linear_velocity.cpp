@@ -9,7 +9,7 @@ namespace point_handling
 
       _J.setZero();
 
-      CalcPointJacobian(_model, _state.get(), _body_id, _position.getFixed(), _J,
+      CalcPointJacobian(_model, _state.get(), _body_id, frame.position.getFixed(), _J,
                         update);
 
       return _J;
@@ -19,7 +19,7 @@ namespace point_handling
   mwoibn::Matrix LinearVelocity::getJacobian(bool update) const{
     mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
 
-    CalcPointJacobian(_model, _state.get(), _body_id, _position.getFixed(), J,
+    CalcPointJacobian(_model, _state.get(), _body_id, frame.position.getFixed(), J,
                       update);
 
     return J;

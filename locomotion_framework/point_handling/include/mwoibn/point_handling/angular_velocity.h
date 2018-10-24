@@ -2,7 +2,7 @@
 #define __MWOIBN__POINT_HANDLING__ANGULAR_VELOCITY_H
 
 #include "mwoibn/point_handling/velocity.h"
-#include "mwoibn/point_handling/position.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -15,22 +15,17 @@ class AngularVelocity: public Velocity
 
 public:
 
-
-  template<typename Body>
-  AngularVelocity(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position,
+  AngularVelocity(point_handling::FramePlus& frame,
        std::string name = "")
-      : Velocity(body_id, model, state, position, 3, name)
+      : Velocity(frame, 3, name)
   {
-      _J_full.setZero(6, state.size()); }
+      _J_full.setZero(6, _state.size()); }
 
-  template<typename Body>
-  AngularVelocity(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, std::string name = "")
-      : Velocity(current, body_id, model, state, position, 3, name)
+  AngularVelocity(Point::Current current,
+        point_handling::FramePlus& frame, std::string name = "")
+      : Velocity(current, frame, name)
   {
-    _J_full.setZero(6, state.size()); }
+    _J_full.setZero(6, _state.size()); }
 
   AngularVelocity(const AngularVelocity&& other)
       : Velocity(other), _J_full(other._J_full)
@@ -40,12 +35,12 @@ public:
       : Velocity(other), _J_full(other._J_full)
   {  }
 
-  AngularVelocity(const AngularVelocity&& other, point_handling::Position& position)
-      : Velocity(other, position), _J_full(other._J_full)
+  AngularVelocity(const AngularVelocity&& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame), _J_full(other._J_full)
   {  }
 
-  AngularVelocity(const AngularVelocity& other, point_handling::Position& position)
-      : Velocity(other, position), _J_full(other._J_full)
+  AngularVelocity(const AngularVelocity& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame), _J_full(other._J_full)
   {  }
 
   virtual ~AngularVelocity() {}

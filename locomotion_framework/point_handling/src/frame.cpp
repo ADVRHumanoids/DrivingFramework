@@ -12,30 +12,30 @@ Frame::getFullStateWorld(bool update)
 
   getLinearWorld(update);
   getOrientationWorld(update);
-  toFullState(_temp_full, _position.getFixed(), _orientation.getFixed());
+  toFullState(_temp_full, _frame.position.getFixed(), _frame.orientation.getFixed());
 
   return _temp_full;
 }
 
 void Frame::fromFullState(const mwoibn::Vector7& full_state,
                           Point::Current& linear,
-                          Orientation::O& orientation)
+                          Orientation::O& quat)
 {
   linear.head<3>() = full_state.head<3>();
-  orientation.x() = full_state[3];
-  orientation.y() = full_state[4];
-  orientation.z() = full_state[5];
-  orientation.w() = full_state[6];
+  quat.x() = full_state[3];
+  quat.y() = full_state[4];
+  quat.z() = full_state[5];
+  quat.w() = full_state[6];
 }
 void Frame::toFullState(mwoibn::Vector7& full_state,
                         const Point::Current& linear,
-                        const Orientation::O& orientation)
+                        const Orientation::O& quat)
 {
   full_state.head<3>() = linear.head<3>();
-  full_state[3] = orientation.x();
-  full_state[4] = orientation.y();
-  full_state[5] = orientation.z();
-  full_state[6] = orientation.w();
+  full_state[3] = quat.x();
+  full_state[4] = quat.y();
+  full_state[5] = quat.z();
+  full_state[6] = quat.w();
 }
 void Frame::setFullStateWorld(const mwoibn::Vector7 state, bool update)
 {
@@ -103,25 +103,25 @@ Frame::getFullJacobian(bool update)
 Rotation::R Frame::getRotationFixed() const
 {
 
-  return _orientation.rotation().getFixed();
+  return _frame.orientation.rotation().getFixed();
 }
 
 const Rotation::R& Frame::getRotationFixed()
 {
-  return _orientation.rotation().getFixed();
+  return _frame.orientation.rotation().getFixed();
 }
 
 void Frame::setRotationFixed(const Rotation::R rotation)
 {
-  _orientation.rotation().setFixed(rotation);
-  _orientation.synch();
+  _frame.orientation.rotation().setFixed(rotation);
+  _frame.orientation.synch();
 }
 
 void Frame::setRotationWorld(const Rotation::R rotation, bool update)
 {
 
-  _orientation.rotation().setWorld(rotation, update);
-  _orientation.synch();
+  _frame.orientation.rotation().setWorld(rotation, update);
+  _frame.orientation.synch();
 }
 
 

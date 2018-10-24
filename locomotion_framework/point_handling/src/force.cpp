@@ -9,7 +9,7 @@ namespace point_handling
   const Point::Current&
   Force::getWorld(bool update)
   {
-    _temp_current = _rotation.getWorld(update)*_current;
+    _temp_current = frame.rotation().getWorld(update)*_current;
 
     return _temp_current;
   }
@@ -18,19 +18,19 @@ namespace point_handling
   void Force::setWorld( const Point::Current& linear,
                                bool update)
   {
-    _current = _rotation.getWorld(update).transpose()*linear;
+    _current = frame.rotation().getWorld(update).transpose()*linear;
   }
 
   Point::Current
   Force::getWorld(bool update) const{
-    return _rotation.getWorld(update)*_current;
+    return frame.rotation().getWorld(update)*_current;
   }
 
 
   const Point::Current&
   Force::getReference( unsigned int refernce_id, bool update)
   {
-    _temp_current =  _rotation.getReference(refernce_id, update)*_current;
+    _temp_current =  frame.rotation().getReference(refernce_id, update)*_current;
     return _temp_current;
   }
 
@@ -38,7 +38,7 @@ namespace point_handling
                                    unsigned int reference_id,
                                    bool update)
   {
-    _current =  _rotation.getReference(reference_id, update).transpose()*_current;
+    _current =  frame.rotation().getReference(reference_id, update).transpose()*_current;
   }
 
 

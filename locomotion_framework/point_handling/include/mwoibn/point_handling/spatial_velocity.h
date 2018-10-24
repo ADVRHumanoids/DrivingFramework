@@ -18,21 +18,16 @@ class SpatialVelocity: public Velocity
 
 public:
 
-
-  template<typename Body>
-  SpatialVelocity(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position, std::string name = "")
-      : Velocity(body_id, model, state, position, 6, name),
-       _linear(body_id, model, state, position, name), _angular(body_id, model, state, position, name)
+  SpatialVelocity(point_handling::FramePlus& frame, std::string name = "")
+      : Velocity(frame, 6, name),
+       _linear(frame, name), _angular(frame, name)
   {
   }
 
-  template<typename Body>
-  SpatialVelocity(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, std::string name = "")
-      : Velocity(current, body_id, model, state, position, 6, name),
-       _linear(body_id, model, state, position, name), _angular(body_id, model, state, position, name)
+  SpatialVelocity(Point::Current current,
+        point_handling::FramePlus& frame, std::string name = "")
+      : Velocity(current, frame, name),
+       _linear(frame, name), _angular(frame, name)
   {
     _current.noalias() = current;
     _linear.setFixed(current.tail<3>());
@@ -40,19 +35,19 @@ public:
    }
 
   SpatialVelocity(const SpatialVelocity&& other)
-      : Velocity(other), _linear(other._linear, _position), _angular(other._angular, _position)
+      : Velocity(other), _linear(other._linear, frame), _angular(other._angular, frame)
   {  }
 
   SpatialVelocity(const SpatialVelocity& other)
-      : Velocity(other), _linear(other._linear, _position), _angular(other._angular, _position)
+      : Velocity(other), _linear(other._linear, frame), _angular(other._angular, frame)
   {  }
 
-  SpatialVelocity(const SpatialVelocity&& other, point_handling::Position& position)
-      : Velocity(other, position), _linear(other._linear, _position), _angular(other._angular, _position)
+  SpatialVelocity(const SpatialVelocity&& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame), _linear(other._linear, frame), _angular(other._angular, frame)
   {  }
 
-  SpatialVelocity(const SpatialVelocity& other, point_handling::Position& position)
-      : Velocity(other, position), _linear(other._linear, _position), _angular(other._angular, _position)
+  SpatialVelocity(const SpatialVelocity& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame), _linear(other._linear, frame), _angular(other._angular, frame)
   {  }
 
   virtual ~SpatialVelocity() {}

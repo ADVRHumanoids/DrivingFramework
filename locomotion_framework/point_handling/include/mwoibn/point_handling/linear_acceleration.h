@@ -1,9 +1,8 @@
 #ifndef __MWOIBN__POINT_HANDLING__LINEAR_ACCELERATION_H
 #define __MWOIBN__POINT_HANDLING__LINEAR_ACCELERATION_H
 
-#include "mwoibn/point_handling/point.h"
-#include "mwoibn/common/state.h"
-#include "mwoibn/point_handling/position.h"
+#include "mwoibn/point_handling/state.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -11,92 +10,69 @@ namespace mwoibn
 namespace point_handling
 {
 
-class LinearAcceleration: public Point
+class LinearAcceleration: public State
 {
 
 public:
 
-  LinearAcceleration(unsigned int body_id, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        Point::Linear position = Point::Linear::Zero(3),
-        std::string name = "")
-      : Point(body_id, model, state, name), _frame(position, body_id, model, state)
-  {
-    _init();
-  }
+  LinearAcceleration(point_handling::FramePlus& frame, std::string name = "")
+      : State(frame, 3, name)
+  {  }
 
-  LinearAcceleration(std::string body_name, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        Point::Linear position = Point::Linear::Zero(3),
-        std::string name = "")
-      : Point(body_name, model, state, name), _frame(position, body_name, model, state)
-  {
-    _init();
-  }
-
-  LinearAcceleration(Point::Linear linear, unsigned int body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        Point::Linear position = Point::Linear::Zero(3),
-        std::string name = "")
-      : Point(linear, body_id, model, state, name), _frame(position, body_id, model, state)
-  {
-    _init();
-  }
-
-  LinearAcceleration(Point::Linear linear, std::string body_name,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        Point::Linear position = Point::Linear::Zero(3),
-        std::string name = "")
-      : Point(linear, body_name, model, state, name), _frame(position, body_name, model, state)
-  {
-    _init();
-  }
+  LinearAcceleration(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
+      : State(current, frame, name)
+  { _size = 3; }
 
   LinearAcceleration(const LinearAcceleration&& other)
-      : Point(other), _jacobian(other._jacobian), _zero(other._zero), _shift(other._shift), _frame(other._frame)  {  }
+      : State(other)
+  {  }
 
   LinearAcceleration(const LinearAcceleration& other)
-      : Point(other), _jacobian(other._jacobian), _zero(other._zero), _shift(other._shift), _frame(other._frame)  {  }
+      : State(other)
+  {  }
+
+  LinearAcceleration(const LinearAcceleration&& other, point_handling::FramePlus& frame)
+      : State(other, frame)
+  {  }
+
+  LinearAcceleration(const LinearAcceleration& other, point_handling::FramePlus& frame)
+      : State(other, frame)
+  {  }
 
   virtual ~LinearAcceleration() {}
 
-
   /** @brief get Position in a world frame */
-  virtual const Point::Linear&
-  getLinearWorld(bool update = false);
+  virtual const Point::Current&
+  getWorld(bool update = false){
+      _temp_current = CalcPointAcceleration(_model, _state.get(INTERFACE::POSITION), _state.get(INTERFACE::VELOCITY),
+                                                    _state.get(INTERFACE::ACCELERATION), _body_id, frame.position.getFixed());
 
-  virtual Point::Linear
-  getLinearWorld(bool update = false) const;
+      _temp_current += frame.rotation().getWorld()*_current;
+      return _temp_current;
+
+  } // NOT IMPLEMENTED
+
+  virtual Point::Current
+  getWorld(bool update = false) const {
+    return CalcPointAcceleration(_model, _state.get(INTERFACE::POSITION), _state.get(INTERFACE::VELOCITY),
+                                         _state.get(INTERFACE::ACCELERATION), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
+  } // NOT IMPLEMENTED
+
   /** @brief set new tracked point giving data in a world frame*/
-  virtual void setLinearWorld(const Point::Linear linear,
-                        bool update = false);
+  virtual void setWorld(const Point::Current& current,
+                        bool update = false){}// NOT IMPLEMENTED
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Linear&
-  getLinearReference(unsigned int refernce_id, bool update = false);
+  virtual const Point::Current&
+  getReference(unsigned int refernce_id, bool update = false){}// NOT IMPLEMENTED
 
-  virtual void setLinearReference(const Point::Linear position,
+  virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
-                            bool update = false);
+                            bool update = false){}// NOT IMPLEMENTED
 
-  virtual const mwoibn::Matrix& getJacobian();
 
-  void _init(){
-    _linear << 0, 0, 0;
-    _jacobian.setZero(3, _state.size());
-    _zero.setZero(_state.size());
-    _shift.setZero(_state.size());
-    _shift[0] = 1;
-  }
-
-  void setPointWorld(const mwoibn::Vector3& position){_frame.setLinearWorld(position);}
-  Point::Linear getPointWorld() const {return _frame.getLinearWorld();}
-  Point::Linear getPointFixed() const {return _frame.getLinearFixed();}
-  void setPointFixed(const mwoibn::Vector3& linear) {_frame.setLinearFixed(linear);}
-  Position::Rotation getRotationWorld() const {return _frame.getRotationWorld();}
-
-protected:
-    mwoibn::Matrix _jacobian;
-    mwoibn::VectorN _zero, _shift;
-    Position _frame;
+  protected:
+    using INTERFACE = mwoibn::robot_class::INTERFACE;
 
 };
 

@@ -15,7 +15,7 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS odometry ground_forces)
+LIST( APPEND INSTALL_TARGETS odometry ground_forces acceleration_test)
 LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_point_handling filters modules)
 LIST( APPEND CATKIN_DEPENDS_SET dynamic_models)
 
@@ -30,7 +30,7 @@ catkin_package(
   LIBRARIES
         odometry
         ground_forces
-#        acceleration_test
+        acceleration_test
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -67,17 +67,17 @@ target_link_libraries(ground_forces
    ${catkin_LIBRARIES}
 )
 
-#add_library(acceleration_test
-#   src/acceleration_test.cpp
-#)
+add_library(acceleration_test
+   src/acceleration_test.cpp
+)
 
-#add_dependencies(acceleration_test
-#   ${catkin_EXPORTED_TARGETS}
-#)
+add_dependencies(acceleration_test
+   ${catkin_EXPORTED_TARGETS}
+)
 
-#target_link_libraries(acceleration_test
-#   ${catkin_LIBRARIES}
-#)
+target_link_libraries(acceleration_test
+   ${catkin_LIBRARIES}
+)
 
 ## Mark executables and/or libraries for installation
  install(TARGETS ${INSTALL_TARGETS}

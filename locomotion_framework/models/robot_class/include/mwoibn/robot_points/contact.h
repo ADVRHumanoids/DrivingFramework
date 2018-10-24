@@ -28,7 +28,7 @@ template<typename Type>
 Contact(Type end_frame, RigidBodyDynamics::Model& model,
         const mwoibn::robot_class::State& state, bool is_active,
         robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN, std::string name = "")
-      : Point(model, state), _is_active(is_active), _frame(end_frame, model, state), _wrench(end_frame, model, state, _frame.position(), _frame.orientation().rotation()),
+      : Point(model, state), _is_active(is_active), _frame(end_frame, model, state), _wrench(_frame.frame()),
         _type(type), _name(name) // this zero should as some kind of constant value defined
                     // in robot_class.h
 {
@@ -42,7 +42,7 @@ Contact(Type end_frame, RigidBodyDynamics::Model& model,
 
 Contact(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, YAML::Node config)
         : Point(model, state), _frame([](YAML::Node contact) {return _readEndFrame(contact);}(config), model, state),
-          _wrench([](YAML::Node contact) {return _readEndFrame(contact);}(config), model, state, _frame.position(), _frame.orientation().rotation())
+          _wrench(_frame.frame())
 {
         _resize();
         _read(config);
@@ -55,7 +55,7 @@ Contact(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state
 Contact(Contact&& other)
         : Point(other), _is_active(other._is_active),
           _state_size(other._state_size), _frame(other._frame),
-          _wrench(other._wrench, _frame.position(), _frame.orientation().rotation()) //_wrench(other._wrench)
+          _wrench(other._wrench, _frame.frame()) //_wrench(other._wrench)
 {
         _resize();
         _ground_normal << 0,0,1;
@@ -67,7 +67,7 @@ Contact(Contact&& other)
 Contact(Contact& other)
         : Point(other), _is_active(other._is_active),
           _state_size(other._state_size), _frame(other._frame),
-          _wrench(other._wrench, _frame.position(), _frame.orientation().rotation())
+          _wrench(other._wrench, _frame.frame())
 {
         _resize();
         _ground_normal << 0,0,1;
@@ -149,8 +149,10 @@ virtual void _resize(){
 }
 
 bool _is_active;   //!< whether a contact is active or not?
-point_handling::Wrench _wrench;
+
 point_handling::Frame _frame;
+point_handling::Wrench _wrench;
+
 
 mwoibn::Vector3 _ground_normal;
 mwoibn::VectorInt _chain;

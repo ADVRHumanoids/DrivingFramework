@@ -2,8 +2,7 @@
 #define __MWOIBN__POINT_HANDLING__FORCE_H
 
 #include "mwoibn/point_handling/state.h"
-#include "mwoibn/point_handling/position.h"
-#include "mwoibn/point_handling/rotation.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -17,33 +16,31 @@ class Force: public State
 public:
 
 
-  template<typename Body>
-  Force(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position, point_handling::Rotation& rotation, std::string name = "")
-      : State(body_id, model, state, position, 3, name), _rotation(rotation)
+  Force(point_handling::FramePlus& frame, std::string name = "")
+      : State(frame, 3, name)
   {  }
 
-  template<typename Body>
-  Force(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, point_handling::Rotation& rotation, std::string name = "")
-      : State(current, body_id, model, state, position, 3, name), _rotation(rotation)
-  { }
+  Force(Point::Current current,
+       point_handling::FramePlus& frame, std::string name = "")
+      : State(current, frame, name)
+  {
+      _size = 3;
+  }
 
-  Force(const Force&& other, point_handling::Position& position, point_handling::Rotation& rotation)
-      : State(other, position), _rotation(rotation)
+  Force(const Force&& other,point_handling::FramePlus& frame)
+      : State(other, frame)
   {  }
 
-  Force(const Force& other, point_handling::Position& position, point_handling::Rotation& rotation)
-      : State(other, position), _rotation(rotation)
+  Force(const Force& other,point_handling::FramePlus& frame)
+      : State(other, frame)
   {  }
 
   Force(const Force&& other)
-      : State(other), _rotation(other._rotation)
+      : State(other)
   {  }
 
   Force(const Force& other)
-      : State(other), _rotation(other._rotation)
+      : State(other)
   {  }
 
   virtual ~Force() {}
@@ -69,10 +66,6 @@ public:
   using State::getReference;
   using State::setReference;
 
-  Rotation& rotation(){return _rotation;}
-
-  protected:
-    Rotation& _rotation;
 
 };
 

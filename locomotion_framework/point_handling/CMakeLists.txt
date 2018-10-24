@@ -49,7 +49,7 @@ catkin_package(
 )
 
  add_library(points_handler
-   src/base_points_handler.cpp
+   #src/base_points_handler.cpp
 
    src/position.cpp
    src/rotation.cpp
@@ -60,8 +60,6 @@ catkin_package(
    src/frame.cpp
    src/force.cpp
    src/torque.cpp
-   #src/point_state.cpp
-   #src/linear_acceleration.cpp
    src/wrench.cpp
  )
 

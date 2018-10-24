@@ -53,6 +53,30 @@ public:
       : Base(other)
   {  }
 
+
+    template<typename Source>
+    Point(const Source&& other, int size, std::string name = "")
+        : Base(other, size, name)
+    {     _current.setZero(size);
+        _temp_current.setZero(size); }
+
+    template<typename Source>
+    Point(const Source& other, int size, std::string name = "")
+        : Base(other, size, name)
+    {     _current.setZero(size);
+        _temp_current.setZero(size); }
+
+    template<typename Source>
+    Point(Point::Current current, const Source&& other, std::string name = "")
+        : Base(other, current.size(), name)
+    {  }
+
+    template<typename Source>
+    Point(Point::Current current, const Source& other, std::string name = "")
+        : Base(other, current.size(), name)
+    {  }
+
+
   using Base::getReference;
   using Base::setReference;
 

@@ -3,7 +3,7 @@
 
 #include "mwoibn/point_handling/force.h"
 #include "mwoibn/point_handling/torque.h"
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -16,39 +16,29 @@ class Wrench: public State
 
 public:
 
-  template<typename Type>
-  Wrench(Type body_id, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, point_handling::Rotation& rotation, std::string name = "")
-      : State(body_id, model, state, position, 6, name), _rotation(rotation),
-       _force(body_id, model, state, position, rotation, name), _torque(body_id, model, state, _force, name)
+  Wrench(point_handling::FramePlus& frame, std::string name = "")
+      : State(frame, 6, name), force(frame, name), torque(force, name)
   {
   }
 
-  template<typename Type>
-  Wrench(Point::Current current, Type body_id,
-         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-         point_handling::Position& position, point_handling::Rotation& rotation, std::string name = "")
-      : State(current, body_id, model, state, position, 6, name), _rotation(rotation),
-       _force(body_id, model, state, position, rotation, name), _torque(body_id, model, state, _force, name)
+  Wrench(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
+      : State(current, frame, name), force(frame, name), torque(force, name)
   {
       synch();
+      _size = 6;
   }
 
   Wrench(const Wrench&& other) : State(other),
-        _rotation(other._rotation),
-        _force(other._force, _position, _rotation), _torque(other._torque, _force)
+        force(other.force, frame), torque(other.torque, force)
   {  }
 
-  Wrench(const Wrench& other) : State(other),
-        _rotation(other._rotation), _force(other._force, _position, _rotation), _torque(other._torque, _force)
+  Wrench(const Wrench& other) : State(other), force(other.force, frame), torque(other.torque, force)
   {  }
 
-  Wrench(const Wrench&& other, point_handling::Position& position, point_handling::Rotation& rotation) : State(other, position),
-        _rotation(rotation), _force(other._force, _position, _rotation), _torque(other._torque, _force)
+  Wrench(const Wrench&& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force)
   {  }
 
-  Wrench(const Wrench& other, point_handling::Position& position, point_handling::Rotation& rotation) : State(other, position),
-        _rotation(rotation), _force(other._force, _position, _rotation), _torque(other._torque, _force)
+  Wrench(const Wrench& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force)
   {  }
 
 
@@ -72,24 +62,16 @@ public:
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false);
 
-  virtual void setReference(const Point::Current& position,
+  virtual void setReference(const Point::Current& frame,
                             unsigned int reference_id,
                             bool update = false);
 
-  Force& force(){return _force;}
-  Torque& torque(){return _torque;}
-  Rotation& rotation(){return _rotation;}
-
-  const Force& force() const {return _force;}
-  const Torque& torque() const {return _torque;}
-  const Rotation& rotation() const {return _rotation;}
+  Force force;
+  Torque torque;
 
   void synch();
 
   protected:
-    Rotation& _rotation;
-    Force _force;
-    Torque _torque;
 
     void _get(Point::Current& current, const Point::Current& force, const Point::Current& torque) const;
 

@@ -90,10 +90,10 @@ void mgnss::state_estimation::GroundForces::update()
     _robot.get();
     _robot.updateKinematics();
 
-    world_contact <<  _robot.contacts().contact(0).wrench().force().getWorld(),
-                      _robot.contacts().contact(1).wrench().force().getWorld(),
-                      _robot.contacts().contact(2).wrench().force().getWorld(),
-                      _robot.contacts().contact(3).wrench().force().getWorld();
+    world_contact <<  _robot.contacts().contact(0).wrench().force.getWorld(),
+                      _robot.contacts().contact(1).wrench().force.getWorld(),
+                      _robot.contacts().contact(2).wrench().force.getWorld(),
+                      _robot.contacts().contact(3).wrench().force.getWorld();
 
 
     gravity.noalias() = _gravity.getGravity();

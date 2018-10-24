@@ -2,7 +2,7 @@
 #define __MWOIBN__POINT_HANDLING__STATE_H
 
 #include "mwoibn/point_handling/point.h"
-#include "mwoibn/point_handling/position.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -15,35 +15,29 @@ class State: public Point
 
 public:
 
-
-  template<typename Body>
-  State(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position, int size, std::string name = "")
-      : Point(body_id, model, state, size, name), _position(position)
+  State(point_handling::FramePlus& frame, int size, std::string name = "")
+      : Point(frame, size, name), frame(frame)
   {
   }
 
-  template<typename Body>
-  State(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, int size, std::string name = "")
-      : Point(current, body_id, model, state, name), _position(position)
+  State(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
+      : Point(current, frame, name), frame(frame)
   { }
 
   State(const State&& other)
-      : Point(other), _position(other._position)
+      : Point(other), frame(other.frame)
   {  }
 
   State(const State& other)
-      : Point(other), _position(other._position)
+      : Point(other), frame(other.frame)
   {  }
 
-  State(const State&& other, point_handling::Position& position)
-      : Point(other), _position(position)
+  State(const State&& other, point_handling::FramePlus& frame)
+      : Point(other), frame(frame)
   {  }
 
-  State(const State& other, point_handling::Position& position)
-      : Point(other), _position(position)
+  State(const State& other, point_handling::FramePlus& frame)
+      : Point(other), frame(frame)
   {  }
 
   virtual ~State() {}
@@ -69,10 +63,10 @@ public:
   using Point::getReference;
   using Point::setReference;
 
-  Position& position(){return _position;}
+  Rotation& rotation(){return frame.rotation();}
+  Position& position(){return frame.position;}
+  FramePlus& frame;
 
-protected:
-  Position& _position;
 
 };
 

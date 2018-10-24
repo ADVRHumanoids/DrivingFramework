@@ -2,7 +2,7 @@
 #define __MWOIBN__POINT_HANDLING__VELOCITY_H
 
 #include "mwoibn/point_handling/state.h"
-#include "mwoibn/point_handling/position.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -16,20 +16,19 @@ class Velocity: public State
 public:
 
 
-  template<typename Body>
-  Velocity(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position, int size, std::string name = "")
-      : State(body_id, model, state, position, size, name)
+  Velocity(point_handling::FramePlus& frame, int size, std::string name = "")
+      : State(frame, size, name)
   {
-    _J.setZero(size, state.size());
+    _J.setZero(size, _state.size());
   }
 
-  template<typename Body>
-  Velocity(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, int size, std::string name = "")
-      : State(current, body_id, model, state, position, size, name)
-  { _J.setZero(size, state.size()); }
+  Velocity(Point::Current& current,
+        point_handling::FramePlus& frame, std::string name = "")
+      : State(current, frame, name)
+
+  { _J.setZero(3, _state.size());
+    _size = 3;
+  }
 
   Velocity(const Velocity&& other)
       : State(other), _J(other._J)
@@ -40,12 +39,12 @@ public:
   {  }
 
 
-  Velocity(const Velocity&& other, point_handling::Position& position)
-        : State(other, position), _J(other._J)
+  Velocity(const Velocity&& other, point_handling::FramePlus& frame)
+        : State(other, frame), _J(other._J)
     {  }
 
-  Velocity(const Velocity& other, point_handling::Position& position)
-        : State(other, position), _J(other._J)
+  Velocity(const Velocity& other, point_handling::FramePlus& frame)
+        : State(other, frame), _J(other._J)
     {  }
 
   virtual ~Velocity() {}

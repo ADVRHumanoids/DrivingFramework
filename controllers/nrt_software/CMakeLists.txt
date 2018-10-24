@@ -206,9 +206,9 @@ if(COLLISION_CHECK)
 
 endif(COLLISION_CHECK)
 
-#LIST( APPEND INSTALL_TARGETS
-#  acceleration_test
-#)
+LIST( APPEND INSTALL_TARGETS
+  acceleration_test
+)
 
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
@@ -366,12 +366,12 @@ target_link_libraries(joint_states nrt_plugins
  )
 endif(JOINT_STATES)
 
-#add_executable(acceleration_test src/exec/acceleration_test.cpp)
-#add_dependencies(acceleration_test nrt_plugins ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(acceleration_test
-#    nrt_plugins
-#    ${catkin_LIBRARIES}
-# )
+add_executable(acceleration_test src/exec/acceleration_test.cpp)
+add_dependencies(acceleration_test nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(acceleration_test
+    nrt_plugins
+    ${catkin_LIBRARIES}
+ )
 
 
 #add_executable(contact_test src/contact_test.cpp)

@@ -2,7 +2,7 @@
 #define __MWOIBN__POINT_HANDLING__LINEAR_VELOCITY_H
 
 #include "mwoibn/point_handling/velocity.h"
-#include "mwoibn/point_handling/position.h"
+#include "mwoibn/point_handling/frame_plus.h"
 
 namespace mwoibn
 {
@@ -15,18 +15,13 @@ class LinearVelocity: public Velocity
 
 public:
 
-
-  template<typename Body>
-  LinearVelocity(Body body_id, RigidBodyDynamics::Model& model,
-       const mwoibn::robot_class::State& state, point_handling::Position& position, std::string name = "")
-      : Velocity(body_id, model, state, position, 3, name)
+  LinearVelocity(point_handling::FramePlus& frame, std::string name = "")
+      : Velocity(frame, 3, name)
   {  }
 
-  template<typename Body>
-  LinearVelocity(Point::Current current, Body body_id,
-        RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-        point_handling::Position& position, std::string name = "")
-      : Velocity(current, body_id, model, state, position, 3, name)
+  LinearVelocity(Point::Current current,
+        point_handling::FramePlus& frame, std::string name = "")
+      : Velocity(current, frame, name)
   { }
 
   LinearVelocity(const LinearVelocity&& other)
@@ -37,12 +32,12 @@ public:
       : Velocity(other)
   {  }
 
-  LinearVelocity(const LinearVelocity&& other, point_handling::Position& position)
-      : Velocity(other, position)
+  LinearVelocity(const LinearVelocity&& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame)
   {  }
 
-  LinearVelocity(const LinearVelocity& other, point_handling::Position& position)
-      : Velocity(other, position)
+  LinearVelocity(const LinearVelocity& other, point_handling::FramePlus& frame)
+      : Velocity(other, frame)
   {  }
 
   virtual ~LinearVelocity() {}

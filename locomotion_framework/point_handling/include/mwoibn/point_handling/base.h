@@ -48,6 +48,28 @@ public:
       : TempBase<Type>(other), _current(other._current), _temp_current(other._temp_current)
   {  }
 
+  template<typename Source>
+  Base(const Source&& other, int size, std::string name = "")
+      : TempBase<Type>(other, size, name)
+  {  }
+
+  template<typename Source>
+  Base(const Source& other, int size, std::string name = "")
+      : TempBase<Type>(other, size, name)
+  {  }
+
+  template<typename Source>
+  Base(Type current, const Source&& other, int size, std::string name = "")
+      : TempBase<Type>(other, size, name), _current(current), _temp_current(current)
+  {  }
+
+  template<typename Source>
+  Base(Type current, const Source& other, int size, std::string name = "")
+      : TempBase<Type>(other, size, name), _current(current), _temp_current(current)
+  {  }
+
+
+
   virtual ~Base() {}
 
   /** @brief get Position in a point fixed frame*/
