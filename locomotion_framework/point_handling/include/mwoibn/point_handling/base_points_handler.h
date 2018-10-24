@@ -1,8 +1,8 @@
-#ifndef POINT_HANDLING_BASE_POINTS_HANDLER_H
-#define POINT_HANDLING_BASE_POINTS_HANDLER_H
+#ifndef __MWOIBN__POINT_HANDLING__BASE_POINTS_HANDLER_H
+#define __MWOIBN__POINT_HANDLING__BASE_POINTS_HANDLER_H
 
 #include "mwoibn/point_handling/point_handling.h"
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/frame.h"
 #include <memory>
 #include <numeric>
 #include <vector>
@@ -11,28 +11,168 @@ namespace mwoibn
 {
 namespace point_handling
 {
+  template<typename Type>
+  bool computeChain( int reference, RigidBodyDynamics::Model& model, std::vector<std::unique_ptr<Type>>& points, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty)
+  {
+    int final_id = (reference > model.dof_count)
+                       ? model.GetParentBodyId(reference)
+                       : reference;
+    int current_id = 0;
+    bool success;
+
+    std::vector<RigidBodyDynamics::Joint> mJoints = model.mJoints;
+
+    std::vector<int> chain, empty;
+    for (int i = 0; i < points.size(); i++)
+    {
+      success = false;
+      current_id = points.at(i)->getBodyId();
+
+      while (!success)
+      {
+
+        if (current_id == final_id)
+        {
+          success = true;
+        }
+        else if (current_id > model.dof_count)
+        {
+          current_id = model.GetParentBodyId(current_id);
+        }
+        else if (current_id == 0)
+        {
+          throw(std::domain_error(
+              "could not find the path from body " +
+              model.GetBodyName(points.at(i)->getBodyId()) +
+              " to defined origin " + model.GetBodyName(reference)));
+          return success;
+        }
+        else
+        {
+          for (int temp = 0; temp < mJoints[current_id].mDoFCount; temp++)
+            chain.push_back(mJoints[current_id].q_index + temp);
+
+          current_id = model.GetParentBodyId(current_id);
+        }
+      }
+    }
+    sort(chain.begin(), chain.end());
+    chain.erase(unique(chain.begin(), chain.end()), chain.end());
+
+    std::vector<int> full_list(model.dof_count);
+    std::iota(full_list.begin(), full_list.end(), 0);
+    std::remove_copy_if(chain.begin(), chain.end(),
+                        std::back_inserter(empty), [&full_list](const int& arg)
+                        {
+                          return (std::find(full_list.begin(), full_list.end(),
+                                            arg) != full_list.end());
+                        });
+
+    for (auto i : empty)
+      std::cout << "empty " << i << std::endl;
+
+    ext_chain.setZero(chain.size());
+    for (int i = 0; i < chain.size(); i++)
+      ext_chain[i] = chain[i];
+
+    ext_empty.setZero(empty.size());
+    for (int i = 0; i < empty.size(); i++)
+      ext_empty[i] = empty[i];
+
+    return success;
+  }
+
+  template<typename Type>
+  bool computeChain( int reference, RigidBodyDynamics::Model& model, Type& point, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty)
+  {
+    int final_id = (reference > model.dof_count)
+                       ? model.GetParentBodyId(reference)
+                       : reference;
+    int current_id = 0;
+    bool success;
+
+    std::vector<RigidBodyDynamics::Joint> mJoints = model.mJoints;
+
+    std::vector<int> chain, empty;
+
+      success = false;
+      current_id = point.getBodyId();
+
+      while (!success)
+      {
+
+        if (current_id == final_id)
+        {
+          success = true;
+        }
+        else if (current_id > model.dof_count)
+        {
+          current_id = model.GetParentBodyId(current_id);
+        }
+        else if (current_id == 0)
+        {
+          throw(std::domain_error(
+              "could not find the path from body " +
+              model.GetBodyName(point.getBodyId()) +
+              " to defined origin " + model.GetBodyName(reference)));
+          return success;
+        }
+        else
+        {
+          for (int temp = 0; temp < mJoints[current_id].mDoFCount; temp++)
+            chain.push_back(mJoints[current_id].q_index + temp);
+
+          current_id = model.GetParentBodyId(current_id);
+        }
+      }
+
+    sort(chain.begin(), chain.end());
+    chain.erase(unique(chain.begin(), chain.end()), chain.end());
+
+    std::vector<int> full_list(model.dof_count);
+    std::iota(full_list.begin(), full_list.end(), 0);
+    std::remove_copy_if(chain.begin(), chain.end(),
+                        std::back_inserter(empty), [&full_list](const int& arg)
+                        {
+                          return (std::find(full_list.begin(), full_list.end(),
+                                            arg) != full_list.end());
+                        });
+
+    for (auto i : empty)
+      std::cout << "empty " << i << std::endl;
+
+    ext_chain.setZero(chain.size());
+    for (int i = 0; i < chain.size(); i++)
+      ext_chain[i] = chain[i];
+
+    ext_empty.setZero(empty.size());
+    for (int i = 0; i < empty.size(); i++)
+      ext_empty[i] = empty[i];
+
+    return success;
+  }
 
 template <typename State> class BasePointsHandler
 {
 
 public:
-  BasePointsHandler(int chain_origin, RigidBodyDynamics::Model& model, int jacobian_row, int state_size)
-      : _reference(chain_origin), _model(model), _jacobian_row(jacobian_row), _state_size(state_size)
+  BasePointsHandler(int chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state, int jacobian_row, int state_size)
+      : _reference(chain_origin), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
   }
 
-  BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model, int jacobian_row, int state_size)
-      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size)
+  BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state, int jacobian_row, int state_size)
+      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
   }
 
   virtual ~BasePointsHandler() {}
 
-  BasePointsHandler(int chain_origin, RigidBodyDynamics::Model& model,
-                    std::vector<Point> points, int jacobian_row, int state_size)
-      : _reference(chain_origin), _model(model), _jacobian_row(jacobian_row), _state_size(state_size)  {
+  BasePointsHandler(int chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state,
+                    std::vector<Frame> points, int jacobian_row, int state_size)
+      : _reference(chain_origin), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)  {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
 
     for (auto& point : points)
@@ -41,9 +181,9 @@ public:
     computeChain();
   }
 
-  BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model,
-                    std::vector<Point> points, int jacobian_row, int state_size)
-      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size)  {
+  BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state,
+                    std::vector<Frame> points, int jacobian_row, int state_size)
+      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)  {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
 
     for (auto& point : points)
@@ -53,7 +193,7 @@ public:
   }
 
   BasePointsHandler(const BasePointsHandler& other)
-      : _reference(other._reference), _chain(other._chain), _model(other._model), _jacobian_row(other._jacobian_row), _state_size(other._state_size)
+      : _reference(other._reference), _chain(other._chain), _model(other._model), _jacobian_row(other._jacobian_row), _state_size(other._state_size), _robot_state(other._robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
 
@@ -64,7 +204,7 @@ public:
   }
 
   BasePointsHandler(const BasePointsHandler&& other)
-      : _reference(other._reference), _chain(other._chain), _model(other._model), _jacobian_row(other._jacobian_row), _state_size(other._state_size)
+      : _reference(other._reference), _chain(other._chain), _model(other._model), _jacobian_row(other._jacobian_row), _state_size(other._state_size), _robot_state(other._robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
     _reducedPointJacobian.setZero(_jacobian_row, _chain.size());
@@ -73,9 +213,9 @@ public:
       addPoint(*point);
   }
 
-  /** @name Unique Point
+  /** @name Unique Frame
    *
-   * These methods provided access to analogus methods of a Point class, and
+   * These methods provided access to analogus methods of a Frame class, and
    *possiblity to add/remove points from PointHandler
    */
   ///@{
@@ -91,9 +231,9 @@ public:
    * @return id of a new point
    *
    */
-  unsigned int addPoint(Point point)
+  unsigned int addPoint(Frame point)
   {
-    _points.push_back(std::unique_ptr<Point>(new Point(point)));
+    _points.push_back(std::unique_ptr<Frame>(new Frame(point)));
 
     _resize();
     return _points.size() - 1;
@@ -112,7 +252,7 @@ public:
    */
   unsigned int addPoint(int body_id, std::string name = "")
   {
-    _points.push_back(std::unique_ptr<Point>(new Point(body_id, _model, name)));
+    _points.push_back(std::unique_ptr<Frame>(new Frame(body_id, _model, _robot_state, name)));
     _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
     _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
     _fullState.setZero(getStateSize() * _points.size());
@@ -190,82 +330,75 @@ public:
   /** @brief return number of point defined in a points handler */
   int size() const { return _points.size(); }
 
-  /** @brief set new tracked point for a Point id giving data in a point fixed
+  /** @brief set new tracked point for a Frame id giving data in a point fixed
    *frame
    *
-   * @see Point::setStateFixed
+   * @see Frame::setStateFixed
    */
   virtual void setPointStateFixed(unsigned int id, const State state) = 0;
 
   /** @brief get state of a point id in its fixed frame
    *
-   * @see Point::getStateFixed
+   * @see Frame::getStateFixed
    */
   virtual const State& getPointStateFixed(unsigned int id) = 0;
 
-  /** @brief set new tracked point for a Point id giving data in a world frame
+  /** @brief set new tracked point for a Frame id giving data in a world frame
    *
-   * @see Point::setStateWorld
+   * @see Frame::setStateWorld
    */
   virtual void setPointStateWorld(unsigned int id, const State state,
-                                  const mwoibn::VectorN& joint_states,
                                   bool update = false) = 0;
 
-  /** @brief get State of a Point id in a world frame
+  /** @brief get State of a Frame id in a world frame
    *
-   * @see Point::getStateWorld
+   * @see Frame::getStateWorld
    */
   virtual const State& getPointStateWorld(unsigned int id,
-                                          const mwoibn::VectorN& joint_states,
                                           bool update = false) = 0;
 
   virtual State getPointStateWorld(unsigned int id,
-                                   const mwoibn::VectorN& joint_states,
                                    bool update = false) const = 0;
   /** @brief get State in a PointHandler reference frame
    *
-   * @see Point::getStateReference
+   * @see Frame::getStateReference
    */
   virtual const State&
-  getPointStateReference(unsigned int id, const mwoibn::VectorN& joint_states,
+  getPointStateReference(unsigned int id,
                          bool update = false) = 0;
 
   /** @brief set new tracked point for a Pint id giving data in a PointHandler
    *reference frame
    *
-   * @see Point::setStateReference
+   * @see Frame::setStateReference
    */
   virtual void setPointStateReference(unsigned int id, const State state,
-                                      const mwoibn::VectorN& joint_states,
                                       bool update = false) = 0;
 
   /** @brief set new tracked point for a Pint id giving data in a PointHandler
    *reference frame
    *
-   * @see Point::setStateReference
+   * @see Frame::setStateReference
    */
   virtual void setFullStateReference(const mwoibn::VectorN state,
-                                     const mwoibn::VectorN& joint_states,
                                      bool update = false) = 0;
 
   virtual void setFullStateWorld(const mwoibn::VectorN state,
-                                 const mwoibn::VectorN& joint_states,
                                  bool update = false) = 0;
 
   virtual void setFullStatesWorld(const std::vector<State>& states,
-                                 const mwoibn::VectorN& joint_states,
                                  bool update = false){
 
     for (int i = 0; i < _points.size(); i++)
     {
-      setPointStateWorld(i, states[i], joint_states, update);
+      setPointStateWorld(i, states[i], update);
       update = false;
     }
 
   }
 
   virtual void setFullStateFixed(const mwoibn::VectorN state) = 0;
-  /** @brief returns Point name */
+  /** @brief returns Frame name */
   std::string getPointName(unsigned int id) const
   {
     return _points.at(id)->getName();
@@ -276,7 +409,7 @@ public:
   unsigned int getPointId(std::string name) const
   {
     auto it = std::find_if(_points.begin(), _points.end(),
-                           [name](const std::unique_ptr<Point>& point)
+                           [name](const std::unique_ptr<Frame>& point)
                            {
                              return point->getName() == name;
                            });
@@ -306,7 +439,7 @@ public:
    * @note whole Jacobian is overwritten
    */
   virtual const mwoibn::Matrix&
-  getPointJacobian(unsigned int id, const mwoibn::VectorN& joint_states,
+  getPointJacobian(unsigned int id,
                    bool update = false) const = 0;
 
   /** @brief returns reduced Jacobian in which only dofs in a chain are
@@ -319,10 +452,10 @@ public:
    * @see getReducedJacobian(), getReducedJacobians()
    */
   virtual const mwoibn::Matrix&
-  getReducedPointJacobian(unsigned int id, const mwoibn::VectorN& joint_states,
+  getReducedPointJacobian(unsigned int id,
                           bool update = false)
   {
-    _fullPointJacobian.noalias() = getPointJacobian(id, joint_states, update);
+    _fullPointJacobian.noalias() = getPointJacobian(id, update);
 
     for (int j = 0; j < _chain.size(); j++)
     {
@@ -343,11 +476,11 @@ public:
    *
    */
   virtual const mwoibn::Matrix&
-  getFullPointJacobian(unsigned int id, const mwoibn::VectorN& joint_states,
+  getFullPointJacobian(unsigned int id,
                        bool update = false)
   {
 
-    _fullPointJacobian.noalias() = getPointJacobian(id, joint_states, update);
+    _fullPointJacobian.noalias() = getPointJacobian(id, update);
 
     for (int i = 0; i < _empty.size(); i++)
     {
@@ -440,78 +573,19 @@ public:
    */
   bool computeChain()
   {
-    int final_id = (_reference > _model.dof_count)
-                       ? _model.GetParentBodyId(_reference)
-                       : _reference;
-    int current_id = 0;
-    bool success;
+    bool success = mwoibn::point_handling::computeChain(_reference, _model, _points, _chain, _empty);
 
-    std::vector<RigidBodyDynamics::Joint> mJoints = _model.mJoints;
-
-    std::vector<int> chain, empty;
-    for (int i = 0; i < _points.size(); i++)
-    {
-      success = false;
-      current_id = _points.at(i)->getBodyId();
-
-      while (!success)
-      {
-
-        if (current_id == final_id)
-        {
-          success = true;
-        }
-        else if (current_id > _model.dof_count)
-        {
-          current_id = _model.GetParentBodyId(current_id);
-        }
-        else if (current_id == 0)
-        {
-          throw(std::domain_error(
-              "could not find the path from body " +
-              _model.GetBodyName(_points.at(i)->getBodyId()) +
-              " to defined origin " + _model.GetBodyName(_reference)));
-          return success;
-        }
-        else
-        {
-          for (int temp = 0; temp < mJoints[current_id].mDoFCount; temp++)
-            chain.push_back(mJoints[current_id].q_index + temp);
-
-          current_id = _model.GetParentBodyId(current_id);
-        }
-      }
-    }
-    sort(chain.begin(), chain.end());
-    chain.erase(unique(chain.begin(), chain.end()), chain.end());
-
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, chain.size());
-    _reducedPointJacobian.setZero(_jacobian_row, chain.size());
-
-    std::vector<int> full_list(_model.dof_count);
-    std::iota(full_list.begin(), full_list.end(), 0);
-    std::remove_copy_if(chain.begin(), chain.end(),
-                        std::back_inserter(empty), [&full_list](const int& arg)
-                        {
-                          return (std::find(full_list.begin(), full_list.end(),
-                                            arg) != full_list.end());
-                        });
-
-    for (auto i : empty)
-      std::cout << "empty " << i << std::endl;
-
-    _chain.setZero(chain.size());
-    for (int i = 0; i < chain.size(); i++)
-      _chain[i] = chain[i];
-
-    _empty.setZero(empty.size());
-    for (int i = 0; i < empty.size(); i++)
-      _empty[i] = empty[i];
+    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
+    _reducedPointJacobian.setZero(_jacobian_row, _chain.size());
 
     return success;
   }
 
-  const Point& point(int i) { return (*_points.at(i)); }
+
+  //static bool computeChain( int reference, RigidBodyDynamics::Model& model, std::vector<std::unique_ptr<Frame>>& points, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty);
+  //static bool computeChain( int reference, RigidBodyDynamics::Model& model, Point& points, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty);
+
+  const Frame& point(int i) { return (*_points.at(i)); }
   /** @brief returns selector for a given point_handler **/
   virtual const mwoibn::VectorInt& getChain() { return _chain; }
 
@@ -533,13 +607,12 @@ public:
    *
    * @see getReducedPointJacobian(), getReducedJacobians()
    */
-  virtual const mwoibn::Matrix& getReducedJacobian(const mwoibn::VectorN& joint_states,
-                                            bool update = false)
+  virtual const mwoibn::Matrix& getReducedJacobian(bool update = false)
   {
     for (int i = 0; i < _points.size(); i++)
     {
       _reducedJacobian.middleRows(i * getPointJacobianRows(i), getPointJacobianRows(i)) =
-          getReducedPointJacobian(i, joint_states, update);
+          getReducedPointJacobian(i, update);
       update = false;
     }
 
@@ -552,13 +625,12 @@ public:
    *
    * @see getFullPointJacobian(), getFullJacobians()
    */
-  virtual const mwoibn::Matrix& getFullJacobian(const mwoibn::VectorN& joint_states,
-                               bool update = false)
+  virtual const mwoibn::Matrix& getFullJacobian(bool update = false)
   {
     for (int i = 0; i < _points.size(); i++)
     {
       _fullJacobian.middleRows(i * getPointJacobianRows(i), getPointJacobianRows(i)) =
-          getFullPointJacobian(i, joint_states, update);
+          getFullPointJacobian(i, update);
       update = false;
     }
     return _fullJacobian;
@@ -571,14 +643,14 @@ public:
    * @see getReducedPointJacobian(), getReducedJacobian()
    */
   virtual std::vector<mwoibn::Matrix>
-  getReducedJacobians(mwoibn::VectorN joint_states, bool update = false)
+  getReducedJacobians(bool update = false)
   {
 
     std::vector<mwoibn::Matrix> Js;
 
     for (int i = 0; i < _points.size(); i++)
     {
-      Js.push_back(getReducedPointJacobian(i, joint_states, update));
+      Js.push_back(getReducedPointJacobian(i, update));
       update = false;
     }
 
@@ -594,12 +666,12 @@ public:
    * @see getFullPointJacobian(), getFullJacobian()
    */
   virtual std::vector<mwoibn::Matrix>
-  getFullJacobians(mwoibn::VectorN joint_states, bool update = false)
+  getFullJacobians(bool update = false)
   {
     std::vector<mwoibn::Matrix> Js;
     for (int i = 0; i < _points.size(); i++)
     {
-      Js.push_back(getFullPointJacobian(i, joint_states, update));
+      Js.push_back(getFullPointJacobian(i, update));
       update = false;
     }
 
@@ -636,16 +708,14 @@ public:
    *\f$ \dot x = J \dot q \f$
    *
    */
-  virtual const mwoibn::VectorN& getFullStateWorld(const mwoibn::VectorN& joint_states,
-                                            bool update = false) = 0;
+  virtual const mwoibn::VectorN& getFullStateWorld(bool update = false) = 0;
 
   /** @brief Returns a RBDL vector of States for all points. States are returned
    *in the world frame. State \f$ x \f$ is in the same order as in equation
    *\f$ \dot x = J \dot q \f$
    *
    */
-  virtual mwoibn::VectorN getFullStateWorld(const mwoibn::VectorN& joint_states,
-                                            bool update = false) const = 0;
+  virtual mwoibn::VectorN getFullStateWorld(bool update = false) const = 0;
   /** @brief Returns a RBDL vector of States for all points. States are returned
    *in the points own frames. State \f$ x \f$ is in the same order as in
    *equation
@@ -660,22 +730,20 @@ public:
    *\f$ \dot x = J \dot q \f$
    *
    */
-  virtual const mwoibn::VectorN& getFullStateReference(const mwoibn::VectorN& joint_states,
-                                                bool update = false) = 0;
+  virtual const mwoibn::VectorN& getFullStateReference(bool update = false) = 0;
 
   /** @brief Returns a std::vector of states for all points. States are returned
    *in the world frame.
    *
    *  NRT!
    */
-  virtual std::vector<State> getFullStatesWorld(mwoibn::VectorN joint_states,
-                                                bool update = false)
+  virtual std::vector<State> getFullStatesWorld(bool update = false)
   {
 
     std::vector<State> states;
     for (int i = 0; i < _points.size(); i++)
     {
-      states.push_back(getPointStateWorld(i, joint_states, update));
+      states.push_back(getPointStateWorld(i, update));
       update = false;
     }
     return states;
@@ -699,13 +767,13 @@ public:
    *
    */
   virtual std::vector<State>
-  getFullStatesReference(mwoibn::VectorN joint_states, bool update = false)
+  getFullStatesReference(bool update = false)
   {
 
     std::vector<State> states;
     for (int i = 0; i < _points.size(); i++)
     {
-      states.push_back(getPointStateReference(i, joint_states, update));
+      states.push_back(getPointStateReference(i, update));
       update = false;
     }
     return states;
@@ -728,8 +796,8 @@ protected:
   mwoibn::VectorN _fullState;
   State _state;
   /** keeps all the possible data*/
-  std::vector<std::unique_ptr<Point>> _points;
-
+  std::vector<std::unique_ptr<Frame>> _points;
+  const mwoibn::robot_class::State& _robot_state;
   RigidBodyDynamics::Model& _model;
 
   void _resize(){

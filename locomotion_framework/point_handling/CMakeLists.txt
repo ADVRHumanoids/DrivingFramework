@@ -42,15 +42,27 @@ catkin_package(
   CATKIN_DEPENDS ${CATKIN_DEPENDS_SET}
   INCLUDE_DIRS
     include
-    ${catkin_INCLUDE_DIRS} 
-    ${RBDL_INCLUDE_DIR} 
+    ${catkin_INCLUDE_DIRS}
+    ${RBDL_INCLUDE_DIR}
   DEPENDS
     Eigen3
 )
 
  add_library(points_handler
    src/base_points_handler.cpp
-   src/point.cpp
+
+   src/position.cpp
+   src/rotation.cpp
+   src/orientation.cpp
+   src/linear_velocity.cpp
+   src/angular_velocity.cpp
+   src/spatial_velocity.cpp
+   src/frame.cpp
+   src/force.cpp
+   src/torque.cpp
+   #src/point_state.cpp
+   #src/linear_acceleration.cpp
+   src/wrench.cpp
  )
 
  add_dependencies(points_handler ${catkin_EXPORTED_TARGETS} ${RBDL_EXPORTED_TARGETS})
@@ -87,9 +99,9 @@ if(CATKIN_ENABLE_TESTING)
  find_package(RBDL REQUIRED)
  find_package(Eigen3 REQUIRED)
 
- catkin_add_gtest(${PROJECT_NAME}-test 
-	test/src/test_point_handling.cpp 
-	test/src/test_point_position.cpp 
+ catkin_add_gtest(${PROJECT_NAME}-test
+	test/src/test_point_handling.cpp
+	test/src/test_point_position.cpp
 	test/src/test_position_handler.cpp
 	test/src/test_orientation_handler.cpp
 	test/src/test_full_state_handler.cpp
