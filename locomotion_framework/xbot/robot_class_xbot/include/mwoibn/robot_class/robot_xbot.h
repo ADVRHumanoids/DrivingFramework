@@ -2,8 +2,6 @@
 #define ROBOT_CLASS_ROBOT_XBOT_H
 
 #include "mwoibn/robot_class/robot.h"
-#include "mwoibn/robot_class/contact_v2.h"
-#include "mwoibn/robot_class/wheel_contact.h"
 
 //#include <SharedLibraryClass.h>
 

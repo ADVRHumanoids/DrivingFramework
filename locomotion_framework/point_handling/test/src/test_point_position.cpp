@@ -1,6 +1,6 @@
 #include "mwoibn/point_handling/test.h"
 
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/position.h"
 
 
 // Check if class initialization works correctly
@@ -29,7 +29,7 @@ TEST(PointTest, initialization)
   try
   {
     // check initialization with one point by names
-    mwoibn::point_handling::Point point_1(P_1, 8, *(_model_ptr));
+    mwoibn::point_handling::Position point_1(P_1, 8, *(_model_ptr));
   }
   catch (const std::exception& exc)
   {
@@ -43,7 +43,7 @@ TEST(PointTest, initialization)
   try
   {
     // check initialization with one point by names
-  mwoibn::point_handling::Point point_2(P_1, "arm2_7", *(_model_ptr));
+  mwoibn::point_handling::Position point_2(P_1, "arm2_7", *(_model_ptr));
   }
   catch (const std::exception& exc)
   {
@@ -54,7 +54,7 @@ TEST(PointTest, initialization)
     ADD_FAILURE() << "Unknown exception";
   }
 
-  EXPECT_THROW(mwoibn::point_handling::Point point_1(P_1, "asfd", *(_model_ptr)), std::invalid_argument);
+  EXPECT_THROW(mwoibn::point_handling::Position point_1(P_1, "asfd", *(_model_ptr)), std::invalid_argument);
 
 }
 
@@ -80,9 +80,9 @@ TEST(PointTest, methods)
   mwoibn::Vector3 P_1 = mwoibn::Vector3::Zero(3);
   P_1 << 0.0, 0.0, -0.15;
 
-  mwoibn::point_handling::Point point_1(P_1, "arm1_7", *(_model_ptr));
+  mwoibn::point_handling::Position point_1(P_1, "arm1_7", *(_model_ptr));
 
-  mwoibn::point_handling::Point point_2("arm2_7", *(_model_ptr));
+  mwoibn::point_handling::Position point_2("arm2_7", *(_model_ptr));
 
   mwoibn::VectorN joint_states(_model_ptr->dof_count);
   joint_states << 0.2, 0.2, -0.2, 0.5, -0.7, 0.6, -0.9, 0.5, 0.2, -0.2, 0.5,

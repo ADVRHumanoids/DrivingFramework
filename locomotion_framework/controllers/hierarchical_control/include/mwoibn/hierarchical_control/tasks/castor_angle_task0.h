@@ -23,7 +23,7 @@ class CastorAngle
 {
 public:
 CastorAngle(mwoibn::robot_class::Robot& robot,
-            mwoibn::point_handling::Point point, mwoibn::Axis axis)
+            mwoibn::point_handling::Position point, mwoibn::Axis axis)
         : _point(point), _robot(robot), _axis(axis)
 {
         _x_world << 1, 0, 0;
@@ -39,9 +39,9 @@ virtual ~CastorAngle() {
 void update()
 {
         // axis - z
-        _v1 = _point.getRotationWorld(_robot.state.get()) * _z_world;
+        _v1 = _point.getRotationWorld() * _z_world;
 
-        _n = _point.getRotationWorld(_robot.state.get()) * _axis;
+        _n = _point.getRotationWorld() * _axis;
 
         _v2 = _z_world - _n * _z_world.transpose() * _n;
 
@@ -87,7 +87,7 @@ void update()
         _tA = A * _tA;
         _tA += B * _tB;
 
-        _J.noalias() = _tA * _point.getOrientationJacobian(_robot.state.get());
+        _J.noalias() = _tA * _point.getOrientationJacobian();
 }
 
 double get() {
@@ -104,7 +104,7 @@ mwoibn::Axis _v2, _n, _v1;
 mwoibn::Axis _x_world, _y_world,
              _z_world; // for now assume the basic initialization
 double _castor, _d_castor;
-mwoibn::point_handling::Point _point;
+mwoibn::point_handling::Position _point;
 mwoibn::robot_class::Robot& _robot;
 
 mwoibn::Vector3 _vA;

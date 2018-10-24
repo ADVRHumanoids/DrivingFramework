@@ -18,7 +18,7 @@ class Camber : public Basic
 {
 public:
 Camber(mwoibn::robot_class::Robot& robot,
-       mwoibn::point_handling::Point point,
+       mwoibn::point_handling::Frame point,
        mwoibn::Axis axis)
         : Basic(robot, point, axis)
 {
@@ -34,8 +34,7 @@ virtual ~Camber() {
 
 virtual void update()
 {
-        _y = _point.getRotationWorld(_robot.state.get()) *
-             _axis;
+        _y = _point.getRotationWorld() * _axis;
 
         _n = _y.cross(_z_world);
 
@@ -89,7 +88,7 @@ virtual void update()
         _tA  = H*_tA;
         _tA += I*_tB;
 
-        _J.noalias() = _tA * _point.getOrientationJacobian(_robot.state.get());
+        _J.noalias() = _tA * _point.getOrientationJacobian();
 
 }
 

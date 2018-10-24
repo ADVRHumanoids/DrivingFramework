@@ -34,7 +34,7 @@ const mwoibn::Vector6& getRaw(){
 const mwoibn::Vector6& getFiltered(){
         return _base_filtered;
 }
-const mwoibn::Point& getContact(int i){
+const mwoibn::point_handling::Point::Current& getContact(int i){
         return _contact_points[i];
 }
 
@@ -63,7 +63,7 @@ mwoibn::VectorInt _selector, _contacts;     // _state - current wheel position
 
 std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr;
 
-std::vector<mwoibn::Point> _estimated, _pelvis, _contact_points;     // _estimated - wheel center position
+std::vector<mwoibn::point_handling::Point::Current> _estimated, _pelvis, _contact_points;     // _estimated - wheel center position
 std::vector<mwoibn::Vector3> _directions, _axes;     // directions
 double _r;
 mwoibn::VectorInt _ids;

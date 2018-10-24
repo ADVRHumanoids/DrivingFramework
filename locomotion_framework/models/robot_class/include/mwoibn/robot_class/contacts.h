@@ -1,9 +1,9 @@
 #ifndef ROBOT_CLASS_CONTACTS_H
 #define ROBOT_CLASS_CONTACTS_H
 
-#include "mwoibn/robot_class/contact_v2.h"
+#include "mwoibn/robot_points/contact.h"
 #include <rbdl/rbdl.h>
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/position.h"
 #include <memory>
 #include "mwoibn/eigen_utils/eigen_utils.h"
 
@@ -25,7 +25,7 @@ Contacts(unsigned int dofs) : _dofs(dofs) {
 virtual ~Contacts() {
 }
 
-virtual void add(std::unique_ptr<ContactV2> contact)
+virtual void add(std::unique_ptr<robot_points::Contact> contact)
 {
         _contacts.push_back(std::move(contact));
         resize();
@@ -75,7 +75,7 @@ int getId(std::string name) const;   // RT?
  *
  * @@throws std::out_of_range if ID is beyond the scope of a _contacts vector
  */
-ContactV2& contact(unsigned int id);   // RT
+robot_points::Contact& contact(unsigned int id);   // RT
 /**
  * @brief Check which contacts are active and returns theirs ids
  *
@@ -110,6 +110,7 @@ unsigned int sizeInactive() const;   // RT?
  * @brief Returns constraints Jacobian for current state of the robot
  */
 const mwoibn::Matrix& getJacobian();   // RT - change to get and update
+const mwoibn::Matrix& getWorldJacobian();   // RT - change to get and update
 
 /**
  * @brief Returns constraints Jacobian for current state of the robot
@@ -120,6 +121,7 @@ mwoibn::Matrix getMinimumJacobian();   // NRT?
  * @brief Returns constraints Jacobian for current state of the robot
  */
 std::vector<mwoibn::Matrix> getJacobians();   // NRT - to RT
+std::vector<mwoibn::Matrix> getWorldJacobians();   // NRT - to RT
 
 /**
  * @brief Returns constraints Jacobian for current state of the robot
@@ -155,7 +157,7 @@ int jacobianCols() const {
 
 
 protected:
-std::vector<std::unique_ptr<mwoibn::robot_class::ContactV2> > _contacts;
+std::vector<std::unique_ptr<mwoibn::robot_points::Contact> > _contacts;
 mwoibn::Matrix _jacobian;
 mwoibn::VectorN _positions;
 unsigned int _dofs;

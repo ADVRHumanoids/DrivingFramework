@@ -2,7 +2,6 @@
 #define POINT_HANDLING_ROBOT_POINTS_HANDLER_H
 
 #include "mwoibn/robot_class/robot.h"
-#include "mwoibn/point_handling/state_points_handler.h"
 #include "mwoibn/point_handling/raw_positions_handler.h"
 #include "mwoibn/point_handling/raw_orientations_handler.h"
 #include "mwoibn/point_handling/raw_full_states_handler.h"
@@ -13,28 +12,29 @@ namespace point_handling
 {
 //typedef mwoibn::Vector3 State;
 
-template <typename rawHandler, typename State> class RobotPointsHandler : public StatePointsHandler<rawHandler, State>
+template <typename rawHandler, typename State>
+class RobotPointsHandler : public rawHandler
 {
 public:
 RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot)
-        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
+        : rawHandler(chain_origin, robot.getModel(), robot.state)
 {
 }
 
 RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot)
-        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION))
+        : rawHandler(chain_origin, robot.getModel(), robot.state)
 {
 }
 
 RobotPointsHandler(int chain_origin, mwoibn::robot_class::Robot& robot,
-                   std::vector<Point> points)
-        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
+                   std::vector<Position> points)
+        : rawHandler(chain_origin, robot.getModel(), robot.state, points)
 {
 }
 
 RobotPointsHandler(std::string chain_origin, mwoibn::robot_class::Robot& robot,
-                   std::vector<Point> points)
-        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), points)
+                   std::vector<Position> points)
+        : rawHandler(chain_origin, robot.getModel(), robot.state, points)
 {
 }
 
@@ -44,49 +44,49 @@ RobotPointsHandler(Type chain_origin, mwoibn::robot_class::Robot& robot,
                    std::vector<State> states = {
                    },
                    std::vector<std::string> names = {})
-        : StatePointsHandler<rawHandler, State>(chain_origin, robot.getModel(), robot.state.state(robot_class::INTERFACE::POSITION), reference_frames,
+        : rawHandler(chain_origin, robot.getModel(), robot.state, reference_frames,
                                                 states, names)
 {
 }
 
 RobotPointsHandler(RobotPointsHandler& other)
-        : StatePointsHandler<rawHandler, State>(other)
+        : rawHandler(other)
 {
 }
 
 RobotPointsHandler(RobotPointsHandler&& other)
-        : StatePointsHandler<rawHandler, State>(std::move(other))
+        : rawHandler(std::move(other))
 {
 }
 };
 
 //specific implementations
-class PositionsHandler : public RobotPointsHandler<RawPositionsHandler, Point::Position>{
+class PositionsHandler : public RobotPointsHandler<RawPositionsHandler, Point::Current>{
 public:
 
 using RobotPointsHandler::RobotPointsHandler;
 
 PositionsHandler(PositionsHandler&& other)
-        : RobotPointsHandler<RawPositionsHandler, Point::Position>(std::move(other))
+        : RobotPointsHandler<RawPositionsHandler, Point::Current>(std::move(other))
 {
 }
 PositionsHandler(PositionsHandler& other)
-        : RobotPointsHandler<RawPositionsHandler, Point::Position>(other)
+        : RobotPointsHandler<RawPositionsHandler, Point::Current>(other)
 {
 }
 virtual ~PositionsHandler(){
 }
 };
 
-class OrientationsHandler : public RobotPointsHandler<RawOrientationsHandler, Point::Orientation>{
+class OrientationsHandler : public RobotPointsHandler<RawOrientationsHandler, Orientation::O>{
 public:
 using RobotPointsHandler::RobotPointsHandler;
 OrientationsHandler(OrientationsHandler&& other)
-        : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(std::move(other))
+        : RobotPointsHandler<RawOrientationsHandler, Orientation::O>(std::move(other))
 {
 }
 OrientationsHandler(OrientationsHandler& other)
-        : RobotPointsHandler<RawOrientationsHandler, Point::Orientation>(other)
+        : RobotPointsHandler<RawOrientationsHandler, Orientation::O>(other)
 {
 }
 virtual ~OrientationsHandler(){

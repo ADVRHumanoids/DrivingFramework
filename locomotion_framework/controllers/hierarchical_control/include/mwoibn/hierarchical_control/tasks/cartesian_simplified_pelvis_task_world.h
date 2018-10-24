@@ -65,7 +65,7 @@ mwoibn::Matrix computeContactJacobian(int i){
         contact_2 -= 0.5*norm*norm*_axes_world[i]*_axes_world[i].transpose()*_ground_normal*_ground_normal.transpose();
 
         mwoibn::Matrix contact;
-        contact = contact_2*contact_j*_wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
+        contact = contact_2*contact_j*_wheels_ptr->point(i).getOrientationJacobian()*R*norm;
 
         return contact;
 }

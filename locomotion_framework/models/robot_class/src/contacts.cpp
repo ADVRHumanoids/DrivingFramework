@@ -19,9 +19,9 @@ bool mwoibn::robot_class::Contacts::remove(int i)
 int mwoibn::robot_class::Contacts::getId(std::string name) const
 {
   auto foundItem = std::find_if(_contacts.begin(), _contacts.end(),
-                                [&name](std::unique_ptr<ContactV2> const& contact)
+                                [&name](std::unique_ptr<robot_points::Contact> const& contact)
                                 {
-                                  return contact->getPointName(0) == name;
+                                  return contact->getName() == name;
                                 });
 
   if (foundItem == _contacts.end())
@@ -30,7 +30,7 @@ int mwoibn::robot_class::Contacts::getId(std::string name) const
     return std::distance(_contacts.begin(), foundItem);
 }
 
-mwoibn::robot_class::ContactV2&
+mwoibn::robot_points::Contact&
 mwoibn::robot_class::Contacts::contact(unsigned int id)
 {
   if (id < _contacts.size())
@@ -52,7 +52,7 @@ mwoibn::robot_class::Contacts::getActive(std::vector<std::string>* names) const
   if (names)
   {
     for (auto& id : ids)
-      names->push_back(_contacts[id]->getPointName(0));
+      names->push_back(_contacts[id]->getName());
   }
 
   return ids;
@@ -71,7 +71,7 @@ std::vector<unsigned int> mwoibn::robot_class::Contacts::getInactive(
   if (names)
   {
     for (auto& id : ids)
-      names->push_back(_contacts[id]->getPointName(0));
+      names->push_back(_contacts[id]->getName());
   }
 
   return ids;
@@ -112,6 +112,21 @@ const mwoibn::Matrix& mwoibn::robot_class::Contacts::getJacobian()
   return _jacobian;
 }
 
+const mwoibn::Matrix& mwoibn::robot_class::Contacts::getWorldJacobian()
+{
+  _jacobian.setZero();
+
+  unsigned int i = 0;
+
+  for (auto& contact : _contacts)
+  {
+    _jacobian.block(i, 0, contact->jacobianSize(), _dofs) = contact->getWorldJacobian();
+    i += contact->jacobianSize();
+  }
+
+  return _jacobian;
+}
+
 mwoibn::Matrix
 mwoibn::robot_class::Contacts::getMinimumJacobian()
 {
@@ -146,6 +161,19 @@ mwoibn::robot_class::Contacts::getJacobians()
 }
 
 std::vector<mwoibn::Matrix>
+mwoibn::robot_class::Contacts::getWorldJacobians()
+{
+
+  std::vector<mwoibn::Matrix> jacobians;
+  for (auto& contact : _contacts)
+  {
+    jacobians.push_back(contact->getWorldJacobian());
+  }
+
+  return jacobians;
+}
+
+std::vector<mwoibn::Matrix>
 mwoibn::robot_class::Contacts::getMinimumJacobians()
 {
 
@@ -162,7 +190,7 @@ mwoibn::robot_class::Contacts::getMinimumJacobians()
 const mwoibn::VectorN& mwoibn::robot_class::Contacts::getPosition()
 {
 
-  _positions.setZero(_contacts.size() * 7);
+  _positions.setZero();
 
   unsigned int i = 0;
 

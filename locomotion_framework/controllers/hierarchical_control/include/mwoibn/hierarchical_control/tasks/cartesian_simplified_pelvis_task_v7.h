@@ -68,7 +68,7 @@ const mwoibn::Matrix& computeContactJacobian(int i){
         _contact_2 -= 0.5*norm*norm*_point*_ground_normal.transpose();
         _contact_3 = _contact_2*_contact_1;
 
-        _contact_k.noalias() = _wheels_ptr->point(i).getOrientationJacobian(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION))*R*norm;
+        _contact_k.noalias() = _wheels_ptr->point(i).getOrientationJacobian()*R*norm;
         _contact_j.noalias() = _contact_3*_contact_k;
 
         return _contact_j;
@@ -78,7 +78,7 @@ virtual void updateState(){
 
         ContactPoint3DRbdl::updateState();
 
-        q_twist = _pelvis_ptr->point(0).getOrientationWorld(_robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        _pelvis_ptr->point(0).getOrientationWorld(q_twist);
         q_twist = q_twist.twistSwing(_ground_normal);
         angle_twist = q_twist.toAxisAngle(axis_twist);
 

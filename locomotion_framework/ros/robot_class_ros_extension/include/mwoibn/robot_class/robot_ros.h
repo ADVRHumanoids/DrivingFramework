@@ -2,7 +2,6 @@
 #define ROBOT_CLASS_ROBOT_ROS_H
 
 #include "mwoibn/robot_class/robot.h"
-#include "mwoibn/robot_class/wheel_contact.h"
 
 #include <ros/ros.h>
 

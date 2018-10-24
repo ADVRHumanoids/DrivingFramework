@@ -83,10 +83,7 @@ public:
     {
       _ground_normal << 0, 0, 1; // HARDCODED
       _axes_world[i] =
-          _wheels_ptr->point(i)
-              .getRotationWorld(
-                   _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)) *
-          _axes[i]; // z axis, for our kinematics wheel axis in general
+          _wheels_ptr->point(i).getRotationWorld() * _axes[i]; // z axis, for our kinematics wheel axis in general
 
       _x_world[i] = _axes_world[i].cross(_ground_normal); //?
       _x_world[i].normalize();

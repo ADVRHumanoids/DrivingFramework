@@ -113,10 +113,7 @@ void mgnss::state_estimation::OdometryV2::_allocate(std::vector<std::string> nam
                 _axes.push_back(axis);
                 _pelvis.push_back(axis);
 
-                _directions.push_back(_wheels_ph.point(i)
-                                      .getRotationWorld(_robot.state.get(
-                                                                mwoibn::robot_class::INTERFACE::POSITION))
-                                      .col(2));
+                _directions.push_back(_wheels_ph.point(i).getRotationWorld().col(2));
 
                 mwoibn::VectorInt dof = _robot.getDof(names[i]);
                 if (dof.size() == 0)
@@ -127,10 +124,11 @@ void mgnss::state_estimation::OdometryV2::_allocate(std::vector<std::string> nam
                 _contact_points.push_back(_wheels_ph.getPointStateWorld(i));
         }
 
-        _estimated =
-                _wheels_ph.getFullStatesWorld(); // initialize add a current point
-        _step = _estimated;
-}
+        for(auto& state: _wheels_ph.getFullStatesWorld()){
+           _estimated.push_back(state); // initialize add a current point
+           _step.push_back(state);
+        }
+   }
 
 
 void mgnss::state_estimation::OdometryV2::init(){
@@ -148,8 +146,8 @@ void mgnss::state_estimation::OdometryV2::init(){
         //std::cout << "OdometryV2 filter: initial state: " << _base_pos.transpose() << std::endl;
 
         for(int i = 0; i < _estimated.size(); i++) {
-                _contact_points[i] = _wheels_ph.getPointStateWorld(i);
-                _estimated[i] = _contact_points[i];
+                _contact_points[i].noalias() = _wheels_ph.getPointStateWorld(i);
+                _estimated[i].noalias() = _contact_points[i];
         }
 
         _previous_state.noalias() = _state;
@@ -206,7 +204,7 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
         // remove the rotation ground ground component
         _twist_raw = _imu.twistSwing(_z,_swing);
 
-        mwoibn::Point _euler;
+        mwoibn::Position _euler;
         // get robot base eueler angles
         _euler = _swing.toMatrix().eulerAngles(0, 1, 2);
 
@@ -224,7 +222,7 @@ void mgnss::state_estimation::OdometryV2::_filter(){
 
         // clear estimation based on a final result
         for(int i = 0; i < _wheels_ph.size(); i++)
-                _estimated[i] = _base.head<3>() + _contact_points[i];
+                _estimated[i].noalias() = _base.head<3>() + _contact_points[i];
 
         _base_pos = _base.head(3);
         _base_raw = _base;
@@ -242,10 +240,7 @@ void mgnss::state_estimation::OdometryV2::_increment(){
         for (int i = 0; i < _state.size(); i++)
         {
                 // compute world position of the wheel axis
-                _directions[i] = _wheels_ph.point(i)
-                                 .getRotationWorld(_robot.state.get(
-                                                           mwoibn::robot_class::INTERFACE::POSITION))
-                                 .col(2); // z axis
+                _directions[i] = _wheels_ph.point(i).getRotationWorld().col(2); // z axis
                 // std::cout << _directions[i].transpose() << std::endl;
                 // compute the wheel direction of motion
                 _directions[i] = _directions[i].cross(_axes[i]);
@@ -254,8 +249,8 @@ void mgnss::state_estimation::OdometryV2::_increment(){
                 // compute the distance travelled
                 _error[i] *= _r;
                 // estimate current contact point position
-                _step[i] = _directions[i] * _error[i]; // in the world frame
-                _contact_points[i] = _wheels_ph.getPointStateWorld(i); // in the
+                _step[i].noalias() = _directions[i] * _error[i]; // in the world frame
+                _contact_points[i].noalias() = _wheels_ph.getPointStateWorld(i); // in the
 
         }
 
@@ -266,9 +261,9 @@ void mgnss::state_estimation::OdometryV2::_applyTwist(){
         {
                 // compute world position of the wheel axis
                 //_directions[i] = _twist_es.rotate(_directions[i]); // z axis
-                _contact_points[i] = _twist_es.rotate(_contact_points[i]);
+                _contact_points[i].noalias() = _twist_es.rotate(_contact_points[i]);
                 // estimate current contact point position
-                _estimated[i] += _twist_es.rotate(_step[i]);
+                _estimated[i].noalias() += _twist_es.rotate(_step[i]);
         }
 
 }
@@ -281,7 +276,7 @@ void mgnss::state_estimation::OdometryV2::_poseEstimation(){
         for (int i = 0; i < _wheels_ph.size(); i++) {
                 // compute the distance between the contact point and base origin
                 // estimate the state for each leg
-                _pelvis[i] = _estimated[i] - _contact_points[i];
+                _pelvis[i].noalias() = _estimated[i] - _contact_points[i];
         }
 
         // choose the solution

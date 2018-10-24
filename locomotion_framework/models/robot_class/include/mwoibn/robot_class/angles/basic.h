@@ -20,7 +20,7 @@ class Basic
 {
 public:
 Basic(mwoibn::robot_class::Robot& robot,
-      mwoibn::point_handling::Point point,
+      mwoibn::point_handling::Frame point,
       mwoibn::Axis axis)
         : _axis(axis), _point(point), _robot(robot){
 }    // for now just support major axes
@@ -41,7 +41,7 @@ protected:
 mwoibn::Axis _axis;
 
 double _angle;
-mwoibn::point_handling::Point _point;
+mwoibn::point_handling::Frame _point;
 mwoibn::robot_class::Robot& _robot;
 
 mwoibn::Matrix _J;

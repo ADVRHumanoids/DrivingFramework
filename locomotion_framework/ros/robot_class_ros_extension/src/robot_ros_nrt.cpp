@@ -281,7 +281,6 @@ void mwoibn::robot_class::RobotRosNRT::_loadContacts(YAML::Node contacts_config)
 
                 //    if (contact.first.as<std::string>() == "settings")
                 //      continue;
-
                 contact["settings"] = contacts_config["settings"];
 
                 if (!contact["type"])
@@ -295,27 +294,24 @@ void mwoibn::robot_class::RobotRosNRT::_loadContacts(YAML::Node contacts_config)
 
                         if (type.compare("point_foot") == 0)
                         {
-                                _contacts->add(std::unique_ptr<ContactV2>(new ContactRos<ContactV2>(
-                                                                                  ContactV2(_model, state.state(INTERFACE::POSITION), contact),
-                                                                                  contact)));
+                                _contacts->add(std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::ContactV2>(
+                                                                                  robot_points::ContactV2(_model, state, contact), contact)));
                                 continue;
                         }
                         if (type.compare("wheel") == 0)
                         {
                                 _contacts->add(
-                                        std::unique_ptr<ContactV2>(new ContactRos<WheelContactV2>(
-                                                                           WheelContactV2(_model, state.state(INTERFACE::POSITION),
-                                                                                          contact),
-                                                                           contact)));
+                                        std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::WheelContactV2>(
+                                                                           robot_points::WheelContactV2(_model, state, contact), contact)));
                                 continue;
                         }
-                        if (type.compare("wheel_locked") == 0)
-                        {
-                                _contacts->add(std::unique_ptr<ContactV2>(new ContactRos<WheelContact>(
-                                                                                  WheelContact(_model, state.state(INTERFACE::POSITION), contact),
-                                                                                  contact)));
-                                continue;
-                        }
+                        // if (type.compare("wheel_locked") == 0)
+                        // {
+                        //         _contacts->add(std::unique_ptr<ContactV2>(new ContactRos<WheelContact>(
+                        //                                                           WheelContact(_model, state.state(INTERFACE::POSITION), contact),
+                        //                                                           contact)));
+                        //         continue;
+                        // }
 
                         throw std::invalid_argument(std::string("Uknown contacy type: ") + type);
                 }

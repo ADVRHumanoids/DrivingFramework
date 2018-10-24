@@ -19,26 +19,26 @@ void mgnss::controllers::WheelsControllerExtend::_createAngleTasks(){
 
         mwoibn::Axis ax;
         ax << 0, 1, 0;
-        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_1", _robot.getModel()), ax));
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Frame("ankle2_1", _robot.getModel(), _robot.state), ax));
         ax << 0, -1, 0;
-        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_2", _robot.getModel()), ax));
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Frame("ankle2_2", _robot.getModel(), _robot.state), ax));
         ax << 0, 1, 0;
-        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_3", _robot.getModel()), ax));
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Frame("ankle2_3", _robot.getModel(), _robot.state), ax));
         ax << 0, -1, 0;
-        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Point("ankle2_4", _robot.getModel()), ax));
+        _caster.push_back(mwoibn::robot_class::angles::Caster(_robot, mwoibn::point_handling::Frame("ankle2_4", _robot.getModel(), _robot.state), ax));
 
         ax <<  0,  0,  1;
-        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax));
-        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_1", _robot.getModel()), ax));
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Frame("wheel_1", _robot.getModel(), _robot.state), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame("wheel_1", _robot.getModel(), _robot.state), ax));
         ax <<  0,  0,  -1;
-        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax));
-        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_2", _robot.getModel()), ax));
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Frame("wheel_2", _robot.getModel(), _robot.state), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame("wheel_2", _robot.getModel(), _robot.state), ax));
         ax <<  0,  0,  1;
-        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax));
-        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_3", _robot.getModel()), ax));
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Frame("wheel_3", _robot.getModel(), _robot.state), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame("wheel_3", _robot.getModel(), _robot.state), ax));
         ax <<  0,  0,  -1;
-        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax));
-        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Point("wheel_4", _robot.getModel()), ax));
+        _camber.push_back(mwoibn::robot_class::angles::Camber( _robot, mwoibn::point_handling::Frame("wheel_4", _robot.getModel(), _robot.state), ax));
+        _steer.push_back(mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame("wheel_4", _robot.getModel(), _robot.state), ax));
 
         for(auto& angle : _caster)
                 _caster_task.push_back(mwoibn::hierarchical_control::tasks::Angle(angle, _robot));

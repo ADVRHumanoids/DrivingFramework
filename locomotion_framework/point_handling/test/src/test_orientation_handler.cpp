@@ -1,6 +1,6 @@
 #include "mwoibn/point_handling/test.h"
 #include "mwoibn/point_handling/raw_orientations_handler.h"
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/position.h"
 
 // Check if class initialization works correctly
 TEST(OrientationPHTest, initialization)
@@ -30,8 +30,8 @@ TEST(OrientationPHTest, initialization)
   EXPECT_NO_THROW(mwoibn::point_handling::RawOrientationsHandler point_1(
       "pelvis", *(_model_ptr)));
 
-  mwoibn::point_handling::Point p1("arm1_7", *_model_ptr);
-  mwoibn::point_handling::Point p2("arm1_7", *_model_ptr,
+  mwoibn::point_handling::Position p1("arm1_7", *_model_ptr);
+  mwoibn::point_handling::Position p2("arm1_7", *_model_ptr,
                                    "I have a name");
   EXPECT_NO_THROW(mwoibn::point_handling::RawOrientationsHandler point_1(
       _model_ptr->GetBodyId("pelvis"), *(_model_ptr),
@@ -208,12 +208,12 @@ TEST(OrientationPHTest, JacobianAndStateMethods)
   points.getFullPointJacobian(1, J_2,joint_states);
 
   mwoibn::Matrix J_full = mwoibn::Matrix::Zero(points.getFullJacobianRows(), _model_ptr->dof_count);
-  points.getFullJacobian(J_full, joint_states);
+  points.getFullJacobian(J_full);
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_1, J_full.topRows(points.getPointJacobianRows(0)), eps));
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_2, J_full.bottomRows(points.getPointJacobianRows(1)), eps));
 
-  std::vector<mwoibn::Matrix> v_J = points.getFullJacobians(joint_states);
+  std::vector<mwoibn::Matrix> v_J = points.getFullJacobians();
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_1, v_J[0], eps));
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_2, v_J[1], eps));
@@ -233,5 +233,3 @@ TEST(OrientationPHTest, JacobianAndStateMethods)
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_2, v_J[1], eps));
 
 }
-
-

@@ -47,7 +47,7 @@ TEST(ContactsTest, initializationBaseClass)
 
     EXPECT_EQ("",robot.contacts().contact(1).getName());
 
-    mwoibn::robot_class::Contact contact= robot.contacts.contact(0);
+    mwoibn::robot_points::Contact contact= robot.contacts.contact(0);
     EXPECT_EQ("front_right_leg",contact.getName());
 
     EXPECT_THROW(robot.contacts().contact(2), std::out_of_range);
@@ -79,13 +79,13 @@ TEST(ContactsTest, methodsBaseClass)
     std::string path = ros::package::getPath("tests_common");
     std::string file_name = path + "/resources/urdf/centauro_full_test.urdf";
 
-    mwoibn::robot_class::Robot robot(file_name, "", true);
+    mwoibn::robot_points::Robot robot(file_name, "", true);
 
     mwoibn::VectorN joint_states =
         Eigen::VectorXd::Random(robot.getDofs());
 
-    robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
-    EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+    robot.state.set(joint_states, mwoibn::robot_points::INTERFACE::POSITION);
+    EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_points::INTERFACE::POSITION));
 
  //   robot.updateJointStates();
  //   EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));

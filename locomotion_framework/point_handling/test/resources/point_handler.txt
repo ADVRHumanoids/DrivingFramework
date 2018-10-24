@@ -69,7 +69,7 @@ current position of new point
 -0.00647254
 0.3877
 point_handling::checkPoint: 
-Point nr 0
+Position nr 0
 defined in frame 8, arm1_7
 point position in the reference frame: -2.77556e-17 1.38778e-17       -0.15
 track orientation 0

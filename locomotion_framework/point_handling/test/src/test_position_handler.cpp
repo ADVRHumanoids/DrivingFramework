@@ -1,6 +1,6 @@
 #include "mwoibn/point_handling/test.h"
 #include "mwoibn/point_handling/raw_positions_handler.h"
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/position.h"
 
 // Check if class initialization works correctly
 TEST(PointPHTest, initialization)
@@ -31,8 +31,8 @@ TEST(PointPHTest, initialization)
   EXPECT_NO_THROW(mwoibn::point_handling::RawPositionsHandler point_1(
       "pelvis", *(_model_ptr)));
 
-  mwoibn::point_handling::Point p1("arm1_7", *_model_ptr);
-  mwoibn::point_handling::Point p2("arm1_7", *_model_ptr,
+  mwoibn::point_handling::Position p1("arm1_7", *_model_ptr);
+  mwoibn::point_handling::Position p2("arm1_7", *_model_ptr,
                                    "I have a name");
   EXPECT_NO_THROW(mwoibn::point_handling::RawPositionsHandler point_1(
       _model_ptr->GetBodyId("pelvis"), *(_model_ptr),
@@ -162,7 +162,7 @@ TEST(PointPHTest, uniquePointMathods)
   int max = 11;
 
   mwoibn::VectorN position_1 =
-      point_1.getFullStateWorld(joint_states);
+      point_1.getFullStateWorld();
 
   EXPECT_EQ(i + 1, point_1.addPoint(P_2, 8));
   i++;
@@ -172,7 +172,7 @@ TEST(PointPHTest, uniquePointMathods)
   i++;
 
   mwoibn::VectorN position_4 =
-      point_1.getFullStateWorld(joint_states);
+      point_1.getFullStateWorld();
 
   EXPECT_EQ(i + 1, point_1.addPoint(P_1, "arm1_7", "I have a name"));
   i++;
@@ -201,9 +201,9 @@ TEST(PointPHTest, uniquePointMathods)
   EXPECT_EQ("I have a name", point_1.getPointName(7));
   i++;
 
-  mwoibn::point_handling::Point point("arm1_7", *_model_ptr,
+  mwoibn::point_handling::Position point("arm1_7", *_model_ptr,
                                       "test me");
-  mwoibn::point_handling::Point point2(point);
+  mwoibn::point_handling::Position point2(point);
 
   EXPECT_EQ(10, point_1.addPoint(point));
   i++;
@@ -216,7 +216,7 @@ TEST(PointPHTest, uniquePointMathods)
   point_1.removePoint(5);
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(
-      position_4, point_1.getFullStateWorld(joint_states), eps));
+      position_4, point_1.getFullStateWorld(), eps));
 
   point_1.removePoint(2);
 
@@ -225,7 +225,7 @@ TEST(PointPHTest, uniquePointMathods)
   position_5.tail(6) = position_4.tail(6);
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(
-      position_5, point_1.getFullStateWorld(joint_states), eps));
+      position_5, point_1.getFullStateWorld(), eps));
 
   point_1.removePoint(2);
   point_1.removePoint(2);
@@ -235,9 +235,9 @@ TEST(PointPHTest, uniquePointMathods)
   mwoibn::point_handling::RawPositionsHandler point_2(
       base, *(_model_ptr), {"arm1_7", "arm1_7"}, {P_1, P_1});
 
-  mwoibn::point_handling::Point point_test_1(P_2, "arm1_7",
+  mwoibn::point_handling::Position point_test_1(P_2, "arm1_7",
                                              *_model_ptr, mwoibn::Quaternion(0,0,0,1), "test me");
-  mwoibn::point_handling::Point point_test_2(P_3, "arm1_7",
+  mwoibn::point_handling::Position point_test_2(P_3, "arm1_7",
                                              *_model_ptr, mwoibn::Quaternion(0,0,0,1), "test me");
 
   mwoibn::Vector3 result_1_world =
@@ -247,7 +247,7 @@ TEST(PointPHTest, uniquePointMathods)
   mwoibn::Vector3 result_1_reference =
       point_test_1.getPositionReference(base, joint_states);
   mwoibn::Matrix jacobian_1 =
-      point_test_1.getPositionJacobian(joint_states);
+      point_test_1.getPositionJacobian();
 
   mwoibn::Vector3 result_2_world =
       point_test_2.getPositionWorld(joint_states);
@@ -256,7 +256,7 @@ TEST(PointPHTest, uniquePointMathods)
   mwoibn::Vector3 result_2_reference =
       point_test_2.getPositionReference(base, joint_states);
   mwoibn::Matrix jacobian_2 =
-      point_test_2.getPositionJacobian(joint_states);
+      point_test_2.getPositionJacobian();
 
 //  // Make get/set tests
 
@@ -391,13 +391,13 @@ TEST(PointPHTest, JacobianAndStateMethods)
     FAIL() << "couldn't continue, file finished prematurely";
   J = mwoibn::point_handling::readMatrix(&myfile, 6, 15);
   J_test = mwoibn::Matrix::Zero(6, _model_ptr->dof_count);
-  points.getFullJacobian(J_test, joint_states); // only position
+  points.getFullJacobian(J_test); // only position
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J, J_test, eps));
 
   jacobians.clear();
 
-  jacobians = points.getFullJacobians(joint_states);
+  jacobians = points.getFullJacobians();
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J.topRows(3), jacobians[0], eps));
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J.bottomRows(3), jacobians[1], eps));
 
@@ -423,7 +423,7 @@ TEST(PointPHTest, JacobianAndStateMethods)
     FAIL() << "couldn't continue, file finished prematurely";
   J = mwoibn::point_handling::readMatrix(&myfile, 6, 1);
   J_test = mwoibn::Matrix::Zero(6, 1);
-  J_test = points.getFullStateWorld(joint_states); // ponly position
+  J_test = points.getFullStateWorld(); // ponly position
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_test, J, eps));
 
@@ -432,15 +432,15 @@ TEST(PointPHTest, JacobianAndStateMethods)
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J.topRows(3), states[0], eps));
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J.bottomRows(3), states[1], eps));
 
-  mwoibn::point_handling::Point point1(P_1, "arm1_7", *_model_ptr);
-  mwoibn::point_handling::Point point2(P_1, "arm2_7", *_model_ptr);
+  mwoibn::point_handling::Position point1(P_1, "arm1_7", *_model_ptr);
+  mwoibn::point_handling::Position point2(P_1, "arm2_7", *_model_ptr);
 
   mwoibn::VectorN ref_position(6);
 
   ref_position.head(3) = point1.getPositionReference("torso_2", joint_states);
   ref_position.tail(3) = point2.getPositionReference("torso_2", joint_states);
 
-  J_test = points.getFullStateReference(joint_states); // ponly position
+  J_test = points.getFullStateReference(); // ponly position
 
   EXPECT_TRUE(mwoibn::point_handling::compareMatrices(J_test, ref_position, eps));
 
@@ -452,5 +452,3 @@ TEST(PointPHTest, JacobianAndStateMethods)
 
 
 }
-
-

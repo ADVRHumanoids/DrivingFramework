@@ -18,7 +18,7 @@ class Steering : public Basic
 {
 public:
 Steering(mwoibn::robot_class::Robot& robot,
-         mwoibn::point_handling::Point point,
+         mwoibn::point_handling::Frame point,
          mwoibn::Axis axis)
         : Basic(robot, point, axis)
 {
@@ -38,7 +38,7 @@ virtual void update()
 
         _n = _z_world;
 
-        _y = _point.getRotationWorld(_robot.state.get()) * _axis;
+        _y = _point.getRotationWorld() * _axis;
         _v2 = _y.cross(_z_world);
 
         mwoibn::Scalar b = 1 / _v2.norm();
@@ -78,7 +78,7 @@ virtual void update()
         _tA = O * _tA;
         _tA += P * _tB;
 
-        _J.noalias() = _tA * _point.getOrientationJacobian(_robot.state.get());
+        _J.noalias() = _tA * _point.getOrientationJacobian();
 }
 
 protected:

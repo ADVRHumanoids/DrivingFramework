@@ -19,7 +19,7 @@ class Caster : public Basic
 {
 public:
 Caster(mwoibn::robot_class::Robot& robot,
-       mwoibn::point_handling::Point point, mwoibn::Axis axis)
+       mwoibn::point_handling::Frame point, mwoibn::Axis axis)
         : Basic(robot, point, axis)
 {
         _x_world << 1, 0, 0;
@@ -35,9 +35,9 @@ virtual ~Caster() {
 virtual void update()
 {
         // axis - z
-        _v1 = _point.getRotationWorld(_robot.state.get()) * _z_world;
+        _v1 = _point.getRotationWorld() * _z_world;
 
-        _n = _point.getRotationWorld(_robot.state.get()) * _axis;
+        _n = _point.getRotationWorld() * _axis;
 
         _v2 = _z_world - _n * _z_world.transpose() * _n;
 
@@ -83,7 +83,7 @@ virtual void update()
         _tA = A * _tA;
         _tA += B * _tB;
 
-        _J.noalias() = _tA * _point.getOrientationJacobian(_robot.state.get());
+        _J.noalias() = _tA * _point.getOrientationJacobian();
 }
 
 protected:

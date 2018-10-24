@@ -53,9 +53,7 @@ public:
     _state[1] = _temp_point[1];
     _state[3] = _temp_point[2];
 
-    getAngles(_pelvis_ptr->point(0)
-                      .getRotationWorld(_robot.state.get(
-                          mwoibn::robot_class::INTERFACE::POSITION)));
+    getAngles(_pelvis_ptr->point(0).getRotationWorld());
 
     _state[2] = _temp_point[0];
     _state[4] = _temp_point[1];

@@ -12,6 +12,7 @@
 #include "mwoibn/communication_modules/all.h"
 #include "mwoibn/robot_class/contact_ros.h"
 
+
 namespace mwoibn
 {
 namespace robot_class
@@ -102,6 +103,7 @@ public:
   static bool loadJointSpaceFeedback(YAML::Node config,
                                      Feedbacks& external_feedbacks,
                                      State& external_state, BiMap external_map);
+
   static bool loadOperationalSpaceFeedback(YAML::Node config,
                                            Feedbacks& external_feedbacks,
                                            State& external_state,

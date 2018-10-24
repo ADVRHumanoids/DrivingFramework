@@ -117,10 +117,7 @@ void updateState()
         _state[1] = _temp_point[1];
         _state[3] = _temp_point[2];
 
-        _temp_point = _pelvis_ptr->point(0)
-                      .getRotationWorld(_robot.state.get(
-                                                mwoibn::robot_class::INTERFACE::POSITION))
-                      .eulerAngles(2, 1, 0);
+        _temp_point = _pelvis_ptr->point(0).getRotationWorld().eulerAngles(2, 1, 0);
 
         //    ensure the angles are in the correct ranges (-pi:pi, -pi/2:pi/2,
         //    -pi:pi)

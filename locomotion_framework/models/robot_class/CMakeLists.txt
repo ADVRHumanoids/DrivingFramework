@@ -18,17 +18,17 @@ set(LOGGER_INCLUDE_DIRS "")
 set(LOGGER_LIBRARIES "")
 set(LOGGER_EXPORTED_TARGETS "")
 
-find_package(catkin REQUIRED point_handling urdf srdfdom common eigen_utils filters) 
+find_package(catkin REQUIRED point_handling urdf srdfdom common eigen_utils filters)
 
 if(LOGGER)
 find_package(simple_log REQUIRED)
-LIST(APPEND LOGGER_LIBRARIES 
+LIST(APPEND LOGGER_LIBRARIES
 	${simple_log_LIBRARIES}
 )
-LIST(APPEND LOGGER_INCLUDE_DIRS 
+LIST(APPEND LOGGER_INCLUDE_DIRS
 	${simple_log_INCLUDE_DIRS}
 )
-LIST(APPEND LOGGER_EXPORTED_TARGETS 
+LIST(APPEND LOGGER_EXPORTED_TARGETS
 	${simple_log_EXPORTED_TARGETS}
 )
 endif(LOGGER)
@@ -40,19 +40,19 @@ find_package(Eigen3 REQUIRED)
 find_package(YamlCpp REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
-	include 
-	${catkin_INCLUDE_DIRS} 
-	${RBDL_INCLUDE_DIR} 
-	${RBDL_URDFReader_INCLUDE_DIR} 
+  INCLUDE_DIRS
+	include
+	${catkin_INCLUDE_DIRS}
+	${RBDL_INCLUDE_DIR}
+	${RBDL_URDFReader_INCLUDE_DIR}
 	${LOGGER_INCLUDE_DIRS}
-  LIBRARIES 
+  LIBRARIES
 	robot_class
-	${catkin_LIBRARIES} 
-	${RBDL_LIBRARY} 
-	${RBDL_URDFReader_LIBRARY} 
+	${catkin_LIBRARIES}
+	${RBDL_LIBRARY}
+	${RBDL_URDFReader_LIBRARY}
 	${LOGGER_LIBRARIES}
-  DEPENDS 
+  DEPENDS
 	Eigen3
         YamlCpp
 )
@@ -72,15 +72,17 @@ ${LOGGER_INCLUDE_DIRS}
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(ROBOT_CLASS_SOURCE 
-        src/robot.cpp 
-        src/wheel_contact.cpp
-        src/contact_v2.cpp 
-        src/contacts.cpp 
-        src/actuators.cpp 
-        src/actuator.cpp 
-        src/center_of_mass.cpp 
-        src/state.cpp
+set(ROBOT_CLASS_SOURCE
+        src/robot.cpp
+				src/robot_points/wheel_contact.cpp
+        src/robot_points/contact_v2.cpp
+				src/robot_points/contact.cpp
+				src/robot_points/center_of_mass.cpp
+				src/robot_points/center_of_pressure.cpp
+				src/robot_points/center_of_pressure_fast.cpp
+        src/contacts.cpp
+        src/actuators.cpp
+        src/actuator.cpp
 )
 
 ## Declare a C++ library
@@ -108,7 +110,7 @@ set(ROBOT_CLASS_SOURCE
  )
 
 ## Mark cpp header files for installation
- install(DIRECTORY include/mwoibn/${PROJECT_NAME} include/mwoibn/communication_modules
+ install(DIRECTORY include/mwoibn/${PROJECT_NAME} include/mwoibn/communication_modules include/mwoibn/robot_points
    DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
@@ -190,6 +192,7 @@ if(CATKIN_ENABLE_TESTING)
         ${centauro_LIBRARIES}
    )
  endif()
+
 endif(CATKIN_ENABLE_TESTING)
 #  find_package(rostest REQUIRED)
 #  add_rostest_gtest(tests_${PROJECT_NAME} tests/mynode.test src/test/test_mynode.cpp)

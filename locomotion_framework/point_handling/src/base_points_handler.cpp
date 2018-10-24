@@ -6,7 +6,11 @@ namespace mwoibn
 namespace point_handling
 {
 
-typedef mwoibn::Vector3 State;
+//typedef mwoibn::Vector3 State;
+
+
+
+
 
 
 } // namespace package

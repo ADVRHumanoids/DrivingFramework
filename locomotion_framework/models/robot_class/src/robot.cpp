@@ -76,9 +76,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 
         _actuation = mwoibn::VectorInt::Ones(getDofs());
 
-        _center_of_mass.reset(new CenterOfMass(_model,
-                                               state.state(INTERFACE::POSITION),
-                                               state.state(INTERFACE::VELOCITY)));
+        _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
         _contacts.reset(new Contacts(getDofs()));
 
         // set to unactuated all dofs not in the model
@@ -234,7 +232,7 @@ void mwoibn::robot_class::Robot::_loadGroup(
         for (const auto& chain : group.chains_)
         {
                 mwoibn::point_handling::RawPositionsHandler my_chain(
-                        chain.first, _model, std::vector<std::string>{chain.second});
+                        chain.first, _model, state, std::vector<std::string>{chain.second});
                 for (int i = 0; i < my_chain.getChain().size(); i++)
                         map[my_chain.getChain()[i]] = 1;
         }
@@ -353,14 +351,26 @@ std::vector<std::string>
 mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
 {
         std::vector<std::string> links;
-        bool found;
+
         for (int i = 0; i < dofs.size(); i++)
+            links.push_back(getLinks(dofs[i]));
+        // ensure uniquness
+        if (unique) // return repetitions
+                links.erase(std::unique(links.begin(), links.end()), links.end());
+
+        return links;
+}
+
+std::string
+mwoibn::robot_class::Robot::getLinks(unsigned int dof)
+{
+        std::string links;
+        bool found = false;
+
+        for (int k = 0; k < _model.mJoints.size(); k++)
         {
-                found = false;
-                for (int k = 0; k < _model.mJoints.size(); k++)
-                {
-                        if (dofs[i] >= _model.mJoints[k].q_index &&
-                            dofs[i] < (_model.mJoints[k].q_index + _model.mJoints[k].mDoFCount))
+                if (dof >= _model.mJoints[k].q_index &&
+                            dof < (_model.mJoints[k].q_index + _model.mJoints[k].mDoFCount))
                         {
                                 if (!_is_static && _model.mJoints[k].q_index < 6 &&
                                     _model.mJoints[k].q_index + _model.mJoints[k].mDoFCount != 6)
@@ -371,7 +381,7 @@ mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
                                                     _model.mJoints[l].q_index + _model.mJoints[l].mDoFCount == 6)
                                                 {
 
-                                                        links.push_back(_model.GetBodyName(l));
+                                                        links = _model.GetBodyName(l);
                                                         found = true;
                                                         break;
                                                 }
@@ -379,22 +389,17 @@ mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
                                 }
                                 else
                                 {
-                                        links.push_back(_model.GetBodyName(k));
+                                        links = _model.GetBodyName(k);
                                         found = true;
                                         break;
                                 }
                         }
-                }
+            }
 
-                if (!found)
-                        throw std::invalid_argument(
-                                      std::string("No link is associated with dof ") +
-                                      std::to_string(dofs[i]));
-        }
-
-        // ensure uniquness
-        if (unique) // return repetitions
-                links.erase(std::unique(links.begin(), links.end()), links.end());
+            if (!found)
+                    throw std::invalid_argument(
+                              std::string("No link is associated with dof ") +
+                          std::to_string(dof));
 
         return links;
 }
@@ -542,28 +547,25 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
 
                         if (type.compare("point_foot") == 0)
                         {
-                                _contacts->add(std::unique_ptr<mwoibn::robot_class::ContactV2>(
-                                                       new mwoibn::robot_class::ContactV2(
-                                                               _model, state.state(robot_class::INTERFACE::POSITION),
-                                                               contact)));
+                                _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
+                                                       new mwoibn::robot_points::ContactV2(
+                                                               _model, state, contact)));
                                 continue;
                         }
                         if (type.compare("wheel") == 0)
                         {
-                                _contacts->add(std::unique_ptr<mwoibn::robot_class::ContactV2>(
-                                                       new mwoibn::robot_class::WheelContactV2(
-                                                               _model, state.state(robot_class::INTERFACE::POSITION),
-                                                               contact)));
+                                _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
+                                                       new mwoibn::robot_points::WheelContactV2(
+                                                               _model, state, contact)));
                                 continue;
                         }
-                        if (type.compare("wheel_locked") == 0)
-                        {
-                                _contacts->add(std::unique_ptr<mwoibn::robot_class::ContactV2>(
-                                                       new mwoibn::robot_class::WheelContact(
-                                                               _model, state.state(robot_class::INTERFACE::POSITION),
-                                                               contact)));
-                                continue;
-                        }
+                        // if (type.compare("wheel_locked") == 0)
+                        // {
+                        //         _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
+                        //                                new mwoibn::robot_points::WheelContact(
+                        //                                        _model, state, contact)));
+                        //         continue;
+                        // }
 
                         throw std::invalid_argument(std::string("Uknown contacy type: ") + type);
                 }
@@ -1146,10 +1148,10 @@ void mwoibn::robot_class::Robot::_initModel(bool is_static,
 {
         // RigidBodyDynamics::Model model;
         if (!RigidBodyDynamics::Addons::URDFReadFromFile(source.c_str(), &model,
-                                                         !is_static, false))									 
+                                                         !is_static, false))
                 throw std::invalid_argument(
                               std::string("Error loading model from file  for mapping "));
-														 
+
 }
 
 void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)

@@ -65,10 +65,7 @@ virtual void updateState()
         {
                 mwoibn::Vector3 axis, direction;
                 axis << 0, 0, 1;
-                direction = _wheels_ptr->point(i)
-                            .getRotationWorld(_robot.state.get(
-                                                      mwoibn::robot_class::INTERFACE::POSITION))
-                            .col(2); // z axis, for our kinematics wheel axis in general
+                direction = _wheels_ptr->point(i).getRotationWorld().col(2); // z axis, for our kinematics wheel axis in general
 
                 direction = direction.cross(axis); //?
                 direction.normalize();

@@ -3,16 +3,20 @@
 
 #include <rbdl/rbdl.h>
 #include "mwoibn/robot_class/robot_class.h"
-#include "mwoibn/robot_class/contact_v2.h"
-#include "mwoibn/robot_class/wheel_contact.h"
+#include "mwoibn/robot_points/contact.h"
+#include "mwoibn/robot_points/wheel_contact.h"
+#include "mwoibn/robot_points/contact_v2.h"
 
 #include "mwoibn/robot_class/contacts.h"
 #include "mwoibn/robot_class/controllers.h"
 #include "mwoibn/robot_class/feedbacks.h"
 
 #include "mwoibn/robot_class/actuators.h"
-#include "mwoibn/robot_class/center_of_mass.h"
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/robot_points/center_of_mass.h"
+
+#include "mwoibn/robot_points/center_of_pressure.h"
+
+#include "mwoibn/common/all.h"
 #include "mwoibn/robot_class/mappings.h"
 #include "mwoibn/robot_class/map.h"
 #include <memory>
@@ -117,6 +121,7 @@ Actuators& actuators() {
 Mappings<BiMap>& biMaps() {
         return _bi_maps;
 }
+
 Mappings<SelectorMap>& selectors() {
         return _selector_maps;
 }
@@ -131,7 +136,7 @@ const mwoibn::VectorInt& getActuationState() {
 /** @brief CenterOfMass
  *  Functions releated to hendle robot's center of mass
  */
-CenterOfMass& centerOfMass() {
+robot_points::CenterOfMass& centerOfMass() {
         return *(_center_of_mass.get());
 }
 
@@ -158,6 +163,8 @@ Feedbacks feedbacks;
 std::vector<std::string> getLinks(mwoibn::VectorInt dofs, bool unique = true);
 
 std::vector<std::string> getLinks(std::string chain, bool unique = true);
+
+std::string getLinks(unsigned int dof);
 
 
 /** @brief return rbdl state vetor dofs associated with given links **/
@@ -231,7 +238,7 @@ double _rate = 0;
 std::unique_ptr<Contacts> _contacts;
 
 //! Kepps center of mass data
-std::unique_ptr<CenterOfMass> _center_of_mass;
+std::unique_ptr<robot_points::CenterOfMass> _center_of_mass;
 
 //! Actuators Module
 Actuators _actuators;

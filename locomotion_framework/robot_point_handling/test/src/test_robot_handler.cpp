@@ -2,7 +2,7 @@
 #include "mwoibn/point_handling/raw_positions_handler.h"
 #include "mwoibn/point_handling/robot_points_handler.h"
 
-#include "mwoibn/point_handling/point.h"
+#include "mwoibn/point_handling/position.h"
 
 //typedef mwoibn::point_handling::RobotPointsHandler<mwoibn::point_handling::RawPositionsHandler>
 //    PointsHandler;
@@ -27,8 +27,8 @@ TEST(RobotPHTest, initialization)
 
   EXPECT_NO_THROW(PointsHandler point_1("pelvis", robot));
 
-  mwoibn::point_handling::Point p1("arm1_7", robot.getModel());
-  mwoibn::point_handling::Point p2("arm1_7", robot.getModel(), "I have a name");
+  mwoibn::point_handling::Position p1("arm1_7", robot.getModel());
+  mwoibn::point_handling::Position p2("arm1_7", robot.getModel(), "I have a name");
 
   EXPECT_NO_THROW(PointsHandler point_1(
       robot.getModel().GetBodyId("pelvis"), robot, {p1, p2, p1}));
@@ -166,8 +166,8 @@ TEST(RobotPHTest, uniquePointMathods)
   EXPECT_EQ("I have a name", point_1.getPointName(7));
   i++;
 
-  mwoibn::point_handling::Point point("arm1_7", robot.getModel(), "test me");
-  mwoibn::point_handling::Point point2(point);
+  mwoibn::point_handling::Position point("arm1_7", robot.getModel(), "test me");
+  mwoibn::point_handling::Position point2(point);
 
   EXPECT_EQ(10, point_1.addPoint(point));
   i++;
@@ -196,9 +196,9 @@ TEST(RobotPHTest, uniquePointMathods)
   // Get data for get/set tests
   PointsHandler point_2(base, robot, {"arm1_7", "arm1_7"}, {P_1, P_1});
 
-  mwoibn::point_handling::Point point_test_1(P_2, "arm1_7", robot.getModel(),
+  mwoibn::point_handling::Position point_test_1(P_2, "arm1_7", robot.getModel(),
                                      "test me");
-  mwoibn::point_handling::Point point_test_2(P_3, "arm1_7", robot.getModel(),
+  mwoibn::point_handling::Position point_test_2(P_3, "arm1_7", robot.getModel(),
                                      "test me");
 
   mwoibn::Vector3 result_1_world =
@@ -383,8 +383,8 @@ points.getFullStatesWorld();
   EXPECT_TRUE(mwoibn::tests_common::compareMatrices(J.topRows(3), states[0], eps));
   EXPECT_TRUE(mwoibn::tests_common::compareMatrices(J.bottomRows(3), states[1], eps));
 
-  mwoibn::point_handling::Point point1(P_1, "arm1_7", robot.getModel());
-  mwoibn::point_handling::Point point2(P_1, "arm2_7", robot.getModel());
+  mwoibn::point_handling::Position point1(P_1, "arm1_7", robot.getModel());
+  mwoibn::point_handling::Position point2(P_1, "arm2_7", robot.getModel());
 
   mwoibn::VectorN ref_position(6);
 
