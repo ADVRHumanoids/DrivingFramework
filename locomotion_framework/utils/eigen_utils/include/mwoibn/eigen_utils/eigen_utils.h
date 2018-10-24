@@ -186,6 +186,9 @@ Scalar damping(int i){
         return _damping[i];
 }
 
+Eigen::Matrix<Scalar, Eigen::Dynamic, 1> damping() {return _damping;}
+
+
 const Dynamic_Matrix& get() const {
         return _inversed;
 }
@@ -289,6 +292,10 @@ void compute(const Dynamic_Matrix& jacobian, Dynamic_Matrix& P)
 //    for(int i = 0; i < _jacobian.rows(); i++){
 //      _dets[i] = _jacobian.row(i).cwiseAbs().maxCoeff();
 //    }
+}
+
+Eigen::Matrix<Scalar, Eigen::Dynamic, 1> damping(){
+  return _inverser.damping();
 }
 
 Scalar damping(int i){
@@ -403,6 +410,16 @@ struct Hasher
                 return hash_bool(std_vec);
         }
 };
+
+static Eigen::VectorXi it(int size, int base = 0)
+{
+  Eigen::VectorXi iter(size);
+
+  for(int i = 0; i < size; i++)
+    iter[i] = i + base;
+
+  return iter;
+}
 
 
 // }
