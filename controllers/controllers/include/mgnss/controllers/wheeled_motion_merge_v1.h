@@ -6,7 +6,8 @@
 // #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 // #include <mwoibn/hierarchical_control/controllers/actions.h>
 
-#include <mwoibn/hierarchical_control/actions/merge.h>
+//#include <mwoibn/hierarchical_control/actions/merge.h>
+#include <mwoibn/hierarchical_control/actions/angles_merge.h>
 #include <mwoibn/hierarchical_control/actions/compute.h>
 
 namespace mgnss

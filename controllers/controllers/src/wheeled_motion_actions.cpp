@@ -57,15 +57,15 @@ void mgnss::controllers::WheeledMotionActions::_allocate(){
 void mgnss::controllers::WheeledMotionActions::_initIK(YAML::Node config){
         std::cout << "Wheeled Motion loaded " << config["tunning"] << " tunning." << std::endl;
 
+                if(!config["chain"])
+                        throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
+                        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
 
         config = config["tunnings"][config["tunning"].as<std::string>()];
 
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
-
-        if(!config["chain"])
-                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
-        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
 
         // int task = 0;
         double ratio = config["ratio"].as<double>(); // 4
@@ -314,7 +314,7 @@ void mgnss::controllers::WheeledMotionActions::steering()
 
         for (int i = 0; i < 4; i++)
         {
-//                setSteering(i, steerings[i]);
+                setSteering(i, steerings[i]);
         }
 
 }

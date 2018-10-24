@@ -47,15 +47,17 @@ void mgnss::controllers::WheeledMotionMergeV1::_initIK(YAML::Node config){
 
         _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
         _actions_ptr = dynamic_cast<mwoibn::hierarchical_control::controllers::Actions*>(_hierarchical_controller_ptr.get());
+
+
+        if(!config["chain"])
+                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
+                _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
+
         config = config["tunnings"][config["tunning"].as<std::string>()];
 
         for(auto entry : config)
                 std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
-
-        if(!config["chain"])
-                throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
-        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
-
 
         // int task = 0;
         double ratio = config["ratio"].as<double>(); // 4
@@ -81,7 +83,7 @@ void mgnss::controllers::WheeledMotionMergeV1::_initIK(YAML::Node config){
 
         // _actions_ptr->idleTask(_leg_castor, config["castor"].as<double>() * ratio, config["castor_damp"].as<double>());
 
-        _leg_merge_ptr.reset(new mwoibn::hierarchical_control::actions::Merge(*_leg_camber_action, *_leg_castor_action, _actions_ptr->state(), config["camber_tolerance"].as<double>()));
+        _leg_merge_ptr.reset(new mwoibn::hierarchical_control::actions::AnglesMerge(*_leg_camber_action, *_leg_castor_action, _actions_ptr->state(), config["camber_tolerance"].as<double>(), config["camber_speed"].as<double>(), _caster_task, *_constraints_ptr, _robot));
 
         _actions_ptr->addAction(*_leg_merge_ptr);
 
