@@ -66,7 +66,7 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
         else if (req.p == 4) {
                 {
                         if (req.d >= 0 && req.d < 4) {
-                                controller_ptr->setCamber(req.d, req.nr*mwoibn::PI/180);
+                                controller_ptr->setCamber(req.d, req.nr*mwoibn::PI/180/10);
                                 res.success = true;
                                 return true;
                         }
@@ -75,7 +75,7 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
         else if (req.p == 5) {
                 {
                         if (req.d >= 0 && req.d < 4) {
-                                controller_ptr->setCastor(req.d, req.nr*mwoibn::PI/180);
+                                controller_ptr->setCastor(req.d, req.nr*mwoibn::PI/180/10);
                                 res.success = true;
                                 return true;
                         }
@@ -84,11 +84,13 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
         else if (req.p == 6) {
                 {
                         if (req.d >= 0 && req.d < 4) {
-                                controller_ptr->setSteering(req.d, req.nr*mwoibn::PI/180);
+                                controller_ptr->setSteering(req.d, req.nr*mwoibn::PI/180/10);
                                 res.success = true;
+                                std::cout << req.nr << std::endl;
                                 return true;
                         }
                 }
+
         }
         return false;
 }
