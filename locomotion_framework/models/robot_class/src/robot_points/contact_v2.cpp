@@ -28,7 +28,7 @@ const mwoibn::Matrix& mwoibn::robot_points::ContactV2::getPointJacobian()
 
 const mwoibn::Matrix& mwoibn::robot_points::ContactV2::getWorldJacobian()
 {
-  _transformation.noalias() = _frame.getPositionJacobian();
+  _transformation.noalias() = getPointJacobian();
   _jacobian.noalias() = _frame.getRotationWorld()*_transformation;
 
   return _jacobian;
