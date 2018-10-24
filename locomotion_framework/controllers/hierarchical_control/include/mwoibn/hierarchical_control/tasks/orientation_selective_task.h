@@ -53,30 +53,32 @@ public:
 
     //  std::vector<mwoibn::Quaternion> current = _ik.getFullStatesWorld();
 
-    int k = 0;
-    for (int i = 0; i < _ik.size(); i++)
-    {
-      _current = _ik.getPointStateWorld(i);
 
-      _current.ensureHemisphere(_reference[i]);
+        int k = 0, rows = 0;
+        for (int i = 0; i < _ik.size(); i++)
+        {
+          rows = _ik.getPointJacobianRows(i);
+          _current = _ik.getPointStateWorld(i);
 
-      _skew << 0, -_reference[i].z(), _reference[i].y(), _reference[i].z(), 0,
-          -_reference[i].x(), -_reference[i].y(), _reference[i].x(), 0;
+          _current.ensureHemisphere(_reference[i]);
 
-      _axis = _current.axis();
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) =
-          _reference[i].w() * _axis;
-      _axis = _reference[i].axis();
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) -=
-          _current.w() * _axis;
-      _full_error.segment(k, _ik.getPointJacobianRows(i)) +=
-          _skew * _current.axis();
+          _skew << 0, -_reference[i].z(), _reference[i].y(), _reference[i].z(), 0,
+              -_reference[i].x(), -_reference[i].y(), _reference[i].x(), 0;
 
-      k += _ik.getPointJacobianRows(i);
+          _axis = _current.axis();
 
-      //    _previous_state[i] = _current;
-      //    std::cout << "orientation" << _error << "\n done" << std::endl;
-    }
+          _full_error.segment(k, rows) = _reference[i].w() * _axis;
+
+          _axis = _reference[i].axis();
+
+          _full_error.segment(k, rows) -= _current.w() * _axis;
+          _full_error.segment(k, rows) += _skew * _current.axis();
+
+          k += rows;
+
+          //    _previous_state[i] = _current;
+          //    std::cout << "orientation" << _error << "\n done" << std::endl;
+        }
 
     int j = 0;
 

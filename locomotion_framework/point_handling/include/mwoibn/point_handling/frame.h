@@ -287,7 +287,7 @@ public:
    *
    * @see getOrientationJacobian, getOrientationJacobianCols
    */
-  unsigned int getOrientationJacobianRows() const { _velocity.angular().size(); }
+  unsigned int getOrientationJacobianRows() const { return _velocity.angular().size(); }
 
   /** @bried returnes jacobian for a full Position of a point
   */
