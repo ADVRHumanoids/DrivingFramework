@@ -96,7 +96,6 @@ void _updateSelection()
                 if (!_selector[i])
                         continue;
 
-
                 for (int k = 0; k < _robot.contacts().contact(i).getChain().size(); k++)
                         _selector_dof[_robot.contacts().contact(i).getChain()[k]] = true;
         }
