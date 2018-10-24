@@ -45,6 +45,7 @@
   <depend>robot_point_handling</depend> <!-- all programs -->
   <depend>filters</depend> <!-- all programs -->
   <depend>modules</depend> <!-- all programs -->
+  <depend>dynamic_models</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
