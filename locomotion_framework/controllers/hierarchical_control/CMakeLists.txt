@@ -84,6 +84,8 @@ include_directories(
 
   add_library(controller_actions
     src/actions/merge.cpp
+    src/actions/angles_merge.cpp
+
     src/actions/merge/end.cpp
     src/actions/merge/front.cpp
     src/actions/merge/local.cpp

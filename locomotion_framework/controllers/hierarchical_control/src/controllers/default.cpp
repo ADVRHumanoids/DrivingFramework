@@ -132,15 +132,10 @@ void mwoibn::hierarchical_control::controllers::Default::_updateTask(int i, mwoi
         _errors[i].noalias() = -(_gains[i].asDiagonal() * task.getError());
         _errors[i].noalias() -= task.getJacobian() * _command;
 
-
-
         if (_errors[i].size())
         {
                 _inversers_ptrs[i]->compute(task.getJacobian(), _P);
                 _command.noalias() += _inversers_ptrs[i]->getInverse() * _errors[i];
         }
-
-//        std::cout << i << "\t" << _command.transpose() << std::endl;
-
 
 }

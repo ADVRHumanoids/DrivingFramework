@@ -29,6 +29,7 @@ virtual Local& pull();
 virtual void push(Local& parent);
 
 virtual void release();
+virtual void releaseMemory();
 
 virtual void assign(actions::Task& t_new, actions::Task* t_old, Local* parent);
 virtual void assign(actions::Task& t_new, Local* parent);
@@ -41,6 +42,7 @@ virtual bool isParent(actions::Task& task);
 virtual actions::Primary& baseAction();
 virtual actions::Task& action();
 virtual void setParent(Local& parent);
+virtual std::string name() {return "frn";}
 
 protected:
 actions::Task* _this;

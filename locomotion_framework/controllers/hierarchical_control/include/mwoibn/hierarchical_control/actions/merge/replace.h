@@ -33,8 +33,11 @@ virtual Local& swapToReplace(Local& high, Local& high_parent);
 virtual Local& swapToEnd(Local& high);
 // virtual void setParent(Local& parent);
 virtual void run();
+virtual void release();
+virtual void releaseMemory();
 
 virtual bool isParent(actions::Task& task);
+virtual std::string name() {return "rep";}
 
 protected:
 virtual void _finish(Local& local){

@@ -6,7 +6,8 @@ mwoibn::hierarchical_control::actions::merge::Front::~Front(){
 }
 
 mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_control::actions::merge::Front::pull(){
-        return _parent->swapFromFront(*this);
+
+  return _parent->swapFromFront(*this);
 
 }
 
@@ -15,6 +16,10 @@ void mwoibn::hierarchical_control::actions::merge::Front::release(){
                 _map[baseAction().getTask()] = _next;
         else
                 _map.erase(baseAction().getTask());
+        releaseMemory();
+}
+
+void mwoibn::hierarchical_control::actions::merge::Front::releaseMemory(){
         _merge_memory.release(*this);
 }
 
@@ -24,9 +29,12 @@ void mwoibn::hierarchical_control::actions::merge::Front::push(Local& parent){
 
 
 void mwoibn::hierarchical_control::actions::merge::Front::assign(actions::Task& t_new, Local* parent){
+
         _parent = parent;
         _this = &t_new;
         _next = this;
+        _map[baseAction().getTask()] = this;
+
 }
 
 void mwoibn::hierarchical_control::actions::merge::Front::assign(actions::Task& t_new, actions::Task* t_old, Local* parent){
@@ -46,7 +54,7 @@ void mwoibn::hierarchical_control::actions::merge::Front::setParent(Local& paren
 }
 
 void mwoibn::hierarchical_control::actions::merge::Front::run(){
-        // std::cout << "front" << std::endl;
+        //std::cout << "front" << std::endl;
         _this->run();
 }
 

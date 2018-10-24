@@ -16,6 +16,7 @@ class Basic : public mwoibn::basic_controllers::BasicController
 public:
 Basic() : mwoibn::basic_controllers::BasicController() {
 }
+
 virtual ~Basic() {
 }
 virtual void init(){
@@ -33,6 +34,7 @@ virtual void addTask(tasks::BasicTask& new_task, unsigned int i, double gain,
 
 //! Removes a task from the stack
 virtual void removeTask(unsigned int i) = 0;
+
 
 virtual const mwoibn::VectorN& update() = 0;
 //! computes the controll law without updating the controllers states

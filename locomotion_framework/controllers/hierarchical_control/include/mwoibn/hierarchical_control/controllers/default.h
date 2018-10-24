@@ -36,6 +36,19 @@ class Default : public Basic
 public:
 Default() : Basic() {
 }
+
+//Default(const Default& other) : Basic(other), _gains(other._gains), _errors(other._errors), _inversers_ptrs(other._inversers_ptrs), _tasks(other._tasks), _P(other._P), _dofs(other._dofs)  {
+//}
+
+Default(const Default& other) : Basic(other), _P(other._P), _dofs(other._dofs), _errors(other._errors)  {
+
+  for(int i =0; i < other._tasks.size(); i++){
+    addTask(other._tasks[i], other._gains[i], other._inversers_ptrs[i]->damping(0));
+  }
+
+}
+
+
 virtual ~Default() {
 }
 virtual void init(){
@@ -64,8 +77,11 @@ virtual void addTask(tasks::BasicTask& new_task, unsigned int i, mwoibn::VectorN
 virtual void addTask(tasks::BasicTask& new_task, unsigned int i, double gain,
                      double damping = 1e-8);
 
+
+
 //! Removes a task from the stack
 virtual void removeTask(unsigned int i);
+
 
 /**
  * \see Default#compute()
@@ -110,7 +126,6 @@ std::vector<mwoibn::VectorN> _errors;
 std::vector<std::unique_ptr<mwoibn::Projection> > _inversers_ptrs;
 virtual void _updateTask(int i, mwoibn::hierarchical_control::tasks::BasicTask& task);
 std::vector<std::reference_wrapper<tasks::BasicTask> > _tasks;
-
 
 virtual void _init();
 mwoibn::Matrix _P;

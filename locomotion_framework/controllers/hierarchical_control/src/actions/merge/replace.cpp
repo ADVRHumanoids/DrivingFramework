@@ -13,7 +13,7 @@ mwoibn::hierarchical_control::actions::merge::Replace::~Replace(){
 // }
 
 void mwoibn::hierarchical_control::actions::merge::Replace::run(){
-        // std::cout << "replace" << std::endl;
+        //std::cout << "replace" << std::endl;
         progress();
         _this.run();
 }
@@ -23,7 +23,7 @@ void mwoibn::hierarchical_control::actions::merge::Replace::progress(){
         _t += _dt;
         updateGain();
         // std::cout << "dt " << _dt << std::endl;
-        std::cout << "rep_p " << _p << std::endl;
+        //std::cout << "rep_p " << _p << std::endl;
 
 }
 
@@ -34,15 +34,17 @@ mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_contro
         _rep_1->assign(high.action(), &_this.secondAction(), _end_1);
         _end_1->assign(action(), *_rep_1);
 
-        double k = high.getGain() * _p;
-        _end_1->setProgress(k - high.getGain() + 1);
-        _rep_1->setProgress( k /_end_1->getGain() );
+
+
+        _end_1->setProgress((1-high.getGain())*_p);
+        _rep_1->setProgress(high.getGain() / (high.getGain()*_p - _p + 1) );
+
+        high.releaseMemory();
+        releaseMemory();
 
         _map[_end_1->action().baseAction().getTask()] = _end_1;
         _map[_rep_1->action().baseAction().getTask()] = _rep_1;
 
-        high.release();
-        release();
         _merge.setLast(*_end_1);
         return *_end_1;
 
@@ -60,15 +62,18 @@ mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_contro
         _low_1->assign(high.action(), &_this.secondAction(), _parent);
         _high_1->assign(action(), _low_1, &high_parent);
 
-        double k = high.getGain() * _p;
-        _high_1->setProgress(k - high.getGain() + 1);
-        _low_1->setProgress( k /_high_1->getGain() );
+        // double k = high.getGain() * _p;
+        // _high_1->setProgress(k - high.getGain() + 1);
+        // _low_1->setProgress( k /_high_1->getGain() );
+
+        _high_1->setProgress((1-high.getGain())*_p);
+        _low_1->setProgress(high.getGain() / (high.getGain()*_p - _p + 1) );
+
+        high.releaseMemory();
+        releaseMemory();
 
         _map[_low_1->action().baseAction().getTask()] = _low_1;
         _map[_high_1->action().baseAction().getTask()] = _high_1;
-
-        high.release();
-        release();
 
         return *_high_1;
 }
@@ -84,13 +89,13 @@ mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_contro
         _base_1->assign(_this.action(), _rep_1);
         _rep_1->assign(lower.action(), _base_1, _parent);
 
-        _map[_base_1->action().baseAction().getTask()] = _base_1;
-        _map[_rep_1->action().baseAction().getTask()] = _rep_1;
-
         _rep_1->setProgress(1 - _p);
 
-        lower.release();
-        release();
+        lower.releaseMemory();
+        releaseMemory();
+
+        _map[_base_1->action().baseAction().getTask()] = _base_1;
+        _map[_rep_1->action().baseAction().getTask()] = _rep_1;
 
         return *_rep_1;
 
@@ -109,4 +114,17 @@ void mwoibn::hierarchical_control::actions::merge::Replace::assign(actions::Task
         End::assign(t_new, t_old, nullptr);
         _parent = parent;
 
+}
+
+void mwoibn::hierarchical_control::actions::merge::Replace::releaseMemory(){
+
+        _merge_memory.release(*this);
+}
+
+void mwoibn::hierarchical_control::actions::merge::Replace::release(){
+
+        if(_this.isDone()) _end();
+        else
+                _map[_this.baseAction().getTask()] = _next;
+        releaseMemory();
 }

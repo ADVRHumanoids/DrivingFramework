@@ -17,6 +17,7 @@
 #include "mwoibn/hierarchical_control/actions/merge/end.h"
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/state.h"
+#include "mwoibn/hierarchical_control/tasks/constraints_task.h"
 
 #include <unordered_map>
 
@@ -29,7 +30,7 @@ namespace actions {
 class Merge : public Primary
 {
 public:
-Merge(actions::Compute& main_task, actions::Compute& secondary_task, hierarchical_control::State& state, mwoibn::Scalar eps);
+Merge(actions::Compute& main_task, actions::Compute& secondary_task, hierarchical_control::State& state, mwoibn::Scalar eps, mwoibn::Scalar p, mwoibn::hierarchical_control::tasks::Constraints& constraints, mwoibn::robot_class::Robot& robot);
 
 virtual ~Merge(){
 }
@@ -82,15 +83,18 @@ merge::Local* _last;
 std::vector<tasks::BasicTask> _support_tasks;
 std::unordered_map<mwoibn::VectorBool, actions::Compute,
                    mwoibn::eigen_utils::Hasher> _support_actions;
-mwoibn::Scalar _eps, _p = 5;
+mwoibn::Scalar _eps, _p;
 
-
+int counter = 0, local_size = 1;
 // actions::Snap _snap;
 // maps::TaskMap _map;
 //
 
+virtual void _reset(int i){std::cout << "empty" << std::endl;}
+
+virtual void _read(){}
 void _updateTasks();
-void _check();
+virtual void _check();
 //
 // void _add();
 

@@ -27,6 +27,8 @@ const Local& operator=(const Local& task){
 }
 virtual Local& pull() = 0;
 virtual void release() = 0;
+virtual void releaseMemory() = 0;
+
 virtual void push(Local& parent) = 0;
 virtual void assign(actions::Task& t_new, actions::Task* t_old, Local* parent) = 0;
 
@@ -37,7 +39,7 @@ virtual Local& swapFromReplace(Local& lower) = 0;
 
 virtual Local& swapToReplace(Local& high, Local& high_parent);
 virtual Local& swapToEnd(Local& high);
-const double getGain(){
+virtual const double getGain(){
         return 0;
 }
 virtual actions::Task& action() = 0;
@@ -46,7 +48,6 @@ virtual bool isParent(actions::Task& task) = 0;
 virtual void swap(actions::Task& task);
 
 virtual void setParent(Local& parent) = 0;
-
 
 protected:
 maps::TaskMap& _map;

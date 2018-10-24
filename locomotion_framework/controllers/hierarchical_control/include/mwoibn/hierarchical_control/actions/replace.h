@@ -20,12 +20,14 @@ class Replace : public Secondary {
 public:
 Replace(actions::Task& task_new, actions::Task& task_old, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory, maps::TaskMap& map) :
         Secondary(task_new, memory, map), _task_old(&task_old), _command(command){
+        _snap = nullptr;
         _q_new = _command;
         _q_old = _command;
 }
 
 Replace(mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory, maps::TaskMap& map) :
         Secondary(memory, map), _command(command){
+        _snap = nullptr;
         _q_new = _command;
         _q_old = _command;
 }
@@ -41,6 +43,10 @@ virtual ~Replace(){
 virtual void assign(actions::Task& task_new, actions::Task& task_old, actions::Snap& snap){
         _action = &task_new;
         _task_old = &task_old;
+
+        if(_snap != nullptr && _snap != &snap)
+          _memory.release(snap);
+
         _snap = &snap;
         _next = this;
 }

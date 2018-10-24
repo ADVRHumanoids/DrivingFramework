@@ -29,11 +29,16 @@ void mwoibn::hierarchical_control::tasks::Angle::updateJacobian() {
 }
 
 double mwoibn::hierarchical_control::tasks::Angle::getReference() const {
+      //  std::cout << "get reference " << _ref << std::endl;
+
         return _ref;
 }
 
 void mwoibn::hierarchical_control::tasks::Angle::setReference(double reference) {
         _ref = reference;
+
+      //  std::cout << "set reference " << _ref << "\t" << reference << std::endl;
+
 }
 
 // double mwoibn::hierarchical_control::tasks::Angle::det(){

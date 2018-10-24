@@ -48,6 +48,8 @@ virtual void setCondition(double cut_off){
         _cut_off= cut_off;
 }
 
+mwoibn::VectorN& getCommand(){return _command;}
+
 virtual void start(actions::Task& task_new, actions::Task& task_old, actions::Snap& snap, double mu = 0){
         if(mu > 0)
                 _cut_off = mu;
@@ -75,6 +77,11 @@ double _cut_off; // send it on start
 virtual void _merge(){
         _command.noalias() = _q_new.cwiseProduct(_gains);
         _command.noalias() += _q_old.cwiseProduct(_ones-_gains);
+
+        //std::cout << "q_new\t" << _q_new.head<12>().transpose() << std::endl;
+        //std::cout << "q_old\t" << _q_old.head<12>().transpose() << std::endl;
+        //std::cout << "_gains\t" << _gains.head<12>().transpose() << std::endl;
+        //std::cout << "command\t" << _command.head<12>().transpose() << std::endl;
 }
 
 };

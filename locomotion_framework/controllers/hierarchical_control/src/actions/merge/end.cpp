@@ -1,14 +1,40 @@
 #include "mwoibn/hierarchical_control/actions/merge/end.h"
 #include "mwoibn/hierarchical_control/actions/merge/replace.h"
 #include "mwoibn/hierarchical_control/actions/merge.h"
+#include "mwoibn/hierarchical_control/controllers/default.h"
+
+mwoibn::hierarchical_control::actions::merge::End::End(mwoibn::Matrix& P, mwoibn::VectorN& command, MergeManager& memory, maps::TaskMap& map, actions::Merge& merge, double dt, double mu, mwoibn::hierarchical_control::tasks::Constraints& constraints, mwoibn::robot_class::Robot& robot) : Local(memory, map, merge), _gain(), _this(P, command, _merge_memory, map, _gain), _dt(dt), _mu(mu){
+
+        _this_memory.release(_this);
+        _gain.setZero(command.size());
+
+        _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default());
+        _hierarchical_controller_ptr->addTask(constraints, 1.0, 0.0001);
+
+        mwoibn::Matrix jacobian = mwoibn::Matrix::Identity(robot.getDofs(), robot.getDofs());
+
+        _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(robot.getDofs(), robot.getDofs()));
+        _joints->updateJacobian(jacobian);
+        _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
+}
 
 mwoibn::hierarchical_control::actions::merge::End::End(mwoibn::Matrix& P, mwoibn::VectorN& command, MergeManager& memory, maps::TaskMap& map, actions::Merge& merge, double dt, double mu) : Local(memory, map, merge), _gain(), _this(P, command, _merge_memory, map, _gain), _dt(dt), _mu(mu){
 
         _this_memory.release(_this);
         _gain.setZero(command.size());
+
 }
 
 mwoibn::hierarchical_control::actions::merge::End::End(const End& other) : Local(other), _gain(other._gain), _t(other._t), _dt(other._dt), _mu(other._mu), _p(other._p), _this_memory(other._this_memory), _this(other._this, _gain) {
+
+  if(other._hierarchical_controller_ptr == nullptr) return;
+
+  _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default(static_cast<mwoibn::hierarchical_control::controllers::Default&>(*(other._hierarchical_controller_ptr))));
+  _hierarchical_controller_ptr->removeTask( 1);
+
+  _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(*other._joints));
+
+  _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
 
 }
 
@@ -33,18 +59,22 @@ void mwoibn::hierarchical_control::actions::merge::End::reset(){
         _p = 0;
         _t = 0;
         _gain.setZero();
+        //std::cout << name() << "\t reset_p " << _p << std::endl;
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::progress(){
         _t += _dt;
         updateGain();
-        // std::cout << "dt " << _dt << std::endl;
-//        std::cout << "_p " << _p << std::endl;
+        //std::cout << "end_p " << _p << std::endl;
+
 
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::setProgress(double p){
-        _t = std::atanh(p);
+        //if (p == 0) _t = 0;
+        //else
+          _t = std::atanh(p)/_mu;
+
         updateGain();
 }
 
@@ -56,24 +86,36 @@ void mwoibn::hierarchical_control::actions::merge::End::_setLimit(){
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::run(){
+
+        //std::cout << "end" << std::endl;
         progress();
         _this.run();
+
+      //  std::cout << "raw\t" << _this.getCommand().head<12>().transpose() << std::endl;
+
+        _joints->updateError(-_this.getCommand());
+
+        _this.getCommand() = _hierarchical_controller_ptr->update();
+
+      //  std::cout << "swap\t" << _this.getCommand().head<12>().transpose() << std::endl;
+
 }
 
 mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_control::actions::merge::End::swapFromFront(Local& old){
         actions::merge::Front* _base_1  = _merge_memory.local_front.get();
         actions::merge::End* _end_1 = _merge_memory.local_end.get();
 
-        _base_1->assign(_this.action(), _end_1);
+        _base_1->assign(_this.action(), nullptr, _end_1);
         _end_1->assign(old.action(), *_base_1);
+
+        _end_1->setProgress(1 - _p);
+
+        old.releaseMemory();
+        releaseMemory();
 
         _map[_base_1->action().baseAction().getTask()] = _base_1;
         _map[_end_1->action().baseAction().getTask()] = _end_1;
 
-        _end_1->setProgress(1 - _p);
-
-        old.release();
-        release();
         _merge.setLast(*_end_1);
 
         return *_end_1;
@@ -85,9 +127,11 @@ mwoibn::hierarchical_control::actions::merge::Local& mwoibn::hierarchical_contro
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::_end(){
+        //std::cout << name() << "end_p " << _p << std::endl;
+
         // std::cout << "_end" << std::endl;
         _this.secondAction().release(); // this should release pointer
-        _map.erase(_this.secondAction().baseAction().getTask());
+        //_map.erase(_this.secondAction().baseAction().getTask());
 
         actions::merge::Front* ptr = _merge_memory.local_front.get();
         ptr->assign(_this.action().next(), nullptr, nullptr);
@@ -96,13 +140,17 @@ void mwoibn::hierarchical_control::actions::merge::End::_end(){
 }
 
 
+void mwoibn::hierarchical_control::actions::merge::End::releaseMemory(){
+
+        _merge_memory.release(*this);
+}
 
 void mwoibn::hierarchical_control::actions::merge::End::release(){
 
-        if(_this.isDone()) _end();
+      if(_this.isDone()) _end();
         else
                 _map[_this.baseAction().getTask()] = _next;
-        _merge_memory.release(*this);
+        releaseMemory();
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::_finish(Local& last){
@@ -111,7 +159,8 @@ void mwoibn::hierarchical_control::actions::merge::End::_finish(Local& last){
 
 void mwoibn::hierarchical_control::actions::merge::End::assign(actions::Task& t_new, actions::Task& t_old){
         _this_memory.replace.get();
-        _this.start(t_new, t_old, *_memory.snap.get());
+
+         _this.start(t_new, t_old, *_merge_memory.snap.get());
         _map[t_new.baseAction().getTask()] = this;
         _setLimit();
         reset();
@@ -119,18 +168,24 @@ void mwoibn::hierarchical_control::actions::merge::End::assign(actions::Task& t_
 
 
 void mwoibn::hierarchical_control::actions::merge::End::assign(actions::Task& t_new, actions::Task* t_old, Local* parent){
-        _this_memory.replace.get();
+
+        assign(t_new, *t_old);
+      /*_this_memory.replace.get();
+
         _this.start(t_new, *t_old, *_memory.snap.get());
         _map[baseAction().getTask()] = this;
+        _setLimit();
 
-        reset();
+        reset();*/
 }
 
 void mwoibn::hierarchical_control::actions::merge::End::push(Local& parent){
         Replace* _ptr = _merge_memory.local_replace.get();
         _ptr->assign(action(), &_this.secondAction(), &parent);
-        _map[baseAction().getTask()] = _ptr;
+        _ptr->setProgress(getGain());
         release();
+        _map[baseAction().getTask()] = _ptr;
+
 }
 
 mwoibn::hierarchical_control::actions::Task& mwoibn::hierarchical_control::actions::merge::End::next(){
