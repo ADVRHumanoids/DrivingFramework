@@ -57,8 +57,8 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
                              std::cout << std::fixed;
                              std::cout << std::setprecision(8);
         //std::cout << i << "\t_K_icm: " << _K_icm << "\t_K_sp: " << _K_sp << "\t_v_icm: " << _v_icm[i] << "\t_v_sp: " << _v_sp[i] <<  "\t_b_icm: " << _b_icm[i] << "\t_b_sp: " << _b_sp[i] << "\trg: " << _reactif_gain[i] << "\t_K_sp|_r_gain|_v_sp" << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i] << std::endl;
-        std::cout << i << "\t"
-                       << _b[i];
+        //std::cout << i << "\t"
+        //               << _b[i];
 //                       << "\t"
 //                       << _K_icm * _v_icm[i]
 //                       << "\t"
@@ -79,7 +79,7 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
         limit2PI(_pb[i], _limited[i]);
 
         _b[i] = _pb[i] + _damp[i] * (_limited[i] - _pb[i]); // do give the result in the world frame
-                       std::cout << "\t" << _b[i] << "\t" << _damp[i] << std::endl;
+        //               std::cout << "\t" << _b[i] << "\t" << _damp[i] << std::endl;
 
         _b_st[i] = _b[i] + _heading;
 

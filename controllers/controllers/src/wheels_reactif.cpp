@@ -91,7 +91,7 @@ void mgnss::controllers::WheelsReactif::_createTasks(YAML::Node config){
         _constraints_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::Constraints(_robot));
         mwoibn::Vector3 pelvis;
-        pelvis << 0, 0, 1;
+        pelvis << 1, 1, 1;
         mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
                                                            _robot.getLinks("base"));
         _pelvis_position_ptr.reset(
@@ -120,10 +120,10 @@ void mgnss::controllers::WheelsReactif::_createTasks(YAML::Node config){
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
         _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
-        _world_posture_ptr->addTask(*_com_ptr);
+        //_world_posture_ptr->addTask(*_com_ptr);
 
         mwoibn::VectorBool select(3);
-        select << false, false, true;
+        select << true, true, true;
         _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
 
 }
@@ -148,9 +148,9 @@ void mgnss::controllers::WheelsReactif::_setInitialConditions(){
         _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
 
         _position = _pelvis_position_ptr->points().getPointStateWorld(0);
-        _position.head<2>() = _robot.centerOfMass().get().head<2>();
+        //_position.head<2>() = _robot.centerOfMass().get().head<2>();
         _pelvis_position_ptr->setReference(0, _position);
-        _com_ptr->setReference(_position);
+        //_com_ptr->setReference(_position);
 }
 
 
@@ -168,8 +168,9 @@ void mgnss::controllers::WheelsReactif::fullUpdate(const mwoibn::VectorN& suppor
 }
 void mgnss::controllers::WheelsReactif::compute()
 {
+        _com_ptr->update();
         mgnss::controllers::WheelsController::compute();
-        //_correct();
+        _correct();
 
 
 }
@@ -192,7 +193,7 @@ void mgnss::controllers::WheelsReactif::_correct(){
                         if(!_resteer[i]) {
                                 _reset_count[i] = _reset_count[i] + 1;
                         }
-                        if(_reset_count[i] == 50) { //100
+                        if(_reset_count[i] == 20) { //100
                                 _resteer[i] = true;
                                 _start_steer[i] = _test_steer[i];
                                 _reset_count[i] = 0;
@@ -201,6 +202,7 @@ void mgnss::controllers::WheelsReactif::_correct(){
                 else{
                         _reset_count[i] = 0;
                 }
+
 
                 if (_resteer[i])
                 {
@@ -224,13 +226,14 @@ void mgnss::controllers::WheelsReactif::_correct(){
                         std::fabs(_start_steer[i] - steer) < 2.8; // I could add a wheel velocity condition here
 
                 if( _resteer[i] && _start_steer[i] < 0) {
-                        _test_steer[i] = _current_steer[i] + 3.5*mwoibn::PI/180;
+                        _test_steer[i] = _current_steer[i] + 5.0*mwoibn::PI/180;
                 }
                 else if ( _resteer[i] &&  _start_steer[i] > 0) {
-                        _test_steer[i] = _current_steer[i] - 3.5*mwoibn::PI/180;
+                        _test_steer[i] = _current_steer[i] - 5.0*mwoibn::PI/180;
                 }
 
         }
+        std::cout << _reset_count.transpose() << std::endl;
 
 
         _robot.command.set(_test_steer, _select_steer,
