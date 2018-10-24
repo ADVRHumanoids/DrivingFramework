@@ -287,7 +287,9 @@ class Reference:
         #print(np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03))
-        #print(np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03))
+        print(np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03))
+        print(self.getBase(),self.base_now)
+
         #print(self.x_cp)
         #print(self.y_cp)
         #print(self.z_cp)
@@ -354,7 +356,7 @@ if __name__ == '__main__':
     is_support = args['support']
     killer = GracefulKiller()
 
-    while not rospy.is_shutdown() and ref.isRunning() and not killer.kill_now:
+    while ref.isRunning() and not killer.kill_now and not rospy.is_shutdown() :
 
         ref.update()
         if ref.condition():

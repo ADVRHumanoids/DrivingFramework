@@ -66,7 +66,7 @@ pattern:
     base: 2
   4:
     type: wait
-    steps: 200
+    steps: 100
   5:
     type: speed
     motions:
@@ -115,7 +115,7 @@ pattern:
     angle: 0.015
   13:
     type: wait
-    steps: 500
+    steps: 100
   15:
     type: move
     x_cp: 0
