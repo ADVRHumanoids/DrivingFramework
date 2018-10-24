@@ -18,6 +18,10 @@ JointStates(mwoibn::robot_class::Robot& robot);
 virtual ~JointStates() {
 }
 
+bool reset(){
+        _pos_ref = _robot.state.get();
+        _position = _robot.state.get();
+}
 bool setVelocity(std::string name, double vel);
 bool setPosition(std::string name, double pos);
 

@@ -3,8 +3,15 @@
 bool mgnss::ros_callbacks::joint_states::referenceHandler(custom_services::jointStateCmnd::Request& req,
                                                           custom_services::jointStateCmnd::Response& res, mgnss::controllers::JointStates* controller_ptr)
 {
+        if (req.position == "reset")
+        {
+                controller_ptr->reset();
+                res.message = "Reset position ";
+                // res.message = "Position " + req.position + " has not been defined in
+                // the robot";
+        }
 
-        if (controller_ptr->setFullPosition(req.position))
+        else if (controller_ptr->setFullPosition(req.position))
         {
                 res.message = "Found requested position " + req.position;
                 // res.message = "Position " + req.position + " has not been defined in
