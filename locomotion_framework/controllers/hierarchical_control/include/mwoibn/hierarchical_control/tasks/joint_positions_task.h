@@ -86,11 +86,14 @@ virtual void updateError()
 virtual void updateJacobian() {
 }
 //! sets task reference getting only actuated dofs
-virtual void setReference(mwoibn::VectorN reference)
+/*virtual void setReference(mwoibn::VectorN reference)
+{
+        _reference = reference;
+}*/
+virtual void setReference(mwoibn::VectorN& reference)
 {
         _reference = reference;
 }
-
 //! returnes task reference
 mwoibn::VectorN getReference() {
         return _reference;
