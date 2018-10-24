@@ -16,6 +16,7 @@ option(WHEELS_MOTION ON)
 option(JOINT_STATES ON)
 option(GRAVITY_TEST ON)
 option(ODOMETRY ON)
+option(GROUND_FORCES ON)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -124,6 +125,8 @@ if(WHEELS_MOTION)
     wheels_world
     wheels_3
     wheels_reactif
+    wheels_merge
+    wheels_actions
   )
   LIST( APPEND CATKIN_DEPENDS_SET
     roscpp
@@ -169,6 +172,19 @@ if(ODOMETRY)
 
 endif(ODOMETRY)
 
+if(GROUND_FORCES)
+  LIST( APPEND INSTALL_TARGETS
+    ground_forces
+  )
+  LIST( APPEND CATKIN_DEPENDS_SET
+    roscpp
+    robot_class_xbot
+    robot_class_ros_extension
+    state_estimation
+  )
+
+endif(GROUND_FORCES)
+
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
   ${CATKIN_DEPENDS_BUILD}
@@ -189,6 +205,10 @@ if(COLLISION_CHECK)
  )
 
 endif(COLLISION_CHECK)
+
+#LIST( APPEND INSTALL_TARGETS
+#  acceleration_test
+#)
 
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
@@ -294,6 +314,20 @@ target_link_libraries(wheels_world
     ${catkin_LIBRARIES}
  )
 
+ add_executable(wheels_merge src/exec/wheels_merge_1.cpp)
+ add_dependencies(wheels_merge nrt_plugins ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(wheels_merge
+     nrt_plugins
+     ${catkin_LIBRARIES}
+  )
+
+
+  add_executable(wheels_actions src/exec/wheels_actions.cpp)
+  add_dependencies(wheels_actions nrt_plugins ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(wheels_actions
+       nrt_plugins
+       ${catkin_LIBRARIES}
+  )
 endif(WHEELS_MOTION)#############
 
 if(ODOMETRY)
@@ -312,6 +346,16 @@ target_link_libraries(odometry
   )
 endif(ODOMETRY)
 
+if(GROUND_FORCES)
+add_executable(ground_forces src/exec/ground_forces.cpp)
+add_dependencies(ground_forces nrt_plugins ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ground_forces
+    nrt_plugins
+    ${catkin_LIBRARIES}
+ )
+
+endif(GROUND_FORCES)
+
 
 if(JOINT_STATES)
 
@@ -321,6 +365,14 @@ target_link_libraries(joint_states nrt_plugins
     ${catkin_LIBRARIES}
  )
 endif(JOINT_STATES)
+
+#add_executable(acceleration_test src/exec/acceleration_test.cpp)
+#add_dependencies(acceleration_test nrt_plugins ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(acceleration_test
+#    nrt_plugins
+#    ${catkin_LIBRARIES}
+# )
+
 
 #add_executable(contact_test src/contact_test.cpp)
 #add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
