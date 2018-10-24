@@ -143,6 +143,7 @@ set(ROBOT_CLASS_SOURCE "")
 	LIST(APPEND ROBOT_CLASS_SOURCE src/robot_ros_nrt.cpp)
 #endif(ROS_NRT)
 	LIST(APPEND ROBOT_CLASS_SOURCE src/contact_ros.cpp)
+
 ## Declare a C++ library
  add_library(robot_class_ros_extension
    ${ROBOT_CLASS_SOURCE}
@@ -209,5 +210,3 @@ if(CATKIN_ENABLE_TESTING)
  endif()
 
 endif(CATKIN_ENABLE_TESTING)
-
-

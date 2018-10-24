@@ -1,7 +1,7 @@
 #ifndef COMMUNICATION_MODULES_CUSTOM_CONTROLLER_H
 #define COMMUNICATION_MODULES_CUSTOM_CONTROLLER_H
 
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/common/all.h"
 #include "mwoibn/communication_modules/basic_controller.h"
 #include "ros/ros.h"
 #include <custom_messages/CustomCmnd.h>

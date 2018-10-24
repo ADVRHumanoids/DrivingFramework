@@ -3,7 +3,7 @@
 
 #include "mwoibn/basic_controllers/basic_controller.h"
 #include "mwoibn/robot_class/robot.h"
-#include "mwoibn/robot_class/robot_class.h"
+#include "mwoibn/common/all.h"
 
 namespace mwoibn{
 namespace basic_controllers

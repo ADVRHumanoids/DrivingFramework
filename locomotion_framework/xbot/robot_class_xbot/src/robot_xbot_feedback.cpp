@@ -165,5 +165,3 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     continue;
   }
 }
-
-

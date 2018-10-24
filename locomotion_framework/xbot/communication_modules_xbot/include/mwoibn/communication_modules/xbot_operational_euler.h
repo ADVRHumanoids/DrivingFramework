@@ -1,7 +1,7 @@
 #ifndef COMMUNICATION_MODULES_XBOT_OPERATIONAL_EULER_H
 #define COMMUNICATION_MODULES_XBOT_OPERATIONAL_EULER_H
 
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/common/all.h"
 #include "mwoibn/communication_modules/basic_operational_euler.h"
 #include <XBotInterface/RobotInterface.h>
 

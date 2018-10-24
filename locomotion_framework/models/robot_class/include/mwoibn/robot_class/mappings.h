@@ -89,6 +89,17 @@ int getId(std::string name) const {
         return it - _mappings.begin();
 }
 
+std::vector<std::string> names(){
+  std::vector<std::string> name;
+
+  for(auto& map: _mappings){
+    name.push_back(map.getName());
+    //std::cout << map.getName() << std::endl;
+  }
+
+  return name;
+}
+
 protected:
 std::vector<Map> _mappings;
 

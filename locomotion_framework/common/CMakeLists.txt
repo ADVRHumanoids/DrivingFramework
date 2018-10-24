@@ -7,7 +7,7 @@ project(common)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED rbdl_utils eigen_utils)
+find_package(catkin REQUIRED rbdl_utils eigen_utils mwoibn_std_utils)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
@@ -19,13 +19,13 @@ option(LOGGER OFF)
 
 if(LOGGER)
 find_package(simple_log REQUIRED)
-LIST(APPEND LOGGER_LIBRARIES 
+LIST(APPEND LOGGER_LIBRARIES
 	${simple_log_LIBRARIES}
 )
-LIST(APPEND LOGGER_INCLUDE_DIRS 
+LIST(APPEND LOGGER_INCLUDE_DIRS
 	${simple_log_INCLUDE_DIRS}
 )
-LIST(APPEND LOGGER_EXPORTED_TARGETS 
+LIST(APPEND LOGGER_EXPORTED_TARGETS
 	${simple_log_EXPORTED_TARGETS}
 )
 endif(LOGGER)
@@ -38,18 +38,49 @@ find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
-	include 
-	${catkin_INCLUDE_DIRS} 
-	${RBDL_INCLUDE_DIR} 
+  INCLUDE_DIRS
+	include
+	${catkin_INCLUDE_DIRS}
+	${RBDL_INCLUDE_DIR}
 	${LOGGER_INCLUDE_DIRS}
-  LIBRARIES 
-	${catkin_LIBRARIES} 
-	${RBDL_LIBRARY} 
+  LIBRARIES
+	mwoibn_common
+	${catkin_LIBRARIES}
+	${RBDL_LIBRARY}
 	${LOGGER_LIBRARIES}
-  DEPENDS 
+  DEPENDS
 	Eigen3
 )
+
+include_directories(
+include
+${catkin_INCLUDE_DIRS}
+${RBDL_INCLUDE_DIR}
+${RBDL_URDFReader_INCLUDE_DIR}
+${Eigen3_INCLUDE_DIRS}
+${LOGGER_INCLUDE_DIRS}
+)
+
+add_library(mwoibn_common
+	src/state.cpp
+)
+
+add_dependencies(mwoibn_common ${catkin_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARGETS})
+
+target_link_libraries(mwoibn_common
+	${catkin_LIBRARIES}
+	${RBDL_LIBRARY}
+	${RBDL_URDFReader_LIBRARY}
+	${LOGGER_LIBRARIES}
+)
+
+
+# Mark executables and/or libraries for installation
+ install(TARGETS mwoibn_common
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
  install(DIRECTORY include/mwoibn/${PROJECT_NAME}

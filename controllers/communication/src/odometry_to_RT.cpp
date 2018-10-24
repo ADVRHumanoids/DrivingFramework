@@ -1,7 +1,7 @@
 #include <vector>
 #include <ros/ros.h>
 
-#include <mwoibn/robot_class/robot_class.h>
+#include <mwoibn/common/all.h>
 #include <XBotCore-interfaces/XDomainCommunication.h>
 #include <XBotInterface/Logger.hpp>
 #include <custom_messages/CustomCmnd.h>

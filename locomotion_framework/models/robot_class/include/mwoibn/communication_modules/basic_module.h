@@ -1,8 +1,8 @@
 #ifndef COMMUNICATION_MODULES_BASIC_MODULE_H
 #define COMMUNICATION_MODULES_BASIC_MODULE_H
 
-#include "mwoibn/robot_class/robot_class.h"
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/common/all.h"
+#include "mwoibn/common/all.h"
 #include "mwoibn/robot_class/map.h"
 #include "mwoibn/filters/iir_second_order.h"
 

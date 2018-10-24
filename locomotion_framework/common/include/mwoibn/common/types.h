@@ -40,22 +40,22 @@ typedef Eigen::Matrix<double, 1, 3> Vector3T;
 typedef Eigen::Matrix<double, 1, Eigen::Dynamic> VectorNT;
 
 typedef double Scalar;
-typedef Vector3 Point;
+typedef Vector3 Position;
 typedef Vector3 Axis;
 
 typedef RigidBodyDynamics::Math::MatrixNd Matrix;
-typedef Eigen::Matrix<double, 6, 6> Matrix6;
-typedef Eigen::Matrix<double, 3, 6> MatrixJ;
-typedef Eigen::Matrix<double, 3, 3> Matrix3;
+typedef Eigen::Matrix<Scalar, 6, 6> Matrix6;
+typedef Eigen::Matrix<Scalar, 3, 6> MatrixJ;
+typedef Eigen::Matrix<Scalar, 3, 3> Matrix3;
 typedef Eigen::VectorXi VectorInt;
 typedef Eigen::Matrix<bool,Eigen::Dynamic,1> VectorBool;
-typedef Eigen::Matrix<double, RT_SIZE, 1> VectorRT;
-typedef Eigen::Matrix<double, FS_SIZE, 1> VectorFS;
-typedef Eigen::Matrix<double, 7, 1> Vector7;
-typedef Eigen::Matrix<double, 6, 1> Vector6;
+typedef Eigen::Matrix<Scalar, RT_SIZE, 1> VectorRT;
+typedef Eigen::Matrix<Scalar, FS_SIZE, 1> VectorFS;
+typedef Eigen::Matrix<Scalar, 7, 1> Vector7;
+typedef Eigen::Matrix<Scalar, 6, 1> Vector6;
 
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 0, RT_SIZE, RT_SIZE> MatrixLimited; //???
-typedef Eigen::Matrix<double, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
+typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, 0, RT_SIZE, RT_SIZE> MatrixLimited; //???
+typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 
 typedef eigen_utils::PseudoInverse2<mwoibn::Matrix, mwoibn::Scalar> PseudoInverse;
 typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited, mwoibn::Scalar> PseudoInverseLimited;

@@ -1,7 +1,7 @@
 #ifndef COMMUNICATION_MODULES_XBOT_LOWER_LEVEL_H
 #define COMMUNICATION_MODULES_XBOT_LOWER_LEVEL_H
 
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/common/all.h"
 #include "mwoibn/communication_modules/basic_controller.h"
 #include <XBotInterface/RobotInterface.h>
 

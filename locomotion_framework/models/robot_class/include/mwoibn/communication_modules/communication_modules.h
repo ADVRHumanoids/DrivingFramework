@@ -2,7 +2,7 @@
 #define COMMUNICATION_MODULES_COMMUNICATION_MODULES_H
 
 #include "mwoibn/simple_log/log.h"
-#include "mwoibn/robot_class/robot_class.h"
+#include "mwoibn/common/all.h"
 #include <iostream>
 #include <climits>
 

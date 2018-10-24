@@ -1,7 +1,7 @@
 #ifndef COMMUNICATION_MODULES_XBOT_FEEDBACK_ONLINE_H
 #define COMMUNICATION_MODULES_XBOT_FEEDBACK_ONLINE_H
 
-#include "mwoibn/robot_class/state.h"
+#include "mwoibn/common/all.h"
 #include "mwoibn/communication_modules/basic_feedback.h"
 #include <XBotInterface/RobotInterface.h>
 

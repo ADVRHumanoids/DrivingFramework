@@ -28,10 +28,10 @@ if(LOGGER)
         LIST(APPEND LOGGER_LIBRARIES
         	${simple_log_LIBRARIES}
         )
-        LIST(APPEND LOGGER_INCLUDE_DIRS 
+        LIST(APPEND LOGGER_INCLUDE_DIRS
 	        ${simple_log_INCLUDE_DIRS}
         )
-        LIST(APPEND LOGGER_EXPORTED_TARGETS 
+        LIST(APPEND LOGGER_EXPORTED_TARGETS
 	        ${simple_log_EXPORTED_TARGETS}
         )
 endif(LOGGER)
@@ -52,14 +52,14 @@ LIST(APPEND ROBOT_XBOT_LIBRARIES
 	${XBotInterface_LIBRARIES}
 	${XCM_LIBRARIES})
 
-LIST(APPEND ROBOT_XBOT_INCLUDE_DIRS 
+LIST(APPEND ROBOT_XBOT_INCLUDE_DIRS
 	${urdf_INCLUDE_DIRS}
 	${srdfdom_INCLUDE_DIRS}
 	${XBotInterface_INCLUDE_DIRS}
 	${XCM_INCLUDE_DIRS}
 )
 
-LIST(APPEND ROBOT_XBOT_EXPORTED_TARGETS 
+LIST(APPEND ROBOT_XBOT_EXPORTED_TARGETS
 	${urdf_EXPORTED_TARGETS}
 	${srdfdom_EXPORTED_TARGETS}
 	${XBotInterface_EXPORTED_TARGETS}
@@ -67,20 +67,20 @@ LIST(APPEND ROBOT_XBOT_EXPORTED_TARGETS
 )
 
 catkin_package(
-        INCLUDE_DIRS 
-        	include 
-        	${catkin_INCLUDE_DIRS} 
+        INCLUDE_DIRS
+        	include
+        	${catkin_INCLUDE_DIRS}
         	${ROBOT_XBOT_INCLUDE_DIRS}
         	${LOGGER_INCLUDE_DIRS}
-        LIBRARIES 
+        LIBRARIES
         	${PROJECT_NAME}
         	${ROBOT_XBOT_LIBRARIES}
         	${LOGGER_LIBRARIES}
-                ${catkin_LIBRARIES}
+          ${catkin_LIBRARIES}
         CATKIN_DEPENDS
         	robot_class
         	robot_class_ros_extension
-                communication_modules_xbot
+          communication_modules_xbot
 )
 
 ###########
@@ -119,13 +119,13 @@ add_dependencies(robot_class_xbot ${catkin_EXPORTED_TARGETS}
 
 target_link_libraries(robot_class_xbot
         ${catkin_LIBRARIES}
-        ${ROBOT_XBOT_LIBRARIES} 
+        ${ROBOT_XBOT_LIBRARIES}
         #${ROBOT_ROS_NRT_LIBRARIES}
         ${LOGGER_LIBRARIES}
 )
 
 
-LIST(APPEND INSTALL_TARGETS 
+LIST(APPEND INSTALL_TARGETS
 	robot_class_xbot
 )
 
@@ -141,4 +141,3 @@ install(TARGETS ${INSTALL_TARGETS}
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
