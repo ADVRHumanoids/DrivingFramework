@@ -43,7 +43,7 @@ void stopResteer(int i){
 
 void updateBase(){
 
-        _com_ref << _position[0], _position[1];
+        //_com_ref << _position[0], _position[1];
         _pelvis_position_ptr->setReference(0, _position);
         _com_ptr->setReference(_com_ref);
 
@@ -59,7 +59,7 @@ void compute();
 mwoibn::VectorN getCom(){
         return _robot.centerOfMass().get().head<2>();
 }
-const mwoibn::Vector3& getComFull(){
+const mwoibn::VectorN& getComFull(){
         return _robot.centerOfMass().get();
 }
 const mwoibn::VectorN& errorCom(){

@@ -3,7 +3,7 @@
 
 #include <MathGeoLib/Geometry/GeometryAll.h>
 
-#include <mwoibn/robot_class/contact_v2.h>
+#include <mwoibn/robot_points/contact_v2.h>
 
 #include <mwoibn/robot_class/robot.h>
 #include <mwoibn/hierarchical_control/controllers/default.h>
@@ -37,7 +37,7 @@ STATIC
 class Chain
 {
 public:
-Chain(mwoibn::robot_class::ContactV2& contact)
+Chain(mwoibn::robot_points::ContactV2& contact)
         : _action(ACTION::NONE), _state(STATE::STATIC), _contact(contact),
         _mode(0), _reference_state(STATE::STATIC)
 {
@@ -165,7 +165,7 @@ STATE _reference_state;
 int _mode;
 
 RigidBodyDynamics::Math::Vector3d _reference;
-mwoibn::robot_class::ContactV2& _contact;
+mwoibn::robot_points::ContactV2& _contact;
 };
 
 

@@ -42,11 +42,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>robot_class_xbot</depend> <!-- all programs -->
-  <depend>hierarchical_control</depend> 
-  <depend>motor_side_reference</depend> 
-  <depend>gravity_compensation</depend> 
-  <depend>dynamic_models</depend> 
-  <depend>controllers</depend> 
+  <depend>hierarchical_control</depend>
+  <depend>motor_side_reference</depend>
+  <depend>gravity_compensation</depend>
+  <depend>dynamic_models</depend>
+  <depend>controllers</depend>
   <depend>custom_services</depend>
   <depend>custom_messages</depend>
   <depend>state_estimation</depend>

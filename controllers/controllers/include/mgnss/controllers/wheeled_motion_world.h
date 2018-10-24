@@ -82,7 +82,7 @@ virtual double getBaseGroundRz() {
 mwoibn::VectorN getCom() {
         return _robot.centerOfMass().get().head<2>();
 }
-const mwoibn::Vector3& getComFull() {
+const mwoibn::VectorN& getComFull() {
         return _robot.centerOfMass().get();
 }
 const mwoibn::VectorN& errorCom() {

@@ -191,8 +191,7 @@ void _modelDerivatives()
 
 void _modelDerivative(int i)
 {
-        mwoibn::Matrix jacobian = _contacts.point(i).getPositionJacobian(
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        mwoibn::Matrix jacobian = _contacts.point(i).getPositionJacobian();
 
         _modelDiff[i] =
                 jacobian *
@@ -202,10 +201,7 @@ void _modelDerivative(int i)
 
 void _contactPoint(int i)
 {
-        _wheel_axis = _wheels.point(i)
-                      .getRotationWorld(_robot.state.get(
-                                                mwoibn::robot_class::INTERFACE::POSITION))
-                      .col(2); // z axis
+        _wheel_axis = _wheels.point(i).getRotationWorld().col(2); // z axis
 
         _x = _wheel_axis * _ground.transpose() * _wheel_axis;
 
@@ -226,16 +222,11 @@ void _equationDerivatives()
 void _equationDerivative(int i)
 {
 
-        _wheel_axis = _wheels.point(i)
-                      .getRotationWorld(_robot.state.get(
-                                                mwoibn::robot_class::INTERFACE::POSITION))
-                      .col(2); // z axis
+        _wheel_axis = _wheels.point(i).getRotationWorld().col(2); // z axis
 
-        mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian(
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian();
 
-        mwoibn::Matrix jacobian_pos = _wheels.point(i).getPositionJacobian(
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        mwoibn::Matrix jacobian_pos = _wheels.point(i).getPositionJacobian();
 
         mwoibn::Matrix3 temp =
                 -_skew(_current[i] - _wheels.getPointStateWorld(i));
@@ -272,16 +263,11 @@ void _flowDerivatives()
 }
 void _flowDerivative(int i)
 {
-        _wheel_axis = _wheels.point(i)
-                      .getRotationWorld(_robot.state.get(
-                                                mwoibn::robot_class::INTERFACE::POSITION))
-                      .col(2); // z axis
+        _wheel_axis = _wheels.point(i).getRotationWorld().col(2); // z axis
 
-        mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian(
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        mwoibn::Matrix jacobian = _wheels.point(i).getOrientationJacobian();
 
-        mwoibn::Matrix jacobian_pos = _wheels.point(i).getPositionJacobian(
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+        mwoibn::Matrix jacobian_pos = _wheels.point(i).getPositionJacobian();
 
         mwoibn::Matrix3 temp =
                 -_skew(_wheel_axis * _ground.transpose() * _wheel_axis);

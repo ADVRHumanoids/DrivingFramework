@@ -46,6 +46,21 @@ void updateBase(){
 
         _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*(mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate()))*(_orientation);
         _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
+
+
+//        std::cout << std::fixed;
+//        std::cout << std::setprecision(8);
+/*
+        std::cout << "camber\t";
+        for(auto& camber: _camber_task)
+          std::cout << camber.getError() << "\t";
+
+        std::cout << "caster\t";
+        for(auto& caster: _caster_task)
+            std::cout << caster.getError() << "\t";
+
+        std::cout << std::endl;
+        */
 }
 
 void steering();
@@ -67,7 +82,7 @@ virtual void switchToCamber(double mu){
 mwoibn::VectorN getCom(){
         return _robot.centerOfMass().get().head<2>();
 }
-const mwoibn::Vector3& getComFull(){
+const mwoibn::VectorN& getComFull(){
         return _robot.centerOfMass().get();
 }
 const mwoibn::VectorN& errorCom(){
