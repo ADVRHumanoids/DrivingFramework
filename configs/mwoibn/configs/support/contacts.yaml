@@ -15,6 +15,8 @@ centauro:
          type: wheel # required type of a contact that should be considered
          topic: contacts_wheel_1
          active: true
+         message: gazebo_msgs::ContactsState
+         initialize: true
       contact1:
          name: front_right_leg
          end_frame: wheel_2
@@ -30,6 +32,8 @@ centauro:
          type: wheel
          topic: contacts_wheel_2
          active: true
+         message: gazebo_msgs::ContactsState
+         initialize: true
       contact2:
          name: rear_right_leg
          end_frame: wheel_3
@@ -45,6 +49,8 @@ centauro:
          type: wheel
          topic: contacts_wheel_3
          active: true
+         message: gazebo_msgs::ContactsState
+         initialize: true
       contact3:
          name: rear_left_leg
          end_frame: wheel_4
@@ -60,3 +66,5 @@ centauro:
          type: wheel
          topic: contacts_wheel_4
          active: true
+         message: gazebo_msgs::ContactsState
+         initialize: true
