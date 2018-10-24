@@ -76,10 +76,13 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
         _support_vel.setZero();
 
 
-        for(int i = 0; i < _steer_task.size(); i++) {
+        for(int i = 0; i < _steer_task.size(); i++)
                 _steer_task[i].setReference(steerings[i]);
+
+        for(int i = 0; i < _camber_task.size(); i++)
                 _camber_task[i].setReference(_camber_task[i].getCurrent());
+
+        for(int i = 0; i < _caster_task.size(); i++)
                 _caster_task[i].setReference(_caster_task[i].getCurrent());
-        }
 
 }

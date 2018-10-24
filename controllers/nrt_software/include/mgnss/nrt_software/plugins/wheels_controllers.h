@@ -4,7 +4,7 @@
 #include "mgnss/plugins/ros_base.h"
 
 #include "mgnss/controllers/wheels_controller_extend.h"
-#include "mgnss/controllers/wheeled_motion_event.h"
+//#include "mgnss/controllers/wheeled_motion_event.h"
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/controllers/wheels_reactif.h"
 #include "mgnss/controllers/wheeled_motion_world.h"
@@ -73,7 +73,7 @@ virtual void _initCallbacks(){
 }
 
 };
-
+/*
 class WheeledMotionEvent : public WheelsControllerExtend
 {
 public:
@@ -98,7 +98,7 @@ virtual void _initCallbacks(){
 ros::Subscriber _state_rt;
 
 };
-
+*/
 class WheeledMotionEvent3 : public WheelsControllerExtend {
 public:
 WheeledMotionEvent3(int argc, char** argv) : WheelsControllerExtend(argc, argv){
@@ -189,7 +189,12 @@ virtual void _initCallbacks(){
                                        custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_merge::eventsHandler,
                                                                                                                _1, _2, static_cast<mgnss::controllers::WheeledMotionMergeV1*>(_controller_ptr.get())));
         _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+
+        _state_rt = _n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
 }
+
+ros::Subscriber _state_rt;
+
 };
 
 }
