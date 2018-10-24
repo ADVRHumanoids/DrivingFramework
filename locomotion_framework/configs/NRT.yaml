@@ -1,8 +1,0 @@
-mwoibn:
-        robot:
-                rate: 200
-        modules:
-                odometry:
-                        filter:
-                                damping: 1
-                                cut_off_frequency: 200
