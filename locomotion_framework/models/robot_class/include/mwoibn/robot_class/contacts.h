@@ -155,6 +155,11 @@ int jacobianCols() const {
         return _dofs;
 }
 
+std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::iterator begin(){return _contacts.begin();}
+std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::iterator end(){return _contacts.end();}
+
+std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::const_iterator begin() const {return _contacts.begin();}
+std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::const_iterator end() const {return _contacts.end();}
 
 protected:
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact> > _contacts;
