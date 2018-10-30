@@ -320,4 +320,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadContacts(YAML::Node contacts_config)
                         std::cout << e.what() << std::endl;
                 }
         }
+
+        _center_of_pressure->init();
+
 }

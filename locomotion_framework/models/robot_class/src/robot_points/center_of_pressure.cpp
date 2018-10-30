@@ -9,11 +9,18 @@ namespace robot_points
                const mwoibn::robot_class::State& state, mwoibn::robot_class::Contacts& contacts)
         : Point(model, state), _contacts(contacts), _points("ROOT", _model, _state)
 {
+}
+
+void CenterOfPressure::init(){
   _null_space.assign(_contacts.size(), mwoibn::Matrix3::Zero());
+
+  _points.clear();
+  
   for(int i = 0; i < _contacts.size(); i++)
   _points.addPoint(_contacts.contact(i).wrench().getBodyId());
 
   _point.setZero(3);
+  _forces.setZero(_contacts.size());
 }
 
 void CenterOfPressure::compute()

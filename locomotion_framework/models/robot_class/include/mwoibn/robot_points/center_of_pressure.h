@@ -23,6 +23,8 @@ public:
 
   virtual void update(bool jacobian = true);
 
+  void init();
+
 protected:
   mwoibn::robot_class::Contacts& _contacts;
   mwoibn::VectorN _forces;

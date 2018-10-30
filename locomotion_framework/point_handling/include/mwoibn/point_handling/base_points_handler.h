@@ -253,9 +253,7 @@ public:
   unsigned int addPoint(int body_id, std::string name = "")
   {
     _points.push_back(std::unique_ptr<Frame>(new Frame(body_id, _model, _robot_state, name)));
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
-    _fullState.setZero(getStateSize() * _points.size());
+    _resize();
 
     return _points.size() - 1;
   }
@@ -517,11 +515,20 @@ public:
       return false;
 
     _points.erase(_points.begin() + id);
-    _reducedJacobian.setZero(_points.size() * _jacobian_row, _chain.size());
-    _fullJacobian.setZero(_points.size() * _jacobian_row, _model.dof_count);
+    _resize();
 
     return true;
   }
+
+
+  bool clear()
+  {
+
+    _points.clear();
+    _resize();
+    return true;
+  }
+
   ///@}
 
   /** @name General
