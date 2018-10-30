@@ -48,16 +48,18 @@ void _initConfig(YAML::Node config);
 mwoibn::dynamic_models::BasicModel _gravity;
 mwoibn::VectorBool _selector;
 
-
+std::unique_ptr<mwoibn::PseudoInverse> _inverse;
 mwoibn::Axis _n;
-mwoibn::VectorN vel, world_contact, momentum_contact;
+mwoibn::VectorN world_contact;
 mwoibn::point_handling::Point::Current angular;
+std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr;
 
-mwoibn::Matrix _jac, _jac_f;
-mwoibn::Matrix inertia;
+mwoibn::Matrix _jac;
 
-mwoibn::VectorN gravity, nonlinear, acc_f, acc_ft, acc_est, torque;
-
+mwoibn::VectorN gf_est, f_gf;
+std::vector<mwoibn::Matrix> _placements;
+mwoibn::Matrix _all;
+mwoibn::Vector3 _g, _com, _cop, _f_cop;
 
 };
 

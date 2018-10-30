@@ -5,10 +5,10 @@
 mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class::Robot& robot)
         : mgnss::modules::Base(robot), _frame("arm1_7", robot.getModel(), robot.state), _acceleration(_frame)
 {
+          _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.state.acceleration.size(), 1000, 1));
 }
 
-mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class::Robot& robot,
-                                                std::string config_file)
+mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class::Robot& robot, std::string config_file)
         : mgnss::modules::Base(robot), _frame("arm1_7", robot.getModel(), robot.state), _acceleration(_frame)
 {
 
@@ -36,25 +36,79 @@ mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class:
 }
 
 void mgnss::state_estimation::AccelerationTest::_initConfig(YAML::Node config){
-        _allocate();
+  _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.state.acceleration.size(), config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+  _allocate();
 }
 
 void mgnss::state_estimation::AccelerationTest::_checkConfig(YAML::Node config){
 }
 
 void mgnss::state_estimation::AccelerationTest::_allocate(){
+
+  _vel_p.setZero(_robot.state.velocity.size());
+  _acc_est.setZero(_robot.state.acceleration.size());
+  //_f_acc_est.setZero(_robot.state.acceleration.size());
+  _filter_ptr->reset(_acc_est);
+  _point_acc.setZero(3);
 }
 
 
 void mgnss::state_estimation::AccelerationTest::init(){
+        _filter_ptr->computeCoeffs(_robot.rate());
+
         update();
 }
 
 void mgnss::state_estimation::AccelerationTest::update()
 {
   _robot.get();
+
+  _acc_est.noalias() = _robot.state.velocity.get() - _vel_p;
+  _acc_est.noalias() = _acc_est/_robot.rate();
+  //_f_acc_est.noalias() = _acc_est;
+
+  _filter_ptr->update(_acc_est);
+  _robot.state.acceleration.set(_acc_est);
+
   _robot.updateKinematics();
-  std::cout << "jacobian\n" << _acceleration.getWorld() << std::endl;
 
+  _point_acc = _acceleration.getWorld();
+}
 
+void mgnss::state_estimation::AccelerationTest::startLog(mwoibn::common::Logger& logger){
+        logger.addField("time", 0);
+
+        logger.addField("x", _point_acc[0]);
+        logger.addField("y", _point_acc[1]);
+        logger.addField("z", _point_acc[2]);
+        // logger.addField("unfil_5", _acc_est[5]);
+        // logger.addField("unfil_6", _acc_est[6]);
+        // logger.addField("unfil_7", _acc_est[7]);
+        // logger.addField("unfil_8", _acc_est[8]);
+        //
+        // logger.addField("fil_5", _f_acc_est[5]);
+        // logger.addField("fil_6", _f_acc_est[6]);
+        // logger.addField("fil_7", _f_acc_est[7]);
+        // logger.addField("fil_8", _f_acc_est[8]);
+
+        logger.start();
+}
+void mgnss::state_estimation::AccelerationTest::log(mwoibn::common::Logger& logger, double time){
+        logger.addEntry("time", time);
+
+        logger.addEntry("x", _point_acc[0]);
+        logger.addEntry("y", _point_acc[1]);
+        logger.addEntry("z", _point_acc[2]);
+
+        // logger.addEntry("unfil_5", _acc_est[5]);
+        // logger.addEntry("unfil_6", _acc_est[6]);
+        // logger.addEntry("unfil_7", _acc_est[7]);
+        // logger.addEntry("unfil_8", _acc_est[8]);
+        //
+        // logger.addEntry("fil_5", _f_acc_est[5]);
+        // logger.addEntry("fil_6", _f_acc_est[6]);
+        // logger.addEntry("fil_7", _f_acc_est[7]);
+        // logger.addEntry("fil_8", _f_acc_est[8]);
+
+        logger.write();
 }

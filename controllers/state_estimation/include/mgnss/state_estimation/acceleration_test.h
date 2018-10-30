@@ -4,6 +4,8 @@
 #include <mwoibn/robot_class/robot.h>
 #include <mwoibn/point_handling/linear_acceleration.h>
 #include <mwoibn/point_handling/frame_plus.h>
+#include <mwoibn/filters/iir_second_order.h>
+
 
 
 #include "mgnss/modules/base.h"
@@ -31,25 +33,26 @@ virtual void send(){
         //_robot.send();
 }
 
-virtual void stop(){
-}                         // NOT IMPLEMENTED
+virtual void stop(){}                      
 
-virtual void close(){
-}                          // NOT IMPLEMENTED
+virtual void close(){}
 
-virtual void startLog(mwoibn::common::Logger& logger){}
-virtual void log(mwoibn::common::Logger& logger, double time){}
+virtual void startLog(mwoibn::common::Logger& logger);
+virtual void log(mwoibn::common::Logger& logger, double time);
 
 protected:
 void _allocate();
 void _checkConfig(YAML::Node config);
 void _initConfig(YAML::Node config);
 
-
 mwoibn::point_handling::FramePlus _frame;
 
-
 mwoibn::point_handling::LinearAcceleration _acceleration;
+mwoibn::VectorN _vel_p, _acc_est, _point_acc;//, _f_acc_est;
+
+
+std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr;
+
 };
 
 }
