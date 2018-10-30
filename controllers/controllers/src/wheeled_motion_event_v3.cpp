@@ -290,7 +290,7 @@ void mgnss::controllers::WheeledMotionEvent3::_correct(){
                 }
 
         }
-        std::cout << _reset_count.transpose() << std::endl;
+        //std::cout << _reset_count.transpose() << std::endl;
 
 
         _robot.command.position.set(_test_steer, _select_steer);
