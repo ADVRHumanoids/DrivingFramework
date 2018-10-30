@@ -57,6 +57,7 @@ public:
 
     _axes_world = _axes;
     _x_world = _axes;
+    _y_world = _axes;
 
     _ground_normal << 0, 0, 1;
   }
@@ -87,6 +88,7 @@ public:
 
       _x_world[i] = _axes_world[i].cross(_ground_normal); //?
       _x_world[i].normalize();
+      _y_world[i] = _ground_normal.cross(_x_world[i]);
     }
 
     _updateTransform();
@@ -112,7 +114,10 @@ public:
       }
       else
       {
-        _error.segment<3>(3 * i) = _full_error.segment<3>(
+        _trans.row(0) = _x_world[i].transpose();
+        _trans.row(1) = _y_world[i].transpose();
+        _trans.row(2) = _ground_normal.transpose();
+        _error.segment<3>(3 * i) = _trans*_full_error.segment<3>(
             3 * i); // here I should change to keep the first task the same
       }
 
@@ -143,7 +148,10 @@ public:
       }
       else
       {
-        _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = _point_jacobian;
+        _trans.row(0) = _x_world[i].transpose();
+        _trans.row(1) = _y_world[i].transpose();
+        _trans.row(2) = _ground_normal.transpose();
+        _jacobian.block(3 * i, 0, 3, _robot.getDofs()) = _trans*_point_jacobian;
       }
     }
 
@@ -204,11 +212,11 @@ public:
   virtual int getFullTaskSize(){return _full_error.size();}
 
 protected:
-  std::vector<mwoibn::Axis> _axes, _axes_world, _x_world;
+  std::vector<mwoibn::Axis> _axes, _axes_world, _x_world, _y_world;
   mwoibn::VectorBool _selector;
   mwoibn::Axis _ground_normal;
   mwoibn::VectorN _full_error;
-  mwoibn::Matrix3 _rotation;
+  mwoibn::Matrix3 _rotation, _trans;
   mwoibn::Matrix _temp_jacobian, _point_jacobian;
   mwoibn::Vector3 _point;
 
