@@ -374,7 +374,7 @@ mwoibn:
                                 loading: model
                                 urdf: "/robot_upper_body"
                 source:
-                        urdf: "/robot_description"
+                        urdf: "/robot_full"
                         srdf: "/robot_srdf"
                         actuators: "actuators_yaml"
                         contacts: "contacts_yaml"
@@ -735,23 +735,23 @@ mwoibn:
                                         base_orinetation: 45
                                         centre_of_mass_x: 35
                                         centre_of_mass_y: 35
-                                        base_position: 20
+                                        base_position: 30
                                         contact_point: 18
                                         camber: 15 # 100
                                         castor: 30 # 14
                                         camber_damp: 0.08
                                         castor_damp: 0.12
                                         steer_open_loop: 1.00 # 0.95
-                                        steer_feedback: 10.0 # 0.05
+                                        steer_feedback: 0.01 # 0.05
                                         steer_damp: 0.001
                                         damp_icm: 0.0008
                                         damp_sp: 0.0015
                                         tracking_gain: 1.0
                 joint_states:
                         layer: "NRT"
-                        robot: higher_scheme
-#                        robot: joint_space
-                        secondary_file: "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/upper_body.yaml"
+#                        robot: higher_scheme
+                        robot: joint_space
+#                        secondary_file: &config_upper "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/upper_body.yaml"
                         mode: "full"
                 odometry:
                         layer: "NRT"
@@ -764,7 +764,7 @@ mwoibn:
                 centralized:
                         layer: "NRT"
                         robot: default
-#                        secondary_file: *config_lower
+#                        secondary_file: *config_upper
                         mode: "full"
                         type: "online"
                         reference: "reference"
