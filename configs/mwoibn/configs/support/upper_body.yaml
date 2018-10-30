@@ -8,6 +8,8 @@ mwoibn:
                        urdf: "/robot_upper_body"
         controllers:
                 higher_level: [upper_body]
+        feedbacks:
+                online: [link_side_online]              
 
 #                       srdf: "/robot_srdf"
 #        xbot:
