@@ -3,7 +3,7 @@ base_const_vel: [0.0, 0.0, 0.0, 0.0]
 
 # default velocity, controller step
 vel:  0.3
-dt:   0.005
+dt:   0.01
 
 # initial support position
 x cp: [0.47,    0.47,   -0.66,  -0.66 ]

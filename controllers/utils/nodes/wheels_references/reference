@@ -129,20 +129,35 @@ class Reference:
 		self.dx_cp = self.vel[0:4]/self.dt*(self.getX() - self.x_cp)
 		self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
 		self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
+		#self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
 		self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
 
-		self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
-		self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
-		self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
-		self.d_base[np.abs(self.getBase() - self.base_now) < 1e-4] = 0
+		self.check()
+		self.d_base[np.abs(self.getBase() - self.base_now) < 1e-3] = (self.getBase() - self.base_now)[np.abs(self.getBase() - self.base_now) < 1e-3]/self.dt
 
+		self.integrateSupport()
+		self.base_now += self.d_base*self.dt
+
+		#print("base", self.getBase() - self.base_now)
+		#print("d_base", self.d_base)
+		#print("base_now", self.base_now)
+
+		#print("x", self.getX() - self.x_cp)
+		#print("y", self.getY() - self.y_cp)
+		#print("z", self.getZ() - self.z_cp)
+
+		self.timer += 1
+
+    def check(self):
+		self.dx_cp[np.abs(self.dx_cp) < 1e-3] = (self.getX() - self.x_cp)[np.abs(self.dx_cp) < 1e-3]/self.dt
+		self.dy_cp[np.abs(self.dy_cp) < 1e-3] = (self.getY() - self.y_cp)[np.abs(self.dy_cp) < 1e-3]/self.dt
+		self.dz_cp[np.abs(self.dz_cp) < 1e-3] = (self.getZ() - self.z_cp)[np.abs(self.dz_cp) < 1e-3]/self.dt
+
+
+    def integrateSupport(self):
 		self.x_cp += self.dx_cp*self.dt
 		self.y_cp += self.dy_cp*self.dt
 		self.z_cp += self.dz_cp*self.dt
-		self.base_now += self.d_base*self.dt
-		#print(self.base_now)
-
-		self.timer += 1
 
     # [th, v]
     def turn(self):
@@ -160,15 +175,10 @@ class Reference:
     	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
     	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
 
-    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
-    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
-    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
-        self.d_base[np.abs(self.d_base) < 1e-3] = 0
-
-    	self.x_cp += self.dx_cp*self.dt
-    	self.y_cp += self.dy_cp*self.dt
-    	self.z_cp += self.dz_cp*self.dt
-
+    	self.check()
+    	self.integrateSupport()
+    	#print("d_base", self.d_base)
+    	#print("base_now", self.base_now)
     	self.timer += 1
         # print("turn", self.d_base, self.base_now)
 
@@ -195,14 +205,8 @@ class Reference:
     	self.dy_cp = self.vel[4:8]/self.dt*(self.getY() - self.y_cp)
     	self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
 
-    	self.dx_cp[np.abs(self.dx_cp) < 1e-3] = 0
-    	self.dy_cp[np.abs(self.dy_cp) < 1e-3] = 0
-    	self.dz_cp[np.abs(self.dz_cp) < 1e-3] = 0
-        self.d_base[np.abs(self.d_base) < 1e-3] = 0
-
-    	self.x_cp += self.dx_cp*self.dt
-    	self.y_cp += self.dy_cp*self.dt
-    	self.z_cp += self.dz_cp*self.dt
+    	self.check()
+    	self.integrateSupport()
 
     	self.timer += 1
         #print("circle", np.sqrt(self.d_base[0]**2+self.d_base[1]**2) )
@@ -264,7 +268,7 @@ class Reference:
 		if not self.isRunning(): return
 		self.timer = 0
 		self.condFunc = self.conds[self.getType()]
-#		print(self.step, self.getType().__name__)
+		#print(self.step, self.getType().__name__)
 
     def update(self):
 		self.getType()()
@@ -287,8 +291,8 @@ class Reference:
         #print(np.allclose(self.getY() ,self.y_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getX(),self.x_cp, 5e-03, 5e-03))
         #print(np.allclose(self.getZ(),self.z_cp, 5e-03, 5e-03))
-        print(np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03))
-        print(self.getBase(),self.base_now)
+        #print(np.allclose(self.getBase(),self.base_now, 5e-03, 5e-03))
+        #print(self.getBase(),self.base_now)
 
         #print(self.x_cp)
         #print(self.y_cp)
