@@ -39,7 +39,7 @@ virtual const mwoibn::VectorN& getGravity()
 
         _gravity.setZero();
         RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
-                                            _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _zero, _gravity);
+                                            _robot.state.position.get(), _zero, _gravity);
 
         //std::cout << "basic model gravity\t" << _gravity.transpose() << std::endl;
         return _gravity;
@@ -52,8 +52,8 @@ virtual const mwoibn::VectorN& getNonlinearEffects()
 
         _non_linear.setZero();
         RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
-                                            _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                                            _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY), _non_linear);
+                                            _robot.state.position.get(),
+                                            _robot.state.velocity.get(), _non_linear);
 
         return _non_linear;
 }
@@ -64,7 +64,7 @@ virtual const mwoibn::Matrix& getInertia()
         _inertia.setZero();
 
         RigidBodyDynamics::CompositeRigidBodyAlgorithm(
-                _robot.getModel(), _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), _inertia, false);
+                _robot.getModel(), _robot.state.position.get(), _inertia, false);
 
         return _inertia;
 }

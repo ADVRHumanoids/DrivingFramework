@@ -9,21 +9,21 @@ namespace point_handling
 const Point::Current&
 Position::getWorld(bool update)
 {
-  _temp_current = CalcBodyToBaseCoordinates(_model, _state.get(), _body_id,
+  _temp_current = CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
                                              _current, update);
   return _temp_current;
 }
 
 Point::Current
 Position::getWorld(bool update) const{
-  return CalcBodyToBaseCoordinates(_model, _state.get(), _body_id,
+  return CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
                                              _current, update);
 }
 
 void Position::setWorld(const Point::Current& position,
                              bool update)
 {
-  _current = CalcBaseToBodyCoordinates(_model, _state.get(), _body_id,
+  _current = CalcBaseToBodyCoordinates(_model, _state.position.get(), _body_id,
                                         position, update);
 }
 
@@ -31,7 +31,7 @@ const Point::Current&
 Position::getReference(unsigned int refernce_id, bool update)
 {
   _temp_current =
-      CalcBaseToBodyCoordinates(_model, _state.get(), refernce_id,
+      CalcBaseToBodyCoordinates(_model, _state.position.get(), refernce_id,
                                 getWorld(), update);
   return _temp_current;
 }
@@ -42,7 +42,7 @@ void Position::setReference(const Point::Current& position,
 {
 
   Point::Current world_position = CalcBodyToBaseCoordinates(
-      _model, _state.get(), reference_id, position, update);
+      _model, _state.position.get(), reference_id, position, update);
 
   setWorld(world_position);
 }
@@ -52,7 +52,7 @@ void Position::setReference(const Point::Current& position,
 // {
 //
 //   _J_part.setZero();
-//   CalcPointJacobian(_model, _state.get(), _body_id, _current, _J_part,
+//   CalcPointJacobian(_model, _state.position.get(), _body_id, _current, _J_part,
 //                     update);
 //
 //   return _J_part;
@@ -63,7 +63,7 @@ void Position::setReference(const Point::Current& position,
 //
 //   mwoibn::Matrix J = mwoibn::Matrix::Zero(_J_part.rows(), _J_part.cols());
 //
-//   CalcPointJacobian(_model, _state.get(), _body_id, _current, J,
+//   CalcPointJacobian(_model, _state.position.get(), _body_id, _current, J,
 //                     update);
 //
 //   return J;

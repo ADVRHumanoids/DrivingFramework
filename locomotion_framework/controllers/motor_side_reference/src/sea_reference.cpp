@@ -31,8 +31,7 @@ void SeaReference::updateStiffnessMatrix()
 void SeaReference::compute()
 {
 
-        _command = _stiffness_matrix * _gravity_compensation.getCommand() +
-                   _robot.command.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _command = _stiffness_matrix * _gravity_compensation.getCommand() + _robot.command.position.get();
 }
 
 const mwoibn::VectorN& SeaReference::update()

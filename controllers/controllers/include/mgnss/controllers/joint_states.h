@@ -19,8 +19,8 @@ virtual ~JointStates() {
 }
 
 bool reset(){
-        _pos_ref = _robot.state.get();
-        _position = _robot.state.get();
+        _pos_ref = _robot.state.position.get();
+        _position = _robot.state.position.get();
 }
 bool setVelocity(std::string name, double vel);
 bool setPosition(std::string name, double pos);
@@ -54,7 +54,7 @@ mwoibn::Vector3 _error, _last;
 mwoibn::point_handling::PositionsHandler _wheels;
 //  std::vector<mwoibn::Vector3> _wheels_positions;
 //mwoibn::robot_class::Robot& _robot;
-double _step, _dt, _max_vel = 0.5;
+double _step, _dt, _max_vel = 2.0;
 bool _init;
 
 

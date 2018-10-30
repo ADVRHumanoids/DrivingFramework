@@ -40,17 +40,17 @@ public:
 
 
     mwoibn::VectorN state =
-        robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        robot.state.position.get();
     mwoibn::VectorN test = mwoibn::VectorN::Zero(robot.getDofs());
 
-    robot.state.set(test, mwoibn::robot_class::INTERFACE::POSITION);
+    robot.state.position.set(test);
     robot.updateKinematics();
 
     _offset = _ik.getFullStatesWorld();
 
 
 
-    robot.state.set(state, mwoibn::robot_class::INTERFACE::POSITION);
+    robot.state.position.set(state);
     robot.updateKinematics();
 
     for (int i = 0; i < _offset.size(); i++)

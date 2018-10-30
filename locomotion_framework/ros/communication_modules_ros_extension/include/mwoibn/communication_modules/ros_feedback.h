@@ -29,7 +29,7 @@ public:
     if (config["initialize"] && config["initialize"].as<bool>())
     {
       //      bool started = false;
-      int tries = 0, max_tries = 10;
+      int tries = 0, max_tries = 100;
 
       ros::Rate rate(10);
 
@@ -83,14 +83,11 @@ public:
       _initFilters(msg);
 
     if (_position)
-      _command.set(msg->position, _map.reversed(),
-                   robot_class::INTERFACE::POSITION);
+      _command.position.set(msg->position, _map.reversed());
     if (_velocity)
-      _command.set(msg->velocity, _map.reversed(),
-                   robot_class::INTERFACE::VELOCITY);
+      _command.velocity.set(msg->velocity, _map.reversed());
     if (_torque)
-      _command.set(msg->effort, _map.reversed(),
-                   robot_class::INTERFACE::TORQUE);
+      _command.torque.set(msg->effort, _map.reversed());
 
     if (_is_raw)
     {

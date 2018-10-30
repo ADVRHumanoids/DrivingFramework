@@ -181,7 +181,7 @@ namespace mwoibn
        */
       mwoibn::VectorN getJointStates()
       {
-        return _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        return _robot.state.position.get();
       }
 
       //! updates position of all objects in the collision model

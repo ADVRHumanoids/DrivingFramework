@@ -50,8 +50,7 @@ public:
         if (_data[check] != mwoibn::IS_VALID){
           _initialized = false; return false;
         }
-        _command.set(_data, _map.reversed(),
-                     robot_class::INTERFACE::POSITION);
+        _command.position.set(_data, _map.reversed());
       }
       if (_velocity){
 //        mwoibn::VectorRT data;
@@ -60,8 +59,7 @@ public:
         if (_data[check] != mwoibn::IS_VALID){
           _initialized = false; return false;
         }
-        _command.set(_data, _map.reversed(),
-                     robot_class::INTERFACE::VELOCITY);
+        _command.velocity.set(_data, _map.reversed());
       }
       if (_torque){
         _data[check] = mwoibn::INVALID;
@@ -69,8 +67,7 @@ public:
         if (_data[check] != mwoibn::IS_VALID){
           _initialized = false; return false;
         }
-        _command.set(_data, _map.reversed(),
-                     robot_class::INTERFACE::TORQUE);
+        _command.torque.set(_data, _map.reversed());
       }
 
       return _initialized;

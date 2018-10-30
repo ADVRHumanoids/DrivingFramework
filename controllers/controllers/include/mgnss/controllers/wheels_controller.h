@@ -37,7 +37,7 @@ virtual void log(mwoibn::common::Logger& logger, double time){
 
 virtual void stop(){
         _command.setZero();
-        _robot.command.set(_command, mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.velocity.set(_command);
         _robot.send();
 }
 

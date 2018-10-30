@@ -14,7 +14,7 @@ mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot)
         _last_ankle.setZero(_ankle_map.size());
         _des_ankle.setZero(_ankle_map.size());
 
-        _position = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _position = _robot.state.position.get();
         _last_position = _position;
 
         _pos_ref = _position;
@@ -27,16 +27,16 @@ mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot)
 }
 
 void mgnss::controllers::JointStates::init(){
-        _position.noalias() = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _position.noalias() = _robot.state.position.get();
 
-        _robot.state.get(_des_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
-        _robot.state.get(_init_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_des_ankle, _ankle_map);
+        _robot.state.position.get(_init_ankle, _ankle_map);
 
         _pos_ref.noalias() = _position;
         _vel_ref.noalias() = _velocity;
 
-        _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
-        _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_last_ankle, _ankle_map);
+        _robot.command.position.set(_position);
 
 //      _wheels_positions = _wheels.getFullStatesReference();
 
@@ -68,7 +68,7 @@ bool mgnss::controllers::JointStates::setFullPosition(std::string name)
 
     _wheels_positions = _wheels.getFullStatesReference();
 
-    _robot.state.set(_pos_ref, mwoibn::robot_class::INTERFACE::POSITION);
+    _robot.state.position.set(_pos_ref);
     _robot.updateKinematics();
 
     for (int i = 0; i < _wheels.size(); i++)
@@ -92,11 +92,9 @@ bool mgnss::controllers::JointStates::setFullPosition(std::string name)
 
 
     if ( ( ankle<
-            _robot.lower_limits.get(
-               _ankle_map[i] , mwoibn::robot_class::INTERFACE::POSITION)) ||
+            _robot.lower_limits.position.get(_ankle_map[i])) ||
         ( ankle >
-            _robot.upper_limits.get(_ankle_map[i],
-                                    mwoibn::robot_class::INTERFACE::POSITION)))
+            _robot.upper_limits.position.get(_ankle_map[i])))
     {
       _pos_ref[_ankle_map[i]] += 3.1415926;
       mwoibn::eigen_utils::wrapToPi(_pos_ref[_ankle_map[i]]);
@@ -122,7 +120,7 @@ bool mgnss::controllers::JointStates::setFullPosition(std::string name)
 
 void mgnss::controllers::JointStates::update()
 {
-        _robot.state.get(_last_ankle, _ankle_map, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_last_ankle, _ankle_map);
         /*
            if(_init && _ankle_map.size()){
 
@@ -159,11 +157,9 @@ void mgnss::controllers::JointStates::update()
 //      double ankle = _pos_ref[_ankle_map[i]];
 
 //      if ( ( ankle<
-//              _robot.lower_limits.get(
-//                 _ankle_map[i] , mwoibn::robot_class::INTERFACE::POSITION)) ||
+//              _robot.lower_limits.position.get(_ankle_map[i])) ||
 //          ( ankle >
-//              _robot.upper_limits.get(_ankle_map[i],
-//                                      mwoibn::robot_class::INTERFACE::POSITION)))
+//              _robot.upper_limits.position.get(_ankle_map[i])))
 //      {
 //        _pos_ref[_ankle_map[i]] += 3.1415926;
 //        mwoibn::eigen_utils::wrapToPi(_pos_ref[_ankle_map[i]]);
@@ -204,10 +200,9 @@ void mgnss::controllers::JointStates::update()
 
 void mgnss::controllers::JointStates::send()
 {
-        _robot.command.set(_position, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_position);
 
-        _robot.command.set(_velocity, _vel_map,
-                           mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.velocity.set(_velocity, _vel_map);
         _robot.send();
         // _robot.update();
 }

@@ -157,7 +157,7 @@ public:
             .eulerAngles(_angels[0], _angels[1],
                          _angels[2]); // Check if the convention is met here
 
-    _command.set(_full, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+    _command.position.set(_full, _map_dofs);
   }
 
   virtual void getVelocity(const mwoibn::Vector3& linear,
@@ -172,7 +172,7 @@ public:
   virtual void getVelocity(const mwoibn::VectorN& velocity)
   {
 
-    _command.set(velocity, _map_dofs, mwoibn::robot_class::INTERFACE::VELOCITY);
+    _command.velocity.set(velocity, _map_dofs);
   }
 
 protected:

@@ -8,7 +8,7 @@ bool mwoibn::visualization_tools::RvizJointLimits::updateModel()
   // orange 255,140,0
   // red  246, 34, 34
 
-  mwoibn::VectorN robot_state = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+  mwoibn::VectorN robot_state = _robot.state.position.get();
   int i = 0;
   for (auto& limit : _limits)
   {

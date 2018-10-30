@@ -12,15 +12,11 @@ void switchMode(mwoibn::robot_class::Robot* robot_ptr,
 
         if (*motor_side)
         {
-                robot_ref_ptr->state.set(
-                        robot_ptr->command.get(mwoibn::robot_class::INTERFACE::POSITION),
-                        mwoibn::robot_class::INTERFACE::POSITION);
+                robot_ref_ptr->state.position.set(robot_ptr->command.position.get());
                 robot_ref_ptr->update();
         }
         else
-                robot_ptr->command.set(
-                        robot_ref_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                        mwoibn::robot_class::INTERFACE::POSITION);
+                robot_ptr->command.position.set(robot_ref_ptr->state.position.get());
 }
 
 void setReference(RigidBodyDynamics::Math::VectorNd* state_ptr,
@@ -29,13 +25,11 @@ void setReference(RigidBodyDynamics::Math::VectorNd* state_ptr,
 {
         if (*motor_side)
         {
-                robot_ref_ptr->state.set(*state_ptr,
-                                         mwoibn::robot_class::INTERFACE::POSITION);
+                robot_ref_ptr->state.position.set(*state_ptr);
                 robot_ref_ptr->update();
         }
         else
-                robot_ptr->command.set(*state_ptr,
-                                       mwoibn::robot_class::INTERFACE::POSITION);
+                robot_ptr->command.position.set(*state_ptr);
 }
 
 bool setMotorSideReference(std_srvs::SetBool::Request& req,
@@ -66,8 +60,7 @@ bool resetReference(std_srvs::Empty::Request& req,
                     mwoibn::robot_class::Robot* robot_ptr,
                     mwoibn::robot_class::Robot* robot_ref_ptr, bool* motor_side)
 {
-        RigidBodyDynamics::Math::VectorNd state =
-                robot_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        RigidBodyDynamics::Math::VectorNd state = robot_ptr->state.position.get();
         setReference(&state, robot_ptr, robot_ref_ptr, motor_side);
         return true;
 }
@@ -138,14 +131,12 @@ int main(int argc, char** argv)
         robot.get();
 
         // set valid reference for current contact points
-        robot.command.set(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                          mwoibn::robot_class::INTERFACE::POSITION);
-        robot_ref.state.set(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                            mwoibn::robot_class::INTERFACE::POSITION);
+        robot.command.position.set(robot.state.position.get());
+        robot_ref.state.position.set(robot.state.position.get());
 
         while (ros::ok())
         {
                 if (robot_ref.get())
-                        controller.fullUpdate(robot_ref.state.get(mwoibn::robot_class::INTERFACE::POSITION), robot_ref.state.get(mwoibn::robot_class::INTERFACE::VELOCITY));
+                        controller.fullUpdate(robot_ref.state.position.get(), robot_ref.state.velocity.get());
         }
 }

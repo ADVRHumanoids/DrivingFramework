@@ -55,7 +55,7 @@ Flow(mwoibn::robot_class::Robot& robot,
         _fromPosDiff = _current;
 
         _contacts.setFullStatesWorld(
-                _current, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+                _current, robot.state.position.get());
 }
 virtual ~Flow() {
 }
@@ -68,8 +68,7 @@ void update()
 
         _contacts.setFullStatesWorld(
                 _current,
-                _robot.state.get(
-                        mwoibn::robot_class::INTERFACE::POSITION)); // update handler
+                _robot.state.position.get()); // update handler
 
         double test = ((_current[0] - _previous[0]).norm() +
                        (_current[1] - _previous[1]).norm() +
@@ -195,7 +194,7 @@ void _modelDerivative(int i)
 
         _modelDiff[i] =
                 jacobian *
-                _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY); // *
+                _robot.state.velocity.get(); // *
         //_robot.rate();
 }
 
@@ -235,13 +234,13 @@ void _equationDerivative(int i)
 //    temp += _skew(_ground) * r;
 
         _equationDiff[i] =
-                jacobian * _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+                jacobian * _robot.state.velocity.get();
 
         _equationDiff[i] = temp * _equationDiff[i];
 
         _equationDiff[i] +=
                 jacobian_pos *
-                _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+                _robot.state.velocity.get();
 
         //_equationDiff[i] = _equationDiff[i] * _robot.rate();
 }
@@ -281,24 +280,24 @@ void _flowDerivative(int i)
         //          -_skew(_wheel_axis * _ground.transpose() * _wheel_axis);
         //      mwoibn::Vector3 vec1 =
         //          temp1 * jacobian *
-        //          _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+        //          _robot.state.velocity.get();
         //      std::cout << "1\t" << vec1[0] << "\t" << vec1[1] << "\t" << vec1[2]
         //                << "\n";
         //      temp1 = -_wheel_axis * _ground.transpose() * _skew(_wheel_axis);
         //      vec1 = temp1 * jacobian *
-        //             _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+        //             _robot.state.velocity.get();
         //      std::cout << "2\t" << vec1[0] << "\t" << vec1[1] << "\t" << vec1[2]
         //                << "\n";
         //    }
         _flowDiff[i] =
-                jacobian * _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+                jacobian * _robot.state.velocity.get();
 
         _flowDiff[i] = temp * _flowDiff[i];
 
         _flowDiff[i] = _flowDiff[i] * R;
 
         _flowDiff[i] += jacobian_pos *
-                        _robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY);
+                        _robot.state.velocity.get();
 }
 };
 

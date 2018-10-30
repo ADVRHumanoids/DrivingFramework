@@ -10,14 +10,14 @@ namespace point_handling
   const Rotation::R&
   Rotation::getWorld(bool update){
     _temp_current = RigidBodyDynamics::CalcBodyWorldOrientation(
-                         _model, _state.get(), _body_id, update).transpose()*getFixed();
+                         _model, _state.position.get(), _body_id, update).transpose()*getFixed();
 
     return _temp_current;
   }
 
   Rotation::R Rotation::getWorld(bool update) const{
     return RigidBodyDynamics::CalcBodyWorldOrientation(
-          _model, _state.get(), _body_id, update).transpose()*getFixed();
+          _model, _state.position.get(), _body_id, update).transpose()*getFixed();
   }
 
 
@@ -28,7 +28,7 @@ namespace point_handling
   // {
   //
   //   _J.setZero();
-  //   CalcPointJacobian6D(_model, _state.get(), _body_id, _linear, _J, update);
+  //   CalcPointJacobian6D(_model, _state.position.get(), _body_id, _linear, _J, update);
   //
   //   _J_part.noalias() = _J.topRows<3>();
   //
@@ -38,7 +38,7 @@ namespace point_handling
   // mwoibn::Matrix Position::getOrientationJacobian(bool update) const{
   //   mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
   //
-  //   CalcPointJacobian6D(_model, _state.get(), _body_id, _linear, J, update);
+  //   CalcPointJacobian6D(_model, _state.position.get(), _body_id, _linear, J, update);
   //   mwoibn::Matrix J_part = J.topRows<3>();
   //   return J_part;
   // }
@@ -49,7 +49,7 @@ namespace point_handling
 
     _temp_current =
         RigidBodyDynamics::CalcBodyWorldOrientation(
-            _model, _state.get(), reference_id, update) *
+            _model, _state.position.get(), reference_id, update) *
         getWorld();
 
     return _temp_current;

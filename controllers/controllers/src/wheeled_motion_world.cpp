@@ -157,10 +157,8 @@ void mgnss::controllers::WheeledMotionWorld::compute()
 
 void mgnss::controllers::WheeledMotionWorld::_correct(){
 
-        _robot.state.get(_current_steer, _select_steer,
-                         mwoibn::robot_class::INTERFACE::POSITION);
-        _robot.command.get(_test_steer, _select_steer,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_current_steer, _select_steer);
+        _robot.command.position.get(_test_steer, _select_steer);
 
 
         // RESTEER AND CHECK FOR LIMITS
@@ -202,8 +200,7 @@ void mgnss::controllers::WheeledMotionWorld::_correct(){
 
         }
 
-        _robot.command.set(_test_steer, _select_steer,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_test_steer, _select_steer);
 
 }
 
@@ -230,13 +227,13 @@ void mgnss::controllers::WheeledMotionWorld::startLog(mwoibn::common::Logger& lo
    logger.addField("e_base_rx", getBaseOrnError()[0]);
    logger.addField("e_base_ry", getBaseOrnError()[1]);
    logger.addField("e_base_rz", getBaseOrnError()[2]);
-   logger.addField("base_rx", _robot.state.get()[3]);
-   logger.addField("base_ry", _robot.state.get()[4]);
-   logger.addField("base_rz", _robot.state.get()[5]);
+   logger.addField("base_rx", _robot.state.position.get()[3]);
+   logger.addField("base_ry", _robot.state.position.get()[4]);
+   logger.addField("base_rz", _robot.state.position.get()[5]);
 
-   logger.addField("base_x", _robot.state.get()[0]);
-   logger.addField("base_y", _robot.state.get()[1]);
-   logger.addField("base_z", _robot.state.get()[2]);
+   logger.addField("base_x", _robot.state.position.get()[0]);
+   logger.addField("base_y", _robot.state.position.get()[1]);
+   logger.addField("base_z", _robot.state.position.get()[2]);
 
    logger.addField("com_x", getCom()[0]);
    logger.addField("com_y", getCom()[1]);
@@ -292,10 +289,10 @@ void mgnss::controllers::WheeledMotionWorld::startLog(mwoibn::common::Logger& lo
    logger.addField("tan_icm_3", getDampingICM()[2]);
    logger.addField("tan_icm_4", getDampingICM()[3]);
  */
-//  logger.addField("ankle_yaw_1", _robot.state.get()[10]);
-//  logger.addField("ankle_yaw_2", _robot.state.get()[16]);
-//  logger.addField("ankle_yaw_3", _robot.state.get()[22]);
-//  logger.addField("ankle_yaw_4", _robot.state.get()[28]);
+//  logger.addField("ankle_yaw_1", _robot.state.position.get()[10]);
+//  logger.addField("ankle_yaw_2", _robot.state.position.get()[16]);
+//  logger.addField("ankle_yaw_3", _robot.state.position.get()[22]);
+//  logger.addField("ankle_yaw_4", _robot.state.position.get()[28]);
 //  logger.addField("e_st_1", errorSteer()[0]);
 //  logger.addField("e_st_2", errorSteer()[1]);
 //  logger.addField("e_st_3", errorSteer()[2]);
@@ -312,13 +309,13 @@ void mgnss::controllers::WheeledMotionWorld::log(mwoibn::common::Logger& logger,
    logger.addEntry("e_base_rx", getBaseOrnError()[0]);
    logger.addEntry("e_base_ry", getBaseOrnError()[1]);
    logger.addEntry("e_base_rz", getBaseOrnError()[2]);
-   logger.addEntry("base_rx", _robot.state.get()[3]);
-   logger.addEntry("base_ry", _robot.state.get()[4]);
-   logger.addEntry("base_rz", _robot.state.get()[5]);
+   logger.addEntry("base_rx", _robot.state.position.get()[3]);
+   logger.addEntry("base_ry", _robot.state.position.get()[4]);
+   logger.addEntry("base_rz", _robot.state.position.get()[5]);
 
-   logger.addEntry("base_x", _robot.state.get()[0]);
-   logger.addEntry("base_y", _robot.state.get()[1]);
-   logger.addEntry("base_z", _robot.state.get()[2]);
+   logger.addEntry("base_x", _robot.state.position.get()[0]);
+   logger.addEntry("base_y", _robot.state.position.get()[1]);
+   logger.addEntry("base_z", _robot.state.position.get()[2]);
 
    logger.addEntry("com_x", getCom()[0]);
    logger.addEntry("com_y", getCom()[1]);
@@ -374,10 +371,10 @@ void mgnss::controllers::WheeledMotionWorld::log(mwoibn::common::Logger& logger,
    logger.addEntry("tan_icm_3", getDampingICM()[2]);
    logger.addEntry("tan_icm_4", getDampingICM()[3]);
  */
-//  logger.addEntry("ankle_yaw_1", _robot.state.get()[10]);
-//  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
-//  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);
-//  logger.addEntry("ankle_yaw_4", _robot.state.get()[28]);
+//  logger.addEntry("ankle_yaw_1", _robot.state.position.get()[10]);
+//  logger.addEntry("ankle_yaw_2", _robot.state.position.get()[16]);
+//  logger.addEntry("ankle_yaw_3", _robot.state.position.get()[22]);
+//  logger.addEntry("ankle_yaw_4", _robot.state.position.get()[28]);
 //  logger.addEntry("e_st_1", errorSteer()[0]);
 //  logger.addEntry("e_st_2", errorSteer()[1]);
 //  logger.addEntry("e_st_3", errorSteer()[2]);

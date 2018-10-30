@@ -31,9 +31,9 @@ void makeLog() {
   std::string file_name = path+"/centauro_urdf/test/centauro.urdf";
 
 
-  // joint state class keeps joint states and provaides mapping between the rbdl and urdf 
+  // joint state class keeps joint states and provaides mapping between the rbdl and urdf
   mwoibn::robot_class::Robot robot(file_name, "", true);
-  
+
   mwoibn::VectorN joint_states(robot.getDofs());
 
   joint_states << 0.2, 0.2, -0.2, 0.5, -0.7, 0.6, -0.9, 0.5, 0.2, -0.2, 0.5, 1.0, 0.6, 1.2, 0.5;
@@ -43,13 +43,13 @@ void makeLog() {
 //  joint_states_moved << -0.2, 0.3, 0.4, 0.5, -0.6, 0.3, -0.3, -0.5, 0.7, -0.2, 0.3, 0.5, -0.2, 1.0, 0.5;
 
 
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
 // END: INITIALIZATION
 
 
-// FIRST SET OF TESTS 
-// Define the position of the points defined in the previous line: 2 by 3 matrix, each line defines the position of one point  
+// FIRST SET OF TESTS
+// Define the position of the points defined in the previous line: 2 by 3 matrix, each line defines the position of one point
   mwoibn::Vector3 P_1;
   P_1 << 	0.0, 0.0, -0.15;
 
@@ -94,7 +94,7 @@ void makeLog() {
     // SEVENTH MATRIX
     position = position_handler.getFullStateWorld(); // all positions according to the original set-up
     std::cerr << "show all points as defined during initialization\n" << position << std::endl;
-	
+
 
 
   // SECOND SET OF TESTS
@@ -105,7 +105,7 @@ void makeLog() {
   mwoibn::point_handling::FullStatesHandler full_state_handler_2("arm1_2", robot, {"arm1_7"}, {P_1});
 
   mwoibn::Vector3 P_2 = mwoibn::Vector3::Zero (3);
-  P_2 << 0.1, -0.2, -0.05;   
+  P_2 << 0.1, -0.2, -0.05;
 
     // FIRST MATRIX
     J = mwoibn::Matrix::Zero (3,5);
@@ -135,7 +135,7 @@ void makeLog() {
 
     // SIXTH MATRIX
     position_handler_2.setPointStateWorld(0, position_2);
-   	
+
     position = position_handler_2.getPointStateWorld(0);
     std::cerr << "whole state\n" << position << std::endl;
 }

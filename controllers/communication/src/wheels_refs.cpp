@@ -50,9 +50,8 @@ int main(int argc, char** argv)
 
         // starting
         base.setBasePosition(
-                robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3));
-        base.pose.setCurrent(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)
-                             .head(2)); // change it to the data from robot
+                robot.state.position.get().head(3));
+        base.pose.setCurrent(robot.state.position.get().head(2)); // change it to the data from robot
 
         base.height.setCurrent(0.42);
         base.heading.setCurrent(0);

@@ -52,7 +52,7 @@ public:
 
   virtual ~XBotControllerShared()
   {
-      
+
     if (_position){
       _positions[check] = mwoibn::INVALID;
       _pub_position.set(_positions);
@@ -87,17 +87,15 @@ public:
     initialize();
 
     if (_position){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION),
-            _positions);
+      mapTo(_command.position.get(), _positions);
       _pub_position.set(_positions);
     }
     if (_velocity){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY),
-            _velocities);
+      mapTo(_command.velocity.get(), _velocities);
       _pub_velocity.set(_velocities);
     }
     if (_torque){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _torques);
+      mapTo(_command.torque.get(), _torques);
       _pub_torque.set(_torques);
     }
     return true;

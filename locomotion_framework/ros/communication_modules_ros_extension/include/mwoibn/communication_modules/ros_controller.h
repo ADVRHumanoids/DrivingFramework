@@ -70,15 +70,15 @@ protected:
   void _initFilters(){
     if(!_filter) return;
     if(_position){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _filtered);
+      mapTo(_command.position.get(), _filtered);
       _position_filter_ptr->reset(_filtered);
     }
     if(_velocity){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _filtered);
+      mapTo(_command.velocity.get(), _filtered);
       _velocity_filter_ptr->reset(_filtered);
     }
     if(_torque){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _filtered);
+      mapTo(_command.torque.get(), _filtered);
       _torque_filter_ptr->reset(_filtered);
     }
   }

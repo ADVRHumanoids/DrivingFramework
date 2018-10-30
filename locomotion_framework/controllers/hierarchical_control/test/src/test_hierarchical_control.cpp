@@ -75,7 +75,7 @@ TEST(ControlerTaskTest, methodsBaseClass)
         double gain;
         // mwoibn::VectorN gain(1);
 /*
-   robot.state.set(collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+   robot.state.position.set(collision_states);
    robot.update();
 
    gain << 1200;
@@ -134,7 +134,7 @@ TEST(ControlerTaskTest, methodsBaseClass)
         Eigen::MatrixXd J_5 = mwoibn::tests_common::readMatrix(&myfile, 15, 1);
 #endif
 
-        robot.state.set(collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+        robot.state.position.set(collision_states);
         robot.update();
 
         gain = 1200;

@@ -115,7 +115,7 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
         _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
         _controller_ptr->log(*_logger_ptr.get(), time-_start);
 
-//   std::cout <<  _robot_ptr->command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
+//   std::cout <<  _robot_ptr->commad.velocity.get.transpose() << std::endl;
 
 }
 

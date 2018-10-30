@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 // init robot
         mwoibn::robot_class::RobotRosNRT robot("/robot_description", "", false, false);
 
-        RigidBodyDynamics::Math::VectorNd command = robot.state.get(mwoibn::robot_class::INTERFACE::POSITION); // in controller order
+        RigidBodyDynamics::Math::VectorNd command = robot.state.position.get(); // in controller order
         RigidBodyDynamics::Math::VectorNd ref_states = command;
 
         // create rviz trackers
@@ -131,9 +131,9 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update() *
                           rate.expectedCycleTime().toSec() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
                 if(!is_static) command.head(6+4*6) << ref_states.head(6+4*6);
-                robot.command.set(command,mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
                 robot.controllers.send();
                 robot.update();
         }
@@ -160,10 +160,10 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update() *
                           rate.expectedCycleTime().toSec() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
                 if(!is_static) command.head(18) << ref_states.head(18);
 
-                robot.command.set(command,mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set();
                 robot.controllers.send();
                 robot.update();
         }
@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 
                 x_0.head(3) = circle_2.nextStep();
                 x_0.tail(3) = circle_3.nextStep();
-                org = robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3);
+                org = robot.state.position.get().head(3);
                 // update markers
                 cartesian_task_ph.setPointStateFixed(0, x_0.head(3));
                 cartesian_task_ph.setPointStateFixed(1, x_0.tail(3));
@@ -210,10 +210,10 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update() *
                           rate.expectedCycleTime().toSec() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
                 if(!is_static) command.head(18) << ref_states.head(18);
 
-                robot.command.set(command,mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
                 robot.controllers.send();
                 robot.update();
         }
@@ -260,7 +260,7 @@ int main(int argc, char** argv)
                 x_0.head(3) = circle_4.nextStep();
                 x_0.tail(3) = circle_5.nextStep();
                 //     std::cout << x_0 << std::endl;
-                org = robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3);
+                org = robot.state.position.get().head(3);
                 // update markers
                 cartesian_task_ph.setPointStateFixed(0, x_0.head(3));
                 cartesian_task_ph.setPointStateFixed(1, x_0.tail(3));
@@ -273,11 +273,11 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update() *
                           rate.expectedCycleTime().toSec() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
 
                 if(!is_static) command.head(18) << ref_states.head(18);
 
-                robot.command.set(command,mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
                 robot.controllers.send();
                 robot.update();
         }

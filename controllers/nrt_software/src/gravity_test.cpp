@@ -114,8 +114,7 @@ int main(int argc, char** argv)
 
         //#endif
         //#ifdef VISUALIZATION_TOOLS
-        //  robot.command.set(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
-        //                    mwoibn::robot_class::INTERFACE::POSITION);
+        //  robot.command.position.set(robot.state.position.get());
         //    std::cout << "com_point\n" << com_point << std::endl;
 
 //   double eps = 0.005;
@@ -147,17 +146,17 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update();
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::VELOCITY);
+                robot.command.velocity.set(command);
 
                 command = command * robot.rate() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
 
                 //    std::cout << "base" << std::endl;
                 //    std::cout <<
-                //    robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(6) <<
+                //    robot.state.position.get().head(6) <<
                 //    std::endl;
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
 
                 robot.update();
         }

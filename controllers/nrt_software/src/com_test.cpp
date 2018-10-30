@@ -132,13 +132,13 @@ int main(int argc, char** argv)
 
                 command = hierarchical_controller.update();
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::VELOCITY);
+                robot.command.position.set(command);
 
                 command = command * robot.rate() +
-                          robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                          robot.state.position.get();
 
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
 
                 robot.update();
         }

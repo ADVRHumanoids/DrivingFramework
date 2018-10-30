@@ -42,14 +42,14 @@ TEST(QRTest, testFull)
   //  standing_position[16] = 1.57;
 
   robot.controllers.controller(0).mapFromController(standing_position, joint_states);
-  robot.command.set(joint_states, INTERFACE::POSITION);
+  robot.command.position.set(joint_states);
 
   robot.controllers.send();
 
   ros::Duration(2.0).sleep();
   ros::spinOnce();
 
-  mwoibn::VectorN orginal_states = robot.state.get(INTERFACE::POSITION);
+  mwoibn::VectorN orginal_states = robot.state.position.get();
 
   mwoibn::VectorN oldGravity = gravity.getCommand();
 
@@ -65,10 +65,10 @@ TEST(QRTest, testFull)
   ros::spinOnce();
 
   EXPECT_FALSE(mwoibn::tests_common::compareMatrices(
-      robot.command.get(mwoibn::robot_class::INTERFACE::TORQUE),
+      robot.commad.torque.get,
       mwoibn::VectorN::Zero(robot.getDofs()), 10 * eps));
 
-  EXPECT_TRUE(mwoibn::tests_common::compareMatrices(robot.state.get(INTERFACE::POSITION).tail(14),
+  EXPECT_TRUE(mwoibn::tests_common::compareMatrices(robot.state.position.get().tail(14),
                               orginal_states.tail(14), 10 * eps));
 }
 

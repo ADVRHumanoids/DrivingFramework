@@ -176,9 +176,9 @@ int main(int argc, char** argv)
 
                 command =
                         hierarchical_controller.update() * rate.expectedCycleTime().toSec() +
-                        robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                        robot.state.position.get();
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
                 robot.controllers.send();
                 com_task.setReference(ref_com.nextStep().head(2));
 

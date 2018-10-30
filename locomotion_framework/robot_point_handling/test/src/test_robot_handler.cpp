@@ -106,7 +106,7 @@ TEST(RobotPHTest, uniquePointMathods)
   mwoibn::VectorN joint_states(robot.getDofs());
   joint_states << 0.2, 0.2, -0.2, 0.5, -0.7, 0.6, -0.9, 0.5, 0.2, -0.2, 0.5,
       1.0, 0.6, 1.2, 0.5;
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
 
   mwoibn::Vector3 P_1 =
@@ -202,22 +202,22 @@ TEST(RobotPHTest, uniquePointMathods)
                                      "test me");
 
   mwoibn::Vector3 result_1_world =
-      point_test_1.getStateWorld(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_1.getStateWorld(robot.state.position.get());
   mwoibn::Vector3 result_1_fixed =
       point_test_1.getStateFixed();
   mwoibn::Vector3 result_1_reference =
-      point_test_1.getStateReference(base, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_1.getStateReference(base, robot.state.position.get());
   mwoibn::Matrix jacobian_1 =
-      point_test_1.getLinearStateJacobian(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_1.getLinearStateJacobian(robot.state.position.get());
 
   mwoibn::Vector3 result_2_world =
-      point_test_2.getStateWorld(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_2.getStateWorld(robot.state.position.get());
   mwoibn::Vector3 result_2_fixed =
       point_test_2.getStateFixed();
   mwoibn::Vector3 result_2_reference =
-      point_test_2.getStateReference(base, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_2.getStateReference(base, robot.state.position.get());
   mwoibn::Matrix jacobian_2 =
-      point_test_2.getLinearStateJacobian(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+      point_test_2.getLinearStateJacobian(robot.state.position.get());
 
   // Make get/set tests
 
@@ -265,7 +265,7 @@ TEST(RobotPHTest, JacobianAndStateMethods)
   mwoibn::VectorN joint_states(robot.getDofs());
   joint_states << 0.2, 0.2, -0.2, 0.5, -0.7, 0.6, -0.9, 0.5, 0.2, -0.2, 0.5,
       1.0, 0.6, 1.2, 0.5;
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
 
   // TEST FUNCTION THE DOES NOT REQUIRE EXTERNAL DATA
@@ -389,9 +389,9 @@ points.getFullStatesWorld();
   mwoibn::VectorN ref_position(6);
 
   ref_position.head(3) = point1.getStateReference("torso_2",
-robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+robot.state.position.get());
   ref_position.tail(3) = point2.getStateReference("torso_2",
-robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+robot.state.position.get());
 
   J_test = points.getFullStateReference();
 
@@ -404,4 +404,3 @@ robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
   EXPECT_TRUE(mwoibn::tests_common::compareMatrices(J_test.bottomRows(3), states[1], eps));
 
 }
-

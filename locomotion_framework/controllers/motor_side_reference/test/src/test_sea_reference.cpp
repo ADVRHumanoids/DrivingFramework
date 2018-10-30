@@ -18,7 +18,7 @@ TEST(SEAReferenceTest, testFull){
 //                          -0.2,  0.3,  0.5,  1.0, -0.7,  0.5, 0.5,
 //                           0;
 
-//  robot.state.set(non_collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+//  robot.state.position.set(non_collision_states);
 //  robot.update();
 
 
@@ -30,5 +30,3 @@ TEST(SEAReferenceTest, testFull){
 //  reference.getCommand();
 
 }
-
-

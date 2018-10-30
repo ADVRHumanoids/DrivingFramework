@@ -47,9 +47,7 @@ void mgnss::xbot_plugins::CentralizedController::on_start(double time)
         _robot_ptr->update();
         _valid = _robot_ptr->feedbacks.initialized();
         _gravity_compensation_ptr->update();
-        _robot_ptr->command.set(
-                _robot_ref_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                mwoibn::robot_class::INTERFACE::POSITION);
+        _robot_ptr->command.position.set(_robot_ref_ptr->state.position.get());
         _actuation_model_ptr->update();
 
 }
@@ -63,9 +61,7 @@ void mgnss::xbot_plugins::CentralizedController::control_loop(double time, doubl
 
         if (_robot_ref_ptr->get())
         {
-                _robot_ptr->command.set(
-                        _robot_ref_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                        mwoibn::robot_class::INTERFACE::POSITION);
+                _robot_ptr->command.position.set(_robot_ref_ptr->state.position.get());
         }
 
         //  _robot_ref_ptr->updateKinematics(); // ONLINE LOOP
@@ -76,9 +72,7 @@ void mgnss::xbot_plugins::CentralizedController::control_loop(double time, doubl
         if (_motor_side)
                 _actuation_model_ptr->update();
 //  else
-//    _robot_ptr->command.set(
-//        _robot_ref_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION),
-//        mwoibn::robot_class::INTERFACE::POSITION);
+//    _robot_ptr->command.position.set(_robot_ref_ptr->state.position.get());
 
         _robot_ptr->send();
 }

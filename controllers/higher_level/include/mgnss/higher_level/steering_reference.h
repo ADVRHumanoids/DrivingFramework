@@ -61,7 +61,7 @@ SteeringReference(mwoibn::robot_class::Robot& robot,
                   mwoibn::hierarchical_control::tasks::ContactPointTracking& plane, mwoibn::VectorN init_pose,
                   double K_icm, double K_sp, double dt, double margin = 0.04,
                   double max = 2.79252680) : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt),
-        _state(robot.state.state(mwoibn::robot_class::INTERFACE::POSITION))
+        _state(robot.state.position.get())
 {
         _v_icm.setZero(_size);
         _b_icm.setZero(_size);

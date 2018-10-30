@@ -95,8 +95,7 @@ void updateKinematics()
 //        &state.state(INTERFACE::VELOCITY), nullptr);
 
         RigidBodyDynamics::UpdateKinematics(
-                _model, state.state(INTERFACE::POSITION),
-                state.state(INTERFACE::VELOCITY), _zeroVec);
+                _model, state.position.get(), state.velocity.get(), _zeroVec);
 
 }
 virtual bool isRunning() {
@@ -138,6 +137,10 @@ const mwoibn::VectorInt& getActuationState() {
  */
 robot_points::CenterOfMass& centerOfMass() {
         return *(_center_of_mass.get());
+}
+
+robot_points::CenterOfPressure& centerOfPressure() {
+        return *(_center_of_pressure.get());
 }
 
 Contacts& contacts() {
@@ -239,6 +242,7 @@ std::unique_ptr<Contacts> _contacts;
 
 //! Kepps center of mass data
 std::unique_ptr<robot_points::CenterOfMass> _center_of_mass;
+std::unique_ptr<robot_points::CenterOfPressure> _center_of_pressure;
 
 //! Actuators Module
 Actuators _actuators;

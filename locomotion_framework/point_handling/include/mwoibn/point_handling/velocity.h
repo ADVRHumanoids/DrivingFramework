@@ -19,14 +19,14 @@ public:
   Velocity(point_handling::FramePlus& frame, int size, std::string name = "")
       : State(frame, size, name)
   {
-    _J.setZero(size, _state.size());
+    _J.setZero(size, _state.velocity.size());
   }
 
   Velocity(Point::Current& current,
         point_handling::FramePlus& frame, std::string name = "")
       : State(current, frame, name)
 
-  { _J.setZero(3, _state.size());
+  { _J.setZero(3, _state.velocity.size());
     _size = 3;
   }
 

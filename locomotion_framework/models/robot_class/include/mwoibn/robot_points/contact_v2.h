@@ -154,7 +154,7 @@ protected:
 // }
 
 virtual void _resize(){
-        _jacobian.setZero(_state_size, _state.size());
+        _jacobian.setZero(_state_size, _state.velocity.size());
         _rotation.setZero(_state_size, _state_size);
         _transformation.setZero(_state_size, _state_size);
         _directions.setZero(_state_size, _state_size);

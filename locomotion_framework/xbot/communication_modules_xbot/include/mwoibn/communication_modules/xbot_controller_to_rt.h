@@ -57,17 +57,17 @@ public:
 
     if (_position)
     {
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _data);
+      mapTo(_command.position.get(), _data);
       _pub_position.write(_data);
     }
     if (_velocity)
     {
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _data);
+      mapTo(_command.velocity.get(), _data);
       _pub_velocity.write(_data);
     }
     if (_torque)
     {
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _data);
+      mapTo(_command.torque.get(), _data);
       _pub_torque.write(_data);
     }
 

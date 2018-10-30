@@ -22,7 +22,7 @@ public:
   virtual ~LowerLevelController(){}
 
   /** sends command directly to the robot */
-  virtual void setCommand() { _robot.command.set(_command, _interface); }
+  virtual void setCommand() { _robot.command.interface(_interface).set(_command); }
 
   /** provides access to the robot */
   mwoibn::robot_class::Robot& getRobot(){return _robot;}

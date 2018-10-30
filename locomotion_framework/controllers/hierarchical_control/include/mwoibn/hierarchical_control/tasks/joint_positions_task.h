@@ -79,7 +79,7 @@ virtual ~JointPosition() {
 virtual void updateError()
 {
         _last_error = _error;
-        _error = _reference - _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _error = _reference - _robot.state.position.get();
         _error = _error.cwiseProduct(_selector);
 }
 //! updates task Jacobian based on the current state of the robot

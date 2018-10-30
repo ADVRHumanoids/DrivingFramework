@@ -168,17 +168,76 @@ void mgnss::controllers::WheeledMotionEvent3::fullUpdate(const mwoibn::VectorN& 
 void mgnss::controllers::WheeledMotionEvent3::compute()
 {
         mgnss::controllers::WheelsController::compute();
-        //_correct();
+//        _correct();
 
 
 }
 
+// void mgnss::controllers::WheeledMotionEvent3::_correct(){
+//
+//         _robot.state.position.get(_current_steer, _select_steer);
+//         _robot.command.position.get(_test_steer, _select_steer);
+//
+//         // RESTEER AND CHECK FOR LIMITS
+//         for (int i = 0; i < _test_steer.size(); i++)
+//         {
+//                 double steer = _test_steer[i];
+//
+//                 if (((_test_steer[i] - _l_limits[i]) < -0.005 && (_current_steer[i] - _l_limits[i]) < 0.005)
+//                     || ((_test_steer[i] - _u_limits[i]) > 0.005  && (_current_steer[i] - _u_limits[i]) > -0.005))
+//                 {
+//                         if(!_resteer[i]) {
+//                                 _reset_count[i] = _reset_count[i] + 1;
+//                         }
+//                         if(_reset_count[i] == 50) { //100
+//                                 _resteer[i] = true;
+//                                 _start_steer[i] = _test_steer[i];
+//                                 _reset_count[i] = 0;
+//                         }
+//                 }
+//                 else{
+//                         _reset_count[i] = 0;
+//                 }
+//
+//                 if (_resteer[i])
+//                 {
+//                         mwoibn::eigen_utils::limitToHalfPi(_test_steer[i]);
+//
+//                         if (std::fabs(_test_steer[i]) > 1.0 &&
+//                             std::fabs(_test_steer[i] - _start_steer[i]) < mwoibn::PI)
+//                         {
+//                                 if (_start_steer[i] < 0)
+//                                         _test_steer[i] += mwoibn::HALF_PI;
+//                                 else
+//                                         _test_steer[i] -= mwoibn::HALF_PI;
+//                         }
+//
+//                 }
+//
+//                 _resteer[i] =
+//                         _resteer[i] &&
+//                         (std::fabs(steer - _current_steer[i]) <
+//                          (std::fabs(_test_steer[i] - _current_steer[i]) + 0.5)) &&
+//                         std::fabs(_start_steer[i] - steer) < 2.8; // I could add a wheel velocity condition here
+//
+//                 if( _resteer[i] && _start_steer[i] < 0) {
+//                         _test_steer[i] = _current_steer[i] + 3.5*mwoibn::PI/180;
+//                 }
+//                 else if ( _resteer[i] &&  _start_steer[i] > 0) {
+//                         _test_steer[i] = _current_steer[i] - 3.5*mwoibn::PI/180;
+//                 }
+//
+//         }
+//
+//
+//         _robot.command.position.set(_test_steer, _select_steer);
+// }
+//
+
 void mgnss::controllers::WheeledMotionEvent3::_correct(){
 
-        _robot.state.get(_current_steer, _select_steer,
-                         mwoibn::robot_class::INTERFACE::POSITION);
-        _robot.command.get(_test_steer, _select_steer,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_current_steer, _select_steer);
+        _robot.command.position.get(_test_steer, _select_steer);
 
         // RESTEER AND CHECK FOR LIMITS
         for (int i = 0; i < _test_steer.size(); i++)
@@ -191,7 +250,7 @@ void mgnss::controllers::WheeledMotionEvent3::_correct(){
                         if(!_resteer[i]) {
                                 _reset_count[i] = _reset_count[i] + 1;
                         }
-                        if(_reset_count[i] == 50) { //100
+                        if(_reset_count[i] == 20) { //100
                                 _resteer[i] = true;
                                 _start_steer[i] = _test_steer[i];
                                 _reset_count[i] = 0;
@@ -200,6 +259,7 @@ void mgnss::controllers::WheeledMotionEvent3::_correct(){
                 else{
                         _reset_count[i] = 0;
                 }
+
 
                 if (_resteer[i])
                 {
@@ -230,67 +290,11 @@ void mgnss::controllers::WheeledMotionEvent3::_correct(){
                 }
 
         }
+        std::cout << _reset_count.transpose() << std::endl;
 
 
-        _robot.command.set(_test_steer, _select_steer,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_test_steer, _select_steer);
 }
-
-//void mgnss::controllers::WheeledMotionEvent3::_correct(){
-
-//  _robot.state.get(_current_steer, _select_steer,
-//                   mwoibn::robot_class::INTERFACE::POSITION);
-//  _robot.command.get(_test_steer, _select_steer,
-//                     mwoibn::robot_class::INTERFACE::POSITION);
-
-//  // RESTEER AND CHECK FOR LIMITS
-//  for (int i = 0; i < _test_steer.size(); i++)
-//  {
-//    double steer = _test_steer[i];
-
-//    if ((_test_steer[i] < _l_limits[i] || _test_steer[i] > _u_limits[i]) && !_resteer[i])
-//    {
-//                                                                                                                                                                                                                                                                                                                                                                                      _start_steer[i] = _test_steer[i];
-//      _resteer[i] = true;
-////      std::cout << "WARNING: ankle yaw " << i << " on limit."
-////                << std::endl; // NRT
-//    }
-
-//    if (_resteer[i])
-//    {
-////      std::cout << "dsgnkjhlfsymetljhmgdbfc" << std::endl;
-//      mwoibn::eigen_utils::limitToHalfPi(_test_steer[i]);
-
-//      if (std::fabs(_test_steer[i]) > 1.0 &&
-//          std::fabs(_test_steer[i] - _start_steer[i]) < mwoibn::PI)
-//      {
-//        if (_start_steer[i] < 0)
-//          _test_steer[i] += mwoibn::HALF_PI;
-//        else
-//          _test_steer[i] -= mwoibn::HALF_PI;
-//      }
-
-//    }
-
-//    _resteer[i] =
-//        _resteer[i] &&
-//        (std::fabs(steer - _current_steer[i]) <
-//         (std::fabs(_test_steer[i] - _current_steer[i]) + 0.1)) &&
-//        std::fabs(_start_steer[i] - steer) < 2.5;
-
-//    if( _resteer[i] && _start_steer[i] < 0){
-//        _test_steer[i] = _current_steer[i] + 1*mwoibn::PI/180;
-//    }
-//    else if ( _resteer[i] &&  _start_steer[i] > 0){
-//        _test_steer[i] = _current_steer[i] - 1*mwoibn::PI/180;
-//    }
-
-//  }
-
-//  _robot.command.set(_test_steer, _select_steer,
-//                     mwoibn::robot_class::INTERFACE::POSITION);
-
-//}
 
 void mgnss::controllers::WheeledMotionEvent3::steering()
 {
@@ -316,17 +320,17 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
         logger.addField("e_base_ry", getBaseOrnError()[1]);
  */
         logger.addField("e_base_rz", getBaseOrnError()[2]);
-//        logger.addField("base_rx", _robot.state.get()[3]);
-//        logger.addField("base_ry", _robot.state.get()[4]);
-        logger.addField("base_rz", _robot.state.get()[5]);
+//        logger.addField("base_rx", _robot.state.position.get()[3]);
+//        logger.addField("base_ry", _robot.state.position.get()[4]);
+        logger.addField("base_rz", _robot.state.position.get()[5]);
 /*
         logger.addField("v_com_x", _linear_vel[0]);
         logger.addField("v_com_y", _linear_vel[1]);
         logger.addField("v_th", _angular_vel[2]);
-
+*/
         logger.addField("com_x", getCom()[0]);
         logger.addField("com_y", getCom()[1]);
- */
+
         logger.addField("r_com_x", refCom()[0]);
         logger.addField("r_com_y", refCom()[1]);
 
@@ -426,10 +430,10 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
  */
         // logger.addField("d_1", getDamp()[0]);
         // logger.addField("d_2", getDamp()[1]);
-//  logger.addField("ankle_yaw_1", _robot.state.get()[10]);
-//  logger.addField("ankle_yaw_2", _robot.state.get()[16]);
-//  logger.addField("ankle_yaw_3", _robot.state.get()[22]);
-//  logger.addField("ankle_yaw_4", _robot.state.get()[28]);
+//  logger.addField("ankle_yaw_1", _robot.state.position.get()[10]);
+//  logger.addField("ankle_yaw_2", _robot.state.position.get()[16]);
+//  logger.addField("ankle_yaw_3", _robot.state.position.get()[22]);
+//  logger.addField("ankle_yaw_4", _robot.state.position.get()[28]);
 //  logger.addField("e_st_1", errorSteer()[0]);
 //  logger.addField("e_st_2", errorSteer()[1]);
 //  logger.addField("e_st_3", errorSteer()[2]);
@@ -456,21 +460,21 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
        logger.addEntry("e_base_rx", getBaseOrnError()[0]);
        logger.addEntry("e_base_ry", getBaseOrnError()[1]);*/
         logger.addEntry("e_base_rz", getBaseOrnError()[2]);
-//        logger.addEntry("base_rx", _robot.state.get()[3]);
-//        logger.addEntry("base_ry", _robot.state.get()[4]);
-        logger.addEntry("base_rz", _robot.state.get()[5]);
+//        logger.addEntry("base_rx", _robot.state.position.get()[3]);
+//        logger.addEntry("base_ry", _robot.state.position.get()[4]);
+        logger.addEntry("base_rz", _robot.state.position.get()[5]);
 /*
-   //  logger.addEntry("base_x", _robot.state.get()[0]);
-   //  logger.addEntry("base_y", _robot.state.get()[1]);
-   //  logger.addEntry("base_z", _robot.state.get()[2]);
+   //  logger.addEntry("base_x", _robot.state.position.get()[0]);
+   //  logger.addEntry("base_y", _robot.state.position.get()[1]);
+   //  logger.addEntry("base_z", _robot.state.position.get()[2]);
    /*
         logger.addEntry("v_com_x", _linear_vel[0]);
         logger.addEntry("v_com_y", _linear_vel[1]);
         logger.addEntry("v_th", _angular_vel[2]);
-
+ */
         logger.addEntry("com_x", getCom()[0]);
         logger.addEntry("com_y", getCom()[1]);
- */
+
         logger.addEntry("r_com_x", refCom()[0]);
         logger.addEntry("r_com_y", refCom()[1]);
 
@@ -567,10 +571,10 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
  */
         // logger.addEntry("d_1", getDamp()[0]);
         // logger.addEntry("d_2", getDamp()[1]);
-//  logger.addEntry("ankle_yaw_1", _robot.state.get()[10]);
-//  logger.addEntry("ankle_yaw_2", _robot.state.get()[16]);
-//  logger.addEntry("ankle_yaw_3", _robot.state.get()[22]);
-//  logger.addEntry("ankle_yaw_4", _robot.state.get()[28]);
+//  logger.addEntry("ankle_yaw_1", _robot.state.position.get()[10]);
+//  logger.addEntry("ankle_yaw_2", _robot.state.position.get()[16]);
+//  logger.addEntry("ankle_yaw_3", _robot.state.position.get()[22]);
+//  logger.addEntry("ankle_yaw_4", _robot.state.position.get()[28]);
 //  logger.addEntry("e_st_1", errorSteer()[0]);
 //  logger.addEntry("e_st_2", errorSteer()[1]);
 //  logger.addEntry("e_st_3", errorSteer()[2]);

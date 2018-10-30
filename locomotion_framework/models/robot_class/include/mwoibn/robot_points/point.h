@@ -13,7 +13,7 @@ class Point
 
 public:
   Point(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state): _state(state), _model(model){
-    _jacobian.setZero(3, _state.size());
+    _jacobian.setZero(3, _state.velocity.size());
   }
 
   virtual ~Point() {}

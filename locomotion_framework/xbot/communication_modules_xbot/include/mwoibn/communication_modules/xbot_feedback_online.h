@@ -51,8 +51,8 @@ public:
             else
                 std::cout << "Read a torque feedback tolerance as " << config["limits"]["tolerance"]["torque"] << " Nm." << std::endl;
         }
-        mwoibn::VectorN lower_original = _lower_limits.get(mwoibn::robot_class::INTERFACE::POSITION);
-        mwoibn::VectorN upper_original = _upper_limits.get(mwoibn::robot_class::INTERFACE::POSITION);
+        mwoibn::VectorN lower_original = _lower_limits.position.get();
+        mwoibn::VectorN upper_original = _upper_limits.position.get();
 
         _initLimit(_lower_limits, -config["limits"]["tolerance"]["position"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::POSITION);
         _initLimit(_lower_limits, -config["limits"]["tolerance"]["velocity"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::VELOCITY);
@@ -71,9 +71,9 @@ public:
                 std::cout << _robot.getJointByDofIndex(_map.get()[i])->getJointName() << "\t";
 
             std::cout << lower_original[i] << "\t";
-            std::cout << _lower_limits.get(mwoibn::robot_class::INTERFACE::POSITION)[i] << "\t";
+            std::cout << _lower_limits.position.get()[i] << "\t";
             std::cout << upper_original[i] << "\t";
-            std::cout << _upper_limits.get(mwoibn::robot_class::INTERFACE::POSITION)[i] << std::endl;
+            std::cout << _upper_limits.position.get()[i] << std::endl;
         }
 
     */
@@ -95,12 +95,12 @@ public:
     _initialized = true;
 
     if(_position)
-      _initialized = _command.get(mwoibn::robot_class::INTERFACE::POSITION).norm() > 1e-12 && _initialized;
+      _initialized = _command.position.get().norm() > 1e-12 && _initialized;
     if(_velocity)
-      _initialized = _command.get(mwoibn::robot_class::INTERFACE::VELOCITY).norm() > 1e-12 && _initialized;
+      _initialized = _command.velocity.get().norm() > 1e-12 && _initialized;
 
     if(_torque)
-      _initialized = _command.get(mwoibn::robot_class::INTERFACE::TORQUE).norm() > 1e-12 && _initialized;
+      _initialized = _command.torque.get().norm() > 1e-12 && _initialized;
 
     return _initialized;
   }

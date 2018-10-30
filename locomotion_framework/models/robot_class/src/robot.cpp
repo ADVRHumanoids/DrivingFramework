@@ -25,6 +25,7 @@
 
 #include <urdf/model.h>
 #include "mwoibn/point_handling/raw_positions_handler.h"
+#include "mwoibn/robot_points/center_of_pressure_fast.h"
 
 mwoibn::robot_class::Robot::Robot(std::string urdf_description,
                                   std::string srdf_description)
@@ -76,8 +77,11 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 
         _actuation = mwoibn::VectorInt::Ones(getDofs());
 
-        _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
+
         _contacts.reset(new Contacts(getDofs()));
+
+        _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
+        _center_of_pressure.reset(new robot_points::CenterOfPressureFast(_model, state, *_contacts));
 
         // set to unactuated all dofs not in the model
         if (!_is_static)
@@ -167,12 +171,12 @@ void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
         mwoibn::VectorN limits =
                 mwoibn::VectorN::Constant(getDofs(), mwoibn::NON_EXISTING);
 
-        lower_limits.set(limits, INTERFACE::POSITION);
-        lower_limits.set(limits, INTERFACE::VELOCITY);
-        lower_limits.set(limits, INTERFACE::TORQUE);
-        upper_limits.set(limits, INTERFACE::POSITION);
-        upper_limits.set(limits, INTERFACE::VELOCITY);
-        upper_limits.set(limits, INTERFACE::TORQUE);
+        lower_limits.position.set(limits);
+        lower_limits.velocity.set(limits);
+        lower_limits.torque.set(limits);
+        upper_limits.position.set(limits);
+        upper_limits.velocity.set(limits);
+        upper_limits.torque.set(limits);
 
         for (int i = 0; i < _model.mBodies.size(); i++)
         {
@@ -195,23 +199,23 @@ void mwoibn::robot_class::Robot::_readJointLimits(urdf::Model& urdf)
                 if (joint->type != urdf::Joint::CONTINUOUS)
                 {
                         limits.setConstant(dof.size(), joint->limits->lower);
-                        lower_limits.set(limits, dof, INTERFACE::POSITION);
+                        lower_limits.position.set(limits, dof);
                         limits.setConstant(dof.size(), joint->limits->upper);
-                        upper_limits.set(limits, dof, INTERFACE::POSITION);
+                        upper_limits.position.set(limits, dof);
                 }
                 if (joint->limits->velocity)
                 {
                         limits.setConstant(dof.size(), joint->limits->velocity);
-                        upper_limits.set(limits, dof, INTERFACE::VELOCITY);
+                        upper_limits.velocity.set(limits, dof);
                         limits.setConstant(dof.size(), -joint->limits->velocity);
-                        lower_limits.set(limits, dof, INTERFACE::VELOCITY);
+                        lower_limits.velocity.set(limits, dof);
                 }
                 if (joint->limits->effort)
                 {
                         limits.setConstant(dof.size(), joint->limits->effort);
-                        upper_limits.set(limits, dof, INTERFACE::TORQUE);
+                        upper_limits.torque.set(limits, dof);
                         limits.setConstant(dof.size(), -joint->limits->effort);
-                        lower_limits.set(limits, dof, INTERFACE::TORQUE);
+                        lower_limits.torque.set(limits, dof);
                 }
         }
 }
@@ -574,6 +578,8 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                         std::cout << e.what() << std::endl;
                 }
         }
+        _center_of_pressure->init();
+
 }
 
 void mwoibn::robot_class::Robot::_loadActuators(YAML::Node actuators_config)

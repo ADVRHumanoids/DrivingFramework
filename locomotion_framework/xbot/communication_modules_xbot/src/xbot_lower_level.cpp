@@ -8,7 +8,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
 //    std::cout << "position before\t" << pub.transpose() << std::endl;
 
     _limit(mwoibn::robot_class::INTERFACE::POSITION);
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), pub);
+    mapTo(_command.position.get(), pub);
 
 //    std::cout << "position after\t" << pub.transpose() << std::endl;
     _robot.setPositionReference(pub);
@@ -17,10 +17,10 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
   {
     _robot.getVelocityReference(pub);
 //    std::cout << "velocity before\t" << pub.transpose() << std::endl;
-//    std::cout << "velocity command\t" << _command.get(mwoibn::robot_class::INTERFACE::VELOCITY).transpose() << std::endl;
+//    std::cout << "velocity command\t" << _command.velocity.get.transpose() << std::endl;
 
     _limit(mwoibn::robot_class::INTERFACE::VELOCITY);
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), pub);
+    mapTo(_command.velocity.get(), pub);
 
 //    std::cout << "velocity after\t" << pub.transpose() << std::endl;
     _robot.setVelocityReference(pub);
@@ -30,7 +30,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
     _robot.getEffortReference(pub);
 
     _limit(mwoibn::robot_class::INTERFACE::TORQUE);
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), pub);
+    mapTo(_command.torque.get(), pub);
 
     _robot.setEffortReference(pub);
   }

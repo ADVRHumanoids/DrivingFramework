@@ -31,9 +31,9 @@ mwoibn::robot_points::WheelContactV2::WheelContactV2(RigidBodyDynamics::Model& m
 
 void mwoibn::robot_points::WheelContactV2::_resize()
 {
-        _jacobian.setZero(_state_size, _state.size());
+        _jacobian.setZero(_state_size, _state.velocity.size());
         _rotation.setZero(_state_size, _state_size);
-        _transformation.setZero(_state_size, _state.size());
+        _transformation.setZero(_state_size, _state.velocity.size());
 
         if (_directions.rows() == 6 && _directions.cols() == 6)
                 _directions = _directions.bottomRightCorner<3, 3>();

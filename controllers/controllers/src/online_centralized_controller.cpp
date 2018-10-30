@@ -51,10 +51,8 @@ void mgnss::controllers::OnlineCentralizedController::send(){
 
 void mgnss::controllers::OnlineCentralizedController::update(){
         _reference.get();
-        _robot.command.set(_reference.state.get(),
-                           mwoibn::robot_class::INTERFACE::POSITION);
-        _robot.command.set(_reference.state.get(mwoibn::robot_class::INTERFACE::VELOCITY),
-                                              mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.position.set(_reference.state.position.get());
+        _robot.command.velocity.set(_reference.state.velocity.get());
         _gravity_compensation_ptr->update();
         if(_motor_side)
                 _actuation_model_ptr->update();
@@ -68,8 +66,7 @@ void mgnss::controllers::OnlineCentralizedController::fullUpdate(const mwoibn::V
 
         _robot.updateKinematics();
 
-        _robot.command.set(reference,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(reference);
 
         update();
 
@@ -83,11 +80,9 @@ void mgnss::controllers::OnlineCentralizedController::fullUpdate(const mwoibn::V
 
         _robot.updateKinematics();
 
-        _robot.command.set(reference,
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(reference);
 
-        _robot.command.set(vel_reference,
-                           mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.velocity.set(vel_reference);
 
         update();
 

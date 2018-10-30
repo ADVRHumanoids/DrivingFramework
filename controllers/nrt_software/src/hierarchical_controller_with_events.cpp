@@ -225,9 +225,9 @@ int main(int argc, char** argv)
         {
                 command =
                         hierarchical_controller.update() * 1/100 +
-                        robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                        robot.state.position.get();
 
-                robot.command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+                robot.command.position.set(command);
                 robot.controllers.send();
 
                 events.update();

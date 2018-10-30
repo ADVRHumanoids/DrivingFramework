@@ -19,13 +19,13 @@ public:
        std::string name = "")
       : Velocity(frame, 3, name)
   {
-      _J_full.setZero(6, _state.size()); }
+      _J_full.setZero(6, _state.velocity.size()); }
 
   AngularVelocity(Point::Current current,
         point_handling::FramePlus& frame, std::string name = "")
       : Velocity(current, frame, name)
   {
-    _J_full.setZero(6, _state.size()); }
+    _J_full.setZero(6, _state.velocity.size()); }
 
   AngularVelocity(const AngularVelocity&& other)
       : Velocity(other), _J_full(other._J_full)

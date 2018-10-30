@@ -5,7 +5,7 @@ bool mwoibn::communication_modules::VelocityController::send()
 
   if (_velocity)
   {
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY),
+    mapTo(_command.velocity.get(),
                     _des_q.velocity);
   }
 

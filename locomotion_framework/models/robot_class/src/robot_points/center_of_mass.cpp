@@ -33,7 +33,7 @@ void CenterOfMass::compute()
 {
 
         double mass;
-        RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.get(mwoibn::robot_class::INTERFACE::POSITION), _state.get(mwoibn::robot_class::INTERFACE::VELOCITY),
+        RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
                                                    mass, _com, nullptr, nullptr, false);
         _point.noalias() = _com;
 }

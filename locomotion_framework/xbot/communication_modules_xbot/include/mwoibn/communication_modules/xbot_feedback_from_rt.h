@@ -62,7 +62,7 @@ public:
         _initialized = false;
         return false;
       }
-      _command.set(_data, _map.reversed(), robot_class::INTERFACE::POSITION);
+      _command.position.set(_data, _map.reversed());
     }
     if (_velocity)
     {
@@ -73,7 +73,7 @@ public:
         _initialized = false;
         return false;
       }
-      _command.set(_data, _map.reversed(), robot_class::INTERFACE::VELOCITY);
+      _command.velocity.set(_data, _map.reversed());
     }
     if (_torque)
     {
@@ -84,7 +84,7 @@ public:
         _initialized = false;
         return false;
       }
-      _command.set(_data, _map.reversed(), robot_class::INTERFACE::TORQUE);
+      _command.torque.set(_data, _map.reversed());
     }
 
     return true;

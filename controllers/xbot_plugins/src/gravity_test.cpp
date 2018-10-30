@@ -63,7 +63,7 @@ void mgnss::xbot_plugins::GravityTest::_init() {
 
         _pelvis_hight_ptr->setReference(_com_ref);
         _pelvis_orientation_ptr->setReference(0,_pelvis_orientation_ptr->getOffset(0)*mwoibn::Quaternion::fromAxisAngle(axis, 0.0));
-        _state = _robot_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _state = _robot_ptr->state.position.get();
 
         hierarchical_controller.update();
         _initialized = true;
@@ -110,11 +110,11 @@ void mgnss::xbot_plugins::GravityTest::control_loop(double time, double period)
         _command.noalias() = hierarchical_controller.update() * period;
 
 
-        _command.noalias() += _robot_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION);
+        _command.noalias() += _robot_ptr->state.position.get();
 
         _command.tail(15) = _state.tail(15); // maybe to be removed
 
-        _robot_ptr->command.set(_command, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot_ptr->command.position.set(_command);
         _robot_ptr->send();
 }
 

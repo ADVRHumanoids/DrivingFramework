@@ -342,7 +342,7 @@ void mwoibn::collision_model::RobotCollision::updatePosition(int i)
 
         mwoibn::Matrix3 rotation =
                 RigidBodyDynamics::CalcBodyWorldOrientation(
-                        _robot.getModel(), _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION),
+                        _robot.getModel(), _robot.state.position.get(),
                         _robot.getModel().GetBodyId(_objects.at(i).link.c_str()), false);
         mwoibn::Quaternion quaternion =
                 mwoibn::Quaternion::fromMatrix(rotation);

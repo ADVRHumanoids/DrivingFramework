@@ -80,7 +80,7 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
                              _angels[2]); // Check if the convention is met here
 
         //_base.tail<1>()[0] -= _offset_z;
-        _command.set(_base, _map_dofs, mwoibn::robot_class::INTERFACE::POSITION);
+        _command.position.set(_base, _map_dofs);
 }
 
 bool mwoibn::communication_modules::XBotOperationalEuler::reset(){

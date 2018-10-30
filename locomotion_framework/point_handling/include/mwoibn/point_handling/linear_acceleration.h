@@ -44,8 +44,8 @@ public:
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
-      _temp_current = CalcPointAcceleration(_model, _state.get(INTERFACE::POSITION), _state.get(INTERFACE::VELOCITY),
-                                                    _state.get(INTERFACE::ACCELERATION), _body_id, frame.position.getFixed());
+      _temp_current = CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
+                                  _state.acceleration.get(), _body_id, frame.position.getFixed());
 
       _temp_current += frame.rotation().getWorld()*_current;
       return _temp_current;
@@ -54,8 +54,8 @@ public:
 
   virtual Point::Current
   getWorld(bool update = false) const {
-    return CalcPointAcceleration(_model, _state.get(INTERFACE::POSITION), _state.get(INTERFACE::VELOCITY),
-                                         _state.get(INTERFACE::ACCELERATION), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
+    return CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
+                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
   } // NOT IMPLEMENTED
 
   /** @brief set new tracked point giving data in a world frame*/

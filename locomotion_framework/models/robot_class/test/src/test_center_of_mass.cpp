@@ -30,7 +30,7 @@ TEST(CenterOfMassTest, pureClass)
       -0.9, 0, 0.2, 0.3, 0.5, -1.2, 0.7, -0.5, 0.5, -0.2, 0.3, -0.5, 1.0, -0.7,
       0.5, 0.5,
 
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
   com.compute();
 //  std::cerr << "getCom" << std::endl;
@@ -66,7 +66,7 @@ TEST(CenterOfMassTest, robotWrapper)
       -0.9, 0, 0.2, 0.3, 0.5, -1.2, 0.7, -0.5, 0.5, -0.2, 0.3, -0.5, 1.0, -0.7,
       0.5, 0.5,
 
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
   robot.centerOfMass().update();
 //  std::cerr << "getCom" << std::endl;

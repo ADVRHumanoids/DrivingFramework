@@ -143,7 +143,7 @@ const mwoibn::VectorBool& isResteer(){
 const mwoibn::VectorN& getAnkleYaw(){
         return _test_steer;
 }
-//  mwoibn::VectorN getBase(){return _robot.state.get().head<3>();}
+//  mwoibn::VectorN getBase(){return _robot.state.position.get().head<3>();}
 const mwoibn::VectorN& getBaseError(){
         return _pelvis_position_ptr->getError();
 }

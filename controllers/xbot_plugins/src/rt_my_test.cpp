@@ -35,7 +35,7 @@ bool mgnss::xbot_plugins::MyTest::init_control_plugin(XBot::Handle::Ptr handle)
 //            0,  1.57,  2.41,  0.90, 0, 0,
 //            0, -1.57, -2.41, -0.90, 0, 0;
 
-        _robot_ptr->command.set(command, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot_ptr->command.position.set(command);
 
         return true;
 

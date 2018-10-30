@@ -87,16 +87,16 @@ protected:
   void _limit(mwoibn::robot_class::INTERFACE interface)
   {
 
-    for (int i = 0; i < _command.size(); i++)
+    for (int i = 0; i < _command.interface(interface).size(); i++)
     {
       if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
-      if (_lower_limits.state(interface)[i] == mwoibn::NON_EXISTING)
+      if (_lower_limits.interface(interface).get(i) == mwoibn::NON_EXISTING)
         continue;
-      if (_command.state(interface)[i] < _lower_limits.state(interface)[i]){
-        _command.set(_lower_limits.get(i,interface), i, interface);
+      if (_command.interface(interface).get(i) < _lower_limits.interface(interface).get(i)){
+          _command.interface(interface).set(_lower_limits.interface(interface).get(i), i);
       }
-      else if (_command.state(interface)[i] > _upper_limits.state(interface)[i]){
-        _command.set(_upper_limits.get(i, interface), i, interface);
+      else if (_command.interface(interface).get(i) > _upper_limits.interface(interface).get(i)){
+               _command.interface(interface).set(_upper_limits.interface(interface).get(i), i);
       }
     }
   }

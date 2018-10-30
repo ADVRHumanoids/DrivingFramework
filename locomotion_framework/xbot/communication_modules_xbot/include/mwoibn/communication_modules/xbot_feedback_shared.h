@@ -47,7 +47,7 @@ public:
       std::cout << "\tInitialized torque interface in "
                 << config["source"].as<std::string>() << "/torque\n";
     }
-    
+
 
     std::cout << "\tSuccess" << std::endl;
   }
@@ -57,11 +57,11 @@ public:
     _sub_position.get(_positions);
     if (_position && _positions[check] != mwoibn::IS_VALID)
       return false;
-    
+
     _sub_velocity.get(_velocities);
     if (_velocity && _velocities[check] != mwoibn::IS_VALID)
       return false;
-    
+
     _sub_torque.get(_torques);
     if (_torque && _torques[check] != mwoibn::IS_VALID)
       return false;
@@ -78,20 +78,17 @@ public:
     if (_position)
     {
        _sub_position.get(_positions);
-      _command.set(_positions, _map.reversed(),
-                   robot_class::INTERFACE::POSITION);
+      _command.position.set(_positions, _map.reversed());
     }
     if (_velocity)
     {
       _sub_velocity.get(_velocities);
-      _command.set(_velocities, _map.reversed(),
-                   robot_class::INTERFACE::VELOCITY);
+      _command.velocity.set(_velocities, _map.reversed());
     }
     if (_torque)
     {
       _sub_torque.get(_torques);
-      _command.set(_torques, _map.reversed(),
-                   robot_class::INTERFACE::TORQUE);
+      _command.torque.set(_torques, _map.reversed());
     }
 
     return true;
@@ -99,7 +96,7 @@ public:
 
 protected:
   mwoibn::VectorRT _positions, _velocities, _torques;
-  
+
   XBot::SharedObject<mwoibn::VectorRT> _sub_position;
   XBot::SharedObject<mwoibn::VectorRT> _sub_velocity;
   XBot::SharedObject<mwoibn::VectorRT> _sub_torque;

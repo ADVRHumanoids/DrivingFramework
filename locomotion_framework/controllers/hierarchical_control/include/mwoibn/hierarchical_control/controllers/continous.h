@@ -10,7 +10,7 @@ namespace controllers {
 
 class Continous : public Default {
 public:
-Continous(mwoibn::robot_class::Robot& robot, double mu = 10000000) : Default(), _robot(robot), _mu(mu), _joint_states(robot.state.get(mwoibn::robot_class::INTERFACE::POSITION)){
+Continous(mwoibn::robot_class::Robot& robot, double mu = 10000000) : Default(), _robot(robot), _mu(mu), _joint_states(robot.state.position.get()){
 
 								_previous_joint_states = mwoibn::VectorN::Zero(_robot.getDofs());
 								__n_by_n1 = mwoibn::Matrix::Identity(_robot.getDofs(), _robot.getDofs());

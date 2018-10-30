@@ -8,24 +8,24 @@ bool mwoibn::communication_modules::RosController::send()
   if (_position)
   {/*
     if(_filter){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _filtered);
+      mapTo(_command.position.get, _filtered);
       _position_filter_ptr->update(_filtered);
-      _command.set(_filtered, _map.reversed(), mwoibn::robot_class::INTERFACE::POSITION);
+      _command.position.set(_filtered, _map.reversed());
     }
     */
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::POSITION), _des_q.position);
+    mapTo(_command.position.get(), _des_q.position);
     //des_q.position = pub_qq;
   }
   if (_velocity)
   {
     /*
     if(_filter){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _filtered);
+      mapTo(_command.velocity.get, _filtered);
       _velocity_filter_ptr->update(_filtered);
-      _command.set(_filtered, _map.reversed(), mwoibn::robot_class::INTERFACE::VELOCITY);
+      _command.velocity.set(_filtered, _map.reversed());
     }
     */
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::VELOCITY), _des_q.velocity);
+    mapTo(_command.velocity.get(), _des_q.velocity);
     //des_q.velocity = pub_qq;
   }
 
@@ -33,12 +33,12 @@ bool mwoibn::communication_modules::RosController::send()
   {
     /*
     if(_filter){
-      mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _filtered);
+      mapTo(_command.torque.get, _filtered);
       _torque_filter_ptr->update(_filtered);
-      _command.set(_filtered, _map.reversed(), mwoibn::robot_class::INTERFACE::TORQUE);
+      _command.torque.set(_filtered, _map.reversed());
     }
     */
-    mapTo(_command.get(mwoibn::robot_class::INTERFACE::TORQUE), _des_q.effort);
+    mapTo(_command.torque.get(), _des_q.effort);
     //des_q.effort = pub_qq;
   }
 

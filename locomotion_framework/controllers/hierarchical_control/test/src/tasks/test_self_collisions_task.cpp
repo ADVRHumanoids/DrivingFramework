@@ -70,7 +70,7 @@ TEST(ControlerTaskTest, initializationBaseClass)
                           -0.2,  0.3,  0.5,  1.0, -0.7,  0.5, 0.5,
                            0;
 /*
-  robot.state.set(non_collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(non_collision_states);
   robot.update();
 
   task.updateError();
@@ -108,7 +108,7 @@ TEST(ControlerTaskTest, initializationBaseClass)
   Eigen::VectorXd e_2 = mwoibn::tests_common::readMatrix(&myfile, 52, 1);
 #endif
 
-  robot.state.set(collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(collision_states);
   robot.update();
 
   task.updateError();
@@ -130,7 +130,7 @@ TEST(ControlerTaskTest, initializationBaseClass)
   EXPECT_TRUE(mwoibn::tests_common::compareMatrices(task.getPreviousError(), e_1, 0.0001));
 #endif
 
-  robot.state.set(non_collision_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(non_collision_states);
   robot.update();
   task.update();
 

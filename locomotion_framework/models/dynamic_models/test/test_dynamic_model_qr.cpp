@@ -25,7 +25,7 @@ TEST( DISABLED_QRTest, testInitializationAndMethods){
                         0.9,  0.9,  0.9,  0.9,
                        -0.9, -0.9, -0.9, -0.9;
 
-  robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.state.position.set(joint_states);
   robot.update();
 
   for (int i = 0; i < robot.getContactsNumber(); i++)

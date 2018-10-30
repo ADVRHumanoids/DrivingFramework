@@ -47,6 +47,7 @@ void mgnss::state_estimation::Odometry::_initConfig(YAML::Node config){
 
 
 }
+
 void mgnss::state_estimation::Odometry::_checkConfig(YAML::Node config){
 
         if (!config["chain"])
@@ -86,7 +87,7 @@ void mgnss::state_estimation::Odometry::_allocate(std::vector<std::string> names
 
         mwoibn::Vector3 axis, pelvis;
         axis << 0, 0, 1; // for now assume flat ground
-        pelvis = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3);
+        pelvis = _robot.state.position.get().head(3);
         for (int i = 0; i < names.size(); i++)
         {
                 _axes.push_back(axis);
@@ -112,19 +113,19 @@ void mgnss::state_estimation::Odometry::init(){
 
         _filter_ptr->computeCoeffs(_robot.rate());
 
-        //std::cout << "raw" << _robot.state.get().head<6>().transpose() << std::endl;
+        //std::cout << "raw" << _robot.state.position.get().head<6>().transpose() << std::endl;
 
 //    _robot.feedbacks.reset();
 
-        //std::cout << "reset" << _robot.state.get().head<6>().transpose() << std::endl;
+        //std::cout << "reset" << _robot.state.position.get().head<6>().transpose() << std::endl;
 
         _robot.get();
 
-        //std::cout << "get" << _robot.state.get().head<6>().transpose() << std::endl;
+        //std::cout << "get" << _robot.state.position.get().head<6>().transpose() << std::endl;
 
         _robot.updateKinematics();
-        _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
-        _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+        _robot.state.position.get(_state, _ids);
+        _base_pos = _robot.state.position.get().head<3>();
 
         _filter_ptr->reset(_base_pos);
 
@@ -145,7 +146,7 @@ void mgnss::state_estimation::Odometry::init(){
 void mgnss::state_estimation::Odometry::update()
 {
         //Get wheels position
-        _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_state, _ids);
 
         // Compute a difference
         _error.noalias() = _state - _previous_state;
@@ -182,7 +183,7 @@ void mgnss::state_estimation::Odometry::update()
 
         // add imu reading
         _base.tail(3) =
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
+                _robot.state.position.get().segment<3>(3);
 
         // clear estimation based on a final result
         for(int i = 0; i < _wheels_ph.size(); i++)
@@ -199,8 +200,7 @@ void mgnss::state_estimation::Odometry::update()
         _base_filtered = _base;
         _base_filtered.head<3>() = _base_pos;
         //std::cout << _base << std::endl;
-        _robot.command.set(_base, {0, 1, 2, 3, 4, 5},
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_base, {0, 1, 2, 3, 4, 5});
 
         _previous_state.noalias() = _state;
         //_end = std::chrono::high_resolution_clock::now();

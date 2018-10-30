@@ -105,7 +105,7 @@ void mgnss::state_estimation::OdometryV2::_allocate(std::vector<std::string> nam
         // add a reference point on the pelvis to compute the
 
         axis << 0, 0, 1; // for now assume flat ground
-        pelvis = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head(3);
+        pelvis = _robot.state.position.get().head(3);
 
 
         for (int i = 0; i < names.size(); i++)
@@ -138,8 +138,8 @@ void mgnss::state_estimation::OdometryV2::init(){
         _robot.get();
 
         _robot.updateKinematics();
-        _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
-        _base_pos = _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).head<3>();
+        _robot.state.position.get(_state, _ids);
+        _base_pos = _robot.state.position.get().head<3>();
 
         _filter_ptr->reset(_base_pos);
 
@@ -160,7 +160,7 @@ void mgnss::state_estimation::OdometryV2::init(){
 void mgnss::state_estimation::OdometryV2::update()
 {
         //Get wheels position
-        _robot.state.get(_state, _ids, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.get(_state, _ids);
 
         // Compute a difference
         _error.noalias() = _state - _previous_state;
@@ -184,8 +184,7 @@ void mgnss::state_estimation::OdometryV2::update()
         mwoibn::Quaternion temp = _twist_es*_swing;
         _base.tail<3>() = temp.toMatrix().eulerAngles(0,1,2);
         // std::cout << "base" << _base.transpose() << std::endl;
-        _robot.command.set(_base, {0, 1, 2, 3, 4, 5},
-                           mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_base, {0, 1, 2, 3, 4, 5});
 
         _previous_state.noalias() = _state;
         //_end = std::chrono::high_resolution_clock::now();
@@ -196,9 +195,9 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
 
         // For now, retrive the quaternion from eulerAngles
 
-        _imu = mwoibn::Quaternion::fromAxisAngle(_x, _robot.state.get()[3]);
-        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_y, _robot.state.get()[4]);
-        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_z, _robot.state.get()[5]);
+        _imu = mwoibn::Quaternion::fromAxisAngle(_x, _robot.state.position.get()[3]);
+        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_y, _robot.state.position.get()[4]);
+        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_z, _robot.state.position.get()[5]);
 
         // std::cout << _imu << std::endl;
         // remove the rotation ground ground component
@@ -210,7 +209,7 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
 
         // set _robot.base with _swing only
         _base_ids << 3, 4, 5;
-        _robot.state.set(_euler, _base_ids, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.state.position.set(_euler, _base_ids);
         _robot.updateKinematics();   // this way the kinematics is updated twice, that is not good, this can be easily handled in the plugin
 
 }
@@ -218,7 +217,7 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
 void mgnss::state_estimation::OdometryV2::_filter(){
         // add imu reading
         _base.tail(3) =
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION).segment<3>(3);
+                _robot.state.position.get().segment<3>(3);
 
         // clear estimation based on a final result
         for(int i = 0; i < _wheels_ph.size(); i++)

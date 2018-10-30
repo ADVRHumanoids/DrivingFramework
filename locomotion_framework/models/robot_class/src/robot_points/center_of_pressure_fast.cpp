@@ -9,7 +9,7 @@ namespace robot_points
                const mwoibn::robot_class::State& state, mwoibn::robot_class::Contacts& contacts)
         : CenterOfPressure(model, state, contacts)
 {
-    _jacobian.setZero(3, _state.size());
+    _jacobian.setZero(3, _state.velocity.size());
 }
 
 void CenterOfPressureFast::computeJacobian()

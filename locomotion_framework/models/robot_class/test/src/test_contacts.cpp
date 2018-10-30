@@ -84,23 +84,23 @@ TEST(ContactsTest, methodsBaseClass)
     mwoibn::VectorN joint_states =
         Eigen::VectorXd::Random(robot.getDofs());
 
-    robot.state.set(joint_states, mwoibn::robot_points::INTERFACE::POSITION);
-    EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_points::INTERFACE::POSITION));
+    robot.state.position.set(joint_states);
+    EXPECT_EQ(joint_states, robot.state.position.get());
 
  //   robot.updateJointStates();
- //   EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_class::INTERFACE::POSITION));
+ //   EXPECT_EQ(joint_states, robot.state.position.get());
 
-    robot.state.set(joint_states, mwoibn::robot_class::INTERFACE::VELOCITY);
-    EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY));
+    robot.state.velocity.set(joint_states);
+    EXPECT_EQ(joint_states, robot.state.velocity.get());
 
  //   robot.updateJointVelocities();
- //   EXPECT_EQ(joint_states, robot.state.get(mwoibn::robot_class::INTERFACE::VELOCITY));
+ //   EXPECT_EQ(joint_states, robot.state.velocity.get());
 
     EXPECT_EQ(is_static, robot.isStatic());
 
     EXPECT_FALSE(robot.controllers.send());
 
-    robot.command.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+    robot.command.position.set(joint_states);
 
 }
 

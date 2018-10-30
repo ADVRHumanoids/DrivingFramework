@@ -30,14 +30,14 @@ void mgnss::controllers::WheelsController::compute()
 {
         _command.noalias() = _hierarchical_controller_ptr->update();
 
-        _robot.command.set(_command, _select_ik, mwoibn::robot_class::INTERFACE::VELOCITY);
+        _robot.command.velocity.set(_command, _select_ik);
 
 //        std::cout << "velocity " << _command.transpose() << std::endl;
         _command.noalias() = _command * _robot.rate();
         _command.noalias() +=
-                _robot.state.get(mwoibn::robot_class::INTERFACE::POSITION);
+                _robot.state.position.get();
 //        std::cout << "position " << _command.transpose() << std::endl;
-        _robot.command.set(_command, _select_ik, mwoibn::robot_class::INTERFACE::POSITION);
+        _robot.command.position.set(_command, _select_ik);
 
 }
 
@@ -97,8 +97,8 @@ void mgnss::controllers::WheelsController::_allocate(){
         _l_limits.setZero(_select_steer.size());
         _u_limits.setZero(_select_steer.size());
 
-        _robot.lower_limits.get(_l_limits, _select_steer);
-        _robot.upper_limits.get(_u_limits, _select_steer);
+        _robot.lower_limits.position.get(_l_limits, _select_steer);
+        _robot.upper_limits.position.get(_u_limits, _select_steer);
 
         _previous_command = mwoibn::VectorN::Zero(3);
         _command.setZero(_robot.getDofs());

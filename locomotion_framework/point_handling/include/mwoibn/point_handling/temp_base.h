@@ -55,7 +55,7 @@ public:
   unsigned int getBodyId() const { return _body_id; }
 
   virtual int size() const { return _size; }
-  virtual int dofs() const { return _state.size(); }
+  virtual int dofs() const { return _state.position.size(); }
 
   RigidBodyDynamics::Model& getModel() const{
     return _model;

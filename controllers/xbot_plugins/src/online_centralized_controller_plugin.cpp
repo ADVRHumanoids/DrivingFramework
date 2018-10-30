@@ -37,9 +37,7 @@ void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::control_loop(
 
         if (_robot_ref_ptr->get())
         {
-                _robot_ptr->command.set(
-                        _robot_ref_ptr->state.get(mwoibn::robot_class::INTERFACE::POSITION),
-                        mwoibn::robot_class::INTERFACE::POSITION);
+                _robot_ptr->command.position.set(_robot_ref_ptr->state.position.get());
         }
 
         _robot_ptr->updateKinematics();

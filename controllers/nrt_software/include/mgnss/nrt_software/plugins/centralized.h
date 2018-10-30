@@ -48,8 +48,7 @@ void start(double time)
 {
         robot().update();
         robot().wait();
-        robot().command.set(robot().state.get(),
-                            mwoibn::robot_class::INTERFACE::POSITION); //initialize with current position
+        robot().command.position.set(robot().state.position.get()); //initialize with current position
         mgnss::plugins::RosBase::start(time);
 }
 

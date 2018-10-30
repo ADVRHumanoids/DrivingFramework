@@ -138,6 +138,7 @@ virtual int jacobianSize() {
 mwoibn::VectorInt getChain() {return _chain;}
 
 const point_handling::Wrench& wrench() const {return _wrench;}
+point_handling::Wrench& wrench() {return _wrench;}
 
 const mwoibn::Vector3& getGroundNormal() const {return _ground_normal;}
 void setGroundNormal(const mwoibn::Vector3& ground_normal){_ground_normal = ground_normal;}
@@ -145,7 +146,7 @@ void setGroundNormal(const mwoibn::Vector3& ground_normal){_ground_normal = grou
 protected:
 
 virtual void _resize(){
-        _jacobian.setZero(_state_size, _state.size());
+        _jacobian.setZero(_state_size, _state.velocity.size());
 }
 
 bool _is_active;   //!< whether a contact is active or not?

@@ -40,7 +40,7 @@ TEST(ContactsTest, methodsContacts)
     standing_position[16] = 1.57;
 
     robot.controllers.controller(0).mapFromController(standing_position, joint_states);
-    robot.command.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+    robot.command.position.set(joint_states);
     robot.controllers.send();
     ros::Duration(2.0).sleep();
     ros::spinOnce();
@@ -52,7 +52,7 @@ TEST(ContactsTest, methodsContacts)
     robot.contacts().contact(1).getPointJacobian();
 
     robot.controllers.controller(0).mapFromController(raise_leg, joint_states);
-    robot.command.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+    robot.command.position.set(joint_states);
     robot.controllers.send();
 
     ros::Duration(2.0).sleep();
@@ -150,7 +150,7 @@ TEST( ContactsTest, testJacobian){
   standing_position[16] = 1.57;
 
   robot.controllers.controller(0).mapFromController(standing_position, joint_states);
-  robot.command.set(joint_states, mwoibn::robot_class::INTERFACE::POSITION);
+  robot.command.position.set(joint_states);
   robot.controllers.send();
   ros::Duration(2.0).sleep();
   ros::spinOnce();
@@ -208,7 +208,7 @@ TEST( ContactsTest, testJacobian){
   robot.contacts().contact(3).activate();
   EXPECT_EQ(4,robot.contacts().sizeActive());
 
-  RigidBodyDynamics::CalcContactJacobian(robot.getModel(), robot.state.get(mwoibn::robot_class::INTERFACE::POSITION), test_constraints, jacobian_rbdl, true);
+  RigidBodyDynamics::CalcContactJacobian(robot.getModel(), robot.state.position.get(), test_constraints, jacobian_rbdl, true);
 
   std::cerr << jacobian_rbdl << std::endl;
 
