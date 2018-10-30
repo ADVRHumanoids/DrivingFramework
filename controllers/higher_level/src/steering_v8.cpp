@@ -47,10 +47,34 @@ void mgnss::higher_level::Steering8::_merge(int i){
         _v[i] = _computeVelocity(i);
         _damp[i] = std::tanh(std::fabs(_v[i]*_v_icm[i]) /_treshhold/ _treshhold_icm);
 
+
+        double scale, check;
+        if(_v_sp[i] == 0 && _v_icm[i] == 0)
+          scale = 0;
+        else{
+//          check = std::fabs(_K_icm*_v_icm[i])/std::fabs(_K_sp*_v_sp[i]);
+//          scale = (check > 50 || std::fabs(_v_icm[i]) == 0) ? std::fabs(_v_icm[i]) : check/50;
+
+            scale = (std::fabs(_v_icm[i]) < 0.1) ? std::fabs(1000*_v_icm[i]) : 1;
+
+        }
+
         _b[i] = std::atan2(  _K_icm * _v_icm[i]  * std::sin(_b_icm[i]) +
-                             _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::sin(_b_sp[i]),
+                             _K_sp  * scale * _v_sp[i]   * std::sin(_b_sp[i]),
                              _K_icm * _v_icm[i]  * std::cos(_b_icm[i]) +
-                             _K_sp  * std::fabs(_v_icm[i]) * _v_sp[i]   * std::cos(_b_sp[i]));
+                             _K_sp  * scale * _v_sp[i]   * std::cos(_b_sp[i]));
+
+        // std::cout.precision(5);
+        // std::cout << std::fixed;
+        // std::cout << i << "\t" << _v_icm[i] << std::endl;
+
+        // std::cout << "Kicm\t" << _K_icm * _v_icm[i] << ", Ksp\t" << _K_sp * _v_sp[i]
+        //           << ", Ksp v_sp\t" << _K_sp * scale * _v_sp[i]
+        //           << ", scale\t" << scale
+        //           << ", K ratio\t" << std::fabs(_K_icm*_v_icm[i])/std::fabs(_K_sp*_v_sp[i])
+        //           << std::endl;
+
+
 
         _raw[i] = _b[i];
         _limited[i] = _b[i];
