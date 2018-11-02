@@ -58,6 +58,12 @@ public:
                                          _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
   } // NOT IMPLEMENTED
 
+  virtual void
+  getWorld(Point::Current& current, bool update = false) const {
+    current.head<3>() =  CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
+                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
+  } // NOT IMPLEMENTED
+
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& current,
                         bool update = false){}// NOT IMPLEMENTED
@@ -65,6 +71,10 @@ public:
   /** @brief get Position in a user-defined reference frame */
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false){}// NOT IMPLEMENTED
+
+  virtual void
+  getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {}// NOT IMPLEMENTED
+
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,

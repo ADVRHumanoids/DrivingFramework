@@ -129,7 +129,7 @@ virtual void compute();
 protected:
 mwoibn::Vector3 _offset_pos;
 
-mwoibn::Vector3 _ref_position;
+mwoibn::VectorN _ref_position;
 };
 
 } // namespace package

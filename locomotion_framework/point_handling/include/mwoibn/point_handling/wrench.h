@@ -19,27 +19,30 @@ public:
   Wrench(point_handling::FramePlus& frame, std::string name = "")
       : State(frame, 6, name), force(frame, name), torque(force, name)
   {
+    _temp.setZero(3);
   }
 
   Wrench(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
       : State(current, frame, name), force(frame, name), torque(force, name)
   {
+    _temp.setZero(3);
       synch();
       _size = 6;
   }
 
   Wrench(const Wrench&& other) : State(other),
-        force(other.force, frame), torque(other.torque, force)
+        force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
-  Wrench(const Wrench& other) : State(other), force(other.force, frame), torque(other.torque, force)
+  Wrench(const Wrench& other) : State(other), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
-  Wrench(const Wrench&& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force)
+  Wrench(const Wrench&& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
-  Wrench(const Wrench& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force)
+  Wrench(const Wrench& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
+
 
 
   virtual ~Wrench() {}
@@ -51,16 +54,23 @@ public:
   virtual Point::Current
   getWorld(bool update = false) const;
 
+  virtual void
+  getWorld(Point::Current& current, bool update = false) const;
+
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& linear,
                         bool update = false);
 
   virtual void setFixed(const Point::Current& current);
+  virtual void setFixed(const mwoibn::Vector6& current);
 
 
   /** @brief get Position in a user-defined reference frame */
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false);
+
+  virtual void
+  getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;
 
   virtual void setReference(const Point::Current& frame,
                             unsigned int reference_id,
@@ -68,7 +78,7 @@ public:
 
   Force force;
   Torque torque;
-
+  Point::Current _temp;
   void synch();
 
   protected:

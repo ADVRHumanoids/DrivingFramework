@@ -12,7 +12,7 @@ namespace point_handling
       CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), _J_full, update);
 
       _J.noalias() = _J_full.topRows<3>();
-
+      
       return _J;
     }
 
@@ -22,9 +22,17 @@ namespace point_handling
 
     CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), J_full, update);
     mwoibn::Matrix J = J_full.topRows<3>();
+
     return J;
   }
 
+  void AngularVelocity::getJacobian(mwoibn::Matrix& current, bool update) const{
+    current.setZero();
 
+    CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), current, update);
+
+    current.bottomRows<3>().setZero();
+
+  }
 } // namespace package
 } // namespace library

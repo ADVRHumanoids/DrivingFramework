@@ -31,6 +31,7 @@ ContactPoint2DRbdl(point_handling::PositionsHandler ik,
 {
         _init(_ik.size(), _ik.getFullJacobianCols());
 
+        _buildModel();
         _reference.setZero(_ik.size() * 2);
         _directions.setZero(_ik.size() * 2);
         _height.setZero(_ik.size());
@@ -60,6 +61,7 @@ virtual void updateState()
 {
         // update state
         ContactPointRbdl::updateState();
+        RigidBodyDynamics::UpdateKinematics(_flat_model, _state, _zero, _zero);
 
         for (int i = 0; i <  _ik.size(); i++)
         {
@@ -128,10 +130,43 @@ virtual int getFullTaskSize(){
 }
 
 protected:
+  RigidBodyDynamics::Model _flat_model;
+
 mwoibn::VectorN _height, _full_error, _directions;
 
 mwoibn::Matrix _rotation;
 mwoibn::Vector3 _point;
+
+
+  void _buildModel(){
+
+    _flat_model.gravity = mwoibn::Vector3(0., -9.81, 0.);
+    RigidBodyDynamics::Math::Matrix3d inertia =
+        RigidBodyDynamics::Math::Matrix3dZero;
+    RigidBodyDynamics::Math::Vector3d com =
+        RigidBodyDynamics::Math::Vector3dZero;
+
+    RigidBodyDynamics::Body body_a(0, com, inertia);
+    RigidBodyDynamics::Joint joint_a(
+        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 1., 0., 0.),
+        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 1., 0.),
+        RigidBodyDynamics::Math::SpatialVector(0., 0., 1., 0., 0., 0.));
+    _ids.push_back(_flat_model.AddBody(
+        0, RigidBodyDynamics::Math::Xtrans(
+               RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
+        joint_a, body_a));
+
+    RigidBodyDynamics::Body body_b(0, com, inertia);
+    RigidBodyDynamics::Joint joint_b(
+        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 0., 1.),
+        RigidBodyDynamics::Math::SpatialVector(0., 1., 0., 0., 0., 0.),
+        RigidBodyDynamics::Math::SpatialVector(1., 0., 0., 0., 0., 0.));
+    _ids.push_back(_flat_model.AddBody(
+        _ids.back(), RigidBodyDynamics::Math::Xtrans(
+                         RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
+        joint_b, body_b));
+  }
+
 };
 }
 } // namespace package

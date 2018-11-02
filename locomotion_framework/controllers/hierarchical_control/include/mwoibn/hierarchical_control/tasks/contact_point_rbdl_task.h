@@ -36,7 +36,7 @@ public:
     _wheels_ptr.reset(
           new mwoibn::point_handling::OrientationsHandler("ROOT", robot, robot.getLinks("wheels")));
 
-    _buildModel();
+
     _state.setZero(6);
     _zero.setZero(6);
   }
@@ -58,8 +58,6 @@ public:
     _state[2] = _temp_point[0];
     _state[4] = _temp_point[1];
     _state[5] = _temp_point[2];
-
-    RigidBodyDynamics::UpdateKinematics(_flat_model, _state, _zero, _zero);
 
   }
 
@@ -102,42 +100,12 @@ public:
   virtual const mwoibn::Vector3& getReferenceError(int i) = 0;
 
 protected:
-  RigidBodyDynamics::Model _flat_model;
   std::unique_ptr<mwoibn::point_handling::PositionsHandler> _pelvis_ptr;
   std::unique_ptr<mwoibn::point_handling::OrientationsHandler> _wheels_ptr;
 
   mwoibn::VectorN _zero;
   mwoibn::Vector3 _temp_point;
   std::vector<int> _ids;
-
-  void _buildModel(){
-
-    _flat_model.gravity = mwoibn::Vector3(0., -9.81, 0.);
-    RigidBodyDynamics::Math::Matrix3d inertia =
-        RigidBodyDynamics::Math::Matrix3dZero;
-    RigidBodyDynamics::Math::Vector3d com =
-        RigidBodyDynamics::Math::Vector3dZero;
-
-    RigidBodyDynamics::Body body_a(0, com, inertia);
-    RigidBodyDynamics::Joint joint_a(
-        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 1., 0., 0.),
-        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 1., 0.),
-        RigidBodyDynamics::Math::SpatialVector(0., 0., 1., 0., 0., 0.));
-    _ids.push_back(_flat_model.AddBody(
-        0, RigidBodyDynamics::Math::Xtrans(
-               RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
-        joint_a, body_a));
-
-    RigidBodyDynamics::Body body_b(0, com, inertia);
-    RigidBodyDynamics::Joint joint_b(
-        RigidBodyDynamics::Math::SpatialVector(0., 0., 0., 0., 0., 1.),
-        RigidBodyDynamics::Math::SpatialVector(0., 1., 0., 0., 0., 0.),
-        RigidBodyDynamics::Math::SpatialVector(1., 0., 0., 0., 0., 0.));
-    _ids.push_back(_flat_model.AddBody(
-        _ids.back(), RigidBodyDynamics::Math::Xtrans(
-                         RigidBodyDynamics::Math::Vector3d(0., 0., 0.)),
-        joint_b, body_b));
-  }
 };
 }
 } // namespace package

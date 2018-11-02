@@ -33,16 +33,22 @@ ContactRos(Contact& contact, std::string topic, std::string type) : Contact(cont
 */
 ContactRos(Contact&& contact, YAML::Node config) : Contact(std::move(contact))
 {
+        _f.setZero(6);
+        _p.setZero(3);
         _initCallbacks(config);
 }
 
 ContactRos(Contact* contact, YAML::Node config) : Contact(std::move(*contact))
 {
+        _f.setZero(6);
+        _p.setZero(3);
         _initCallbacks(config);
 }
 
 ContactRos(Contact& contact, YAML::Node config) : Contact(contact)
 {
+        _f.setZero(6);
+        _p.setZero(3);
         _initCallbacks(config);
 }
 
@@ -65,6 +71,7 @@ virtual ~ContactRos() {
 protected:
 ros::NodeHandle _node;
 bool _callback = false;
+mwoibn::VectorN _f, _p;
 
 std::unique_ptr<mwoibn::communication_modules::RosPointFeedback> _subsrciber;
 // (
@@ -77,15 +84,14 @@ std::unique_ptr<mwoibn::communication_modules::RosPointFeedback> _subsrciber;
 void _stateCallback(const gazebo_msgs::ContactsState::ConstPtr& msg)
 {
   if(msg->states.size() && msg->states[0].wrenches.size()){
-      mwoibn::Vector6 vc;
-      vc <<  msg->states[0].wrenches[0].torque.x, msg->states[0].wrenches[0].torque.y, msg->states[0].wrenches[0].torque.z, msg->states[0].wrenches[0].force.x, msg->states[0].wrenches[0].force.y, msg->states[0].wrenches[0].force.z;
-      Contact::_wrench.setFixed(vc);
+
+      _f <<  msg->states[0].wrenches[0].torque.x, msg->states[0].wrenches[0].torque.y, msg->states[0].wrenches[0].torque.z, msg->states[0].wrenches[0].force.x, msg->states[0].wrenches[0].force.y, msg->states[0].wrenches[0].force.z;
+      Contact::_wrench.setFixed(_f);
 
       // full with position
-      mwoibn::Vector3 pos;
 
-      pos << msg->states[0].contact_positions[0].x, msg->states[0].contact_positions[0].y, msg->states[0].contact_positions[0].z;
-      Contact::_frame.setLinearWorld(pos);
+      //_p << msg->states[0].contact_positions[0].x, msg->states[0].contact_positions[0].y, msg->states[0].contact_positions[0].z;
+      //Contact::_frame.setLinearWorld(_p);
   }
 
   if (!_callback) return;

@@ -49,26 +49,10 @@ public:
 
   virtual ~Velocity() {}
 
-  /** @brief get Position in a world frame */
-  virtual const Point::Current&
-  getWorld(bool update = false) = 0; // NOT IMPLEMENTED
-
-  virtual Point::Current
-  getWorld(bool update = false) const = 0; // NOT IMPLEMENTED
-  /** @brief set new tracked point giving data in a world frame*/
-  virtual void setWorld(const Point::Current& current,
-                        bool update = false) = 0;// NOT IMPLEMENTED
-
-  /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false) = 0;// NOT IMPLEMENTED
-
-  virtual void setReference(const Point::Current& current,
-                            unsigned int reference_id,
-                            bool update = false) = 0;// NOT IMPLEMENTED
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false) = 0;
   virtual mwoibn::Matrix getJacobian(bool update = false) const = 0;
+  virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const = 0;
 
 
 

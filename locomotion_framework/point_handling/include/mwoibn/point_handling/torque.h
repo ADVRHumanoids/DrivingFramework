@@ -63,6 +63,10 @@ public:
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false);
 
+  /** @brief get Position in a user-defined reference frame */
+  virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;
+
+
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
                             bool update = false);

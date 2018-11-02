@@ -37,7 +37,7 @@ void Frame::toFullState(mwoibn::Vector7& full_state,
   full_state[5] = quat.z();
   full_state[6] = quat.w();
 }
-void Frame::setFullStateWorld(const mwoibn::Vector7 state, bool update)
+void Frame::setFullStateWorld(const mwoibn::Vector7& state, bool update)
 {
   fromFullState(state, _pos, _quat);
   setLinearWorld(_pos, update);

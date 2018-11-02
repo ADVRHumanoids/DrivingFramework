@@ -36,6 +36,7 @@ ContactV2(mwoibn::point_handling::Point::Current position, Type body_id, RigidBo
           std::string name = "")
         : Contact(body_id, model, state, is_active, type, name)
 {
+          _state_size = 6;
         _resize();
         _frame.setLinearFixed(position);
         _frame.setOrientationFixed(orientation);
@@ -58,6 +59,7 @@ ContactV2(point_handling::Frame frame, RigidBodyDynamics::Model& model,
           std::string name = "")
         : Contact(frame.getBodyId(), model, state, is_active, type, name)
 {
+        _state_size = 6;
         _resize();
         _frame.setLinearFixed(_frame.getLinearFixed());
         _frame.setOrientationFixed(_frame.getOrientationFixed());
@@ -69,6 +71,7 @@ ContactV2(RigidBodyDynamics::Model& model,
           YAML::Node config)
         : Contact(model, state, config)
 {
+        _state_size = 6;
         _resize();
         _read(config);
 }
@@ -77,13 +80,15 @@ ContactV2(ContactV2&& other)
         : Contact(other), _directions(other._directions)
 {
         mwoibn::Matrix temp_directions = _directions;
+        //_state_size = 6;
         _resize();
         _directions = temp_directions;
 }
 
 ContactV2(ContactV2& other)
-        : Contact(other),          _directions(other._directions)
+        : Contact(other), _directions(other._directions)
 {
+        //_state_size = 6;
         mwoibn::Matrix temp_directions = _directions;
         _resize();
         _directions = temp_directions;
@@ -158,6 +163,8 @@ virtual void _resize(){
         _rotation.setZero(_state_size, _state_size);
         _transformation.setZero(_state_size, _state_size);
         _directions.setZero(_state_size, _state_size);
+        _point.setZero(_state_size);
+
 }
 
 void _initDirections(mwoibn::Matrix6 directions);

@@ -13,6 +13,12 @@ namespace point_handling
     return _temp_current;
   }
 
+  void
+  Wrench::getWorld(Point::Current& current, bool update) const{
+    torque.getWorld(current, false);
+    current.tail<3>() = current.head<3>();
+    force.getWorld(current,update);
+  }
 
   Point::Current
   Wrench::getWorld(bool update) const{
@@ -23,10 +29,24 @@ namespace point_handling
     return current;
   }
 
+  void Wrench::setFixed(const mwoibn::Vector6& current){
+
+      _temp.head<3>() = current.head<3>();
+      torque.setFixed(_temp);
+
+      _temp.head<3>() = current.tail<3>();
+      force.setFixed(_temp);
+
+      synch();
+    }
+
   void Wrench::setFixed(const Point::Current& current){
 
-    force.setFixed(current.tail<3>());
-    torque.setFixed(current.head<3>());
+    _temp.head<3>() = current.head<3>();
+    torque.setFixed(_temp);
+
+    _temp.head<3>() = current.tail<3>();
+    force.setFixed(_temp);
 
     synch();
   }
@@ -35,8 +55,12 @@ namespace point_handling
   /** @brief set new tracked point giving data in a world frame*/
   void Wrench::setWorld(const Point::Current& linear,
                         bool update){
-    force.setWorld(linear.tail<3>(), update);
-    torque.setWorld(linear.head<3>(), false);
+
+    _temp.head<3>() = linear.head<3>();
+    torque.setWorld(_temp, update);
+
+    _temp.head<3>() = linear.tail<3>();
+    force.setWorld(_temp, update);
 
     synch();
   }
@@ -48,6 +72,14 @@ namespace point_handling
         _get(_temp_current, force.getReference(refernce_id, update), torque.getReference(refernce_id, false));
 
         return _temp_current;
+  }
+
+  void
+  Wrench::getReference(Point::Current& current, unsigned int refernce_id, bool update) const{
+    torque.getReference(current, false);
+    current.tail<3>() = current.head<3>();
+    force.getReference(current,update);
+
   }
 
   void Wrench::setReference(const Point::Current& position,

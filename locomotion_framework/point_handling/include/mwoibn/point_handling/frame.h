@@ -63,12 +63,24 @@ public:
   virtual const Point::Current&
   getLinearWorld(bool update = false){return _frame.position.getWorld();}
 
+  virtual void
+  getLinearWorld(Point::Current& current, bool update = false) const {_frame.position.getWorld(current);}
+
+  virtual void
+  getLinearWorld(mwoibn::Vector3& current, bool update = false) const {_frame.position.getWorld(current);}
+
   virtual Point::Current
   getLinearWorld(bool update = false) const {return _frame.position.getWorld();}
 
 
   /** @brief set new tracked point giving data in a world frame*/
-  virtual void setLinearWorld(const Point::Current linear,
+  virtual void setLinearWorld(const Point::Current& linear,
+                        bool update = false){
+    _frame.position.setWorld(linear, update);
+  }
+
+  /** @brief set new tracked point giving data in a world frame*/
+  virtual void setLinearWorld(const mwoibn::Vector3& linear,
                         bool update = false){
     _frame.position.setWorld(linear, update);
   }
@@ -77,6 +89,11 @@ public:
   virtual const Point::Current&
   getLinearReference(unsigned int refernce_id, bool update = false){
     return _frame.position.getReference(refernce_id, update);
+  }
+
+  virtual void
+  getLinearReference(Point::Current& current, unsigned int refernce_id, bool update = false){
+    return _frame.position.getReference(current, refernce_id, update);
   }
 
   virtual void setLinearReference(const Point::Current position, unsigned int reference_id,
@@ -102,7 +119,7 @@ public:
   const mwoibn::Vector7&
   getFullStateWorld(bool update = false);
 
-  void setFullStateWorld(const mwoibn::Vector7 state, bool update);
+  void setFullStateWorld(const mwoibn::Vector7& state, bool update);
 
   static void toFullState(mwoibn::Vector7& full_state,
                           const Point::Current& linear,

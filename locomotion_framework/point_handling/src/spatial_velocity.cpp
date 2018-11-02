@@ -21,7 +21,12 @@ namespace point_handling
     return J;
   }
 
+  void SpatialVelocity::getJacobian(mwoibn::Matrix& current, bool update) const{
+    current.setZero();
 
+    CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), current, update);
+    
+  }
 
 } // namespace package
 } // namespace library

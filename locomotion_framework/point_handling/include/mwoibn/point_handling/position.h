@@ -56,6 +56,13 @@ public:
 
   virtual Point::Current
   getWorld(bool update = false) const;
+
+  virtual void
+  getWorld(Point::Current& current, bool update = false) const;
+
+  virtual void
+  getWorld(mwoibn::Vector3& current, bool update = false) const;
+
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& current,
                         bool update = false);
@@ -63,6 +70,9 @@ public:
   /** @brief get Position in a user-defined reference frame */
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false);
+
+  virtual void
+  getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,

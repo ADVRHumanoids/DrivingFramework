@@ -52,6 +52,9 @@ public:
   virtual Point::Current
   getWorld(bool update = false) const {} // NOT IMPLEMENTED
   /** @brief set new tracked point giving data in a world frame*/
+  virtual void getWorld(Point::Current& current, bool update = false) const {} // NOT IMPLEMENTED
+  /** @brief set new tracked point giving data in a world frame*/
+
   virtual void setWorld(const Point::Current& current,
                         bool update = false){}// NOT IMPLEMENTED
 
@@ -59,12 +62,15 @@ public:
   virtual const Point::Current&
   getReference(unsigned int refernce_id, bool update = false){}// NOT IMPLEMENTED
 
+  virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {}// NOT IMPLEMENTED
+
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
                             bool update = false){}// NOT IMPLEMENTED
 
-  const mwoibn::Matrix& getJacobian(bool update = false);
-  mwoibn::Matrix getJacobian(bool update = false) const;
+  virtual const mwoibn::Matrix& getJacobian(bool update = false);
+  virtual mwoibn::Matrix getJacobian(bool update = false) const;
+  virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const;
 
 protected:
   mwoibn::Matrix _J_full;

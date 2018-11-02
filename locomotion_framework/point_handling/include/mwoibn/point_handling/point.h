@@ -76,6 +76,9 @@ public:
         : Base(other, current.size(), name)
     {  }
 
+    virtual void getWorld(Point::Current& current, bool update = false) const = 0;
+
+    virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const = 0;
 
   using Base::getReference;
   using Base::setReference;

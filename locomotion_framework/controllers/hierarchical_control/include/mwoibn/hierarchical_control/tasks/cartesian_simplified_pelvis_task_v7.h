@@ -68,7 +68,7 @@ const mwoibn::Matrix& computeContactJacobian(int i){
         _contact_2 -= 0.5*norm*norm*_point*_ground_normal.transpose();
         _contact_3 = _contact_2*_contact_1;
 
-        _contact_k.noalias() = _wheels_ptr->point(i).getOrientationJacobian()*R*norm;
+        _contact_k.noalias() = _wheels_ptr->getPointJacobian(i)*R*norm;
         _contact_j.noalias() = _contact_3*_contact_k;
 
         return _contact_j;

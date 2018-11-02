@@ -592,7 +592,7 @@ public:
   //static bool computeChain( int reference, RigidBodyDynamics::Model& model, std::vector<std::unique_ptr<Frame>>& points, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty);
   //static bool computeChain( int reference, RigidBodyDynamics::Model& model, Point& points, mwoibn::VectorInt& ext_chain, mwoibn::VectorInt& ext_empty);
 
-  const Frame& point(int i) { return (*_points.at(i)); }
+  const Frame& point(int i) const { return (*_points.at(i)); }
   /** @brief returns selector for a given point_handler **/
   virtual const mwoibn::VectorInt& getChain() { return _chain; }
 

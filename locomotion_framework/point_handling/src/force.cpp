@@ -14,6 +14,11 @@ namespace point_handling
     return _temp_current;
   }
 
+  void Force::getWorld(Point::Current& current, bool update) const
+  {
+    current.head<3>() = frame.rotation().getWorld(update)*_current;
+
+  }
 
   void Force::setWorld( const Point::Current& linear,
                                bool update)
@@ -32,6 +37,13 @@ namespace point_handling
   {
     _temp_current =  frame.rotation().getReference(refernce_id, update)*_current;
     return _temp_current;
+  }
+
+
+  void Force::getReference(Point::Current& current, unsigned int refernce_id, bool update) const
+  {
+    current.head<3>() =  frame.rotation().getReference(refernce_id, update)*_current;
+    
   }
 
   void Force::setReference( const Point::Current& position,

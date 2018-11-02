@@ -34,6 +34,7 @@ void mwoibn::robot_points::WheelContactV2::_resize()
         _jacobian.setZero(_state_size, _state.velocity.size());
         _rotation.setZero(_state_size, _state_size);
         _transformation.setZero(_state_size, _state.velocity.size());
+        _point.setZero(_state_size);
 
         if (_directions.rows() == 6 && _directions.cols() == 6)
                 _directions = _directions.bottomRightCorner<3, 3>();
@@ -61,7 +62,7 @@ void mwoibn::robot_points::WheelContactV2::compute()
 
         _point.noalias() = _frame.getLinearWorld();
 
-        _point.noalias() += _offset_pos;
+        _point.head<3>() += _offset_pos;
 
         _frame.setLinearWorld(_point);
 

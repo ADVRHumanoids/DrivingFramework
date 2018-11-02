@@ -146,7 +146,7 @@ void mgnss::controllers::WheeledMotionEvent3::_setInitialConditions(){
 
         _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
 
-        _position = _pelvis_position_ptr->points().getPointStateWorld(0);
+        _pelvis_position_ptr->points().point(0).getLinearWorld(_position);
         _position.head<2>() = _robot.centerOfMass().get().head<2>();
         _pelvis_position_ptr->setReference(0, _position);
         _com_ptr->setReference(_position);
@@ -167,6 +167,7 @@ void mgnss::controllers::WheeledMotionEvent3::fullUpdate(const mwoibn::VectorN& 
 }
 void mgnss::controllers::WheeledMotionEvent3::compute()
 {
+
         mgnss::controllers::WheelsController::compute();
 //        _correct();
 
@@ -328,8 +329,8 @@ void mgnss::controllers::WheeledMotionEvent3::startLog(mwoibn::common::Logger& l
         logger.addField("v_com_y", _linear_vel[1]);
         logger.addField("v_th", _angular_vel[2]);
 */
-        logger.addField("com_x", getCom()[0]);
-        logger.addField("com_y", getCom()[1]);
+        logger.addField("com_x", getComFull()[0]);
+        logger.addField("com_y", getComFull()[1]);
 
         logger.addField("r_com_x", refCom()[0]);
         logger.addField("r_com_y", refCom()[1]);
@@ -472,8 +473,8 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
         logger.addEntry("v_com_y", _linear_vel[1]);
         logger.addEntry("v_th", _angular_vel[2]);
  */
-        logger.addEntry("com_x", getCom()[0]);
-        logger.addEntry("com_y", getCom()[1]);
+        logger.addEntry("com_x", getComFull()[0]);
+        logger.addEntry("com_y", getComFull()[1]);
 
         logger.addEntry("r_com_x", refCom()[0]);
         logger.addEntry("r_com_y", refCom()[1]);

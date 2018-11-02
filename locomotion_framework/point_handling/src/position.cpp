@@ -20,6 +20,16 @@ Position::getWorld(bool update) const{
                                              _current, update);
 }
 
+void Position::getWorld(Point::Current& current, bool update) const{
+  current.head<3>() = CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
+                                                _current, update);
+}
+
+void Position::getWorld(mwoibn::Vector3& current, bool update) const{
+  current.head<3>() = CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
+                                                _current, update);
+}
+
 void Position::setWorld(const Point::Current& position,
                              bool update)
 {
@@ -35,6 +45,17 @@ Position::getReference(unsigned int refernce_id, bool update)
                                 getWorld(), update);
   return _temp_current;
 }
+
+
+void
+Position::getReference(Point::Current& current, unsigned int refernce_id, bool update) const
+{
+  getWorld(current, update);
+
+  current.head<3>() =  CalcBaseToBodyCoordinates(_model, _state.position.get(), refernce_id,
+                                current, false);
+}
+
 
 void Position::setReference(const Point::Current& position,
                                  unsigned int reference_id,
