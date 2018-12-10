@@ -1,9 +1,10 @@
-#include "mgnss/nrt_software/plugins/odometry.h"
+#include "mgnss/plugins/ros_shared.h"
+#include <config.h>
 
 int main(int argc, char** argv)
 {
-
-        mgnss::nrt_software::plugins::Odometry controller(argc, argv);
+        mgnss::plugins::RosShared controller;
+        controller.connect(argc, argv, "shared");
 
         controller.init();
         controller.start(ros::Time::now().toSec());
@@ -13,6 +14,7 @@ int main(int argc, char** argv)
                 controller.control_loop(ros::Time::now().toSec());
         }
 
+        controller.stop();
         controller.close();
 
 }

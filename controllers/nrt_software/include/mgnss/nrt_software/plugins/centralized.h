@@ -14,10 +14,7 @@ class Centralized : public mgnss::plugins::RosBase
 {
 
 public:
-Centralized(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv){
-        _init(argc, argv);
-}
-
+Centralized() : mgnss::plugins::RosBase(){}
 virtual std::string _checkConfig(YAML::Node plugin_config, std::string config_file){
         std::string secondary_file =  RosBase::_checkConfig(plugin_config, config_file);
 
@@ -28,21 +25,23 @@ virtual std::string _checkConfig(YAML::Node plugin_config, std::string config_fi
         return secondary_file;
 }
 
-bool init()
-{
-        YAML::Node config, plugin_config;
 
-        std::string config_file = _loadConfig(config, plugin_config);
+void _initModule(YAML::Node config, YAML::Node plugin_config){
 
-        std::string secondary_file = _checkConfig(plugin_config, config_file);
+        _reference_ptr.reset(mwoibn::loaders::Robot::create(config,  plugin_config["reference"].as<std::string>(), _name).release());
 
-        _loadRobot(config_file, secondary_file, config, plugin_config);
-        _reference_ptr.reset(mwoibn::loaders::Robot::create(config,  plugin_config["reference"].as<std::string>()).release());
-
-        _initModule(config, plugin_config);
-
-        return true;
+        RosBase::_initModule(config, plugin_config);
 }
+
+
+void _initModule(YAML::Node config, YAML::Node plugin_config, mwoibn::communication_modules::Shared& share){
+
+  _reference_ptr.reset(mwoibn::loaders::Robot::create(config,  plugin_config["reference"].as<std::string>(), _name).release());
+
+  RosBase::_initModule(config, plugin_config, share);
+}
+
+
 
 void start(double time)
 {
@@ -56,7 +55,7 @@ mgnss::controllers::OnlineCentralizedController& get(){
         return static_cast<mgnss::controllers::OnlineCentralizedController&>(*_controller_ptr);
 }
 mwoibn::robot_class::Robot& robot(){
-        return *_robot_ptr;
+        return *_robot_ptr.begin()->second;
 } // ?? do I need it
 
 virtual ~Centralized(){
@@ -66,17 +65,14 @@ virtual ~Centralized(){
 protected:
 //ros::ServiceServer _srv_reset, _srv_switch;
 //ros::Subscriber _sub_rt;
-std::unique_ptr<mwoibn::robot_class::Robot> _reference_ptr;
+std::shared_ptr<mwoibn::robot_class::Robot> _reference_ptr;
 
-virtual std::string _setName(){
-        return "centralized";
-}
 
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::OnlineCentralizedController(*_robot_ptr, *_reference_ptr, config));
+        _controller_ptr.reset(new mgnss::controllers::OnlineCentralizedController(*_robot_ptr.begin()->second, *_reference_ptr, config));
 }
 
-virtual void _initCallbacks(){
+virtual void _initCallbacks(YAML::Node config){
 /*        _sub_rt = n.subscribe<custom_messages::CustomCmnd>(
                 "CoM_regulator/contacts", 1,
                 boost::bind(&getContacts, _1, &_robot, &_robot));

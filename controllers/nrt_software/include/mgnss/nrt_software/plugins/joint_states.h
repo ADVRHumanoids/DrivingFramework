@@ -10,42 +10,37 @@ namespace mgnss
 namespace nrt_software {
 namespace plugins
 {
+
 class JointStates : public mgnss::plugins::RosBase
 {
 
 public:
-JointStates(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv){
-        _init(argc, argv);
-}
+// JointStates(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv, "joint_states"){}
+JointStates() : mgnss::plugins::RosBase(){}
 
-virtual ~JointStates(){
-}
+virtual ~JointStates(){}
 
 protected:
-virtual std::string _setName(){
-        return "joint_states";
-}
+
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::JointStates(*_robot_ptr));
+        _controller_ptr.reset(new mgnss::controllers::JointStates(*_robot_ptr.begin()->second));
 }
 
-virtual void _initCallbacks(){
-        _srv_rt =
-                _n->advertiseService<custom_services::jointStateCmnd::Request,
+virtual void _initCallbacks(YAML::Node config){
+        _srv.push_back(_n->advertiseService<custom_services::jointStateCmnd::Request,
                                      custom_services::jointStateCmnd::Response>(
                         "trajectory",
                         boost::bind(&mgnss::ros_callbacks::joint_states::referenceHandler,
-                                    _1, _2, static_cast<mgnss::controllers::JointStates*>(_controller_ptr.get())));
+                                    _1, _2, static_cast<mgnss::controllers::JointStates*>(_controller_ptr.get()))));
 
 }
 
-//virtual void _init(int argc, char** argv);
-
-ros::ServiceServer _srv_rt;
-//double _start;
 
 };
+
+
 }
 }
 }
+
 #endif // RT_MY_TEST_H

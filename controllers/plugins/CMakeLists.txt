@@ -86,6 +86,7 @@ catkin_package(
 add_library(BasePlugin SHARED
     src/xbot_base.cpp
     src/ros_base.cpp
+    src/ros_shared.cpp
 )
 
 if ( Xenomai_FOUND )
@@ -97,6 +98,15 @@ target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_L
 add_dependencies(BasePlugin ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 
 LIST( APPEND INSTALL_TARGETS BasePlugin )
+
+LIST( APPEND INSTALL_TARGETS
+  plugin
+)
+add_executable(plugin src/ros.cpp)
+add_dependencies(plugin ${catkin_EXPORTED_TARGETS})
+target_link_libraries(plugin
+    ${catkin_LIBRARIES}
+ )
 
 #################################################
 #################### INSTALL ####################

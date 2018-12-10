@@ -4,12 +4,16 @@
 #include "mgnss/plugins/ros_base.h"
 
 #include "mgnss/controllers/wheels_controller_extend.h"
-//#include "mgnss/controllers/wheeled_motion_event.h"
+
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
+#include "mgnss/controllers/wheels_zmp.h"
+
 #include "mgnss/controllers/wheels_reactif.h"
 #include "mgnss/controllers/wheeled_motion_world.h"
-#include "mgnss/controllers/wheeled_motion_actions.h"
+//#include "mgnss/controllers/wheeled_motion_actions.h"
 #include "mgnss/controllers/wheeled_motion_merge_v1.h"
+
+#include "mgnss/ros_callbacks/wheels_zmp.h"
 
 #include "mgnss/ros_callbacks/wheels_controller_extend.h"
 #include "mgnss/ros_callbacks/wheels_controller_events.h"
@@ -25,175 +29,119 @@ class WheelsControllerExtend : public mgnss::plugins::RosBase
 {
 
 public:
-WheelsControllerExtend(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv){
-        _init(argc, argv);
+// WheelsControllerExtend(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv, "wheeled_motion"){
+// }
+WheelsControllerExtend(std::string name = "") : mgnss::plugins::RosBase(){
 }
 
 bool init(){
         mgnss::plugins::RosBase::init();
-        _support.noalias() = get().getSupportReference();
-}
-
-void start(double time)
-{
-        mgnss::plugins::RosBase::start(time);
-        if (_valid)
-                _support.noalias() = get().getSupportReference();
 }
 
 mgnss::controllers::WheelsControllerExtend& get(){
         return static_cast<mgnss::controllers::WheelsControllerExtend&>(*_controller_ptr);
 }
 mwoibn::robot_class::Robot& robot(){
-        return *_robot_ptr;
+        return *_robot_ptr.begin()->second;
 }
 
 virtual ~WheelsControllerExtend(){
 }
 
-
 protected:
-ros::ServiceServer _srv_rt;
-ros::Subscriber _sub_rt;
-mwoibn::VectorN _support;
-virtual std::string _setName(){
-        return "wheeled_motion";
-}
+    virtual void _initCallbacks(YAML::Node config){
+        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
+                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 
-//  virtual void _resetPrt(YAML::Node config){
-//    _controller_ptr.reset(new mgnss::controllers::WheelsControllerExtend(*_robot_ptr, config));
-//  }
-
-virtual void _initCallbacks(){
-        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::eventsHandler,
-                                                                                                               _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-
+        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 }
 
 };
-/*
-class WheeledMotionEvent : public WheelsControllerExtend
-{
-public:
-WheeledMotionEvent(int argc, char** argv) : WheelsControllerExtend(argc, argv){
-}
-virtual ~WheeledMotionEvent(){
-}
 
-protected:
-virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent(*_robot_ptr, config));
-}
-virtual void _initCallbacks(){
-        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::eventsHandler,
-                                                                                                               _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-
-        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-        //
-        // _state_rt = _n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-}
-ros::Subscriber _state_rt;
-
-};
-*/
 class WheeledMotionEvent3 : public WheelsControllerExtend {
 public:
-WheeledMotionEvent3(int argc, char** argv) : WheelsControllerExtend(argc, argv){
-}
+// WheeledMotionEvent3(int argc, char** argv) : WheelsControllerExtend(argc, argv){
+// }
+WheeledMotionEvent3() : WheelsControllerExtend(){}
 virtual ~WheeledMotionEvent3(){
 }
 
 protected:
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent3(*_robot_ptr, config));
+        _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent3(*_robot_ptr.begin()->second, config));
 }
 
-virtual void _initCallbacks(){
-        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_events::eventsHandler,
-                                                                                                               _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+virtual void _initCallbacks(YAML::Node config){
+        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
+                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_events::eventsHandler,  _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 
-        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 
-        _state_rt = _n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+        _sub.push_back(_n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 
 }
-ros::Subscriber _state_rt;
 
 };
 
 class WheelsReactif : public WheeledMotionEvent3 {
 public:
-WheelsReactif(int argc, char** argv) : WheeledMotionEvent3(argc, argv){
-}
+
+WheelsReactif() : WheeledMotionEvent3(){}
 virtual ~WheelsReactif(){
 }
 
 protected:
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheelsReactif(*_robot_ptr, config));
+        _controller_ptr.reset(new mgnss::controllers::WheelsReactif(*_robot_ptr.begin()->second, config));
 }
 
 };
 
 class WheeledMotionWorld : public WheelsControllerExtend {
 public:
-WheeledMotionWorld(int argc, char** argv) : WheelsControllerExtend(argc, argv){
-}
+WheeledMotionWorld() : WheelsControllerExtend(){}
 virtual ~WheeledMotionWorld(){
 }
 
 protected:
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionWorld(*_robot_ptr, config));
+        _controller_ptr.reset(new mgnss::controllers::WheeledMotionWorld(*_robot_ptr.begin()->second, config));
 }
 };
 
-
-class WheeledMotionActions : public WheelsControllerExtend {
+class WheelsZMP : public WheelsControllerExtend {
 public:
-WheeledMotionActions(int argc, char** argv) : WheelsControllerExtend(argc, argv){
 
-}
-virtual ~WheeledMotionActions(){
-}
+  WheelsZMP() : WheelsControllerExtend(){}
+  virtual ~WheelsZMP(){
+  }
 
 protected:
-virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionActions(*_robot_ptr, config));
-}
-virtual void _initCallbacks(){
-        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_actions::eventsHandler,
-                                                                                                               _1, _2, static_cast<mgnss::controllers::WheeledMotionActions*>(_controller_ptr.get())));
-        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
-}
+  virtual void _resetPrt(YAML::Node config){
+          _controller_ptr.reset(new mgnss::controllers::WheelsZMP(*_robot_ptr.begin()->second, config));
+  }
 };
 
-class WheeledMotionMergeV1 : public WheeledMotionActions {
+
+class WheeledMotionMergeV1 : public WheeledMotionEvent3 {
 public:
-WheeledMotionMergeV1(int argc, char** argv) : WheeledMotionActions(argc, argv){
-}
+
+WheeledMotionMergeV1() : WheeledMotionEvent3(){}
 virtual ~WheeledMotionMergeV1(){
 }
 
 protected:
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionMergeV1(*_robot_ptr, config));
+        _controller_ptr.reset(new mgnss::controllers::WheeledMotionMergeV1(*_robot_ptr.begin()->second, config));
 }
-virtual void _initCallbacks(){
-        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_merge::eventsHandler,
-                                                                                                               _1, _2, static_cast<mgnss::controllers::WheeledMotionMergeV1*>(_controller_ptr.get())));
-        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+virtual void _initCallbacks(YAML::Node config){
+        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
+                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_merge::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheeledMotionMergeV1*>(_controller_ptr.get()))));
 
-        _state_rt = _n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+
+        _sub.push_back(_n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
 }
-
-ros::Subscriber _state_rt;
 
 };
 

@@ -10,13 +10,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(VISUALZATION_TOOLS ON)
 option(COLLISION_CHECK OFF)
 option(TRAJECTORY_GENERATION OFF)
-option(CENTRALIZED_CONTROLLER ON)
 option(CENTER_OF_MASS_CONTROLLER ON)
-option(WHEELS_MOTION ON)
-option(JOINT_STATES ON)
 option(GRAVITY_TEST ON)
-option(ODOMETRY ON)
-option(GROUND_FORCES ON)
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -34,6 +30,11 @@ set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
+
+LIST( APPEND CATKIN_DEPENDS_SET
+  controllers
+  state_estimation
+)
 
 if(VISUALIZATION_TOOLS)
 	add_definitions(-DVISUALIZATION_TOOLS)
@@ -71,21 +72,6 @@ LIST( APPEND CATKIN_DEPENDS_SET
 
 endif(TRAJECTORY_GENERATION)
 
-if(CENTRALIZED_CONTROLLER)
-  LIST( APPEND INSTALL_TARGETS
-    centralized
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    roscpp
-    robot_class_ros_extension
-    robot_class_xbot
-    controllers
-    gravity_compensation
-    motor_side_reference
-    std_srvs
- )
-endif(CENTRALIZED_CONTROLLER)
-
 if(CENTER_OF_MASS_CONTROLLER)
 
 LIST( APPEND INSTALL_TARGETS
@@ -103,6 +89,10 @@ LIST( APPEND CATKIN_DEPENDS_SET
 
 endif(CENTER_OF_MASS_CONTROLLER)
 
+LIST( APPEND INSTALL_TARGETS
+  shared
+)
+
 if(GRAVITY_TEST)
 
 LIST( APPEND INSTALL_TARGETS
@@ -117,73 +107,6 @@ LIST( APPEND CATKIN_DEPENDS_SET
 )
 
 endif(GRAVITY_TEST)
-
-
-if(WHEELS_MOTION)
-
-  LIST( APPEND INSTALL_TARGETS
-    wheels_world
-    wheels_3
-    wheels_reactif
-    wheels_merge
-    wheels_actions
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    roscpp
-    robot_class_ros_extension
-    robot_class_xbot
-    hierarchical_control
-    custom_services
-    custom_messages
-    controllers
-    communication
-
-  )
-
-endif(WHEELS_MOTION)
-
-if(JOINT_STATES)
-
-  LIST( APPEND INSTALL_TARGETS
-    joint_states
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    roscpp
-    robot_class_xbot
-    robot_class_ros_extension
-    hierarchical_control
-    custom_services
-#    reference_generation
-  )
-
-endif(JOINT_STATES)
-
-if(ODOMETRY)
-  LIST( APPEND INSTALL_TARGETS
-    odometry
-    odometry2
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    roscpp
-    robot_class_xbot
-    robot_class_ros_extension
-    state_estimation
-  )
-
-endif(ODOMETRY)
-
-if(GROUND_FORCES)
-  LIST( APPEND INSTALL_TARGETS
-    ground_forces
-  )
-  LIST( APPEND CATKIN_DEPENDS_SET
-    roscpp
-    robot_class_xbot
-    robot_class_ros_extension
-    state_estimation
-  )
-
-endif(GROUND_FORCES)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -206,13 +129,8 @@ if(COLLISION_CHECK)
 
 endif(COLLISION_CHECK)
 
-LIST( APPEND INSTALL_TARGETS
-  acceleration_test
-)
-
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
-  LIBRARIES nrt_plugins
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -225,18 +143,116 @@ include_directories(
 #  ${XBotCore-interfaces_INCLUDE_DIRS}
 )
 
-add_library(nrt_plugins
+LIST( APPEND INSTALL_TARGETS joint_states )
+
+add_library(joint_states SHARED
    src/plugins/joint_states.cpp
-#	 src/plugins/centralized.cpp
-#   src/plugins/odometry.cpp
  )
-
-add_dependencies(nrt_plugins ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(nrt_plugins
+add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joint_states
    ${catkin_LIBRARIES}
  )
 
+ LIST( APPEND INSTALL_TARGETS centralized )
+
+ add_library(centralized SHARED
+    src/plugins/centralized.cpp
+  )
+ add_dependencies(centralized ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(centralized
+    ${catkin_LIBRARIES}
+  )
+
+ LIST( APPEND INSTALL_TARGETS odometry )
+
+ add_library(odometry SHARED
+    src/plugins/odometry_2.cpp
+  )
+ add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(odometry
+    ${catkin_LIBRARIES}
+  )
+
+
+  LIST( APPEND INSTALL_TARGETS NwheelsWorld )
+
+  add_library(NwheelsWorld SHARED
+     src/plugins/wheels_world.cpp
+   )
+  add_dependencies(NwheelsWorld ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(NwheelsWorld
+     ${catkin_LIBRARIES}
+   )
+
+  LIST( APPEND INSTALL_TARGETS Nwheels3 )
+
+  add_library(Nwheels3 SHARED
+     src/plugins/wheels_3.cpp
+   )
+  add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(Nwheels3
+     ${catkin_LIBRARIES}
+   )
+
+   LIST( APPEND INSTALL_TARGETS NwheelsReactif )
+
+   add_library(NwheelsReactif SHARED
+      src/plugins/wheels_reactif.cpp
+    )
+   add_dependencies(NwheelsReactif ${catkin_EXPORTED_TARGETS})
+   target_link_libraries(NwheelsReactif
+      ${catkin_LIBRARIES}
+    )
+
+    LIST( APPEND INSTALL_TARGETS NwheelsMerge )
+
+    add_library(NwheelsMerge SHARED
+       src/plugins/wheels_merge.cpp
+     )
+    add_dependencies(NwheelsMerge ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(NwheelsMerge
+       ${catkin_LIBRARIES}
+     )
+
+    LIST( APPEND INSTALL_TARGETS NwheelsZMP )
+
+    add_library(NwheelsZMP SHARED
+       src/plugins/wheels_zmp.cpp
+     )
+    add_dependencies(NwheelsZMP ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(NwheelsZMP
+       ${catkin_LIBRARIES}
+     )
+
+   LIST( APPEND INSTALL_TARGETS ground_forces )
+
+   add_library(ground_forces SHARED
+      src/plugins/ground_forces.cpp
+    )
+   add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
+   target_link_libraries(ground_forces
+      ${catkin_LIBRARIES}
+    )
+
+    LIST( APPEND INSTALL_TARGETS gravity_compensation )
+
+    add_library(gravity_compensation SHARED
+       src/plugins/gravity_compensation.cpp
+     )
+    add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(gravity_compensation
+       ${catkin_LIBRARIES}
+     )
+
+    LIST( APPEND INSTALL_TARGETS acceleration )
+
+    add_library(acceleration SHARED
+       src/plugins/acceleration_test.cpp
+     )
+    add_dependencies(acceleration ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(acceleration
+       ${catkin_LIBRARIES}
+     )
 
 if(COLLISION_CHECK)
 add_executable(collision_check src/collision_check.cpp)
@@ -257,12 +273,6 @@ endif(TRAJECTORY_GENERATION)
 
 if(CENTER_OF_MASS_CONTROLLER)
 
-#add_executable(hierarchical_controller_with_events src/hierarchical_controller_with_events.cpp)
-#add_dependencies(hierarchical_controller_with_events ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(hierarchical_controller_with_events
-#    ${catkin_LIBRARIES}
-# )
-
 add_executable(com_test src/com_test.cpp)
 add_dependencies(com_test ${catkin_EXPORTED_TARGETS})
 target_link_libraries(com_test
@@ -280,100 +290,12 @@ target_link_libraries(gravity_test
  )
 endif(GRAVITY_TEST)
 
-if(CENTRALIZED_CONTROLLER)
 
-add_executable(centralized src/exec/centralized.cpp)
-add_dependencies(centralized nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(centralized nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
-endif(CENTRALIZED_CONTROLLER)
-
-
-if(WHEELS_MOTION)
-
-add_executable(wheels_3 src/exec/wheels_3.cpp)
-add_dependencies(wheels_3 nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_3
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
- add_executable(wheels_reactif src/exec/wheels_reactif.cpp)
- add_dependencies(wheels_reactif nrt_plugins ${catkin_EXPORTED_TARGETS})
- target_link_libraries(wheels_reactif
-     nrt_plugins
+ add_executable(shared src/exec/shared.cpp)
+ add_dependencies(shared ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(shared
      ${catkin_LIBRARIES}
   )
-
-add_executable(wheels_world src/exec/wheels_world.cpp)
-add_dependencies(wheels_world nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(wheels_world
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
- add_executable(wheels_merge src/exec/wheels_merge_1.cpp)
- add_dependencies(wheels_merge nrt_plugins ${catkin_EXPORTED_TARGETS})
- target_link_libraries(wheels_merge
-     nrt_plugins
-     ${catkin_LIBRARIES}
-  )
-
-
-  add_executable(wheels_actions src/exec/wheels_actions.cpp)
-  add_dependencies(wheels_actions nrt_plugins ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(wheels_actions
-       nrt_plugins
-       ${catkin_LIBRARIES}
-  )
-endif(WHEELS_MOTION)#############
-
-if(ODOMETRY)
-add_executable(odometry src/exec/odometry.cpp)
-add_dependencies(odometry nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(odometry
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
- add_executable(odometry2 src/exec/odometry_2.cpp)
- add_dependencies(odometry2 nrt_plugins ${catkin_EXPORTED_TARGETS})
- target_link_libraries(odometry2
-     nrt_plugins
-     ${catkin_LIBRARIES}
-  )
-endif(ODOMETRY)
-
-if(GROUND_FORCES)
-add_executable(ground_forces src/exec/ground_forces.cpp)
-add_dependencies(ground_forces nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ground_forces
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
-endif(GROUND_FORCES)
-
-
-if(JOINT_STATES)
-
-add_executable(joint_states src/exec/joint_states.cpp)
-add_dependencies(joint_states nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(joint_states nrt_plugins
-    ${catkin_LIBRARIES}
- )
-endif(JOINT_STATES)
-
-add_executable(acceleration_test src/exec/acceleration_test.cpp)
-add_dependencies(acceleration_test nrt_plugins ${catkin_EXPORTED_TARGETS})
-target_link_libraries(acceleration_test
-    nrt_plugins
-    ${catkin_LIBRARIES}
- )
-
-
 #add_executable(contact_test src/contact_test.cpp)
 #add_dependencies(contact_test ${catkin_EXPORTED_TARGETS})
 #target_link_libraries(contact_test
