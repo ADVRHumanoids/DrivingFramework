@@ -86,6 +86,17 @@ public:
 
    void remove(std::string name) { remove(getId(name)); }
 
+   bool has(std::string name){
+     auto name_ptr =
+         std::find_if(_names.begin(), _names.end(), [&name](std::string names)
+                      {
+                        return names == name;
+                      });
+     if (name_ptr == _names.end())
+        return false;
+     else
+        return true;
+   }
 
 protected:
    std::vector<std::unique_ptr<mwoibn::communication_modules::BasicFeedback>>

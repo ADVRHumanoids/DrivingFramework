@@ -84,6 +84,10 @@ public:
      return;
    }
 
+   mwoibn::communication_modules::BasicController& operator[](std::string name) {
+           return *_controllers.at(getId(name));
+   }
+
 
 protected:
   std::vector<std::unique_ptr<mwoibn::communication_modules::BasicController>>

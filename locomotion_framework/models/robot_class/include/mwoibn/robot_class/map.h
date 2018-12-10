@@ -23,6 +23,16 @@ class Map
 public:
   Map(std::string name, VectorInt map) : _name(name), _map(map) {}
 
+  Map(const Map& other) : _name(other._name), _map(other._map) {}
+  Map( Map&& other) : _name(other._name), _map(other._map) {}
+
+  Map& operator=(const Map& other) {
+
+    _name = other._name;
+    _map = other._map;
+
+
+    return *this;}
   //    int max = 0;
 
   //    for(int i = 0; i < _map.size(); i++){
@@ -90,6 +100,17 @@ public:
       _reversed[_map[i]] = i;
     }
   }
+
+  BiMap( BiMap&& other) : Map(other), _names(other._names), _reversed(other._reversed) {}
+  BiMap(const BiMap& other) : Map(other), _names(other._names), _reversed(other._reversed) {}
+  BiMap& operator=(const BiMap& other) {
+    //if (&other == this) { return *this; } // prevent assigning to self
+    Map::operator=(other);
+
+    _names = other._names;
+    _reversed = other._reversed;
+
+    return *this;}
 
   virtual ~BiMap() {}
 
@@ -223,6 +244,17 @@ public:
     }
   }
 
+
+    SelectorMap( SelectorMap&& other) : Map(other), _active(other._active), _bool(other._bool) {}
+    SelectorMap(const SelectorMap& other) : Map(other), _active(other._active), _bool(other._bool) {}
+    SelectorMap& operator=(const SelectorMap& other) {
+      Map::operator=(other);
+
+      _bool = other._bool;
+      _active = other._active;
+
+      return *this;}
+
   virtual ~SelectorMap() {}
 
   const mwoibn::VectorInt& which() const { return _active; }
@@ -238,6 +270,17 @@ class MapState
 {
 public:
   MapState(std::string name, VectorN map) : _name(name), _map(map) {}
+
+
+ MapState( MapState&& other) : _name(other._name), _map(other._map) {}
+ MapState(const MapState& other) : _name(other._name), _map(other._map) {}
+ MapState& operator=(const MapState& other) {
+       _name = other._name;
+       _map = other._map;
+
+       return *this;
+     }
+
 
   virtual ~MapState() {}
 

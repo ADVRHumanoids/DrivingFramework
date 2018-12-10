@@ -1,5 +1,5 @@
-#ifndef ROBOT_CLASS_CONTACTS_H
-#define ROBOT_CLASS_CONTACTS_H
+#ifndef __MWOIBN__ROBOT_CLASS__CONTACTS_H
+#define __MWOIBN__ROBOT_CLASS__CONTACTS_H
 
 #include "mwoibn/robot_points/contact.h"
 #include <rbdl/rbdl.h>
@@ -34,6 +34,7 @@ virtual void add(std::unique_ptr<robot_points::Contact> contact)
 virtual void resize(){
         _jacobian = mwoibn::Matrix::Zero(jacobianRows(), _dofs);
         _positions = mwoibn::VectorN::Zero(_contacts.size() * 7);
+        _forces = mwoibn::VectorN::Zero(jacobianRows());
 }   // NRT
 
 /**
@@ -133,12 +134,14 @@ std::vector<mwoibn::Matrix> getMinimumJacobians();   // NRT
  * frame
  */
 const mwoibn::VectorN& getPosition();   // NRT - to RT
+const mwoibn::VectorN& getReactionForce();   // NRT - to RT
 
 /**
  * @brief Returns vector of current positions of all contact point in a world
  * frame
  */
 std::vector<mwoibn::VectorN> getPositions();   // NRT - to RT
+std::vector<mwoibn::VectorN> getReactionForces();
 mwoibn::VectorBool getTypes(std::vector<CONTACT_TYPE> types);   // NRT
 
 const mwoibn::VectorBool& getDofs();   // RT
@@ -155,16 +158,29 @@ int jacobianCols() const {
         return _dofs;
 }
 
+void update(bool jacobian = true){
+  for ( auto& contact: _contacts) contact->update(jacobian);
+}
+
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::iterator begin(){return _contacts.begin();}
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::iterator end(){return _contacts.end();}
 
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::const_iterator begin() const {return _contacts.begin();}
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact>>::const_iterator end() const {return _contacts.end();}
 
+virtual const mwoibn::robot_points::Contact& operator[] (int i) const {
+        return *_contacts[i];
+}
+
+virtual mwoibn::robot_points::Contact& operator[](int i) {
+        return *_contacts[i];
+}
+
+
 protected:
 std::vector<std::unique_ptr<mwoibn::robot_points::Contact> > _contacts;
 mwoibn::Matrix _jacobian;
-mwoibn::VectorN _positions;
+mwoibn::VectorN _positions, _forces;
 unsigned int _dofs;
 mwoibn::VectorBool _boolean_checks;
 
