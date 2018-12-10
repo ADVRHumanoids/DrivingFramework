@@ -60,7 +60,7 @@ Frame::getFullStateReference(std::string reference_name, bool update)
   unsigned int body_id;
   try
   {
-    body_id = _checkBody(reference_name);
+    body_id = mwoibn::rbdl_utils::checkBody(reference_name, _model);
   }
   catch (const std::invalid_argument& e)
   {

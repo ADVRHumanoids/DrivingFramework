@@ -119,9 +119,9 @@ public:
     return _points.at(id)->getOrientationWorld(update);
   }
 
-  virtual const State&
+  virtual State
   getPointStateReference(unsigned int id,
-                         bool update = false)
+                         bool update = false) const
   {
     return _points.at(id)
         ->getOrientationReference(_reference, update);

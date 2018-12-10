@@ -138,8 +138,8 @@ public:
   }
 
 
-  virtual const State& getPointStateReference(unsigned int id,
-                                       bool update = false)
+  virtual State getPointStateReference(unsigned int id,
+                                       bool update = false) const
   {
     return _points.at(id)->getFullStateReference(_reference, update);
   }

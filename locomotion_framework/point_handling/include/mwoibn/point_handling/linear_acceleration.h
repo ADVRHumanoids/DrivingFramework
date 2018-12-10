@@ -23,7 +23,7 @@ public:
       : State(current, frame, name)
   { _size = 3; }
 
-  LinearAcceleration(const LinearAcceleration&& other)
+  LinearAcceleration( LinearAcceleration&& other)
       : State(other)
   {  }
 
@@ -31,7 +31,7 @@ public:
       : State(other)
   {  }
 
-  LinearAcceleration(const LinearAcceleration&& other, point_handling::FramePlus& frame)
+  LinearAcceleration( LinearAcceleration&& other, point_handling::FramePlus& frame)
       : State(other, frame)
   {  }
 
@@ -44,45 +44,49 @@ public:
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
-      _temp_current = CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
+      _temp_world = CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
                                   _state.acceleration.get(), _body_id, frame.position.getFixed());
 
-      _temp_current += frame.rotation().getWorld()*_current;
-      return _temp_current;
+      //_temp_current += frame.rotation().getWorld()*_current_fixed;
+      return _temp_world;
 
-  } // NOT IMPLEMENTED
+  }
 
   virtual Point::Current
   getWorld(bool update = false) const {
     return CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
-                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
-  } // NOT IMPLEMENTED
+                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current_fixed;
+  }
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const {
     current.head<3>() =  CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
-                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current;
-  } // NOT IMPLEMENTED
+                                         _state.acceleration.get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current_fixed;
+  }
 
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& current,
-                        bool update = false){}// NOT IMPLEMENTED
+                        bool update = false){
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false){}// NOT IMPLEMENTED
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   virtual void
-  getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {}// NOT IMPLEMENTED
+  getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
-                            bool update = false){}// NOT IMPLEMENTED
-
-
-  protected:
-    using INTERFACE = mwoibn::robot_class::INTERFACE;
+                            bool update = false){
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
 };
 

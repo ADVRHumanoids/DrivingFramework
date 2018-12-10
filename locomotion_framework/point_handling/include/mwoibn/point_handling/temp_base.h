@@ -22,11 +22,11 @@ public:
 
   TempBase(std::string body_name, RigidBodyDynamics::Model& model,
        const mwoibn::robot_class::State& state, unsigned int size, std::string name = "")
-      : _name(name), _model(model), _body_id(_checkBody(body_name, model)), _state(state), _size(size)
+      : _name(name), _model(model), _body_id(mwoibn::rbdl_utils::checkBody(body_name, model)), _state(state), _size(size)
   {
   }
 
-  TempBase(const TempBase&& other)
+  TempBase( TempBase&& other)
       : _name(other._name), _model(other._model), _body_id(other._body_id), _state(other._state), _size(other._size)
   {  }
 
@@ -37,7 +37,7 @@ public:
 
 
     template<typename Source>
-    TempBase(const Source&& other, int size, std::string name = "")
+    TempBase( Source&& other, int size, std::string name = "")
         : _name(name), _model(other.getModel()), _state(other.getState()), _body_id(other.getBodyId()), _size(size)
     {  }
 
@@ -80,25 +80,9 @@ protected:
    * frames RBDL names */
   unsigned int _checkBody(std::string body_name) const
   {
-    return _checkBody(body_name, _model);
+    return mwoibn::rbdl_utils::checkBody(body_name, _model);
   }
 
-  /** helping function to provide functinoality of calling functions through
-   * frames RBDL names */
-  unsigned int _checkBody(std::string body_name,
-                          RigidBodyDynamics::Model model) const
-  {
-
-    unsigned int body_id = model.GetBodyId(body_name.c_str());
-
-    if (body_id == std::numeric_limits<unsigned int>::max())
-    {
-
-      throw(std::invalid_argument("unknown body, " + body_name +
-                                  " couldn't find it in a RBDL model"));
-    }
-    return body_id;
-  }
 };
 
 } // namespace package

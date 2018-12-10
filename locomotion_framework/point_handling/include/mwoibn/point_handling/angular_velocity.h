@@ -27,7 +27,7 @@ public:
   {
     _J_full.setZero(6, _state.velocity.size()); }
 
-  AngularVelocity(const AngularVelocity&& other)
+  AngularVelocity( AngularVelocity&& other)
       : Velocity(other), _J_full(other._J_full)
   {  }
 
@@ -35,7 +35,7 @@ public:
       : Velocity(other), _J_full(other._J_full)
   {  }
 
-  AngularVelocity(const AngularVelocity&& other, point_handling::FramePlus& frame)
+  AngularVelocity( AngularVelocity&& other, point_handling::FramePlus& frame)
       : Velocity(other, frame), _J_full(other._J_full)
   {  }
 
@@ -47,26 +47,40 @@ public:
 
   /** @brief get Position in a world frame */
   virtual const Point::Current&
-  getWorld(bool update = false){} // NOT IMPLEMENTED
+  getWorld(bool update = false){
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   virtual Point::Current
-  getWorld(bool update = false) const {} // NOT IMPLEMENTED
+  getWorld(bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
   /** @brief set new tracked point giving data in a world frame*/
-  virtual void getWorld(Point::Current& current, bool update = false) const {} // NOT IMPLEMENTED
+  virtual void getWorld(Point::Current& current, bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
   /** @brief set new tracked point giving data in a world frame*/
 
   virtual void setWorld(const Point::Current& current,
-                        bool update = false){}// NOT IMPLEMENTED
+                        bool update = false){
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false){}// NOT IMPLEMENTED
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
-  virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {}// NOT IMPLEMENTED
+  virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
-                            bool update = false){}// NOT IMPLEMENTED
+                            bool update = false){
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  }
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false);
   virtual mwoibn::Matrix getJacobian(bool update = false) const;

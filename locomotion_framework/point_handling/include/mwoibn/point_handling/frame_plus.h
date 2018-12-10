@@ -13,6 +13,11 @@ namespace mwoibn
 namespace point_handling
 {
 
+
+// I could extend that to consider custom frame
+//  use rotation current to get that value
+//  implement get world - get fixed
+//  only different will be get world as
 class FramePlus: public TempBase<mwoibn::Vector7>
 {
 
@@ -34,7 +39,7 @@ public:
     orientation.setFixed(quat);
   }
 
-  FramePlus(const FramePlus&& other)
+  FramePlus( FramePlus&& other)
       : TempBase(other), orientation(other.orientation), position(other.position)
   {  }
 

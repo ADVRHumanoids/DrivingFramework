@@ -24,7 +24,7 @@ public:
   //      const mwoibn::robot_class::State& state, std::string name = "")
   //     : Base(body_name, model, state, name)
   // {
-  //   _current.setZero(size);
+  //   _current_fixed.setZero(size);
   // }
   template<typename Body>
   Position(Point::Current current, Body body_id,
@@ -33,14 +33,7 @@ public:
       : Point(current, body_id, model, state, 3, name)
   {  }
 
-  // Base(Type current, std::string body_name,
-  //       RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-  //       std::string name = "")
-  //     : _name(name), _model(model), _body_id(_checkBody(body_name, model)),
-  //        _current(current), _state(state)
-  // {  }
-
-  Position(const Position&& other)
+  Position( Position&& other)
       : Point(other)
   {  }
 
@@ -68,8 +61,8 @@ public:
                         bool update = false);
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

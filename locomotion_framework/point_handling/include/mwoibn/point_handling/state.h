@@ -24,7 +24,7 @@ public:
       : Point(current, frame, name), frame(frame)
   { }
 
-  State(const State&& other)
+  State( State&& other)
       : Point(other), frame(other.frame)
   {  }
 
@@ -32,7 +32,7 @@ public:
       : Point(other), frame(other.frame)
   {  }
 
-  State(const State&& other, point_handling::FramePlus& frame)
+  State( State&& other, point_handling::FramePlus& frame)
       : Point(other), frame(frame)
   {  }
 
@@ -44,21 +44,21 @@ public:
 
   /** @brief get Position in a world frame */
   virtual const Point::Current&
-  getWorld(bool update = false) = 0; // NOT IMPLEMENTED
+  getWorld(bool update = false) = 0;
 
   virtual Point::Current
-  getWorld(bool update = false) const = 0; // NOT IMPLEMENTED
+  getWorld(bool update = false) const = 0;
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& current,
-                        bool update = false) = 0;// NOT IMPLEMENTED
+                        bool update = false) = 0;
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false) = 0;// NOT IMPLEMENTED
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const = 0;
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,
-                            bool update = false) = 0;// NOT IMPLEMENTED
+                            bool update = false) = 0;
 
   using Point::getReference;
   using Point::setReference;

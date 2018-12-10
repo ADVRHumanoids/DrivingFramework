@@ -30,14 +30,14 @@ public:
       _size = 6;
   }
 
-  Wrench(const Wrench&& other) : State(other),
+  Wrench( Wrench&& other) : State(other),
         force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
   Wrench(const Wrench& other) : State(other), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
-  Wrench(const Wrench&& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
+  Wrench( Wrench&& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
   {  }
 
   Wrench(const Wrench& other, point_handling::FramePlus& frame) : State(other, frame), force(other.force, frame), torque(other.torque, force), _temp(other._temp)
@@ -66,8 +66,8 @@ public:
 
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

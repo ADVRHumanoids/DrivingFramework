@@ -33,6 +33,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>simple_log</depend>
   <depend>common</depend>
+  
 
 
   <test_depend>roslib</test_depend>

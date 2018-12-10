@@ -20,8 +20,8 @@ public:
   Rotation(Body body_id, RigidBodyDynamics::Model& model,
        const mwoibn::robot_class::State& state, std::string name = "")
       : Base(body_id, model, state, 9, name)
-  { _current.setIdentity();
-   _temp_current.setIdentity();}
+  { _current_fixed.setIdentity();
+    _temp_world.setIdentity();}
 
   template<typename Body>
   Rotation(Rotation::R current, Body body_id,
@@ -30,14 +30,31 @@ public:
       : Base(current, body_id, model, state, 9, name)
   { }
 
+  template<typename Other>
+  Rotation( Other&& other)
+      : Base(other, 9)
+  {
+    _current_fixed.setIdentity();
+      _temp_world.setIdentity();
+  }
 
-  Rotation(const Rotation&& other)
+
+  template<typename Other>
+  Rotation(const Other& other)
+      : Base(other, 9)
+  {
+    _current_fixed.setIdentity();
+      _temp_world.setIdentity();
+  }
+
+  Rotation( Rotation&& other)
       : Base(other)
   {  }
 
   Rotation(const Rotation& other)
       : Base(other)
   {  }
+
   virtual ~Rotation() {}
 
   /** @brief get Position in a world frame */
@@ -50,9 +67,11 @@ public:
   virtual void setWorld(const Rotation::R& current,
                         bool update = false);
 
+  virtual void setFixed(const Rotation::R& current){ _current_fixed.noalias() = current; }
+
   /** @brief get Position in a user-defined reference frame */
-  virtual const Rotation::R&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Rotation::R
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void setReference(const Rotation::R& current,
                             unsigned int reference_id,

@@ -35,7 +35,7 @@ public:
     setOrientationFixed(quat);
   }
 
-  Frame(const Frame&& other)
+  Frame( Frame&& other)
       : TempBase(other), _frame(other._frame), _temp_full(other._temp_full), _quat(other._quat),
         _pos(other._pos), _velocity(other._velocity, _frame)
   {  }
@@ -86,8 +86,8 @@ public:
   }
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getLinearReference(unsigned int refernce_id, bool update = false){
+  virtual Point::Current
+  getLinearReference(unsigned int refernce_id, bool update = false) const {
     return _frame.position.getReference(refernce_id, update);
   }
 

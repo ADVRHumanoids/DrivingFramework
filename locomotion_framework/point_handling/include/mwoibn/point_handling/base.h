@@ -18,38 +18,36 @@ public:
        const mwoibn::robot_class::State& state, unsigned int size, std::string name = "")
       : TempBase<Type>(body_id, model, state, size, name)
   {
-    //_current.setZero(size);
   }
 
   Base(std::string body_name, RigidBodyDynamics::Model& model,
        const mwoibn::robot_class::State& state, unsigned int size, std::string name = "")
       : TempBase<Type>(body_name, model, state, size, name)
   {
-    //_current.setZero(size);
   }
 
   Base(Type current, unsigned int body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         unsigned int size, std::string name = "")
-      : TempBase<Type>(body_id, model, state, size, name), _current(current), _temp_current(current)
+      : TempBase<Type>(body_id, model, state, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
   Base(Type current, std::string body_name,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         unsigned int size, std::string name = "")
-      : TempBase<Type>(body_name, model, state, size, name), _current(current), _temp_current(current)
+      : TempBase<Type>(body_name, model, state, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
-  Base(const Base&& other)
-      : TempBase<Type>(other), _current(other._current), _temp_current(other._temp_current)
+  Base( Base&& other)
+      : TempBase<Type>(other), _current_fixed(other._current_fixed), _temp_world(other._temp_world)
   {  }
 
   Base(const Base& other)
-      : TempBase<Type>(other), _current(other._current), _temp_current(other._temp_current)
+      : TempBase<Type>(other), _current_fixed(other._current_fixed), _temp_world(other._temp_world)
   {  }
 
   template<typename Source>
-  Base(const Source&& other, int size, std::string name = "")
+  Base( Source&& other, int size, std::string name = "")
       : TempBase<Type>(other, size, name)
   {  }
 
@@ -59,13 +57,13 @@ public:
   {  }
 
   template<typename Source>
-  Base(Type current, const Source&& other, int size, std::string name = "")
-      : TempBase<Type>(other, size, name), _current(current), _temp_current(current)
+  Base(Type current,  Source&& other, int size, std::string name = "")
+      : TempBase<Type>(other, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
   template<typename Source>
   Base(Type current, const Source& other, int size, std::string name = "")
-      : TempBase<Type>(other, size, name), _current(current), _temp_current(current)
+      : TempBase<Type>(other, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
 
@@ -73,11 +71,11 @@ public:
   virtual ~Base() {}
 
   /** @brief get Position in a point fixed frame*/
-  const Type& getFixed() const { return _current; }
+  virtual const Type& getFixed() const { return _current_fixed; }
 
   /** @brief set new tracked point giving data in a point fixed frame*/
-  void setFixed(const Type& current){ _current.noalias() = current; }
-
+  //virtual void setFixed(const Type& current){ _current_fixed.noalias() = current; }
+  virtual void setFixed(const Type& current) = 0;
   /** @brief get Position in a world frame */
   virtual const Type&
   getWorld(bool update = false) = 0;
@@ -89,11 +87,13 @@ public:
                         bool update = false) = 0;
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Type&
-  getReference(unsigned int refernce_id, bool update = false) = 0;
+  virtual Type
+  getReference(unsigned int refernce_id, bool update = false) const = 0;
 
-  const Type&
-  getReference(std::string reference_name, bool update = false);
+  Type
+  getReference(std::string reference_name, bool update = false) const{
+    getReference(TempBase<Type>::_checkBody(reference_name), update);
+  }
 
   virtual void setReference(const Type& current,
                             unsigned int reference_id,
@@ -101,11 +101,13 @@ public:
 
   void setReference(const Type& current,
                           std::string reference_name,
-                          bool update = false);
+                          bool update = false){
+                            setReference(current, TempBase<Type>::_checkBody(reference_name), update);
+                          }
 
 
 protected:
-  Type _current, _temp_current;
+  Type _current_fixed, _temp_world;
 
 };
 

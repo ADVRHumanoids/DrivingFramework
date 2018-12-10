@@ -31,7 +31,7 @@ public:
   {
   }
 
-  Orientation(const Orientation&& other)
+  Orientation( Orientation&& other)
       : Base(other), _rotation(other._rotation)
   {  }
 
@@ -41,9 +41,8 @@ public:
 
   virtual ~Orientation() {}
   /** @brief get Position in a point fixed frame*/
-
-  void setFixed(const Orientation::O& current){ _current = current;
-                                      _rotation.setFixed(_current.toMatrix()); }
+  virtual void setFixed(const Orientation::O& current) override { _current_fixed = current;
+                                      _rotation.setFixed(_current_fixed.toMatrix()); }
 
   /** @brief get Position in a world frame */
   virtual const Orientation::O&
@@ -56,8 +55,8 @@ public:
                         bool update = false);
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Orientation::O&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Orientation::O
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   using Base::getReference;
   using Base::setReference;
@@ -69,7 +68,7 @@ public:
   point_handling::Rotation& rotation(){return _rotation;}
   const point_handling::Rotation& rotation() const{return _rotation;}
 
-  void synch(){ _current = _set(_rotation.getFixed());}
+  void synch(){ _current_fixed = _set(_rotation.getFixed());}
 
   protected:
   point_handling::Rotation _rotation;

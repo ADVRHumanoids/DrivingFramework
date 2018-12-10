@@ -108,12 +108,11 @@ public:
     return _points.at(id)->getLinearWorld(update);
   }
 
-  virtual const State&
+  virtual State
   getPointStateReference(unsigned int id,
-                         bool update = false)
+                         bool update = false) const
   {
-    return _points.at(id)
-        ->getLinearReference(_reference, update);
+    return _points.at(id)->getLinearReference(_reference, update);
   }
 
   virtual void setPointStateReference(unsigned int id, const State state,

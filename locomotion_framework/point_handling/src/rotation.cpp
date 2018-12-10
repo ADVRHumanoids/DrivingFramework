@@ -9,10 +9,10 @@ namespace point_handling
    */
   const Rotation::R&
   Rotation::getWorld(bool update){
-    _temp_current = RigidBodyDynamics::CalcBodyWorldOrientation(
+    _temp_world = RigidBodyDynamics::CalcBodyWorldOrientation(
                          _model, _state.position.get(), _body_id, update).transpose()*getFixed();
 
-    return _temp_current;
+    return _temp_world;
   }
 
   Rotation::R Rotation::getWorld(bool update) const{
@@ -43,22 +43,18 @@ namespace point_handling
   //   return J_part;
   // }
 
-  const Rotation::R&
-  Rotation::getReference(unsigned int reference_id, bool update)
+  Rotation::R
+  Rotation::getReference(unsigned int reference_id, bool update) const
   {
-
-    _temp_current =
-        RigidBodyDynamics::CalcBodyWorldOrientation(
-            _model, _state.position.get(), reference_id, update) *
-        getWorld();
-
-    return _temp_current;
+    return  RigidBodyDynamics::CalcBodyWorldOrientation(
+                _model, _state.position.get(), reference_id, update) *
+            getWorld();;
   }
 
   void Rotation::setWorld(const Rotation::R& rotation, bool update)
   {
 
-    Rotation::R _current = getWorld(update).transpose() * rotation;
+    _current_fixed = getWorld(update).transpose() * rotation;
 
   }
 
@@ -66,9 +62,9 @@ namespace point_handling
                                    unsigned int reference_id,
                                    bool update)
   {
-    Rotation::R _current =
-        getReference(reference_id, update).transpose() *
-        rotation;
+    _current_fixed =
+    (RigidBodyDynamics::CalcBodyWorldOrientation(_model, _state.position.get(),
+                        reference_id, update) * getWorld()).transpose() * rotation;
   }
 
 

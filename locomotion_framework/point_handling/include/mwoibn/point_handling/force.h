@@ -27,7 +27,7 @@ public:
       _size = 3;
   }
 
-  Force(const Force&& other,point_handling::FramePlus& frame)
+  Force( Force&& other,point_handling::FramePlus& frame)
       : State(other, frame)
   {  }
 
@@ -35,7 +35,7 @@ public:
       : State(other, frame)
   {  }
 
-  Force(const Force&& other)
+  Force( Force&& other)
       : State(other)
   {  }
 
@@ -60,8 +60,8 @@ public:
                         bool update = false);
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

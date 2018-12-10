@@ -1,3 +1,4 @@
+
 #ifndef __MWOIBN__POINT_HANDLING__POINT_H
 #define __MWOIBN__POINT_HANDLING__POINT_H
 
@@ -21,31 +22,19 @@ public:
        const mwoibn::robot_class::State& state, int size, std::string name = "")
       : Base(body_id, model, state, size, name)
   {
-    _current.setZero(size);
-    _temp_current.setZero(size);
+    _current_fixed.setZero(size);
+    _temp_world.setZero(size);
   }
 
-  // Point(std::string body_name, RigidBodyDynamics::Model& model,
-  //      const mwoibn::robot_class::State& state, std::string name = "")
-  //     : Base(body_name, model, state, name)
-  // {
-  //   _current.setZero(size);
-  // }
   template<typename Body>
   Point(Point::Current current, Body body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         std::string name = "")
       : Base(current, body_id, model, state, current.size(), name)
-  {}
+  {
+  }
 
-  // Base(Type current, std::string body_name,
-  //       RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
-  //       std::string name = "")
-  //     : _name(name), _model(model), _body_id(_checkBody(body_name, model)),
-  //        _current(current), _state(state)
-  // {  }
-
-  Point(const Point&& other)
+  Point( Point&& other)
       : Base(other)
   {  }
 
@@ -53,21 +42,20 @@ public:
       : Base(other)
   {  }
 
-
     template<typename Source>
-    Point(const Source&& other, int size, std::string name = "")
+    Point( Source&& other, int size, std::string name = "")
         : Base(other, size, name)
-    {     _current.setZero(size);
-        _temp_current.setZero(size); }
+    {     _current_fixed.setZero(size);
+        _temp_world.setZero(size); }
 
     template<typename Source>
     Point(const Source& other, int size, std::string name = "")
         : Base(other, size, name)
-    {     _current.setZero(size);
-        _temp_current.setZero(size); }
+    {     _current_fixed.setZero(size);
+        _temp_world.setZero(size); }
 
     template<typename Source>
-    Point(Point::Current current, const Source&& other, std::string name = "")
+    Point(Point::Current current,  Source&& other, std::string name = "")
         : Base(other, current.size(), name)
     {  }
 
@@ -79,9 +67,13 @@ public:
     virtual void getWorld(Point::Current& current, bool update = false) const = 0;
 
     virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const = 0;
+    virtual void setFixed(const Point::Current& current){ _current_fixed.noalias() = current; }
+
 
   using Base::getReference;
   using Base::setReference;
+
+
 
   ~Point() {}
 

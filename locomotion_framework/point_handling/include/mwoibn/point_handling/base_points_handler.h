@@ -163,7 +163,7 @@ public:
   }
 
   BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state, int jacobian_row, int state_size)
-      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)
+      : _reference(mwoibn::rbdl_utils::checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
   }
@@ -183,7 +183,7 @@ public:
 
   BasePointsHandler(std::string chain_origin, RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& robot_state,
                     std::vector<Frame> points, int jacobian_row, int state_size)
-      : _reference(_checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)  {
+      : _reference(mwoibn::rbdl_utils::checkBody(chain_origin, model)), _model(model), _jacobian_row(jacobian_row), _state_size(state_size), _robot_state(robot_state)  {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
 
     for (auto& point : points)
@@ -203,7 +203,7 @@ public:
       addPoint(*point);
   }
 
-  BasePointsHandler(const BasePointsHandler&& other)
+  BasePointsHandler( BasePointsHandler&& other)
       : _reference(other._reference), _chain(other._chain), _model(other._model), _jacobian_row(other._jacobian_row), _state_size(other._state_size), _robot_state(other._robot_state)
   {
     _fullPointJacobian.setZero(_jacobian_row, _model.dof_count);
@@ -274,7 +274,7 @@ public:
     int body_id;
     try
     {
-      body_id = _checkBody(body_name);
+      body_id = mwoibn::rbdl_utils::checkBody(body_name, _model);
     }
     catch (const std::invalid_argument& e)
     {
@@ -315,7 +315,7 @@ public:
     int body_id;
     try
     {
-      body_id = _checkBody(body_name);
+      body_id = mwoibn::rbdl_utils::checkBody(body_name, _model);
     }
     catch (const std::invalid_argument& e)
     {
@@ -361,9 +361,9 @@ public:
    *
    * @see Frame::getStateReference
    */
-  virtual const State&
+  virtual State
   getPointStateReference(unsigned int id,
-                         bool update = false) = 0;
+                         bool update = false) const = 0;
 
   /** @brief set new tracked point for a Pint id giving data in a PointHandler
    *reference frame
@@ -789,6 +789,17 @@ public:
   virtual unsigned int getStateSize() const {return _state_size;}
   ///@}
 
+
+  typename std::vector<std::unique_ptr<Frame>>::iterator begin(){return _points.begin();}
+  typename std::vector<std::unique_ptr<Frame>>::iterator end(){return _points.end();}
+
+  typename std::vector<std::unique_ptr<Frame>>::const_iterator begin() const {return _points.begin();}
+  typename std::vector<std::unique_ptr<Frame>>::const_iterator end() const {return _points.end();}
+
+
+  virtual Frame operator[](int i) {
+          return *_points[i];
+  }
 protected:
   /** @brief Keeps all links in a chain from point reference frame to a
    * user-defined
@@ -814,26 +825,6 @@ protected:
   }
 
   unsigned int _reference;
-
-  unsigned int _checkBody(std::string body_name) const
-  {
-    return _checkBody(body_name, _model);
-  }
-
-  unsigned int _checkBody(std::string body_name,
-                          RigidBodyDynamics::Model model) const
-  {
-
-    unsigned body_id = model.GetBodyId(body_name.c_str());
-
-    if (body_id == std::numeric_limits<unsigned int>::max())
-    {
-
-      throw(std::invalid_argument("unknown body, " + body_name +
-                                  " couldn't find it in a RBDL model"));
-    }
-    return body_id;
-  }
 
   template <typename Type>
   void _initFromVectors(Type reference_frames,

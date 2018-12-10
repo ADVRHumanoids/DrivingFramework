@@ -27,7 +27,7 @@ public:
     _size = 3;
   }
 
-  Torque(const Torque&& other)
+  Torque( Torque&& other)
       : State(other), force(other.force)
   {  }
 
@@ -35,7 +35,7 @@ public:
       : State(other), force(other.force)
   {  }
 
-  Torque(const Torque&& other, point_handling::Force& force)
+  Torque( Torque&& other, point_handling::Force& force)
       : State(other, force.frame), force(force)
   {  }
 
@@ -60,8 +60,8 @@ public:
                         bool update = false);
 
   /** @brief get Position in a user-defined reference frame */
-  virtual const Point::Current&
-  getReference(unsigned int refernce_id, bool update = false);
+  virtual Point::Current
+  getReference(unsigned int refernce_id, bool update = false) const;
 
   /** @brief get Position in a user-defined reference frame */
   virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

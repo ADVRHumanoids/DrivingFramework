@@ -30,7 +30,7 @@ public:
     _size = 3;
   }
 
-  Velocity(const Velocity&& other)
+  Velocity( Velocity&& other)
       : State(other), _J(other._J)
   {  }
 
@@ -39,7 +39,7 @@ public:
   {  }
 
 
-  Velocity(const Velocity&& other, point_handling::FramePlus& frame)
+  Velocity( Velocity&& other, point_handling::FramePlus& frame)
         : State(other, frame), _J(other._J)
     {  }
 

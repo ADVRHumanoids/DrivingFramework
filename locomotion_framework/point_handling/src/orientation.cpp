@@ -11,8 +11,8 @@ namespace point_handling
   const Orientation::O&
   Orientation::getWorld(bool update)
   {
-    _temp_current = _set(_rotation.getWorld(update));
-    return _temp_current;
+    _temp_world = _set(_rotation.getWorld(update));
+    return _temp_world;
   }
   /** @brief get orientation in a world frame as a quaternion
    */
@@ -26,17 +26,16 @@ namespace point_handling
   void Orientation::setWorld(const Orientation::O& quat, bool update)
   {
     _rotation.setWorld(quat.toMatrix(), update);
-    _current = _set(_rotation.getFixed());
+    _current_fixed = _set(_rotation.getFixed());
 
   }
 
   /** @brief get Position in a user-defined reference frame
    */
-  const Orientation::O&
-  Orientation::getReference(unsigned int reference_id, bool update)
+  Orientation::O
+  Orientation::getReference(unsigned int reference_id, bool update) const
   {
-    _temp_current = _set(_rotation.getReference(reference_id, update));
-    return _temp_current;
+    return _set(_rotation.getReference(reference_id, update));
   }
 
 
@@ -50,7 +49,7 @@ namespace point_handling
   {
 
     _rotation.setReference(quat.toMatrix(), reference_id, update);
-    _current = _set(_rotation.getFixed());
+    _current_fixed = _set(_rotation.getFixed());
   }
 
 
