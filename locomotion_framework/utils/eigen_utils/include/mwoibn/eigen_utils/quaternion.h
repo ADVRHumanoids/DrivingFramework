@@ -1,5 +1,5 @@
-#ifndef EIGEN_UTILS_QUATERNION_H
-#define EIGEN_UTILS_QUATERNION_H
+#ifndef __MWOIBN__EIGEN_UTILS__QUATERNION_H
+#define __MWOIBN__EIGEN_UTILS__QUATERNION_H
 
 #include <Eigen/Dense>
 #include <utility>
@@ -7,7 +7,7 @@
 namespace mwoibn
 {
 
-class Quaternion : public Eigen::Quaterniond
+class Quaternion : protected Eigen::Quaterniond
 {
 
 public:
@@ -24,13 +24,17 @@ Quaternion(double x, double y, double z, double w, double normalize = true)
         (*this).z() = (*this).z() / n;
 }
 
+template <typename Vector>
+static Quaternion vector(const Vector& vec){return  Quaternion(vec[0], vec[1], vec[2], 0, false); }
+
+
 Quaternion() : Eigen::Quaterniond(1, 0, 0, 0) {
 }
 
 Quaternion(const Quaternion& q) : Eigen::Quaterniond(q) {
 }
 
-Quaternion(const Quaternion&& q) : Eigen::Quaterniond(std::move(q)) {
+Quaternion( Quaternion&& q) : Eigen::Quaterniond(std::move(q)) {
 }
 
 Quaternion operator=(const Quaternion& q)
@@ -57,13 +61,6 @@ Quaternion operator*(const Quaternion& q) const
                           w()*q.w() - x()*q.x() - y()*q.y() - z()*q.z(), false);
 }
 
-Quaternion chuj(const Quaternion& q) const
-{
-        return Quaternion(q.w() * x() + q.x() * w() + q.y() * z() - q.z() * y(),
-                          q.w() * y() + q.y() * w() + q.z() * x() - q.x() * z(),
-                          q.w() * z() + q.z() * w() + q.x() * y() - q.y() * x(),
-                          q.w() * w() - q.x() * x() - q.y() * y() - q.z() * z(), false);
-}
 
 Quaternion operator*(const double& s) const
 {
@@ -91,7 +88,7 @@ friend std::ostream& operator<<(std::ostream& os, const Quaternion& q)
         return os;
 }
 
-Eigen::Vector3d axis()
+Eigen::Vector3d axis() const
 {
         Eigen::Vector3d axis;
         axis << x(), y(), z();
@@ -125,6 +122,12 @@ double toAxisAngle(Eigen::Vector3d& vector) const
         return toAxisAngle(vector, *this);
 }
 
+double angle() const
+{
+        return Eigen::AngleAxisd(*this).angle();
+}
+
+
 static double toAxisAngle(Eigen::Vector3d& vector, const Quaternion quat)
 {
         Eigen::AngleAxisd angleAxis(quat);
@@ -151,7 +154,7 @@ Quaternion reciprocal() const
  * @param quat_swing
  * @return
  */
-Quaternion swingTwist(const Eigen::Vector3d dir, Quaternion& q_swing)
+Quaternion swingTwist(const Eigen::Vector3d dir, Quaternion& q_swing) const
 {
 
         Quaternion q_twist = swingTwist(dir);
@@ -161,7 +164,7 @@ Quaternion swingTwist(const Eigen::Vector3d dir, Quaternion& q_swing)
         return q_twist;
 }
 
-Quaternion swingTwist(const Eigen::Vector3d dir)
+Quaternion swingTwist(const Eigen::Vector3d dir) const
 {
 
         double norm = dir.norm();
@@ -176,16 +179,21 @@ Quaternion swingTwist(const Eigen::Vector3d dir)
         Quaternion q_twist(dir[0] * u / l, dir[1] * u / l, dir[2] * u / l, m / l,
                            false);
 
+        Quaternion::vector(dir).ensureHemisphere(q_twist);
+
         return q_twist;
 }
 
-Quaternion twistSwing(const Eigen::Vector3d dir)
+Quaternion twistSwing(const Eigen::Vector3d dir) const
 {
+        Quaternion q_twist = reciprocal().swingTwist(dir).reciprocal();
 
-        return reciprocal().swingTwist(dir).reciprocal();
+        Quaternion::vector(dir).ensureHemisphere(q_twist);
+
+        return q_twist;
 }
 
-Quaternion twistSwing(const Eigen::Vector3d dir, Quaternion& q_swing)
+Quaternion twistSwing(const Eigen::Vector3d dir, Quaternion& q_swing) const
 {
         Quaternion q_twist = this->reciprocal().swingTwist(dir, q_swing).reciprocal();
         q_swing = q_swing.reciprocal();

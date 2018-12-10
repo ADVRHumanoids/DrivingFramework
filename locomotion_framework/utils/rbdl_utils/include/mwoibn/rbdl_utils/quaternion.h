@@ -1,5 +1,5 @@
-#ifndef RBDL_UTILS_QUATERNION_H
-#define RBDL_UTILS_QUATERNION_H
+#ifndef __MWOIBN__RBDL_UTILS__QUATERNION_H
+#define __MWOIBN__RBDL_UTILS__QUATERNION_H
 
 #include <rbdl/rbdl.h>
 #include <math.h>
@@ -29,7 +29,7 @@ Quaternion(const Quaternion& q)
         : RigidBodyDynamics::Math::Quaternion(q[0], q[1], q[2], q[3])
 {
 }
-Quaternion(const Quaternion&& q)
+Quaternion( Quaternion&& q)
         : RigidBodyDynamics::Math::Quaternion(q[0], q[1], q[2], q[3])
 {
 }
