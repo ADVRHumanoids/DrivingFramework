@@ -7,15 +7,15 @@ mwoibn::hierarchical_control::actions::merge::End::End(mwoibn::Matrix& P, mwoibn
 
         _this_memory.release(_this);
         _gain.setZero(command.size());
-
-        _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default());
-        _hierarchical_controller_ptr->addTask(constraints, 1.0, 0.0001);
-
-        mwoibn::Matrix jacobian = mwoibn::Matrix::Identity(robot.getDofs(), robot.getDofs());
-
-        _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(robot.getDofs(), robot.getDofs()));
-        _joints->updateJacobian(jacobian);
-        _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
+        //
+        // _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default());
+        // _hierarchical_controller_ptr->addTask(constraints, 1.0, 0.0001);
+        //
+        // mwoibn::Matrix jacobian = mwoibn::Matrix::Identity(robot.getDofs(), robot.getDofs());
+        //
+        // _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(robot.getDofs(), robot.getDofs()));
+        // _joints->updateJacobian(jacobian);
+        // _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
 }
 
 mwoibn::hierarchical_control::actions::merge::End::End(mwoibn::Matrix& P, mwoibn::VectorN& command, MergeManager& memory, maps::TaskMap& map, actions::Merge& merge, double dt, double mu) : Local(memory, map, merge), _gain(), _this(P, command, _merge_memory, map, _gain), _dt(dt), _mu(mu){
@@ -27,14 +27,14 @@ mwoibn::hierarchical_control::actions::merge::End::End(mwoibn::Matrix& P, mwoibn
 
 mwoibn::hierarchical_control::actions::merge::End::End(const End& other) : Local(other), _gain(other._gain), _t(other._t), _dt(other._dt), _mu(other._mu), _p(other._p), _this_memory(other._this_memory), _this(other._this, _gain) {
 
-  if(other._hierarchical_controller_ptr == nullptr) return;
+  // if(other._hierarchical_controller_ptr == nullptr) return;
+  //
+  // _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default(static_cast<mwoibn::hierarchical_control::controllers::Default&>(*(other._hierarchical_controller_ptr))));
+  // _hierarchical_controller_ptr->removeTask( 1);
+  //
+  // _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(*other._joints));
 
-  _hierarchical_controller_ptr.reset(new mwoibn::hierarchical_control::controllers::Default(static_cast<mwoibn::hierarchical_control::controllers::Default&>(*(other._hierarchical_controller_ptr))));
-  _hierarchical_controller_ptr->removeTask( 1);
-
-  _joints.reset(new mwoibn::hierarchical_control::tasks::BasicTask(*other._joints));
-
-  _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
+  // _hierarchical_controller_ptr->addTask(*_joints, 1.0, 0.0001);
 
 }
 
@@ -92,10 +92,8 @@ void mwoibn::hierarchical_control::actions::merge::End::run(){
         _this.run();
 
       //  std::cout << "raw\t" << _this.getCommand().head<12>().transpose() << std::endl;
-
-        _joints->updateError(-_this.getCommand());
-
-        _this.getCommand() = _hierarchical_controller_ptr->update();
+      
+        //_this.getCommand() = _hierarchical_controller_ptr->update();
 
       //  std::cout << "swap\t" << _this.getCommand().head<12>().transpose() << std::endl;
 

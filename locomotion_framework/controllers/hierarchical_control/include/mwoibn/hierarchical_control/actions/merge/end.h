@@ -72,8 +72,7 @@ virtual void _end();
 virtual void _finish(Local& local);
 
 //mwoibn::robot_class::Robot* _robot;
-std::unique_ptr<mwoibn::hierarchical_control::controllers::Basic> _hierarchical_controller_ptr;
-std::unique_ptr<mwoibn::hierarchical_control::tasks::BasicTask> _joints;
+//std::unique_ptr<mwoibn::hierarchical_control::controllers::Basic> _hierarchical_controller_ptr;
 
 };
 

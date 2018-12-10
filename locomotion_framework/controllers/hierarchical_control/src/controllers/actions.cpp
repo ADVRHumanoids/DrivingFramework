@@ -2,7 +2,7 @@
 #include "mwoibn/hierarchical_control/actions/compute.h"
 
 
-mwoibn::hierarchical_control::controllers::Actions::Actions(double dt, unsigned int dofs) : Basic(), _dt(dt), _dofs(dofs), _state(_command, _P, _map, _memory, _dt, _dofs) {
+mwoibn::hierarchical_control::controllers::Actions::Actions(double dt, unsigned int dofs) : Basic(), _dt(dt), _dofs(dofs), state(_command, _P, _map, _memory, _dt, _dofs) {
         _command = mwoibn::VectorN::Zero(_dofs);
         _P = mwoibn::Matrix::Identity(_dofs, _dofs);
 
@@ -32,14 +32,14 @@ void mwoibn::hierarchical_control::controllers::Actions::idleTask(tasks::BasicTa
 
 void mwoibn::hierarchical_control::controllers::Actions::_addTask(tasks::BasicTask& new_task, mwoibn::VectorN& gain,
                                                                   double damping){
-        _actions_set.push_back(std::unique_ptr<actions::Task>(new actions::Compute(new_task, gain, damping, _P, _command, _memory)));
+        _actions_set.push_back(std::unique_ptr<actions::Task>(new actions::Compute(new_task, gain, damping, state)));
 
         _map[new_task] = _actions_set.back().get();
 }
 
 void mwoibn::hierarchical_control::controllers::Actions::_addTask(tasks::BasicTask& new_task, double gain,
                                                                   double damping){
-        _actions_set.push_back(std::unique_ptr<actions::Task>(new actions::Compute(new_task, gain, damping, _P, _command, _memory)));
+        _actions_set.push_back(std::unique_ptr<actions::Task>(new actions::Compute(new_task, gain, damping, state)));
         _map[new_task] = _actions_set.back().get();
 }
 

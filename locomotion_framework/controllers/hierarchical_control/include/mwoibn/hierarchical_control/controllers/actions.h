@@ -87,21 +87,12 @@ maps::ActionsMap& map(){
         return _map;
 }
 
-State& state(){
-        return _state;
-}
-
 actions::Task& getAction(tasks::BasicTask& task){
         return *_map[task];
 }
 
-protected:
-/** \brief Comprises pointers to all of the tasks,
- * in the priority order.
- *
- * The lower position in the stack the higher priority (i.e tasks[0] is more
- * important than tasks[1])
- */
+State state;
+
 protected:
 // virtual void _construct() = 0;
 void _addTask(tasks::BasicTask& new_task, double gain, double damping);
@@ -122,7 +113,8 @@ memory::Manager _memory;
 mwoibn::Matrix _P;
 double _dofs, _dt;
 
-State _state;
+
+
 
 };
 }

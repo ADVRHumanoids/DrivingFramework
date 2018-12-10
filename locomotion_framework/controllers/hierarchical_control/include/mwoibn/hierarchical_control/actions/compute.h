@@ -3,6 +3,7 @@
 
 #include "mwoibn/hierarchical_control/actions/primary.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
+#include "mwoibn/hierarchical_control/state.h"
 
 namespace mwoibn {
 namespace hierarchical_control {
@@ -11,7 +12,7 @@ namespace actions {
 
 class Compute : public Primary {
 public:
-Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Primary(task, memory),_gains(gains), _P(P), _command(command){
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, double damping, hierarchical_control::State& state) : Primary(task, state.memory),_gains(gains), _P(state.P), _command(state.command){
         if(gains.size() != task.getTaskSize())
                 throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, sizes incompatible between gains and task."));
         if(_command.size() != task.getTaskDofs())
@@ -20,7 +21,7 @@ Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::Vect
         _init(damping);
 }
 
-Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, const mwoibn::VectorN& damping, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Primary(task, memory),_gains(gains), _P(P), _command(command){
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, const mwoibn::VectorN& damping, hierarchical_control::State& state) : Primary(task, state.memory),_gains(gains), _P(state.P), _command(state.command){
         if(gains.size() != task.getTaskSize())
                 throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, sizes incompatible between gains and task."));
         if(_command.size() != task.getTaskDofs())
@@ -29,10 +30,36 @@ Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::Vect
         _init(damping);
 }
 
-Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, double damping, mwoibn::Matrix& P, mwoibn::VectorN& command, memory::Manager& memory) : Primary(task, memory), _P(P), _command(command){
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, double damping, hierarchical_control::State& state) : Primary(task, state.memory), _P(state.P), _command(state.command){
         _gains.setConstant(_task.getTaskSize(), gain);
         _init(damping);
 }
+
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, double gain, double damping, hierarchical_control::State& state, memory::Manager& memory) : Primary(task, memory), _P(state.P), _command(state.command){
+        _gains.setConstant(_task.getTaskSize(), gain);
+        _init(damping);
+}
+
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, double damping, hierarchical_control::State& state, memory::Manager& memory) : Primary(task, memory),_gains(gains), _P(state.P), _command(state.command){
+        if(gains.size() != task.getTaskSize())
+                throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, sizes incompatible between gains and task."));
+        if(_command.size() != task.getTaskDofs())
+                throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, incompatible sizes of task and controller."));
+
+        _init(damping);
+}
+
+Compute(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gains, const mwoibn::VectorN& damping, hierarchical_control::State& state, memory::Manager& memory) : Primary(task, memory),_gains(gains), _P(state.P), _command(state.command){
+        if(gains.size() != task.getTaskSize())
+                throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, sizes incompatible between gains and task."));
+        if(_command.size() != task.getTaskDofs())
+                throw(std::invalid_argument("hierarchical_control::controllers::Compute - couldn't add the task, incompatible sizes of task and controller."));
+
+        _init(damping);
+}
+
+
+
 
 Compute(const Compute& other) : Primary(other), _gains(other._gains), _P(other._P), _command(other._command), _errors(other._errors), _inverser_ptr(std::move(other._inverser_ptr.get())){
 }
