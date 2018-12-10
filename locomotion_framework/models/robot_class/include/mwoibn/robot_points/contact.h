@@ -2,10 +2,13 @@
 #define __MWOIBN__ROBOT_CLASS__ROBOT_POINTS__CONTACT_H
 
 #include "mwoibn/robot_class/robot_class.h"
-#include "mwoibn/robot_points/point.h"
+#include "mwoibn/robot_points/state.h"
 #include "mwoibn/point_handling/wrench.h"
 #include "mwoibn/point_handling/frame.h"
 #include "mwoibn/point_handling/base_points_handler.h"
+#include "mwoibn/communication_modules/basic_module.h"
+#include "mwoibn/communication_modules/shared_point_get.h"
+
 
 namespace mwoibn
 {
@@ -14,7 +17,7 @@ namespace robot_points
 {
 /** @brief This class implements the simple contact characterized by a constant state in its end-point reference frame.
  */
-class Contact : public Point
+class Contact : public State
 {
 
 public:
@@ -28,7 +31,7 @@ template<typename Type>
 Contact(Type end_frame, RigidBodyDynamics::Model& model,
         const mwoibn::robot_class::State& state, bool is_active,
         robot_class::CONTACT_TYPE type = robot_class::CONTACT_TYPE::UNKNOWN, std::string name = "")
-      : Point(model, state), _is_active(is_active), _frame(end_frame, model, state), _wrench(_frame.frame()),
+      : State(model, state), _is_active(is_active), _frame(end_frame, model, state), _wrench(_frame.frame()),
         _type(type), _name(name) // this zero should as some kind of constant value defined
                     // in robot_class.h
 {
@@ -41,7 +44,7 @@ Contact(Type end_frame, RigidBodyDynamics::Model& model,
 }
 
 Contact(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, YAML::Node config)
-        : Point(model, state), _frame([](YAML::Node contact) {return _readEndFrame(contact);}(config), model, state),
+        : State(model, state), _frame([](YAML::Node contact) {return _readEndFrame(contact);}(config), model, state),
           _wrench(_frame.frame())
 {
         _resize();
@@ -53,9 +56,9 @@ Contact(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state
 }
 
 Contact(Contact&& other)
-        : Point(other), _is_active(other._is_active),
+        : State(other), _is_active(other._is_active),
           _state_size(other._state_size), _frame(other._frame),
-          _wrench(other._wrench, _frame.frame()) //_wrench(other._wrench)
+          _wrench(other._wrench, _frame.frame()), _name(other._name) //_wrench(other._wrench)
 {
         _resize();
         _ground_normal << 0,0,1;
@@ -65,15 +68,32 @@ Contact(Contact&& other)
 }
 
 Contact(Contact& other)
-        : Point(other), _is_active(other._is_active),
+        : State(other), _is_active(other._is_active),
           _state_size(other._state_size), _frame(other._frame),
-          _wrench(other._wrench, _frame.frame())
+          _wrench(other._wrench, _frame.frame()), _name(other._name)
 {
         _resize();
         _ground_normal << 0,0,1;
 
         mwoibn::VectorInt ext_empty;
         mwoibn::point_handling::computeChain( 0, _model, _wrench, _chain, ext_empty);
+}
+using Point::operator=;
+
+virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> generateCallback(YAML::Node config){
+  return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+}
+
+virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> generateCallback(YAML::Node config, mwoibn::communication_modules::Shared& shared){
+    if (!config["name"])
+      throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
+
+    if (shared.startsWith(config["name"].as<std::string>()))
+    return  std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                                   new mwoibn::communication_modules::SharedPointGet(config, shared, _wrench));
+
+    return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+
 }
 
 virtual void compute(){
@@ -136,6 +156,8 @@ virtual int jacobianSize() {
 
 //  const int size = 6; // PH
 mwoibn::VectorInt getChain() {return _chain;}
+
+virtual const mwoibn::VectorN& getReactionForce() = 0;
 
 const point_handling::Wrench& wrench() const {return _wrench;}
 point_handling::Wrench& wrench() {return _wrench;}

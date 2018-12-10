@@ -8,7 +8,7 @@ namespace robot_points
 CenterOfMass::CenterOfMass(RigidBodyDynamics::Model& model,
                            const mwoibn::robot_class::State& state)
 
-        : Point(model, state), _points(0, model, state)
+        : State(model, state), _points(0, model, state)
 {
 
         std::vector<RigidBodyDynamics::Body> bodies = model.mBodies;

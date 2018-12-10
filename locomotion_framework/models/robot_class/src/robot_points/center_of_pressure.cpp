@@ -6,8 +6,8 @@ namespace robot_points
 {
 
   CenterOfPressure::CenterOfPressure(RigidBodyDynamics::Model& model,
-               const mwoibn::robot_class::State& state, mwoibn::robot_class::Contacts& contacts)
-        : Point(model, state), _contacts(contacts), _points("ROOT", _model, _state)
+               const mwoibn::robot_class::State& state, mwoibn::robot_class::Contacts& contacts, mwoibn::robot_points::CenterOfMass& com)
+        : State(model, state), _contacts(contacts), _points("ROOT", _model, _state), _com(com)
 {
 }
 
@@ -15,7 +15,7 @@ void CenterOfPressure::init(){
   _null_space.assign(_contacts.size(), mwoibn::Matrix3::Zero());
 
   _points.clear();
-  
+
   for(int i = 0; i < _contacts.size(); i++)
   _points.addPoint(_contacts.contact(i).wrench().getBodyId());
 
@@ -50,7 +50,7 @@ void CenterOfPressure::update(bool jacobian){
         _contacts.contact(i).update(jacobian);
 
     Point::update(jacobian);
-
+    compute();
 }
 
 

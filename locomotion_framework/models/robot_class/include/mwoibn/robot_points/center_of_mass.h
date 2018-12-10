@@ -4,13 +4,13 @@
 #include <rbdl/rbdl.h>
 #include "mwoibn/point_handling/raw_positions_handler.h"
 #include <memory>
-#include "mwoibn/robot_points/point.h"
+#include "mwoibn/robot_points/state.h"
 
 namespace mwoibn
 {
 namespace robot_points
 {
-class CenterOfMass: public Point
+class CenterOfMass: public State
 {
 
 public:
@@ -18,6 +18,7 @@ public:
                const mwoibn::robot_class::State& state);
 
   virtual ~CenterOfMass() {}
+  using Point::operator=;
 
   virtual void compute();
 

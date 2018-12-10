@@ -103,6 +103,8 @@ WheelContactV2(WheelContactV2& other)
         compute();
 }
 
+using Point::operator=;
+
 virtual ~WheelContactV2() {
 }
 
@@ -113,6 +115,10 @@ virtual mwoibn::VectorN getPosition()
 {
         compute();
         return _point;
+}
+
+const mwoibn::VectorN& getReactionForce(){
+  return _wrench.force.getWorld();
 }
 
 virtual const mwoibn::Matrix&

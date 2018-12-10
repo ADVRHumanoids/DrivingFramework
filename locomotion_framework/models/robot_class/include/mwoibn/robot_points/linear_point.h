@@ -1,34 +1,33 @@
 #ifndef __MWOIBN__ROBOT_CLASS__LINEAR_POINT_H
 #define __MWOIBN__ROBOT_CLASS__LINEAR_POINT_H
 
-#include "mwoibn/robot_class/point.h"
-#include "mwoibn/robot_class/position.h"
+#include "mwoibn/robot_points/state.h"
+#include "mwoibn/point_handling/frame.h"
 
 
 namespace mwoibn
 {
-namespace robot_class
+namespace robot_points
 {
 
-class LinearPoint: public Point
+class LinearPoint: public State
 {
 
 public:
-  LinearPoint(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::point_handling::Position& position): Point(model, state), point(position){
+  template<typename Body>
+  LinearPoint(Body body, mwoibn::robot_class::Robot& robot): State(robot.getModel(), robot.state), point(body, robot.getModel(), robot.state){
     _point.setZero(3);
   }
 
-  LinearPoint(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::point_handling::Position position): Point(model, state), point(position){
-    _point.setZero(3);
-  }
+  using Point::operator=;
 
   virtual ~LinearPoint() {}
 
-  void compute(){_point.noalias() = point.getPointWorld();}
+  void compute(){_point.noalias() = point.getLinearWorld();}
 
   void computeJacobian() {_jacobian.noalias() = point.getPositionJacobian();}
 
-  mwoibn::point_handling::Position point;
+  mwoibn::point_handling::Frame point;
 
 
 };

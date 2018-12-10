@@ -54,8 +54,11 @@ mwoibn::robot_points::ContactV2::getPointJacobian(mwoibn::Matrix3 rotation_matri
 
 mwoibn::VectorN mwoibn::robot_points::ContactV2::getPosition()
 {
-
   return _frame.getFullStateWorld();
+}
+
+const mwoibn::VectorN& mwoibn::robot_points::ContactV2::getReactionForce(){
+  return _wrench.getWorld();
 }
 
 void mwoibn::robot_points::ContactV2::_read(YAML::Node contact)

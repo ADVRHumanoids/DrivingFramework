@@ -56,6 +56,8 @@ mwoibn::robot_points::WheelContactV2::getPointJacobian(mwoibn::Matrix3 rotation_
         return _jacobian;
 }
 
+
+// this does not support the torus model - it is a spherical model
 void mwoibn::robot_points::WheelContactV2::compute()
 {
         _frame.setLinearFixed(_ref_position);

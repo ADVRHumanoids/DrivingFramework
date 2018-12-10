@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__ROBOT_CLASS__ROBOT_POINTS__CONTACT_V2_H
 #define __MWOIBN__ROBOT_CLASS__ROBOT_POINTS__CONTACT_V2_H
 
-#include "mwoibn/robot_points/point.h"
+#include "mwoibn/robot_points/state.h"
 #include "mwoibn/robot_points/contact.h"
 
 namespace mwoibn
@@ -96,6 +96,7 @@ ContactV2(ContactV2& other)
 
 virtual ~ContactV2() { }
 
+using Point::operator=;
 
 virtual const mwoibn::Matrix& getPointJacobian();   // PH
 
@@ -105,7 +106,7 @@ virtual const mwoibn::Matrix& getWorldJacobian();   // PH
 virtual const mwoibn::Matrix& getPointJacobian(mwoibn::Matrix3 rotation_matrix); // contact specific
 
 
-
+virtual const mwoibn::VectorN& getReactionForce();
 virtual mwoibn::VectorN getPosition();
 
 virtual void setPosition(mwoibn::Vector3 new_state)
