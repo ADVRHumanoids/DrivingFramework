@@ -12,5 +12,6 @@ mwoibn:
                                 cut_off_frequency: 200
                 ground_forces:
                         filter:
-                                damping: 1.0
+                            torque:
+                                damping: 2.0
                                 cut_off_frequency: 200

@@ -1,10 +1,10 @@
 mwoibn:
-#        controller:
-#                position_controller:
-#                        dofs:
-#                                chain: position_lower_body
+        # controller:
+        #         position_controller:
+        #                 dofs:
+        #                         chain: position_lower_body
         feedbacks:
-                online: [link_side_online, odometry, upper_body]
+                online: [link_side_online, simulation_base, upper_body]
 #        ros:
 #                source:
 #                       urdf: "/robot_lower_body"

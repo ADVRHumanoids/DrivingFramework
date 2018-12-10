@@ -1,15 +1,15 @@
 mwoibn:
-        controller:
-                position_controller:
-                        dofs:
-                                chain: upper_body
+        # controller:
+        #         position_controller:
+        #                 dofs:
+        #                         chain: upper_body
         ros:
                 source:
                        urdf: "/robot_upper_body"
         controllers:
                 higher_level: [upper_body]
         feedbacks:
-                online: [link_side_online]              
+                online: [link_side_online]
 
 #                       srdf: "/robot_srdf"
 #        xbot:

@@ -17,6 +17,7 @@ centauro:
          active: true
          message: gazebo_msgs::ContactsState
          initialize: true
+         interface: fixed
       contact1:
          name: front_right_leg
          end_frame: wheel_2
@@ -34,6 +35,7 @@ centauro:
          active: true
          message: gazebo_msgs::ContactsState
          initialize: true
+         interface: fixed
       contact2:
          name: rear_right_leg
          end_frame: wheel_3
@@ -51,6 +53,7 @@ centauro:
          active: true
          message: gazebo_msgs::ContactsState
          initialize: true
+         interface: fixed
       contact3:
          name: rear_left_leg
          end_frame: wheel_4
@@ -68,3 +71,4 @@ centauro:
          active: true
          message: gazebo_msgs::ContactsState
          initialize: true
+         interface: fixed
