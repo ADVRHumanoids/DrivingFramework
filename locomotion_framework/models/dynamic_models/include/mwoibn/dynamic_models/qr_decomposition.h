@@ -1,5 +1,5 @@
-#ifndef DYNAMIC_MODELS_QR_DECOMPOSITION_H
-#define DYNAMIC_MODELS_QR_DECOMPOSITION_H
+#ifndef __MWOIBN__DYNAMIC_MODELS__QR_DECOMPOSITION_H
+#define __MWOIBN__DYNAMIC_MODELS__QR_DECOMPOSITION_H
 
 #include <rbdl/rbdl.h>
 #include "mwoibn/robot_class/robot.h"
@@ -18,7 +18,7 @@ class QrDecomposition : public BasicModel
 {
 
 public:
-QrDecomposition(mwoibn::robot_class::Robot& robot) : BasicModel(robot)
+QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<robot_class::DYNAMIC_MODEL> update = {}) : BasicModel(robot, update)
 {
         _qr_ptr.reset(new Eigen::ColPivHouseholderQR<Eigen::MatrixXd>(
                               _robot.contacts().jacobianCols(), _robot.contacts().jacobianRows()));
@@ -31,31 +31,24 @@ QrDecomposition(mwoibn::robot_class::Robot& robot) : BasicModel(robot)
 virtual ~QrDecomposition() {
 }
 
-virtual const mwoibn::VectorLimited& getGravityUnconstrained()
+virtual const mwoibn::VectorN& getGravity()
 {
-
-        _qr_gravity.noalias() =  _independent * BasicModel::getGravity();
-
         return _qr_gravity;
 }
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamics, computed for a non-constrained directions **/
-virtual const mwoibn::VectorLimited& getNonlinearEffectsUnconstrained()
+virtual const mwoibn::VectorN& getNonlinearEffects()
 {
-        _qr_non_linear.noalias() =  _independent * BasicModel::getNonlinearEffects();
-
         return _qr_non_linear;
 }
 
 /** @brief returns inertia, computed for a non-constrained directions **/
-virtual const mwoibn::MatrixLimited& getInertiaUnconstrained()
+virtual const mwoibn::Matrix& getInertia()
 {
-        _qr_inertia.noalias() = _independent * BasicModel::getInertia();
         return _qr_inertia;
 }
 
 const mwoibn::Matrix& getQMatrix(){
-        _q = _qr_ptr->matrixQ();
         return _q;
 }
 
@@ -70,25 +63,6 @@ unsigned int getRank() const {
         return _qr_ptr->rank();
 }
 
-void updateDecomposition()
-{
-
-
-        _contacts_transpose.noalias() = _robot.contacts().getJacobian().transpose();
-
-        _qr_ptr->compute(_contacts_transpose);
-
-        getQMatrix();
-
-        if (getRank() != _rank)
-                resize();  // NRT
-        else
-                _changed = false;
-
-        _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
-        _independent.noalias() = _q_cut.transpose();
-
-}
 
 void resize()
 {
@@ -100,7 +74,8 @@ bool changed(){
 }
 
 virtual void update() {
-        updateDecomposition();
+        _updateDecomposition();
+          _manager.update();
 }
 
 /** @brief performs transformation of a user defined vector/matrix to a
@@ -116,18 +91,18 @@ template <typename Type> Type decompose(Type state) const
 }
 
 /** @brief retrunes transformation matrix to get the non-constrained state */
-const mwoibn::MatrixLimited& getTransformationMatrix() const {
+const mwoibn::Matrix& getTransformationMatrix() const {
         return _independent;
 }
 
 protected:
 //  Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic>_permutation;
 std::unique_ptr<Eigen::ColPivHouseholderQR<Eigen::MatrixXd> > _qr_ptr;
-mwoibn::MatrixLimited _independent, _qr_inertia;   //< matrix to extract independent rows
+mwoibn::Matrix _independent, _qr_inertia;   //< matrix to extract independent rows
 int _rank;
 bool _changed;
 mwoibn::Matrix _contacts_transpose, _q_cut, _q;
-mwoibn::VectorLimited _qr_gravity, _qr_non_linear;
+mwoibn::VectorN _qr_gravity, _qr_non_linear;
 void _resize(int rank)
 {
         _rank = rank;
@@ -142,6 +117,48 @@ void _resize(int rank)
 //    _qr_non_linear.setZero(_robot.getDofs()-_rank);
 //    _qr_inertia.setZero(_robot.getDofs()-rank, _robot.getDofs());
 }
+
+
+
+virtual void _updateGravity()
+{
+        BasicModel::_updateGravity();
+        _qr_gravity.noalias() =  _independent * BasicModel::getGravity();
+}
+/** @brief returns all modeled nonlinear effects including gravity in robots
+ * dynamics, computed for a non-constrained directions **/
+virtual void _updateNonlinearEffects()
+{
+        BasicModel::_updateNonlinearEffects();
+        _qr_non_linear.noalias() =  _independent * BasicModel::getNonlinearEffects();
+}
+
+/** @brief returns inertia, computed for a non-constrained directions **/
+virtual void _updateInertia()
+{
+        BasicModel::_updateInertia();
+        _qr_inertia.noalias() = _independent * BasicModel::getInertia();
+}
+
+
+void _updateDecomposition()
+{
+        _contacts_transpose.noalias() = _robot.contacts().getJacobian().transpose();
+
+        _qr_ptr->compute(_contacts_transpose);
+
+        _q = _qr_ptr->matrixQ();
+
+        if (getRank() != _rank)
+                resize();  // NRT
+        else
+                _changed = false;
+
+        _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
+        _independent.noalias() = _q_cut.transpose();
+}
+
+
 };
 } // namespace package
 } // namespace library

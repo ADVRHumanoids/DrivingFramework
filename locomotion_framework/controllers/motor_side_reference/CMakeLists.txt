@@ -23,18 +23,18 @@ find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
 	include
 	${RBDL_INCLUDE_DIR}
-  LIBRARIES 
+  LIBRARIES
 	motor_side_reference
 	${RBDL_LIBRARY}
-  CATKIN_DEPENDS  
+  CATKIN_DEPENDS
         basic_controllers
 	eigen_utils
 	simple_log
         dynamic_models
-  DEPENDS 
+  DEPENDS
 	Eigen3
 )
 
@@ -53,6 +53,7 @@ include_directories(
    add_library(motor_side_reference
 
         src/sea_reference.cpp
+        src/sea_compensation.cpp
 )
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -60,7 +61,7 @@ include_directories(
    add_dependencies(motor_side_reference ${catkin_EXPORTED_TARGETS})
 
    target_link_libraries(motor_side_reference
-     ${catkin_LIBRARIES} 
+     ${catkin_LIBRARIES}
      ${RBDL_LIBRARY}
    )
 
@@ -113,6 +114,3 @@ endif()
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
-
-

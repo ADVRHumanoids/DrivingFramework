@@ -1,5 +1,5 @@
-#ifndef GRAVITY_COMPENSATION_SIMPLE_QR_GRAVITY_COMPENSATION_H
-#define GRAVITY_COMPENSATION_SIMPLE_QR_GRAVITY_COMPENSATION_H
+#ifndef __MWOIBN__GRAVITY_COMPENSATION__SIMPLE_QR_GRAVITY_COMPENSATION_H
+#define __MWOIBN__GRAVITY_COMPENSATION__SIMPLE_QR_GRAVITY_COMPENSATION_H
 
 #include "mwoibn/gravity_compensation/gravity_compensation.h"
 #include "mwoibn/robot_class/robot.h"
@@ -24,12 +24,13 @@ public:
  */
 SimpleQRGravityCompensation(
         mwoibn::dynamic_models::QrDecomposition& dynamic_model,
-        mwoibn::robot_class::INTERFACE interface =
-                mwoibn::robot_class::INTERFACE::TORQUE)
+        mwoibn::Interface interface =
+                "TORQUE")
         : mwoibn::basic_controllers::LowerLevelController(
                 dynamic_model.getRobot(), interface),
         _dynamic_model(dynamic_model)
 {
+        _dynamic_model.subscribe(mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -41,11 +42,12 @@ SimpleQRGravityCompensation(
 SimpleQRGravityCompensation(
         mwoibn::dynamic_models::QrDecomposition& dynamic_model,
         mwoibn::robot_class::Robot& robot_real,
-        mwoibn::robot_class::INTERFACE interface =
-                mwoibn::robot_class::INTERFACE::TORQUE)
+        mwoibn::Interface interface =
+                "TORQUE")
         : mwoibn::basic_controllers::LowerLevelController(robot_real, interface),
         _dynamic_model(dynamic_model)
 {
+       _dynamic_model.subscribe(mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -86,7 +88,7 @@ virtual void compute()
         //std::cout << _transformation_inverser.get() << std::endl;
 
         _command.noalias() =
-                _transformation_inverser.get() * _dynamic_model.getGravityUnconstrained();
+                _transformation_inverser.get() * _dynamic_model.getGravity();
 
         //std::cout << "command\t" << _command.transpose() << std::endl;
         //std::cout << "_transformation_inverser.get()\t" << _transformation_inverser.get() << std::endl;

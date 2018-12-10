@@ -7,7 +7,7 @@
 #include "mwoibn/dynamic_models/qr_decomposition.h"
 #include "mwoibn/tests_common/test.h"
 
-using mwoibn::robot_class::INTERFACE;
+using mwoibn::Interface;
 
 TEST(QRTest, testFull)
 {

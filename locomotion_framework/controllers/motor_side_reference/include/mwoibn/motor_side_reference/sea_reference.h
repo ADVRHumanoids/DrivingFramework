@@ -1,10 +1,10 @@
-#ifndef MOTOR_SIDE_REFERENCE_SEA_REFERENCE_H
-#define MOTOR_SIDE_REFERENCE_SEA_REFERENCE_H
+#ifndef __MWOIBN__MOTOR_SIDE_REFERENCE__SEA_REFERENCE_H
+#define __MWOIBN__MOTOR_SIDE_REFERENCE__SEA_REFERENCE_H
 
 #include <rbdl/rbdl.h>
 #include "mwoibn/eigen_utils/eigen_utils.h"
 #include "mwoibn/basic_controllers/lower_level_controller.h"
-#include "mwoibn/dynamic_models/basic_model.h"
+//#include "mwoibn/dynamic_models/basic_model.h"
 
 namespace mwoibn {
 
@@ -13,7 +13,7 @@ namespace motor_side_reference {
 class SeaReference: public mwoibn::basic_controllers::LowerLevelController {
 
 public:
-  SeaReference(mwoibn::robot_class::Robot& robot, mwoibn::basic_controllers::LowerLevelController& gravity_compensation,  mwoibn::robot_class::INTERFACE interface = mwoibn::robot_class::INTERFACE::POSITION);
+  SeaReference(mwoibn::robot_class::Robot& robot, mwoibn::basic_controllers::LowerLevelController& gravity_compensation,  mwoibn::Interface interface = "POSITION");
   virtual ~SeaReference(){}
 
 //  void setLinkSideReference(mwoibn::VectorN reference){_link_side = reference;}

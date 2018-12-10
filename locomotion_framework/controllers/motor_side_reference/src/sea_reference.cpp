@@ -9,7 +9,7 @@ namespace motor_side_reference
 SeaReference::SeaReference(
         mwoibn::robot_class::Robot& robot,
         mwoibn::basic_controllers::LowerLevelController& gravity_compensation,
-        mwoibn::robot_class::INTERFACE interface)
+        mwoibn::Interface interface)
         : mwoibn::basic_controllers::LowerLevelController(robot, interface),
         _gravity_compensation(gravity_compensation)
 {
@@ -30,7 +30,7 @@ void SeaReference::updateStiffnessMatrix()
 
 void SeaReference::compute()
 {
-
+        // use robot state as a feedback? or command -- I don't have to pass it
         _command = _stiffness_matrix * _gravity_compensation.getCommand() + _robot.command.position.get();
 }
 
