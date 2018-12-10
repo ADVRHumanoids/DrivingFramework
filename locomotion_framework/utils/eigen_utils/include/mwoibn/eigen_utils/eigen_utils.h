@@ -186,6 +186,15 @@ Scalar damping(int i){
         return _damping[i];
 }
 
+void setDamping(int i, double damp){
+        _damping[i] = damp;
+}
+
+void setDamping(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damp){
+        for(int i = 0; i < _damping.size(); i++)
+            _damping[i] = damp[i];
+}
+
 Eigen::Matrix<Scalar, Eigen::Dynamic, 1> damping() {return _damping;}
 
 
@@ -278,20 +287,11 @@ void compute(const Dynamic_Matrix& jacobian, Dynamic_Matrix& P)
 
         _jacobian.noalias() = jacobian * P;
 
-//    for(int i = 0; i < _jacobian.rows(); i++){
-//      for(int j = 0; j < _jacobian.cols(); j++){
-//        if (std::fabs(_jacobian(i,j)) < 1e-4) _jacobian(i,j) = 0.0;
-//      }
-//    }
+        // here the singularity should be noticed?
         _inverser.compute(_jacobian);
 
-        //std::cout << _jacobian << std::endl;
 
         P.noalias() -= _inverser.get() * _jacobian;
-
-//    for(int i = 0; i < _jacobian.rows(); i++){
-//      _dets[i] = _jacobian.row(i).cwiseAbs().maxCoeff();
-//    }
 }
 
 Eigen::Matrix<Scalar, Eigen::Dynamic, 1> damping(){
@@ -308,7 +308,6 @@ const Dynamic_Matrix& getInverse() const {
 const Dynamic_Matrix& getJacobian() const {
         return _jacobian;
 }
-//  const Dynamic_Matrix& getDets() {return _dets[i];}
 
 virtual ~AgumentedNullSpaceProjection() {
 }
@@ -411,7 +410,7 @@ struct Hasher
         }
 };
 
-static Eigen::VectorXi it(int size, int base = 0)
+static Eigen::VectorXi iota(int size, int base = 0)
 {
   Eigen::VectorXi iter(size);
 
@@ -420,6 +419,19 @@ static Eigen::VectorXi it(int size, int base = 0)
 
   return iter;
 }
+
+static Eigen::VectorXi enumerate(Eigen::Matrix<bool, Eigen::Dynamic, 1> bools)
+{
+  Eigen::VectorXi ids(bools.count());
+  int k = 0;
+  for(int i = 0; i < bools.size(); i++){
+    if(bools[i]) { ids[k] = i;
+                   k++; }
+  }
+
+  return ids;
+}
+
 
 
 // }
