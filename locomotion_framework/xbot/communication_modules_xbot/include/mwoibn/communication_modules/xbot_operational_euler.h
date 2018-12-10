@@ -22,7 +22,7 @@ public:
   virtual bool reset();
   virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 position);
   virtual ~XBotOperationalEuler(){}
-  virtual bool get();
+  virtual bool run();
 
 protected:
   XBot::ImuSensor::ConstPtr _imu;

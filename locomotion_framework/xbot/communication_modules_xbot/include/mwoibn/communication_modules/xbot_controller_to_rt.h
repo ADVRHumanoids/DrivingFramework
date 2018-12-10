@@ -50,7 +50,7 @@ public:
 
   virtual ~XBotControllerToRT() {}
 
-  virtual bool send()
+  virtual bool run()
   {
 
     _data[check] = mwoibn::IS_VALID;

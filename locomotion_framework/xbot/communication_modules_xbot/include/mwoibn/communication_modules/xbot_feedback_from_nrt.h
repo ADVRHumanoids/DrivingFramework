@@ -41,7 +41,7 @@ public:
 
   virtual ~XBotFeedbackFromNRT(){}
 
-  virtual bool get(){
+  virtual bool run(){
 
     _initialized = true;
       if (_position){

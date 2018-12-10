@@ -34,7 +34,7 @@ public:
 
   virtual ~XBotOperationalEulerFromNRT() {}
 
-  virtual bool get()
+  virtual bool run()
   {
     _sub_position.read(_state);
 

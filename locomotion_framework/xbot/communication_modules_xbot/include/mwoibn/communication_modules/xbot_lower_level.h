@@ -74,7 +74,7 @@ public:
 
   virtual ~XBotLowerLevel() {}
 
-  virtual bool send();
+  virtual bool run();
 
 protected:
   XBot::RobotInterface& _robot;
@@ -84,19 +84,19 @@ protected:
   const mwoibn::robot_class::State& _lower_limits;
   const mwoibn::robot_class::State& _upper_limits;
 
-  void _limit(mwoibn::robot_class::INTERFACE interface)
+  void _limit(mwoibn::Interface interface)
   {
 
-    for (int i = 0; i < _command.interface(interface).size(); i++)
+    for (int i = 0; i < _command[interface].size(); i++)
     {
       if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
-      if (_lower_limits.interface(interface).get(i) == mwoibn::NON_EXISTING)
+      if (_lower_limits[interface].get(i) == mwoibn::NON_EXISTING)
         continue;
-      if (_command.interface(interface).get(i) < _lower_limits.interface(interface).get(i)){
-          _command.interface(interface).set(_lower_limits.interface(interface).get(i), i);
+      if (_command[interface].get(i) < _lower_limits[interface].get(i)){
+          _command[interface].set(_lower_limits[interface].get(i), i);
       }
-      else if (_command.interface(interface).get(i) > _upper_limits.interface(interface).get(i)){
-               _command.interface(interface).set(_upper_limits.interface(interface).get(i), i);
+      else if (_command[interface].get(i) > _upper_limits[interface].get(i)){
+               _command[interface].set(_upper_limits[interface].get(i), i);
       }
     }
   }

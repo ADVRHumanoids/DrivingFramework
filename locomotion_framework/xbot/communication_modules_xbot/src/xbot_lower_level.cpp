@@ -1,13 +1,13 @@
 #include "mwoibn/communication_modules/xbot_lower_level.h"
 
-bool mwoibn::communication_modules::XBotLowerLevel::send()
+bool mwoibn::communication_modules::XBotLowerLevel::run()
 {
   if (_position)
   {
     _robot.getPositionReference(pub);
 //    std::cout << "position before\t" << pub.transpose() << std::endl;
 
-    _limit(mwoibn::robot_class::INTERFACE::POSITION);
+    _limit("POSITION");
     mapTo(_command.position.get(), pub);
 
 //    std::cout << "position after\t" << pub.transpose() << std::endl;
@@ -19,7 +19,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
 //    std::cout << "velocity before\t" << pub.transpose() << std::endl;
 //    std::cout << "velocity command\t" << _command.velocity.get.transpose() << std::endl;
 
-    _limit(mwoibn::robot_class::INTERFACE::VELOCITY);
+    _limit("VELOCITY");
     mapTo(_command.velocity.get(), pub);
 
 //    std::cout << "velocity after\t" << pub.transpose() << std::endl;
@@ -29,7 +29,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::send()
   {
     _robot.getEffortReference(pub);
 
-    _limit(mwoibn::robot_class::INTERFACE::TORQUE);
+    _limit("TORQUE");
     mapTo(_command.torque.get(), pub);
 
     _robot.setEffortReference(pub);

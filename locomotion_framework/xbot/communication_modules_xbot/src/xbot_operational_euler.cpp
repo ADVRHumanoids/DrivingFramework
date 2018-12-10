@@ -57,7 +57,7 @@ mwoibn::communication_modules::XBotOperationalEuler::XBotOperationalEuler(
 
 }
 
-bool mwoibn::communication_modules::XBotOperationalEuler::get()
+bool mwoibn::communication_modules::XBotOperationalEuler::run()
 {
 
         if(!_size) return true;

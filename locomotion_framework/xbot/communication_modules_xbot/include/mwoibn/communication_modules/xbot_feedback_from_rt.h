@@ -48,7 +48,7 @@ public:
 
   virtual ~XBotFeedbackFromRT() {}
 
-  virtual bool get()
+  virtual bool run()
   {
 
     _initialized = true;

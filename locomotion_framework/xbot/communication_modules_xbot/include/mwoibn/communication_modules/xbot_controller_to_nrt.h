@@ -43,7 +43,7 @@ public:
 
   virtual ~XBotControllerToNRT(){}
 
-  virtual bool send(){
+  virtual bool run(){
 
     if (_position){
       mapTo(_command.position.get(),

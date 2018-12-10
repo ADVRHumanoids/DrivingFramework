@@ -82,7 +82,7 @@ public:
     return _initialized;
   }
 
-  virtual bool send()
+  virtual bool run()
   {
     initialize();
 

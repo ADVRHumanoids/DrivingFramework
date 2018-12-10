@@ -71,7 +71,7 @@ public:
 
   virtual ~XBotFeedbackShared() {}
 
-  virtual bool get()
+  virtual bool run()
   {
     if(!initialize()) return false;
 

@@ -54,17 +54,17 @@ public:
         mwoibn::VectorN lower_original = _lower_limits.position.get();
         mwoibn::VectorN upper_original = _upper_limits.position.get();
 
-        _initLimit(_lower_limits, -config["limits"]["tolerance"]["position"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::POSITION);
-        _initLimit(_lower_limits, -config["limits"]["tolerance"]["velocity"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::VELOCITY);
-        _initLimit(_lower_limits, -config["limits"]["tolerance"]["torque"].as<double>(),                    mwoibn::robot_class::INTERFACE::TORQUE);
-        _initLimit(_upper_limits,  config["limits"]["tolerance"]["position"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::POSITION);
-        _initLimit(_upper_limits,  config["limits"]["tolerance"]["velocity"].as<double>()*mwoibn::PI/180.0, mwoibn::robot_class::INTERFACE::VELOCITY);
-        _initLimit(_upper_limits,  config["limits"]["tolerance"]["torque"].as<double>(),                    mwoibn::robot_class::INTERFACE::TORQUE);
+        _initLimit(_lower_limits, -config["limits"]["tolerance"]["position"].as<double>()*mwoibn::PI/180.0, "POSITION");
+        _initLimit(_lower_limits, -config["limits"]["tolerance"]["velocity"].as<double>()*mwoibn::PI/180.0, "VELOCITY");
+        _initLimit(_lower_limits, -config["limits"]["tolerance"]["torque"].as<double>(),                    "TORQUE");
+        _initLimit(_upper_limits,  config["limits"]["tolerance"]["position"].as<double>()*mwoibn::PI/180.0, "POSITION");
+        _initLimit(_upper_limits,  config["limits"]["tolerance"]["velocity"].as<double>()*mwoibn::PI/180.0, "VELOCITY");
+        _initLimit(_upper_limits,  config["limits"]["tolerance"]["torque"].as<double>(),                    "TORQUE");
     /*
         std::cout << "INIT tolerance" << std::endl;
         std::cout << "name\tLL_org\tLL_new\tUP_old\tUP_new" << std::endl;
 
-        for(int i = 0; i < _lower_limits.get(mwoibn::robot_class::INTERFACE::POSITION).size(); i++){
+        for(int i = 0; i < _lower_limits.get("POSITION").size(); i++){
             if (_map.get()[i] == mwoibn::NON_EXISTING)
                 std::cout << "unknown\t";
             else
@@ -105,7 +105,7 @@ public:
     return _initialized;
   }
 
-  virtual bool get();
+  virtual bool run();
 
   virtual bool reset();
 
@@ -113,10 +113,10 @@ protected:
   mwoibn::VectorN _pub;
   XBot::RobotInterface& _robot;
   mwoibn::robot_class::State _lower_limits, _upper_limits;
-  virtual bool _inLimits(mwoibn::robot_class::INTERFACE interface);
-  virtual bool _inLimits(int i, mwoibn::robot_class::INTERFACE interface);
+  virtual bool _inLimits(mwoibn::Interface interface);
+  virtual bool _inLimits(int i, mwoibn::Interface interface);
 
-  void _initLimit(mwoibn::robot_class::State& limits, double tolerance, mwoibn::robot_class::INTERFACE interface);
+  void _initLimit(mwoibn::robot_class::State& limits, double tolerance, mwoibn::Interface interface);
 };
 }
 }
