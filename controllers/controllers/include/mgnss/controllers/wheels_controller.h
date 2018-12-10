@@ -12,6 +12,11 @@
 #include <mwoibn/hierarchical_control/tasks/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/tasks/orientation_selective_task.h>
 
+#include <mwoibn/hierarchical_control/controllers/actions.h>
+#include <mwoibn/hierarchical_control/actions/task.h>
+#include <mwoibn/hierarchical_control/actions/compute.h>
+
+
 namespace mgnss
 {
 
@@ -26,12 +31,19 @@ WheelsController(mwoibn::robot_class::Robot& robot);
 virtual ~WheelsController() {
 }
 
-virtual void init() {
+virtual void init(){
+        _robot.wait();
+        _robot.get();
+        _robot.updateKinematics();
+        _robot.centerOfMass().update();
+
         _setInitialConditions();
+
 }
 
-virtual void startLog(mwoibn::common::Logger& logger){
+virtual void initLog(mwoibn::common::Logger& logger){
 }
+
 virtual void log(mwoibn::common::Logger& logger, double time){
 }
 
@@ -43,14 +55,13 @@ virtual void stop(){
 
 virtual void send(){
         _robot.send();
-}   // NOT IMPLEMENTED
+}
 
-virtual void close(){
-}                        // NOT IMPLEMENTED
+virtual void close(){}
+
 virtual void setRate(double rate){
         mgnss::modules::Base::setRate(rate);
         setRate();
-
 }
 
 virtual void update(){
@@ -138,17 +149,25 @@ virtual const mwoibn::Vector3& getAngVel(){
 void setSupport(const mwoibn::VectorN& support){
         _support.noalias() = support;
 }
+
+void setSupport(int i, double pos){_support[i] = pos;}
+
 void setSupportVel(const mwoibn::VectorN& support_vel){
         _support_vel.noalias() = support_vel;
 }
 
+void setSupportVel(int i, double vel){_support_vel[i] = vel;}
+
+
 virtual double getBaseGroundX() = 0;
 virtual double getBaseGroundY() = 0;
 virtual double getBaseGroundZ() = 0;
-virtual double getBaseGroundRz() = 0;
 
 
-virtual void updateBase() = 0;
+virtual void updateBase(){
+          _orientation = mwoibn::Quaternion::fromAxisAngle(_x, _angular_vel[0]*_robot.rate())*(mwoibn::Quaternion::fromAxisAngle(_y, _angular_vel[1]*_robot.rate()))*(_orientation);
+          _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
+}
 
 virtual void step();
 
@@ -162,32 +181,12 @@ virtual bool isRunning() {
         return _robot.isRunning();
 }
 
-virtual bool isDonePosition(const double eps)
-{
-        return _isDone(*_pelvis_position_ptr, eps);
-}
-virtual bool isDoneOrientation(const double eps)
-{
-        return _isDone(*_pelvis_orientation_ptr, eps);
-}
-virtual bool isDoneSteering(const double eps) const = 0;
-//  {
-//    return _isDone(*_leg_steer_ptr, eps);
-//  }
-virtual bool isDonePlanar(const double eps) const = 0;
-//  {
-//    return _isDone(*_steering_ptr, eps);
-//  }
-virtual bool isDoneWheels(const double eps) const = 0;
-//  {
-//    return _isDone(*_leg_castor_ptr, eps);
-//  }
 
-const mwoibn::VectorN& getSupportReference()
+virtual const mwoibn::VectorN& getSupportReference()
 {
         return _steering_ptr->getReference();
 }
-const mwoibn::VectorN& getBodyPosition()
+virtual const mwoibn::VectorN& getBodyPosition()
 {
         return _pelvis_position_ptr->getReference();
 }
@@ -195,43 +194,28 @@ const mwoibn::VectorN& getBodyPosition()
 virtual void nextStep();
 
 
-protected:
-bool _isDone(const mwoibn::hierarchical_control::tasks::BasicTask& task,
-             const double eps) const
-{
-        return task.getError().cwiseAbs().maxCoeff() < eps;
-}
+const mgnss::higher_level::SteeringReference& steering_task(){return *_steering_ref_ptr;}
 
-template<typename Task>
-bool _isDone(const std::vector<Task>& tasks,
-             const double eps) const
-{
-        bool done = true;
-        for(auto& task : tasks) {
-                done = _isDone(task, eps) && done;
-        }
-        return done;
-}
+protected:
 
 virtual void _updateSupport()
 {
         _steering_ptr->setReference(_support);
 }
 
-std::unique_ptr<mwoibn::hierarchical_control::tasks::Constraints>
-_constraints_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::Constraints> _constraints_ptr;
 
-std::unique_ptr<mwoibn::hierarchical_control::tasks::CartesianSelective>
-_pelvis_position_ptr;
-std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective>
-_pelvis_orientation_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::CartesianSelective> _pelvis_position_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelvis_orientation_ptr;
 
-std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointTracking>
-_steering_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointTracking> _steering_ptr;
 
 std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
 
-std::unique_ptr<mwoibn::hierarchical_control::controllers::Basic> _hierarchical_controller_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::controllers::Actions> _ik_ptr;
+
+std::map<std::string, mwoibn::hierarchical_control::tasks::BasicTask*> _tasks;  // Adding that only helps with automatic IK generation
+std::map<std::string, std::shared_ptr<mwoibn::hierarchical_control::actions::Task> > _actions;  // Adding that only helps with automatic IK generation
 
 
 double rate = 200;
@@ -246,8 +230,13 @@ mwoibn::VectorInt _select_steer, _select_ik;
 mwoibn::VectorN _l_limits, _u_limits;
 int count = 0;
 
-virtual void _setInitialConditions() = 0;
+virtual void _setInitialConditions();
 virtual void _allocate();
+virtual void _createTasks(YAML::Node config);
+virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config);
+virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Compute> _taskAction(std::string task, YAML::Node config);
+virtual void _initIK(YAML::Node config);
+
 
 };
 }

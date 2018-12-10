@@ -1,5 +1,5 @@
-#ifndef __MGNSS__CONTROLLERS__WHEELED_MOTION_EVENT_3_H
-#define __MGNSS__CONTROLLERS__WHEELED_MOTION_EVENT_3_H
+#ifndef __MGNSS_CONTROLLERS_WHEELED_MOTION_EVENT_4_H
+#define __MGNSS_CONTROLLERS_WHEELED_MOTION_EVENT_4_H
 
 #include "mgnss/controllers/wheels_controller_extend.h"
 
@@ -11,25 +11,14 @@ namespace mgnss
 namespace controllers
 {
 
-class WheeledMotionEvent3 : public WheelsControllerExtend
+class WheeledMotionEvent4 : public WheelsControllerExtend
 {
 
 public:
-  WheeledMotionEvent3( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot)
-  {
-          YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
-          config["name"] = name;
-          _create(config);
-  }
+WheeledMotionEvent4(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name);
+WheeledMotionEvent4(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
-
-
-  WheeledMotionEvent3( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot)
-  {
-          _create(config);
-  }
-
-virtual ~WheeledMotionEvent3() {
+virtual ~WheeledMotionEvent4() {
 }
 
 virtual void initLog(mwoibn::common::Logger& logger);
@@ -74,27 +63,45 @@ virtual double getBaseGroundZ()
         return _pelvis_position_ptr->points().getPointStateWorld(0)[2];
 }
 
+// const mwoibn::VectorN& getSteer(){
+//         return _leg_tasks["STEERING"].first.getCurrent();
+// }
+// double getSteer(int i){
+//         return _steer_task[i].getCurrent();
+// }
+// const mwoibn::VectorN& errorSteer(){
+//         return _leg_tasks["STEERING"].first.getError();
+// }
+
 const mwoibn::VectorBool& isResteer(){
         return _resteer;
 }
+// const mwoibn::VectorN& getAnkleYaw(){
+//         return _test_steer;
+// }
+//  mwoibn::VectorN getBase(){return _robot.state.position.get().head<3>();}
 const mwoibn::VectorN& getBaseError(){
         return _pelvis_position_ptr->getError();
 }
+// const mwoibn::VectorN& getBaseOrnError(){
+//         return _pelvis_orientation_ptr->getError();
+// }
+// const mwoibn::VectorInt& countResteer(){
+//         return _reset_count;
+// }
 
 
 protected:
-  WheeledMotionEvent3(mwoibn::robot_class::Robot& robot) : WheelsControllerExtend(robot){ }
+void _allocate(YAML::Node config);
 
-  void _allocate(YAML::Node config);
+std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
 
-  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
+mwoibn::VectorN _com_ref;
 
-  mwoibn::VectorN _com_ref;
-
-  virtual void _setInitialConditions();
-  virtual void _allocate();
-  virtual void _createTasks(YAML::Node config);
-  virtual void _initIK(YAML::Node config);
+virtual void _setInitialConditions();
+virtual void _allocate();
+virtual void _createTasks(YAML::Node config);
+virtual void _initIK(YAML::Node config);
 
 
 };

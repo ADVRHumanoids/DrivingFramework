@@ -7,9 +7,6 @@
 #include <mwoibn/robot_class/angles/caster.h>
 #include <mwoibn/robot_class/angles/steering.h>
 #include <mwoibn/hierarchical_control/tasks/aggravated.h>
-//#include <mwoibn/hierarchical_control/tasks/castor_angle_task.h>
-//#include <mwoibn/hierarchical_control/tasks/camber_angle_task_2.h>
-//#include <mwoibn/hierarchical_control/tasks/steering_angle_task.h>
 
 namespace mgnss
 {
@@ -25,79 +22,143 @@ WheelsControllerExtend(mwoibn::robot_class::Robot& robot);
 virtual ~WheelsControllerExtend() {
 }
 
-void resetSteering();
+virtual void compute();
+virtual void steering();
 
-void setSteering(int i, double th)
+virtual void fullUpdate(const mwoibn::VectorN& support);
+
+virtual void resteer(int i)
 {
-        _steer_task[i].setReference(th);
+        _resteer[i] = true;
+        _start_steer[i] = _test_steer[i];
+}
+virtual void stopResteer(int i)
+{
+        _resteer[i] = false;
+        _start_steer[i] = _test_steer[i];
 }
 
-void setCastor(int i, double th)
+virtual void resetSteering();
+
+virtual void setSteering(int i, double th)
 {
-        _caster_task[i].setReference(th);
-}
-void setCamber(int i, double th)
-{
-        _camber_task[i].setReference(th);
+        _leg_tasks["STEERING"].second[i].setReference(th);
 }
 
-void setSteering(const mwoibn::VectorN& ref)
+virtual void setCastor(int i, double th)
+{
+        _leg_tasks["CASTER"].second[i].setReference(th);
+}
+virtual void setCamber(int i, double th)
+{
+        _leg_tasks["CAMBER"].second[i].setReference(th);
+}
+
+virtual void setSteering(const mwoibn::VectorN& ref)
 {
         for(int i = 0; i < ref.size(); i++)
-                _steer_task[i].setReference(ref[i]);
+                _leg_tasks["STEERING"].second[i].setReference(ref[i]);
 }
 
-void setCastor(const mwoibn::VectorN& ref)
+virtual void setCastor(const mwoibn::VectorN& ref)
 {
         for(int i = 0; i < ref.size(); i++)
-                _caster_task[i].setReference(ref[i]);
+                _leg_tasks["CASTER"].second[i].setReference(ref[i]);
 }
-void setCamber(const mwoibn::VectorN& ref)
+virtual void setCamber(const mwoibn::VectorN& ref)
 {
         for(int i = 0; i < ref.size(); i++)
-                _camber_task[i].setReference(ref[i]);
+                _leg_tasks["CAMBER"].second[i].setReference(ref[i]);
 }
 
-virtual bool isDoneSteering(const double eps) const
-{
-        return _isDone(_leg_steer, eps);
-}
-virtual bool isDonePlanar(const double eps) const
-{
-        return _isDone(*_steering_ptr, eps);
-}
-virtual bool isDoneWheels(const double eps) const
-{
-        return _isDone(_leg_camber, eps);
+double getSteer(int i){
+        return _leg_tasks["STEERING"].second[i].getCurrent();
 }
 
-void claim(int i){
+const mwoibn::VectorN& errorSteer(){
+        return _leg_tasks["STEERING"].first.getError();
+}
+
+// const mwoibn::VectorN& getSteerICM(){
+//         return _steering_ref_ptr->getICM();
+// }
+// const mwoibn::VectorN& getSteerSP(){
+//         return _steering_ref_ptr->getSP();
+// }
+// const mwoibn::VectorN& getVelICM(){
+//         return _steering_ref_ptr->vICM();
+// }
+// const mwoibn::VectorN& getVelSP(){
+//         return _steering_ref_ptr->vSP();
+// }
+// const mwoibn::VectorN& getDampingICM(){
+//         return _steering_ref_ptr->getDampingICM();
+// }
+// const mwoibn::VectorN& getDampingSP(){
+//         return _steering_ref_ptr->getDampingSP();
+// }
+
+// const mwoibn::VectorN& getVel(){
+//         return _steering_ref_ptr->v();
+// }
+// const mwoibn::VectorN& getDamp(){
+//         return _steering_ref_ptr->damp();
+// }
+// const mwoibn::VectorN& rawSteer(){
+//         return _steering_ref_ptr->getLimited();
+// }
+// const mwoibn::VectorN& pureSteer(){
+//         return _steering_ref_ptr->getRaw();
+// }
+
+//
+// virtual bool isDoneSteering(const double eps) const
+// {
+//         return _isDone(_leg_tasks["STEERING"].first, eps);
+// }
+// virtual bool isDonePlanar(const double eps) const
+// {
+//         return _isDone(*_steering_ptr, eps);
+// }
+// virtual bool isDoneWheels(const double eps) const
+// {
+//         return _isDone(_leg_tasks["CAMBER"].first, eps);
+// }
+
+const mwoibn::VectorInt& countResteer(){
+        return _reset_count;
+}
+
+virtual void _allocate();
+
+
+virtual void claim(int i){
         _steering_ptr->claimContact(i);
         _constraints_ptr->claimContact(i);
 }
 
-void release(int i){
+virtual void release(int i){
         _steering_ptr->releaseContact(i);
         _constraints_ptr->releaseContact(i);
 }
 
+virtual void initLog(mwoibn::common::Logger& logger);
+virtual void log(mwoibn::common::Logger& logger, double time);
+
+
 protected:
+std::map<std::string, std::pair<mwoibn::hierarchical_control::tasks::Aggravated, std::vector<mwoibn::hierarchical_control::tasks::Angle> > > _leg_tasks;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _world_posture_ptr;
 
-std::vector<mwoibn::robot_class::angles::Caster> _caster;
-std::vector<mwoibn::robot_class::angles::Steering> _steer;
-std::vector<mwoibn::robot_class::angles::Camber> _camber;
+mwoibn::VectorInt _reset_count;
+mwoibn::VectorN _test_steer, _current_steer, _start_steer;
+mwoibn::VectorBool _resteer;
 
-std::vector<mwoibn::hierarchical_control::tasks::Angle> _caster_task;
-std::vector<mwoibn::hierarchical_control::tasks::SoftAngle> _steer_task;
-std::vector<mwoibn::hierarchical_control::tasks::Angle> _camber_task;
+void _create(YAML::Node config);
+virtual void _correct();
 
-mwoibn::hierarchical_control::tasks::Aggravated _leg_camber;
-mwoibn::hierarchical_control::tasks::Aggravated _leg_castor;
-mwoibn::hierarchical_control::tasks::Aggravated _leg_steer;
-
-virtual void _createAngleTasks();
+virtual void _createTasks(YAML::Node config);
 virtual void _setInitialConditions();
-
 };
 }
 }
