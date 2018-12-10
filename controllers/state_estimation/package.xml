@@ -46,6 +46,7 @@
   <depend>filters</depend> <!-- all programs -->
   <depend>modules</depend> <!-- all programs -->
   <depend>dynamic_models</depend>
+  <depend>mwoibn_dynamic_points</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

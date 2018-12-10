@@ -1,31 +1,25 @@
 #include "mgnss/state_estimation/ground_forces.h"
-
 #include <iomanip>
 
-mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot)
-        : mgnss::modules::Base(robot), _gravity(robot)//, _ax_oh("ROOT", _robot), _ax_ph("ROOT", _robot)
-{
-        _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.contacts().size()*3, 1000, 1));
-
-        _n << 0,0,1;
-}
-
 mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot,
-                                                std::string config_file)
-        : mgnss::modules::Base(robot), _gravity(robot)//, _ax_oh("ROOT", _robot), _ax_ph("ROOT", _robot)
+                                                std::string config_file, std::string name)
+        : mgnss::modules::Base(robot), _gravity(robot, {mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY,
+                                                        mwoibn::robot_class::DYNAMIC_MODEL::INERTIA,
+                                                        mwoibn::robot_class::DYNAMIC_MODEL::NON_LINEAR  }), _points_force(_robot.getDofs())
 {
-        _n << 0,0,1;
+        //_n << 0,0,1;
 
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
 
         if (!config["modules"])
                 throw std::invalid_argument(
                               std::string("Couldn't find modules configurations."));
-        if (!config["modules"]["ground_forces"])
+        if (!config["modules"][name])
                 throw std::invalid_argument(
                               std::string("Couldn't find ground_forces module configuration."));
 
-        config = config["modules"]["ground_forces"];
+        config = config["modules"][name];
+        config["name"] = name;
 
         _checkConfig(config);
         _initConfig(config);
@@ -33,9 +27,11 @@ mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& 
 
 mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot,
                                                 YAML::Node config)
-        : mgnss::modules::Base(robot), _gravity(robot)//, _ax_oh("ROOT", _robot), _ax_ph("ROOT", _robot)
+        : mgnss::modules::Base(robot), _gravity(robot, {mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY,
+                                                        mwoibn::robot_class::DYNAMIC_MODEL::INERTIA,
+                                                        mwoibn::robot_class::DYNAMIC_MODEL::NON_LINEAR}), _points_force(_robot.getDofs())
 {
-        _n << 0,0,1;
+        //_n << 0,0,1;
 
         _checkConfig(config);
         _initConfig(config);
@@ -43,8 +39,40 @@ mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& 
 
 void mgnss::state_estimation::GroundForces::_initConfig(YAML::Node config){
 
-        _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.contacts().size()*3, config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        _name = config["name"].as<std::string>();
+        _filter_torque_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.getDofs(), config["filter"]["torque"]["cut_off_frequency"].as<double>(), config["filter"]["torque"]["damping"].as<double>()));
         _allocate();
+
+        for(auto& contact: _robot.contacts())
+          _points_force.add(mwoibn::dynamic_points::Force(_robot, _gravity, *contact));
+
+
+//        std::vector<std::string> names = {"wheel_1", "wheel_2", "wheel_3", "wheel_4"};
+
+//        mwoibn::robot_points::Handler<mwoibn::robot_points::TorusModel> contact_points(_robot.getDofs());
+
+//        mwoibn::VectorInt bi_map = mwoibn::VectorInt::Constant(names.size(), mwoibn::NON_EXISTING);
+
+        // for(auto& contact: _robot.contacts())
+        // {
+        //     std::string name = _robot.getBodyName(contact->wrench().getBodyId());
+        //     if(!std::count(names.begin(), names.end(), name)){
+        //       std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+        //       names.erase(std::remove(names.begin(), names.end(), name), names.end());
+        //       continue;
+        //     }
+        //
+        //     bi_map[contact_points.size()] = contact_points.size();
+        //     _wheels.add(mwoibn::robot_points::TorusModel(
+        //                        _robot, mwoibn::point_handling::FramePlus(name,
+        //                        _robot.getModel(), _robot.state),
+        //                        mwoibn::Axis(config["reference_axis"][name]["x"].as<double>(),
+        //                                     config["reference_axis"][name]["y"].as<double>(),
+        //                                     config["reference_axis"][name]["z"].as<double>()),
+        //                                     config["minor_axis"].as<double>(), config["major_axis"].as<double>(),
+        //                                     contact->getGroundNormal()));
+        //
+        // }
 
 }
 void mgnss::state_estimation::GroundForces::_checkConfig(YAML::Node config){
@@ -53,18 +81,32 @@ void mgnss::state_estimation::GroundForces::_checkConfig(YAML::Node config){
 
 void mgnss::state_estimation::GroundForces::_allocate(){
 
-  _inverse.reset(new mwoibn::PseudoInverse(_robot.contacts().getJacobian().transpose()));
-
-  world_contact.setZero(12);
-
-  gf_est.setZero(_robot.contacts().size()*3);
-  f_gf.setZero(_robot.contacts().size()*3);
+  _gravity.subscribe({mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY, mwoibn::robot_class::DYNAMIC_MODEL::INERTIA, mwoibn::robot_class::DYNAMIC_MODEL::NON_LINEAR});
+  _robot.state.add("OVERALL_FORCE");
 
 
-  // _placements.assign(_robot.contacts().size()+1, mwoibn::Matrix::Zero(3,_robot.contacts().size()+1));
-  // _all.setZero(3, _robot.contacts().size()+1);
-  // _g << 0,0, -9.81;
-  // _all.col(_robot.contacts().size()) = _g*_robot.centerOfMass().mass();
+  _inertia_inverse.reset(new mwoibn::PseudoInverse(_gravity.getInertia()));
+  _contacts_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix(_robot.contacts().jacobianRows(), _robot.contacts().jacobianRows() )));
+  _world_contacts.setZero(_robot.contacts().jacobianRows());
+  _contacts_jacobian = _robot.contacts().getWorldJacobian();
+  _contacts_inversed.setZero(_robot.state.velocity.size(), _robot.state.velocity.size());
+  _force_1.setZero(_robot.state.velocity.size());
+  _force_2.setZero(_robot.state.velocity.size());
+  //world_contact.setZero(12);
+
+  //gf_est.setZero(_robot.contacts().size()*3);
+  //_torque_f.setZero(_robot.state.torque.size());
+
+  _filter_torque_ptr->reset(_robot.state.torque.get());
+
+  for(auto& contact: _robot.contacts()){
+      //_wheel_center.add(mwoibn::point_handling::FramePlus(contact->wrench().getBodyId(), _robot.getModel(), _robot.state));
+      //_velocities.add(mwoibn::point_handling::LinearVelocity(*_wheel_center.end()[-1]));
+      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame));
+    }
+  // for(auto& body: _robot.getLinks(mwoibn::eigen_utils::enumerate(actuated)))
+  //   _joints.add(mwoibn::robot_points::Joint(body, _robot));
+
 }
 
 
@@ -73,157 +115,88 @@ void mgnss::state_estimation::GroundForces::init(){
         _robot.get();
         _robot.updateKinematics();
 
-        _filter_ptr->computeCoeffs(_robot.rate());
+        _filter_torque_ptr->computeCoeffs(_robot.rate());
 
         update();
-        _filter_ptr->reset(gf_est);
-
-        _g << 0,0, -9.81;
+        _filter_torque_ptr->reset(_robot.state.torque.get());
 }
 
 void mgnss::state_estimation::GroundForces::update()
 {
-    _robot.get();
-    _robot.updateKinematics();
 
-    // world_contact <<  _robot.contacts().contact(0).wrench().force.getWorld(),
-    //                   _robot.contacts().contact(1).wrench().force.getWorld(),
-    //                   _robot.contacts().contact(2).wrench().force.getWorld(),
-    //                   _robot.contacts().contact(3).wrench().force.getWorld();
+      _filter_torque_ptr->update(_robot.state.torque);
+      //_robot.updateKinematics();
 
-    _inverse->compute(_robot.contacts().getJacobian().transpose());
-    gf_est.noalias() = _inverse->get()*(_gravity.getGravity()-_robot.state.torque.get());
-    f_gf.noalias() = gf_est;
-    _filter_ptr->update(f_gf);
+      // Without explicit acceleration estimation
+      _robot.contacts().update(true);
+      _gravity.update();
+      _contacts_jacobian = _robot.contacts().getWorldJacobian();
+      _inertia_inverse->compute(_gravity.getInertia());
 
-    // _robot.centerOfMass().update(false);
-    // _robot.centerOfPressure().update(false);
+      _contacts_inversed = _contacts_jacobian*_inertia_inverse->get();
 
-    // _com = _robot.centerOfMass().get();
-    // _cop = _robot.centerOfPressure().get();
+      _contacts_inverse->compute(_contacts_inversed*_contacts_jacobian.transpose());
 
-//    std::cout << "GF\t" << gf_est.transpose() << std::endl;
+      _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get();
+      _force_2.noalias() = _contacts_inversed*(_force_1);
+      _force_1 = _force_2  - _accelerations.getWorld();
 
+      _world_contacts = _contacts_inverse->get()*_force_1;
 
-//    std::cout << "Simulation" << std::endl;
-//    for(auto& contact: _robot.contacts()){
-//      std::cout << contact->wrench().getFixed().transpose() << std::endl;
-//    }
+      for(int i = 0; i < _robot.contacts().size(); i++){
+            _robot.contacts()[i].wrench().force.setWorld(_world_contacts.segment<3>(3*i));
+            _robot.contacts()[i].wrench().synch();
+            //_points_force[i].frame.position.setWorld(_robot.contacts()[i].get());
+            // std::cout << "contact: " << _robot.contacts()[i].get().transpose() << std::endl;
+      }
 
-    for(int i = 0; i < _robot.contacts().size(); i++){
-      _robot.contacts().contact(i).wrench().force.setFixed(gf_est.segment<3>(3*i));
-      _robot.contacts().contact(i).wrench().torque.setFixed(mwoibn::Vector3(0,0,0));
-      _robot.contacts().contact(i).wrench().synch();
-    }
-
-//    std::cout << "Estimation" << std::endl;
-//    for(auto& contact: _robot.contacts()){
-//      std::cout << contact->wrench().getFixed().transpose() << std::endl;
-//    }
-
-    _robot.centerOfMass().update(false);
-    _robot.centerOfPressure().update(false);
-
-    _com = _robot.centerOfMass().get();
-    _cop = _robot.centerOfPressure().get();
-
-    for(int i = 0; i < _robot.contacts().size(); i++){
-      _robot.contacts().contact(i).wrench().force.setFixed(f_gf.segment<3>(3*i));
-      //_robot.contacts().contact(i).wrench().torque.setFixed(mwoibn::Vector3(0,0,0));
-      _robot.contacts().contact(i).wrench().synch();
-    }
-
-    _robot.centerOfMass().update(false);
-    _robot.centerOfPressure().update(false);
-
-    _f_cop = _robot.centerOfPressure().get();
-
-    // for(auto& placement: _placements)
-    //   placement.setZero();
-    //
-    // mwoibn::Vector3 contact;
-    // int size = _robot.contacts().size();
-    //
-    // for(int i = 0; i < size; i++){
-    //   _all.col(i) = gf_est.segment<3>(3*i);
-    //   //_all.col(i) = _robot.contacts().contact(i).wrench().force.getWorld();
-    //   contact = _robot.contacts().contact(i).getPosition().head<3>();
-    //
-    //   for(int j = 0; j < _placements.size(); j++){
-    //     _placements[j].col(i) += contact;
-    //     _placements[i].col(j) -= contact;
-    //   }
-    // }
-
-     // std::cout << "com\t" << _com.transpose() << std::endl;
-     // std::cout << "cop\t" << _cop.transpose() << std::endl;
-
-     //
-     // std::cout << "NEW" << std::endl;
-     //
-     // for(int j = 0; j <  _placements.size(); j++){
-     //     _placements[j].col(size) += contact;
-     //     _placements[size].col(j) -= contact;
-     //
-     //  }
-     //
-     //  int j = 0;
-     //
-     //  for(auto& placement: _placements){
-     //    mwoibn::Vector3 sum = mwoibn::Vector3::Zero() ;
-     //    std::cout << std::fixed;
-     //    std::cout << std::setprecision(8);
-     //    for(int i = 0; i < size+1; i++)
-     //      sum += placement.col(i).head<3>().cross(_all.col(i).head<3>());
-     //
-     //    std::cout << "sum\t" << sum.transpose() << std::endl;
-     //
-     //    j+=1;
-     //  }
+      _robot.state["OVERALL_FORCE"].set(-_gravity.getNonlinearEffects() + _robot.state.torque.get() + _robot.contacts().getWorldJacobian().transpose()*_robot.contacts().getReactionForce());
+      _points_force.update(true);
+      //std::cout << "GF: " << _points_force.getState().transpose() << std::endl;
 
 }
 
-void mgnss::state_estimation::GroundForces::startLog(mwoibn::common::Logger& logger){
+void mgnss::state_estimation::GroundForces::initLog(mwoibn::common::Logger& logger){
         logger.addField("time", 0);
 
-        logger.addField("com_x", _com[0]);
-        logger.addField("com_y", _com[1]);
-        logger.addField("com_z", _com[2]);
-        logger.addField("cop_x", _cop[0]);
-        logger.addField("cop_y", _cop[1]);
-        logger.addField("cop_z", _cop[2]);
-        logger.addField("f_cop_x", _f_cop[0]);
-        logger.addField("f_cop_y", _f_cop[1]);
-        logger.addField("f_cop_z", _f_cop[2]);
-        logger.addField("gf_1", gf_est[2]);
-        logger.addField("gf_2", gf_est[5]);
-        logger.addField("gf_3", gf_est[8]);
-        logger.addField("gf_4", gf_est[11]);
-        logger.addField("f_gf_1", f_gf[2]);
-        logger.addField("f_gf_2", f_gf[5]);
-        logger.addField("f_gf_3", f_gf[8]);
-        logger.addField("f_gf_4", f_gf[11]);
-        logger.start();
+        //for(int i = 0; i < 3; i++){
+        //   logger.addField(_name + std::string("__com_")+char('x'+i), _com[i]);
+        //   logger.addField(_name + std::string("__cop_")+char('x'+i), _cop[i]);
+        //   logger.addField(_name + std::string("__s_cop_")+char('x'+i), _f_cop[i]);
+        //   logger.addField(_name + std::string("__a_cop_")+char('x'+i), _a_cop[i]);
+        //}
+
+        for(int contact = 0; contact < _robot.contacts().size(); contact++){
+            for(int i = 0; i < 3; i++){
+              logger.addField(_name + std::string("__model_")+std::to_string(contact) + "_" + char('x'+i), _robot.contacts().begin()[contact]->wrench().force.getWorld()[i]);
+//              logger.addField(_name + std::string("__residue_")+std::to_string(contact) + "_" + char('x'+i), _world_contacts[contact*3+i]);
+              logger.addField(_name + std::string("__point_")+std::to_string(contact) + "_" + char('x'+i), _points_force[contact].get()[i]);
+//              logger.addField("force_contact_"+std::to_string(contact) + "_" + char('x'+i), _estimations[contact][i]);
+            }
+//            logger.addField("wheel_"+std::to_string(contact), _robot.state.acceleration.get(_robot.getDof(_robot.getBodyName(_robot.contacts()[contact].wrench().getBodyId()))[0]));
+        }
+
+
 }
 void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, double time){
         logger.addEntry("time", time);
 
-        logger.addEntry("com_x", _com[0]);
-        logger.addEntry("com_y", _com[1]);
-        logger.addEntry("com_z", _com[2]);
-        logger.addEntry("cop_x", _cop[0]);
-        logger.addEntry("cop_y", _cop[1]);
-        logger.addEntry("cop_z", _cop[2]);
-        logger.addEntry("f_cop_x", _f_cop[0]);
-        logger.addEntry("f_cop_y", _f_cop[1]);
-        logger.addEntry("f_cop_z", _f_cop[2]);
-        logger.addEntry("gf_1", gf_est[2]);
-        logger.addEntry("gf_2", gf_est[5]);
-        logger.addEntry("gf_3", gf_est[8]);
-        logger.addEntry("gf_4", gf_est[11]);
-        logger.addEntry("f_gf_1", f_gf[2]);
-        logger.addEntry("f_gf_2", f_gf[5]);
-        logger.addEntry("f_gf_3", f_gf[8]);
-        logger.addEntry("f_gf_4", f_gf[11]);
-        logger.write();
+        //for(int i = 0; i < 3; i++){
+        //   logger.addEntry(_name + std::string("__com_")+char('x'+i), _com[i]);
+        //   logger.addEntry(_name + std::string("__cop_")+char('x'+i), _cop[i]);
+        //   logger.addEntry(_name + std::string("__s_cop_")+char('x'+i), _f_cop[i]);
+        //   logger.addEntry(_name + std::string("__a_cop_")+char('x'+i), _a_cop[i]);
+        //}
+
+        for(int contact = 0; contact < _robot.contacts().size(); contact++){
+            for(int i = 0; i < 3; i++){
+              logger.addEntry(_name + std::string("__model_")+std::to_string(contact) + "_" + char('x'+i), _robot.contacts().begin()[contact]->wrench().force.getWorld()[i]);
+//              logger.addEntry(_name + std::string("__residue_")+std::to_string(contact) + "_" + char('x'+i), _world_contacts[contact*3+i]);
+              logger.addEntry(_name + std::string("__point_")+std::to_string(contact) + "_" + char('x'+i), _points_force[contact].get()[i]);
+             // logger.addEntry("force_contact_"+std::to_string(contact) + "_" + char('x'+i), _estimations[contact][i]);
+            }
+           // logger.addEntry("wheel_"+std::to_string(contact), _robot.state.acceleration.get(_robot.contacts()[contact].wrench().getBodyId()));
+        }
+
+
 }

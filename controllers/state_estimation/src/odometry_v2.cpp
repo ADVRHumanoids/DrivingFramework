@@ -3,19 +3,7 @@
 #include <iomanip>
 
 mgnss::state_estimation::OdometryV2::OdometryV2(mwoibn::robot_class::Robot& robot,
-                                                std::vector<std::string> names, double r)
-        : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot), _r(r)
-{
-        _x << 1,0,0;
-        _y << 0,1,0;
-        _z << 0,0,1;
-
-        _allocate(names);
-        _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 1000, 1));
-}
-
-mgnss::state_estimation::OdometryV2::OdometryV2(mwoibn::robot_class::Robot& robot,
-                                                std::string config_file)
+                                                std::string config_file, std::string name)
         : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot)
 {
         _x << 1,0,0;
@@ -31,7 +19,7 @@ mgnss::state_estimation::OdometryV2::OdometryV2(mwoibn::robot_class::Robot& robo
                               std::string("Couldn't find odometry module configuration."));
 
         config = config["modules"]["odometry"];
-
+        config["name"] = name;
         _checkConfig(config);
         _initConfig(config);
 }
@@ -49,7 +37,7 @@ mgnss::state_estimation::OdometryV2::OdometryV2(mwoibn::robot_class::Robot& robo
 }
 
 void mgnss::state_estimation::OdometryV2::_initConfig(YAML::Node config){
-
+        _name = config["name"].as<std::string>();
         std::vector<std::string> names = _robot.getLinks(config["chain"].as<std::string>());
 
         _r = config["wheel_radius"].as<double>();
@@ -547,16 +535,16 @@ int mgnss::state_estimation::OdometryV2::_min(mwoibn::VectorBool& selector, cons
         return id;
 }
 
-void mgnss::state_estimation::OdometryV2::startLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0);
-        logger.addField("q_raw_x", _twist_raw.x());
-        logger.addField("q_raw_y", _twist_raw.y());
-        logger.addField("q_raw_z", _twist_raw.z());
-        logger.addField("q_raw_w", _twist_raw.w());
-        logger.addField("q_es_x", _twist_es.x());
-        logger.addField("q_es_y", _twist_es.y());
-        logger.addField("q_es_z", _twist_es.z());
-        logger.addField("q_es_w", _twist_es.w());
+void mgnss::state_estimation::OdometryV2::initLog(mwoibn::common::Logger& logger){
+        // logger.addField("time", 0);
+        // logger.addField("q_raw_x", _twist_raw.x());
+        // logger.addField("q_raw_y", _twist_raw.y());
+        // logger.addField("q_raw_z", _twist_raw.z());
+        // logger.addField("q_raw_w", _twist_raw.w());
+        // logger.addField("q_es_x", _twist_es.x());
+        // logger.addField("q_es_y", _twist_es.y());
+        // logger.addField("q_es_z", _twist_es.z());
+        // logger.addField("q_es_w", _twist_es.w());
 //  logger.addField("raw_x", getRaw()[0]);
 //  logger.addField("raw_y", getRaw()[1]);
 //  logger.addField("raw_z", getRaw()[2]);
@@ -569,18 +557,17 @@ void mgnss::state_estimation::OdometryV2::startLog(mwoibn::common::Logger& logge
 //  logger.addField("fil_tx", getFiltered()[3]);
 //  logger.addField("fil_ty", getFiltered()[4]);
 //  logger.addField("fil_tz", getFiltered()[5]);
-        logger.start();
 }
 void mgnss::state_estimation::OdometryV2::log(mwoibn::common::Logger& logger, double time){
-        logger.addEntry("time", time);
-        logger.addEntry("q_raw_x", _twist_raw.x());
-        logger.addEntry("q_raw_y", _twist_raw.y());
-        logger.addEntry("q_raw_z", _twist_raw.z());
-        logger.addEntry("q_raw_w", _twist_raw.w());
-        logger.addEntry("q_es_x", _twist_es.x());
-        logger.addEntry("q_es_y", _twist_es.y());
-        logger.addEntry("q_es_z", _twist_es.z());
-        logger.addEntry("q_es_w", _twist_es.w());
+        // logger.addEntry("time", time);
+        // logger.addEntry("q_raw_x", _twist_raw.x());
+        // logger.addEntry("q_raw_y", _twist_raw.y());
+        // logger.addEntry("q_raw_z", _twist_raw.z());
+        // logger.addEntry("q_raw_w", _twist_raw.w());
+        // logger.addEntry("q_es_x", _twist_es.x());
+        // logger.addEntry("q_es_y", _twist_es.y());
+        // logger.addEntry("q_es_z", _twist_es.z());
+        // logger.addEntry("q_es_w", _twist_es.w());
 //  logger.addEntry("raw_x", getRaw()[0]);
 //  logger.addEntry("raw_y", getRaw()[1]);
 //  logger.addEntry("raw_z", getRaw()[2]);
@@ -593,5 +580,4 @@ void mgnss::state_estimation::OdometryV2::log(mwoibn::common::Logger& logger, do
 //  logger.addEntry("fil_tx", getFiltered()[3]);
 //  logger.addEntry("fil_ty", getFiltered()[4]);
 //  logger.addEntry("fil_tz", getFiltered()[5]);
-        logger.write();
 }

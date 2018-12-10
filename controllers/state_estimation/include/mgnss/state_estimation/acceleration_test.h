@@ -20,7 +20,7 @@ namespace state_estimation {
 class AccelerationTest : public mgnss::modules::Base {
 public:
 AccelerationTest(mwoibn::robot_class::Robot& robot);
-AccelerationTest(mwoibn::robot_class::Robot& robot, std::string config_file);
+AccelerationTest(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name);
 AccelerationTest(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
 virtual ~AccelerationTest(){
@@ -33,11 +33,11 @@ virtual void send(){
         //_robot.send();
 }
 
-virtual void stop(){}                      
+virtual void stop(){}
 
 virtual void close(){}
 
-virtual void startLog(mwoibn::common::Logger& logger);
+virtual void initLog(mwoibn::common::Logger& logger);
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 protected:

@@ -10,14 +10,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
-set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS odometry ground_forces acceleration_test)
 LIST( APPEND CATKIN_DEPENDS_SET robot_class robot_point_handling filters modules)
-LIST( APPEND CATKIN_DEPENDS_SET dynamic_models)
+LIST( APPEND CATKIN_DEPENDS_SET dynamic_models mwoibn_dynamic_points)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -28,9 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES
-        odometry
-        ground_forces
-        acceleration_test
+        mgnss_state_estimation
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -42,45 +38,24 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(odometry
+add_library(mgnss_state_estimation
    src/odometry.cpp
    src/odometry_v2.cpp
-)
-
-add_dependencies(odometry
-   ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(odometry
-   ${catkin_LIBRARIES}
-)
-
-add_library(ground_forces
    src/ground_forces.cpp
-)
-
-add_dependencies(ground_forces
-   ${catkin_EXPORTED_TARGETS}
-)
-
-target_link_libraries(ground_forces
-   ${catkin_LIBRARIES}
-)
-
-add_library(acceleration_test
    src/acceleration_test.cpp
 )
 
-add_dependencies(acceleration_test
+add_dependencies(mgnss_state_estimation
    ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(acceleration_test
+target_link_libraries(mgnss_state_estimation
    ${catkin_LIBRARIES}
 )
 
+
 ## Mark executables and/or libraries for installation
- install(TARGETS ${INSTALL_TARGETS}
+ install(TARGETS mgnss_state_estimation
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

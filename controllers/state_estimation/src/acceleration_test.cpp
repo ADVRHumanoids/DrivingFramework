@@ -8,7 +8,7 @@ mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class:
           _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.state.acceleration.size(), 1000, 1));
 }
 
-mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class::Robot& robot, std::string config_file)
+mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name)
         : mgnss::modules::Base(robot), _frame("arm1_7", robot.getModel(), robot.state), _acceleration(_frame)
 {
 
@@ -17,12 +17,12 @@ mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class:
         if (!config["modules"])
                 throw std::invalid_argument(
                               std::string("Couldn't find modules configurations."));
-        if (!config["modules"]["acceleration_test"])
+        if (!config["modules"][name])
                 throw std::invalid_argument(
                               std::string("Couldn't find ground_forces module configuration."));
 
-        config = config["modules"]["acceleration_test"];
-
+        config = config["modules"][name];
+        config["name"] = name;
         _checkConfig(config);
         _initConfig(config);
 }
@@ -36,6 +36,7 @@ mgnss::state_estimation::AccelerationTest::AccelerationTest(mwoibn::robot_class:
 }
 
 void mgnss::state_estimation::AccelerationTest::_initConfig(YAML::Node config){
+  _name = config["name"].as<std::string>();
   _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.state.acceleration.size(), config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
   _allocate();
 }
@@ -75,7 +76,7 @@ void mgnss::state_estimation::AccelerationTest::update()
   _point_acc = _acceleration.getWorld();
 }
 
-void mgnss::state_estimation::AccelerationTest::startLog(mwoibn::common::Logger& logger){
+void mgnss::state_estimation::AccelerationTest::initLog(mwoibn::common::Logger& logger){
         logger.addField("time", 0);
 
         logger.addField("x", _point_acc[0]);
@@ -91,7 +92,6 @@ void mgnss::state_estimation::AccelerationTest::startLog(mwoibn::common::Logger&
         // logger.addField("fil_7", _f_acc_est[7]);
         // logger.addField("fil_8", _f_acc_est[8]);
 
-        logger.start();
 }
 void mgnss::state_estimation::AccelerationTest::log(mwoibn::common::Logger& logger, double time){
         logger.addEntry("time", time);
@@ -110,5 +110,4 @@ void mgnss::state_estimation::AccelerationTest::log(mwoibn::common::Logger& logg
         // logger.addEntry("fil_7", _f_acc_est[7]);
         // logger.addEntry("fil_8", _f_acc_est[8]);
 
-        logger.write();
 }

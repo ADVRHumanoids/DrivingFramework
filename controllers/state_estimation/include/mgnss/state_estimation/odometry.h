@@ -16,8 +16,7 @@ namespace state_estimation {
  */
 class Odometry : public mgnss::modules::Base {
 public:
-Odometry(mwoibn::robot_class::Robot& robot, std::vector<std::string> names, double r);
-Odometry(mwoibn::robot_class::Robot& robot, std::string config_file);
+Odometry(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name);
 Odometry(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
 virtual ~Odometry(){
@@ -46,11 +45,10 @@ virtual void init();
 virtual void send(){
         _robot.send();
 }
-virtual void stop(){
-}                         // NOT IMPLEMENTED
-virtual void close(){
-}                          // NOT IMPLEMENTED
-virtual void startLog(mwoibn::common::Logger& logger);
+virtual void stop(){}
+virtual void close(){}
+
+virtual void initLog(mwoibn::common::Logger& logger);
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 protected:

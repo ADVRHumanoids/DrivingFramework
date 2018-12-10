@@ -2,16 +2,9 @@
 
 #include <iomanip>
 
-mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
-                                            std::vector<std::string> names, double r)
-        : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot), _r(r)
-{
-        _allocate(names);
-        _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, 1000, 1));
-}
 
 mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
-                                            std::string config_file)
+                                            std::string config_file, std::string name)
         : mgnss::modules::Base(robot), _wheels_ph("ROOT", _robot)
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file);
@@ -19,12 +12,12 @@ mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
         if (!config["modules"])
                 throw std::invalid_argument(
                               std::string("Couldn't find modules configurations."));
-        if (!config["modules"]["odometry"])
+        if (!config["modules"][name])
                 throw std::invalid_argument(
                               std::string("Couldn't find odometry module configuration."));
 
-        config = config["modules"]["odometry"];
-
+        config = config["modules"][name];
+        config["name"] = name;
         _checkConfig(config);
         _initConfig(config);
 }
@@ -38,7 +31,7 @@ mgnss::state_estimation::Odometry::Odometry(mwoibn::robot_class::Robot& robot,
 }
 
 void mgnss::state_estimation::Odometry::_initConfig(YAML::Node config){
-
+        _name = config["name"].as<std::string>();
         std::vector<std::string> names = _robot.getLinks(config["chain"].as<std::string>());
 
         _r = config["wheel_radius"].as<double>();
@@ -358,7 +351,7 @@ int mgnss::state_estimation::Odometry::_min()
         return id;
 }
 
-void mgnss::state_estimation::Odometry::startLog(mwoibn::common::Logger& logger){
+void mgnss::state_estimation::Odometry::initLog(mwoibn::common::Logger& logger){
         logger.addField("time", 0);
 //  logger.addField("raw_x", getRaw()[0]);
 //  logger.addField("raw_y", getRaw()[1]);
@@ -372,7 +365,6 @@ void mgnss::state_estimation::Odometry::startLog(mwoibn::common::Logger& logger)
 //  logger.addField("fil_tx", getFiltered()[3]);
 //  logger.addField("fil_ty", getFiltered()[4]);
 //  logger.addField("fil_tz", getFiltered()[5]);
-        logger.start();
 }
 void mgnss::state_estimation::Odometry::log(mwoibn::common::Logger& logger, double time){
         logger.addEntry("time", time);
@@ -388,5 +380,4 @@ void mgnss::state_estimation::Odometry::log(mwoibn::common::Logger& logger, doub
 //  logger.addEntry("fil_tx", getFiltered()[3]);
 //  logger.addEntry("fil_ty", getFiltered()[4]);
 //  logger.addEntry("fil_tz", getFiltered()[5]);
-        logger.write();
 }
