@@ -32,6 +32,19 @@ void addTask(BasicTask& task, unsigned int i);
 //  // i - zero based
 void addTask(BasicTask& task, mwoibn::VectorBool selector, unsigned int i);
 
+int taskSize(const BasicTask& task){
+  auto task_ptr_ =
+      std::find_if(_tasks_ptrs.begin(), _tasks_ptrs.end(), [&task](const std::pair<mwoibn::VectorBool, BasicTask&>& pair)
+                   {
+                     return &(pair.second) == &task;
+                   });
+  if (task_ptr_ == _tasks_ptrs.end())
+    return 0;
+
+  return task_ptr_->first.count();
+
+}
+
 virtual void updateJacobian();
 //! generic function to provide the same syntax for error update of all
 //derived classes
