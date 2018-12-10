@@ -41,20 +41,22 @@ find_package(YamlCpp REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
-	include
-	${catkin_INCLUDE_DIRS}
-	${RBDL_INCLUDE_DIR}
-	${RBDL_URDFReader_INCLUDE_DIR}
-	${LOGGER_INCLUDE_DIRS}
+			include
+			${catkin_INCLUDE_DIRS}
+			${RBDL_INCLUDE_DIR}
+			${RBDL_URDFReader_INCLUDE_DIR}
+			${LOGGER_INCLUDE_DIRS}
   LIBRARIES
-	robot_class
-	${catkin_LIBRARIES}
-	${RBDL_LIBRARY}
-	${RBDL_URDFReader_LIBRARY}
-	${LOGGER_LIBRARIES}
+			robot_class
+			communication
+			${catkin_LIBRARIES}
+			${RBDL_LIBRARY}
+			${RBDL_URDFReader_LIBRARY}
+			${LOGGER_LIBRARIES}
   DEPENDS
 	Eigen3
         YamlCpp
+
 )
 
 ###########
@@ -72,27 +74,41 @@ ${LOGGER_INCLUDE_DIRS}
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(ROBOT_CLASS_SOURCE
-        src/robot.cpp
-				src/robot_points/wheel_contact.cpp
-        src/robot_points/contact_v2.cpp
-				src/robot_points/contact.cpp
-				src/robot_points/center_of_mass.cpp
-				src/robot_points/center_of_pressure.cpp
-				src/robot_points/center_of_pressure_fast.cpp
-        src/contacts.cpp
-        src/actuators.cpp
-        src/actuator.cpp
-)
+
 
 ## Declare a C++ library
+add_library(communication
+src/communication_modules/shared_controller.cpp
+src/communication_modules/shared_point_setter.cpp )
+
+add_dependencies(communication ${catkin_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARGETS})
+
+target_link_libraries(communication
+	${catkin_LIBRARIES}
+	${RBDL_LIBRARY}
+	${RBDL_URDFReader_LIBRARY}
+	${LOGGER_LIBRARIES}
+)
+
+
  add_library(robot_class
-   ${ROBOT_CLASS_SOURCE}
- )
+ src/robot.cpp
+ src/robot_points/wheel_contact.cpp
+ src/robot_points/contact_v2.cpp
+ src/robot_points/contact.cpp
+ src/robot_points/handler.cpp
+ src/robot_points/center_of_mass.cpp
+ src/robot_points/center_of_pressure.cpp
+# src/robot_points/center_of_pressure_fast.cpp
+ src/robot_points/torus_model.cpp
+ src/contacts.cpp
+ src/actuators.cpp
+ src/actuator.cpp )
 
  add_dependencies(robot_class ${catkin_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARGETS})
 
  target_link_libraries(robot_class
+ 	 communication
    ${catkin_LIBRARIES}
    ${RBDL_LIBRARY}
    ${RBDL_URDFReader_LIBRARY}
@@ -103,7 +119,7 @@ set(ROBOT_CLASS_SOURCE
 #############
 
 # Mark executables and/or libraries for installation
- install(TARGETS robot_class
+ install(TARGETS robot_class communication
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

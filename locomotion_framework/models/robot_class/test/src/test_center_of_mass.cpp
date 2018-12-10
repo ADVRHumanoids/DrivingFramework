@@ -12,7 +12,7 @@ TEST(CenterOfMassTest, pureClass)
   std::string file_name = path + "/resources/urdf/centauro_full_test.urdf";
   mwoibn::robot_class::Robot robot(file_name, "", true);
 
-  mwoibn::robot_points::CenterOfMass com(robot.getModel(), robot.state.state(mwoibn::robot_class::INTERFACE::POSITION), robot.state.state(mwoibn::robot_class::INTERFACE::VELOCITY));
+  mwoibn::robot_points::CenterOfMass com(robot.getModel(), robot.state.state("POSITION"), robot.state.state("VELOCITY"));
 
   com.compute();
 //  std::cerr << "get" << std::endl;

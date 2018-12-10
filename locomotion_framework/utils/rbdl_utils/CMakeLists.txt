@@ -29,12 +29,12 @@ include_directories(
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
   ${Eigen3_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR} 
+  ${RBDL_INCLUDE_DIR}
 )
 
- install(DIRECTORY include
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+## Mark cpp header files for installation
+ install(DIRECTORY include/mwoibn/rbdl_utils
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/mwoibn/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-

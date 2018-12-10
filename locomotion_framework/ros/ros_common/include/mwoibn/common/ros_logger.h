@@ -55,7 +55,7 @@ virtual void addEntry(std::string name, double value){
 }  // doesn't allocate memory
 
 virtual void write(){
-        _file << _print.transpose().format(fmt) << "\n";
+        _file << _print.format(fmt) << "\n";
 }
 
 virtual void flush(){
@@ -76,7 +76,7 @@ Eigen::IOFormat fmt;
 std::map<std::string, int> _map;
 
 //  double start,now;
-mwoibn::VectorN _print;
+mwoibn::VectorNT _print;
 
 };
 

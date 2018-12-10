@@ -4,7 +4,6 @@
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include <rbdl/rbdl.h>
-//#include "point_handling/points_handler.h"
 #include "mwoibn/point_handling/robot_points_handler.h"
 
 namespace mwoibn
