@@ -2,7 +2,7 @@
 
 mwoibn::robot_class::RobotXBotFeedback::RobotXBotFeedback(
     std::string config_file, std::string config_name,
-    std::string secondary_file)
+    std::string controller_source, std::string secondary_file)
     : RobotXBot()
 {
 
@@ -12,7 +12,7 @@ mwoibn::robot_class::RobotXBotFeedback::RobotXBotFeedback(
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
 
     _init(config, robot);
   }
@@ -26,14 +26,14 @@ mwoibn::robot_class::RobotXBotFeedback::RobotXBotFeedback(
 }
 
 mwoibn::robot_class::RobotXBotFeedback::RobotXBotFeedback(
-    YAML::Node full_config, std::string config_name)
+    YAML::Node full_config, std::string config_name, std::string controller_source)
     : RobotXBot()
 {
   YAML::Node config = YAML::Clone(full_config);
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
 
     _init(config, robot);
   }

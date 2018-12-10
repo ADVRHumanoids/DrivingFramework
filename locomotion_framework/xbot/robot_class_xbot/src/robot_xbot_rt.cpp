@@ -3,6 +3,7 @@
 mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
     XBot::RobotInterface::Ptr robot, std::string config_file,
     std::string config_name,
+    std::string controller_source,
     std::string secondary_file,
     XBot::SharedMemory::Ptr shared_memory)
     : RobotXBotFeedback()
@@ -15,7 +16,7 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
 
     if(!robot["rate"])
       throw(std::invalid_argument(
@@ -42,7 +43,7 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
 
 mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
     XBot::RobotInterface::Ptr robot, YAML::Node full_config,
-    std::string config_name,
+    std::string config_name, std::string controller_source,
     XBot::SharedMemory::Ptr shared_memory)
     : RobotXBotFeedback()
 {
@@ -51,7 +52,7 @@ mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
 
     if(!robot["rate"])
       throw(std::invalid_argument(

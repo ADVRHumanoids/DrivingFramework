@@ -29,15 +29,15 @@ public:
    * \param[in] topic name of the ros parameter comprising the robot
    * description, if no value given dafualt "/robot_description" is used
    */
-  RobotXBot(std::string config_file, std::string config_name, std::string secondary_file = "");
-  RobotXBot(YAML::Node full_config, std::string config_name);
+  RobotXBot(std::string config_file, std::string config_name, std::string controller_source, std::string secondary_file = "");
+  RobotXBot(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotXBot() {}
-  virtual void wait(){}
+  virtual void wait(bool spin = true){}
 
 protected:
   RobotXBot(){}
-  YAML::Node _init(YAML::Node config, std::string config_name);
+  YAML::Node _init(YAML::Node config, std::string config_name, std::string controller_source);
 //  std::string _readUrdf(YAML::Node config);
 //  std::string _readSrdf(YAML::Node config);
 

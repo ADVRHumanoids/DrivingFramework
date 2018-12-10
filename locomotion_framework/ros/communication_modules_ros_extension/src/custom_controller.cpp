@@ -1,6 +1,6 @@
 #include "mwoibn/communication_modules/custom_controller.h"
 
-bool mwoibn::communication_modules::CustomController::send()
+bool mwoibn::communication_modules::CustomController::run()
 {
 
   if (_position)

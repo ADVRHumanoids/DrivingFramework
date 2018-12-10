@@ -23,65 +23,83 @@ class CustomController : public BasicController
 
 public:
   CustomController(mwoibn::robot_class::State& command,
-                   mwoibn::robot_class::BiMap map, std::string topic,
+                   mwoibn::robot_class::BiMap& map, std::string topic,
                    bool position = true, bool velocity = false,
                    bool torque = true)
       : BasicController(command, map, position, velocity, torque)
   {
     _init(map.reversed(), map.getDofs(), topic);
+
+    std::cout << "Loaded direct controller " << std::endl;
+  }
+
+  CustomController(mwoibn::robot_class::State& command,
+                   mwoibn::robot_class::BiMap&& map, std::string topic,
+                   bool position = true, bool velocity = false,
+                   bool torque = true)
+      : BasicController(command, map, position, velocity, torque)
+  {
+    _init(map.reversed(), map.getDofs(), topic);
+
+    std::cout << "Loaded direct controller " << std::endl;
+  }
+
+  CustomController(CustomController& other)
+      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name)
+  {
+    std::string topic = other._command_pub.getTopic();
+    other._command_pub.shutdown();
+
+    _command_pub =
+        _node.advertise<custom_messages::CustomCmnd>(topic, 1);
+
+    std::string service = other._load_gains_srv.getService();
+    other._load_gains_srv.shutdown();
+    _load_gains_srv =
+                    _node.advertiseService<custom_services::loadGains::Request,
+                                       custom_services::loadGains::Response>(
+                            service , boost::bind(&CustomController::loadGains, this, _1, _2));
+
+
+    }
+
+  CustomController(CustomController&& other)
+      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name)
+  {
+    std::string topic = other._command_pub.getTopic();
+    other._command_pub.shutdown();
+
+    _command_pub =
+        _node.advertise<custom_messages::CustomCmnd>(topic, 1);
+
+    std::string service = other._load_gains_srv.getService();
+    other._load_gains_srv.shutdown();
+    _load_gains_srv =
+                    _node.advertiseService<custom_services::loadGains::Request,
+                                       custom_services::loadGains::Response>(
+                            service , boost::bind(&CustomController::loadGains, this, _1, _2));
+
+
+   }
+
+  CustomController(
+      mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap& map,
+      YAML::Node config)
+      : BasicController(command, map, config)
+  {
+    _init(config);
+
   }
 
   CustomController(
-      mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map,
-      YAML::Node config,
-      mwoibn::communication_modules::BasicFeedback* feedback = nullptr,
-      const mwoibn::robot_class::BiMap* feedback_map = nullptr)
+      mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap&& map,
+      YAML::Node config)
       : BasicController(command, map, config)
-  {
-    std::cout << "Loading direct controller to the robot" << std::endl;
-
-    if (!config["name"])
-      throw(std::invalid_argument("Required argument \"name\" is missing."));
-
-    _name = config["name"].as<std::string>();
-    std::string sink =
-        (config["sink"]) ? config["sink"].as<std::string>() : "/command";
-    std::string service = (config["ff_service"])
-                              ? config["ff_service"].as<std::string>()
-                              : "/set_ff_torque";
-
-    _init(map.reversed(), map.getDofs(), config["name"].as<std::string>(), sink,
-          service);
-
-    _des_q.position.resize(_dofs, 0);
-    _des_q.effort.resize(_dofs, 0);
-
-    mwoibn::VectorN q_0;
-
-    if (feedback != nullptr &&
-        feedback->raw(q_0, mwoibn::robot_class::INTERFACE::POSITION))
-    {
-      if (feedback_map == nullptr)
-        _des_q.position =
-            std::vector<double>(q_0.data(), q_0.data() + q_0.size());
-      else
-      {
-        mwoibn::robot_class::BiMap temp_map = _initMap(feedback_map->get(), feedback_map->getDofs());
-
-        temp_map.mapReversed(q_0, _des_q.position);
-      }
-    }
-    else
-      throw(std::runtime_error("Couldn't initialize robot state"));
-
-
-
-    std::cout << "Loaded direct controller " << config["name"] << std::endl;
-  }
+  { _init(config);}
 
   virtual ~CustomController() {}
 
-  virtual bool send();
+  virtual bool run();
 
   bool loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res);
 
@@ -98,7 +116,8 @@ protected:
 
   template <typename Vector>
   void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs,
-             const std::string& name, std::string command = "/command",
+             const std::string& name,
+             std::string command = "/command",
              std::string service = "/set_ff_torque")
   {
 
@@ -131,32 +150,60 @@ protected:
 
   mwoibn::robot_class::BiMap _initMap(const Vector& external_map, int dofs)
   {
-  custom_controller::MapToUrdf map;
+      custom_controller::MapToUrdf map;
 
-  Eigen::VectorXi urdf = mwoibn::robot_class::NON_EXISTING *
-                         Eigen::VectorXi::Ones(external_map.size());
+      Eigen::VectorXi urdf = mwoibn::robot_class::NON_EXISTING *
+                             Eigen::VectorXi::Ones(external_map.size());
 
-  _dofs = map.getControllerDofs();
+      _dofs = map.getControllerDofs();
 
-  Eigen::VectorXi controller(_dofs);
+      _des_q.position.resize(_dofs, 0);
+      _des_q.effort.resize(_dofs, 0);
 
-  for (int i = 0; i < _dofs; i++)
-    controller[i] =
-        i; // fill controller vector with the sucessive integer numbers
+      Eigen::VectorXi controller(_dofs);
 
-  map.mapFromController(controller, urdf);
+      for (int i = 0; i < _dofs; i++)
+        controller[i] =
+            i; // fill controller vector with the sucessive integer numbers
 
-  mwoibn::VectorInt rbdl_controller =
-      mwoibn::robot_class::NON_EXISTING * Eigen::VectorXi::Ones(dofs);
+      map.mapFromController(controller, urdf);
 
-  for (int i = 0; i < external_map.size(); i++)
+      mwoibn::VectorInt rbdl_controller =
+          mwoibn::robot_class::NON_EXISTING * Eigen::VectorXi::Ones(dofs);
+
+      for (int i = 0; i < external_map.size(); i++)
+      {
+        if (external_map[i] != mwoibn::robot_class::NON_EXISTING)
+          rbdl_controller[external_map[i]] = urdf[i];
+      }
+
+      return mwoibn::robot_class::BiMap("controller", rbdl_controller);
+  }
+
+
+
+  void _init(YAML::Node config)
   {
-    if (external_map[i] != mwoibn::robot_class::NON_EXISTING)
-      rbdl_controller[external_map[i]] = urdf[i];
+    std::cout << "Loading direct controller to the robot" << std::endl;
+
+    if (!config["name"])
+      throw(std::invalid_argument("Required argument \"name\" is missing."));
+
+    _name = config["name"].as<std::string>();
+    std::string sink =
+        (config["sink"]) ? config["sink"].as<std::string>() : "/command";
+    std::string service = (config["ff_service"])
+                              ? config["ff_service"].as<std::string>()
+                              : "/set_ff_torque";
+
+    _init(_map.reversed(), _map.getDofs(), config["name"].as<std::string>(), sink,
+          service);
+
+
+    std::cout << "Loaded direct controller " << config["name"] << std::endl;
   }
 
-  return mwoibn::robot_class::BiMap("controller", rbdl_controller);
-  }
+
 };
 }
 }

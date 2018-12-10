@@ -18,12 +18,12 @@ class RobotXBotFeedback : public RobotXBot
 {
 public:
   RobotXBotFeedback(std::string config_file, std::string config_name,
-                    std::string secondary_file = "");
+                    std::string controller_source, std::string secondary_file = "");
 
-  RobotXBotFeedback(YAML::Node full_config, std::string config_name);
+  RobotXBotFeedback(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotXBotFeedback() {}
-  virtual void wait(){}
+  virtual void wait(bool spin = true){}
 
 //  virtual void update()
 //  {

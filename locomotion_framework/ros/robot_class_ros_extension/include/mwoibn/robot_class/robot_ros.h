@@ -35,14 +35,14 @@ public:
   /**
    * @brief Constructor from a parameter file
    */
-  RobotRos(std::string config_file, std::string config_name, std::string secondary_file = "");
-  RobotRos(YAML::Node full_config, std::string config_name);
+  RobotRos(std::string config_file, std::string config_name, std::string controller_source, std::string secondary_file = "");
+  RobotRos(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotRos() { _node.shutdown(); }
   virtual bool isRunning() { return ros::ok(); }
 
-  virtual void wait(){
-    _spined = false;
+  virtual void wait(bool spin = true){
+    _spined = !spin;
     _rate_ptr->sleep();
   }
 
@@ -57,7 +57,7 @@ protected:
 
   int _base_ref = -1;
 
-  YAML::Node _init(YAML::Node config, std::string config_name);
+  YAML::Node _init(YAML::Node config, std::string config_name, std::string controller_source);
   std::string _readUrdf(YAML::Node config);
   std::string _readSrdf(YAML::Node config);
 

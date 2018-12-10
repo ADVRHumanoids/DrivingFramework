@@ -1,6 +1,6 @@
 #include "mwoibn/communication_modules/velocity_controller.h"
 
-bool mwoibn::communication_modules::VelocityController::send()
+bool mwoibn::communication_modules::VelocityController::run()
 {
 
   if (_velocity)

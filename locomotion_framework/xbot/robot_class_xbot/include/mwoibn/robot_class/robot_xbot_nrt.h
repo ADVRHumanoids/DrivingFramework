@@ -14,10 +14,10 @@ class RobotXBotNRT : public RobotXBotFeedback
 
 {
 public:
-  RobotXBotNRT(std::string config_file, std::string config_name,
+  RobotXBotNRT(std::string config_file, std::string config_name, std::string controller_source,
                std::string secondary_file = "");
 
-  RobotXBotNRT(YAML::Node full_config, std::string config_name);
+  RobotXBotNRT(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotXBotNRT() {}
 //  virtual void update()
@@ -37,7 +37,7 @@ public:
       return _rate_ptr->expectedCycleTime().toSec();
     }
 
-  virtual void wait() {_rate_ptr->sleep(); }
+  virtual void wait(bool spin = true) {_rate_ptr->sleep(); }
   virtual bool isRunning() { _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);

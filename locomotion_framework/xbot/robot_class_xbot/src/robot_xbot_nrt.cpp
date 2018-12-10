@@ -2,7 +2,7 @@
 //#include "mwoibn/robot_class/robot_ros_nrt.h"
 
 mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
-                                                std::string config_name,
+                                                std::string config_name, std::string controller_source,
                                                 std::string secondary_file)
     : RobotXBotFeedback()
 {
@@ -14,7 +14,7 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
     if (!robot["rate"])
       throw(std::invalid_argument(
           "Desired frequency not defined in a configuration " + config_file +
@@ -39,7 +39,7 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(std::string config_file,
 
 
 mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(YAML::Node full_config,
-                                                std::string config_name)
+                                                std::string config_name, std::string controller_source)
     : RobotXBotFeedback()
 {
   YAML::Node config = YAML::Clone(full_config);
@@ -48,7 +48,7 @@ mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT(YAML::Node full_config,
   try
   {
     YAML::Node robot =
-        mwoibn::robot_class::RobotXBot::_init(config, config_name);
+        mwoibn::robot_class::RobotXBot::_init(config, config_name, controller_source);
     if (!robot["rate"])
       throw(std::invalid_argument(
           std::string("Desired frequency not defined in a configuration ") +
@@ -125,7 +125,7 @@ void mwoibn::robot_class::RobotXBotNRT::RobotXBotNRT::_loadFeedbacks(
   wait();
   get();
   updateKinematics();
-    
+
 }
 
 

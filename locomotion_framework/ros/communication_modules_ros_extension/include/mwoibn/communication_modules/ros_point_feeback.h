@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__COMMUNICATION_MODULES__ROS_POINT_FEEDBACK_H
 #define __MWOIBN__COMMUNICATION_MODULES__ROS_POINT_FEEDBACK_H
 
-#include "mwoibn/communication_modules/point_feedback.h"
+#include "mwoibn/communication_modules/basic_point.h"
 #include "ros/ros.h"
 #include <geometry_msgs/Twist.h>
 
@@ -10,13 +10,13 @@ namespace mwoibn
 namespace communication_modules
 {
 
-class RosPointFeedback : public PointFeedback
+class RosPointFeedback : public BasicPoint
 {
 
 public:
   // for now only full robot is supported for this controller
-  RosPointFeedback(mwoibn::point_handling::Wrench& point, YAML::Node config)
-      : PointFeedback(point, config)
+  RosPointFeedback(mwoibn::point_handling::State& point, YAML::Node config)
+      : BasicPoint(point, config)
   {
     if (!config["source"])
       throw(std::invalid_argument("Missing required parameter: source"));
@@ -24,6 +24,13 @@ public:
     _state_sub =
         _node.subscribe<geometry_msgs::Twist>(config["source"].as<std::string>(), 1,
                                  boost::bind(&RosPointFeedback::get, this, _1));
+
+   if(!config["interface"]) throw(std::invalid_argument("Missing required parameter: interface"));
+
+   if(config["interface"].as<std::string>() == "world") _world = true;
+   else if(config["interface"].as<std::string>() == "fixed") _world = false;
+   else throw(std::invalid_argument("Shared point get: Unknow 'interface': " + config["interface"].as<std::string>()));
+
 
     if (config["initialize"] && config["initialize"].as<bool>())
     {
@@ -67,9 +74,35 @@ public:
 */
     std::cout << "Loaded ROS feedback " << config["name"] << std::endl;
   }
+
+  RosPointFeedback(RosPointFeedback& other)
+      : BasicPoint(other),   _node(other._node), _world(other._world), _state(other._state)
+  {
+    std::string topic = other._state_sub.getTopic();
+    other._state_sub.shutdown();
+
+        _state_sub =
+            _node.subscribe<geometry_msgs::Twist>(topic, 1,
+                                     boost::bind(&RosPointFeedback::get, this, _1));
+   }
+
+
+  RosPointFeedback(RosPointFeedback&& other)
+  : BasicPoint(other),   _node(other._node), _world(other._world), _state(other._state)
+  {
+    std::string topic = other._state_sub.getTopic();
+    other._state_sub.shutdown();
+
+    _state_sub =
+        _node.subscribe<geometry_msgs::Twist>(topic, 1,
+                                 boost::bind(&RosPointFeedback::get, this, _1));
+
+   }
+
+
   virtual ~RosPointFeedback() {}
   virtual bool initialized() { return _initialized; }
-  virtual bool get() { return true; }
+  virtual bool run() { return true; }
 
   void get(const geometry_msgs::Twist::ConstPtr& msg)
   {
@@ -77,67 +110,21 @@ public:
       //std::cout << "ros contact feedback" << std::endl;
     //if (!_initialized)
       //_initFilters(msg);
-      _state << msg->angular.x, msg->angular.y, msg->angular.z, msg->linear.x, msg->linear.y, msg->linear.z,
-      _wrench.setFixed(_state);
+      _state << msg->angular.x, msg->angular.y, msg->angular.z, msg->linear.x, msg->linear.y, msg->linear.z;
+      if(_world)
+      _point.setWorld(_state);
+      else
+      _point.setFixed(_state);
 
 
     _initialized = true;
   }
-  //
-  // virtual bool raw(mwoibn::VectorN& _raw,
-  //                  mwoibn::robot_class::INTERFACE interface)
-  // {
-  //
-  //   _is_raw = true;
-  //
-  //   if (!_initialized)
-  //     return false;
-  //   if (!is(interface))
-  //     return false;
-  //
-  //   _raw_interface = interface;
-  //
-  //   int tries = 0, max_tries = 10;
-  //   ros::Rate rate(10);
-  //
-  //   while (ros::ok() && _is_raw && tries < max_tries)
-  //   {
-  //     ros::spinOnce();
-  //     std::cout << "Waiting for raw feedback. Try " << std::to_string(tries + 1)
-  //               << "/" << max_tries << std::endl;
-  //     tries++;
-  //     rate.sleep();
-  //   }
-  //   if (!_is_raw)
-  //   {
-  //     _raw = _raw_keep;
-  //     std::cout << "Received raw feedback." << std::endl;
-  //     _is_raw = false;
-  //     return true;
-  //   }
-  //   else
-  //   {
-  //     std::cout << "Couldn't return raw feedback." << std::endl;
-  //     _is_raw = false;
-  //     return false;
-  //   }
-  // }
 
 protected:
   ros::NodeHandle _node;
   ros::Subscriber _state_sub;
-
-  //mwoibn::VectorN _raw_keep, _filtered;
+  bool _world;
   mwoibn::Vector6 _state;
-  //bool _is_raw;
-  bool _initialized = false;
-/*
-  void _initFilters(const MessagePtr& msg)
-  {
-    _linear_filter_ptr->reset(msg->position);
-    _angular_filter_ptr->reset(msg->position);
-  }
-  */
 };
 }
 }

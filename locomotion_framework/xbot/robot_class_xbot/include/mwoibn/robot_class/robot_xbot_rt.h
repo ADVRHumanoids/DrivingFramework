@@ -18,16 +18,16 @@ class RobotXBotRT : public RobotXBotFeedback
 {
 public:
   RobotXBotRT(XBot::RobotInterface::Ptr robot, std::string config_file,
-              std::string config_name,
+              std::string config_name,std::string controller_source,
               std::string secondary_file, XBot::SharedMemory::Ptr shared_memory);
 
   RobotXBotRT(XBot::RobotInterface::Ptr robot, YAML::Node full_config,
-              std::string config_name, XBot::SharedMemory::Ptr shared_memory);
+              std::string config_name, std::string controller_source, XBot::SharedMemory::Ptr shared_memory);
 
 
   virtual ~RobotXBotRT() {}
 
-  virtual void wait(){}
+  virtual void wait(bool spin = true){}
 
 protected:
 

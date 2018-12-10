@@ -1,6 +1,6 @@
 #include "mwoibn/communication_modules/ros_controller.h"
 
-bool mwoibn::communication_modules::RosController::send()
+bool mwoibn::communication_modules::RosController::run()
 {
 
   if(!_initialized) {initialize();}
