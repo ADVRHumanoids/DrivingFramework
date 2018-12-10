@@ -15,30 +15,51 @@ class Angle : public BasicTask
 {
 
 public:
-Angle(robot_class::angles::Basic& angle, mwoibn::robot_class::Robot& robot);
-virtual ~Angle() {
-}
+template<typename Other>
+  Angle(Other angle, mwoibn::robot_class::Robot& robot)
+          : BasicTask()
+  {
+          _angle_ptr.reset(new Other(angle));
+          _init(1, robot.getDofs());
+  }
 
-virtual void updateError();
+  Angle(Angle&& other)
+          : BasicTask(other)
+  {
+          _angle_ptr = std::move(other._angle_ptr);
+          //_init(1, robot.getDofs());
+  }
 
-double getCurrent();
+  virtual ~Angle() {
+  }
 
-virtual void updateJacobian();
+  virtual void updateError();
 
-virtual double getReference() const;
-virtual void setReference(double reference);
+  double getCurrent();
+
+  void reset();
+
+  virtual void updateJacobian();
+
+  virtual double getReference() const;
+  virtual void setReference(double reference);
 
 // virtual double det();
 
 protected:
 double _ref;
-robot_class::angles::Basic& _angle;
+std::unique_ptr<robot_class::angles::Basic> _angle_ptr;
 };
 
 class SoftAngle : public Angle {
 
 public:
-SoftAngle(robot_class::angles::Basic& angle, mwoibn::robot_class::Robot& robot);
+  template<typename Other>
+    SoftAngle(Other angle, mwoibn::robot_class::Robot& robot)
+            : Angle(angle, robot)
+    {
+            _resteer = false;
+    }
 
 virtual ~SoftAngle() {
 }
