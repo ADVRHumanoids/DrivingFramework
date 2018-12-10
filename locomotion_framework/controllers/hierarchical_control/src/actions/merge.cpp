@@ -23,7 +23,7 @@ mwoibn::hierarchical_control::actions::Merge::Merge(actions::Compute& main_task,
                         damping[j] = id[j] ? std::sqrt(_primary.damping(j)) : std::sqrt(secondary_task.damping(j));
 
                 }
-                _support_actions.insert(std::make_pair(id, actions::Compute(_support_tasks[i], gain, damping, _controller_state.P, _controller_state.command, _merge_memory)));
+                _support_actions.insert(std::make_pair(id, actions::Compute(_support_tasks[i], gain, damping, _controller_state, _merge_memory)));
         }
 
         _front_tasks.assign(2, merge::Front(_merge_memory, _local_map, *this));
