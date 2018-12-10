@@ -20,6 +20,18 @@ Pipe(int dofs = 0)
         init(dofs);
 }
 
+Pipe(const Pipe& other): _state(other._state)
+{}
+
+Pipe( Pipe&& other): _state(other._state)
+{}
+
+
+Pipe& operator=(const Pipe& other) {
+    init(other.size());
+    set(other);
+    return *this;
+}
 /** @resizes the states, it will reset to zero all values stored in an object */
 void restart(int dofs){
         init(dofs);
@@ -35,7 +47,7 @@ void set(const mwoibn::VectorN& new_state)
 template <typename Vector>
 void set(const Vector& new_state)
 {
-        for (int i = 0; i < new_state.size(); i++)
+        for (int i = 0; i < _state.size(); i++)
                 _state[i] = new_state[i];
 }
 
@@ -121,14 +133,18 @@ void init(int dofs){
         _state = mwoibn::VectorN::Zero(dofs);
 }
 
+
+
+Scalar operator[](int i) const {
+        return _state[i];
+}
+
+
 virtual ~Pipe() {
 }
 
 protected:
 mwoibn::VectorN _state;
-
-// mwoibn::VectorN& _state(){return _state;}
-// const mwoibn::VectorN& _state(const INTERFACE interface) const;
 
 template<typename Vector1, typename Vector2>
 void _select(const Vector1& new_state, Vector2& state, mwoibn::VectorBool selector)

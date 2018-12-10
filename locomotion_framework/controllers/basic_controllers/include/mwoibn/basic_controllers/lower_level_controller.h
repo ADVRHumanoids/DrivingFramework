@@ -14,7 +14,7 @@ class LowerLevelController : public BasicController
 
 public:
   LowerLevelController(mwoibn::robot_class::Robot& robot,
-                       mwoibn::robot_class::INTERFACE interface)
+                       mwoibn::Interface interface)
       : BasicController(), _robot(robot), _interface(interface)
   {
   }
@@ -22,7 +22,7 @@ public:
   virtual ~LowerLevelController(){}
 
   /** sends command directly to the robot */
-  virtual void setCommand() { _robot.command.interface(_interface).set(_command); }
+  virtual void setCommand() { _robot.command[_interface].set(_command); }
 
   /** provides access to the robot */
   mwoibn::robot_class::Robot& getRobot(){return _robot;}
@@ -31,7 +31,7 @@ protected:
   mwoibn::robot_class::Robot& _robot;
 
   /** keeps interface that  should be used to set robot command */
-  const mwoibn::robot_class::INTERFACE _interface;
+  const mwoibn::Interface _interface;
 };
 } // namespace package
 } // namespace library

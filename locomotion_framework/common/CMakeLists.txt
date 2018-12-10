@@ -39,17 +39,21 @@ find_package(Eigen3 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
-	include
-	${catkin_INCLUDE_DIRS}
-	${RBDL_INCLUDE_DIR}
-	${LOGGER_INCLUDE_DIRS}
+		include
+		${catkin_INCLUDE_DIRS}
+		${RBDL_INCLUDE_DIR}
+		${LOGGER_INCLUDE_DIRS}
   LIBRARIES
-	mwoibn_common
-	${catkin_LIBRARIES}
-	${RBDL_LIBRARY}
-	${LOGGER_LIBRARIES}
+		mwoibn_common
+		${catkin_LIBRARIES}
+		${RBDL_LIBRARY}
+		${LOGGER_LIBRARIES}
   DEPENDS
-	Eigen3
+		Eigen3
+	CATKIN_DEPENDS
+		rbdl_utils
+		eigen_utils
+		mwoibn_std_utils
 )
 
 include_directories(

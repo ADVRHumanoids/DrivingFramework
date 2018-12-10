@@ -18,13 +18,14 @@ enum class CONTROL_LEVEL{
   HIGHER_LEVEL
 };
 
-enum class INTERFACE
-{
-  POSITION,
-  VELOCITY,
-  ACCELERATION,
-  TORQUE
-};
+// enum class INTERFACE
+// {
+//   POSITION,
+//   VELOCITY,
+//   ACCELERATION,
+//   TORQUE,
+//   OVERALL_FORCE
+// };
 enum class ACTUATOR_TYPE
 {
   UNACTUATED = 0,
@@ -44,6 +45,13 @@ enum class CONTACT_TYPE
   POINT_FOOT,
   WHEEL_LOCKED,
   WHEEL,
+};
+
+enum class DYNAMIC_MODEL
+{
+  INERTIA,
+  GRAVITY,
+  NON_LINEAR
 };
 
 // eventually I can think about changing CONTACT_TYPE to a string enum
