@@ -8,6 +8,7 @@
 #include <rbdl/addons/urdfreader/urdfreader.h>
 mwoibn::robot_class::RobotRos::RobotRos(std::string config_file,
                                         std::string config_name,
+                                        std::string controller_source,
                                         std::string secondary_file)
     : mwoibn::robot_class::RobotRos::Robot()
 {
@@ -17,7 +18,7 @@ mwoibn::robot_class::RobotRos::RobotRos(std::string config_file,
 
   try
   {
-    _init(config, config_name);
+    _init(config, config_name, controller_source);
   }
   catch (const std::invalid_argument& e)
   {
@@ -28,13 +29,13 @@ mwoibn::robot_class::RobotRos::RobotRos(std::string config_file,
 }
 
 mwoibn::robot_class::RobotRos::RobotRos(YAML::Node full_config,
-                                        std::string config_name)
+                                        std::string config_name, std::string controller_source)
     : mwoibn::robot_class::RobotRos::Robot()
 {
   YAML::Node config = YAML::Clone(full_config);
   try
   {
-    _init(config, config_name);
+    _init(config, config_name, controller_source);
   }
   catch (const std::invalid_argument& e)
   {
@@ -44,10 +45,10 @@ mwoibn::robot_class::RobotRos::RobotRos(YAML::Node full_config,
 }
 
 YAML::Node mwoibn::robot_class::RobotRos::_init(YAML::Node config,
-                                                std::string config_name)
+                                                std::string config_name, std::string controller_source)
 {
 
-  YAML::Node config_robot = _readRobotConfig(config, config_name);
+  YAML::Node config_robot = _readRobotConfig(config, config_name, controller_source);
   // read ROS specific configuration
   config = config["ros"];
 
@@ -116,6 +117,7 @@ void mwoibn::robot_class::RobotRos::_readContacts(YAML::Node config)
       YAML::Load(file)[config["name"].as<std::string>()]["contacts"];
   contacts["settings"] = config["contacts"];
   _loadContacts(contacts);
+  config["contacts"] = contacts;
 }
 
 void mwoibn::robot_class::RobotRos::_readActuators(YAML::Node config)
@@ -168,6 +170,8 @@ bool mwoibn::robot_class::RobotRos::_initUrdf(std::string& urdf_description,
     throw(std::invalid_argument(
         std::string("Could not load urdf description")));
   }
+  _name = urdf.getName();
+
   return (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
              ? false
              : true;

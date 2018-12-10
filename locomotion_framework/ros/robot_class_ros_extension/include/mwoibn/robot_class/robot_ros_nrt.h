@@ -23,10 +23,14 @@ class RobotRosNRT : public RobotRos
 {
 
 public:
-  RobotRosNRT(std::string config_file, std::string config_name,
+  RobotRosNRT(std::string config_file, std::string config_name, std::string controller_source,
               std::string secondary_file = "");
+  RobotRosNRT(YAML::Node full_config, std::string config_name, std::string controller_source);
 
-  RobotRosNRT(YAML::Node full_config, std::string config_name);
+  RobotRosNRT(std::string config_file, std::string config_name, mwoibn::communication_modules::Shared& shared,
+              std::string controller_source, std::string secondary_file = "");
+
+  RobotRosNRT(YAML::Node full_config, std::string config_name, mwoibn::communication_modules::Shared& shared, std::string controller_source);
 
   virtual ~RobotRosNRT() {}
 
@@ -99,28 +103,46 @@ public:
   }
 
 
+  static bool loadJointSpaceFeedback(YAML::Node config,
+                                     communication_modules::Communications& external_feedbacks,
+                                     State& external_state, BiMap& external_map,
+                                     mwoibn::communication_modules::Shared& shared);
 
   static bool loadJointSpaceFeedback(YAML::Node config,
-                                     Feedbacks& external_feedbacks,
-                                     State& external_state, BiMap external_map);
+                                     communication_modules::Communications& external_feedbacks,
+                                     State& external_state, BiMap& external_map);
 
   static bool loadOperationalSpaceFeedback(YAML::Node config,
-                                           Feedbacks& external_feedbacks,
+                                           communication_modules::Communications& external_feedbacks,
                                            State& external_state,
-                                           BiMap external_map);
+                                           BiMap& external_map);
   static bool loadRosControllers(YAML::Node config,
-                                 Controllers& external_controllers,
-                                 State& external_state, BiMap external_map);
+                                 communication_modules::Communications& external_controllers,
+                                 State& external_state, BiMap& external_map);
 
+  virtual void loadControllers(std::string config_file, std::string config_name,
+                       mwoibn::communication_modules::Shared& shared,
+                       std::string controller_source, std::string secondary_file);
+
+
+  virtual void loadControllers(YAML::Node full_config, std::string config_name,
+                       mwoibn::communication_modules::Shared& shared,  std::string controller_source);
 
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
+  virtual void _shareFeedbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
 
   void _loadControllers(YAML::Node config);
+  void _shareControllers(YAML::Node config, mwoibn::communication_modules::Shared& shared);
 
   virtual void _loadContacts(YAML::Node contacts_config);
+  virtual void _initContactsCallbacks(YAML::Node config);
+  virtual void _initContactsCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
   virtual void _loadMapFromTopic(YAML::Node config);
   virtual void _loadMap(YAML::Node config);
+
+  virtual void _init(YAML::Node full_config, std::string config_name, std::string controller_source);
+  virtual void _init(YAML::Node full_config, std::string config_name, mwoibn::communication_modules::Shared& shared, std::string controller_source);
 
 };
 } // namespace package
