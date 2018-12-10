@@ -3,6 +3,7 @@
 
 #include <mwoibn/robot_class/robot.h>
 #include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
+#include <mwoibn/robot_points/point.h>
 
 namespace mgnss {
 
@@ -58,7 +59,7 @@ class SteeringReference
 
 public:
 SteeringReference(mwoibn::robot_class::Robot& robot,
-                  mwoibn::hierarchical_control::tasks::ContactPointTracking& plane, mwoibn::VectorN init_pose,
+                  mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
                   double K_icm, double K_sp, double dt, double margin = 0.04,
                   double max = 2.79252680) : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt),
         _state(robot.state.position.get())
@@ -72,7 +73,7 @@ SteeringReference(mwoibn::robot_class::Robot& robot,
         _damp.setZero(_size);
         _raw.setZero(_size);
         _limited.setZero(_size);
-        _b_st = init_pose;
+        _b_st.setZero(_size);
         _plane_ref.setZero(2);
         _resteer.setConstant(_size, false);
         _steer.setConstant(_size, false);
@@ -144,7 +145,7 @@ void resteer(const mwoibn::VectorBool& steer)
 virtual void compute(const mwoibn::Vector3 next_step){
 
         _plane.updateState();
-        _heading = _plane.getState()[2];
+        _heading = _plane.heading();
         _plane.updateError();
 
         _ICM(next_step); // returns a velue in a robot space
@@ -282,6 +283,7 @@ virtual void _velSP(int i){
 }
 virtual void _computeTreshhold() = 0;
 virtual void _resetTreshhold() = 0;
+
 };
 }
 }

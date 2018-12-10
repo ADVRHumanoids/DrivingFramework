@@ -3,9 +3,9 @@
 mgnss::higher_level::Steering5::Steering5(
         mwoibn::robot_class::Robot& robot,
         mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
-        mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
+        double K_icm, double K_sp, double dt,
         double margin, double max)
-        : SteeringReference(robot, plane, init_pose, K_icm, K_sp, dt, margin, max)
+        : SteeringReference(robot, plane, K_icm, K_sp, dt, margin, max)
 {
         _pb_icm.setZero(_size);
         _pb_sp.setZero(_size);

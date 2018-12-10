@@ -15,7 +15,7 @@ class Steering5 : public SteeringReference
 public:
 Steering5(mwoibn::robot_class::Robot& robot,
           mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
-          mwoibn::VectorN init_pose, double K_icm, double K_sp, double dt,
+          double K_icm, double K_sp, double dt,
           double margin = 0.04, double max = 2.79252680);
 
 virtual ~Steering5() {

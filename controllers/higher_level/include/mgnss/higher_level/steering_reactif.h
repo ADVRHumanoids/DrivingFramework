@@ -19,21 +19,25 @@ class SteeringReactif : public SteeringReference
 public:
 SteeringReactif(mwoibn::robot_class::Robot& robot,
                 mwoibn::hierarchical_control::tasks::ContactPointTracking& plane, const mwoibn::VectorN& contact_vel,
-                mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
+                double K_icm, double K_sp, double K_v, double dt,
                 double margin_icm, double margin_sp, double margin = 0.04, double max = 2.79252680);
 
 virtual ~SteeringReactif() {
 }
 virtual void compute(const mwoibn::Vector3 next_step){
         SteeringReference::compute(next_step);
-        _last_state.noalias() = _plane.getState();
+        _last_state[0] = _plane.baseX(); // will it initialize correctly?
+        _last_state[1] = _plane.baseY(); // will it initialize correctly?
+
+        _last_state[2] = _plane.heading(); // will it initialize correctly?
 
 }
 
 protected:
 
 virtual void _merge(int i);
-mwoibn::VectorN _pb_icm, _pb_sp, _pb, _reactif_gain, _last_state;
+mwoibn::VectorN _pb_icm, _pb_sp, _pb, _reactif_gain;
+mwoibn::Vector3 _last_state;
 double _K_v, _treshhold_icm, _treshhold_sp;
 virtual void _ICM(mwoibn::Vector3 next_step);
 const mwoibn::VectorN& _contact_vel;

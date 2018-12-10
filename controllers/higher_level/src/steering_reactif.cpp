@@ -4,9 +4,9 @@ mgnss::higher_level::SteeringReactif::SteeringReactif(
         mwoibn::robot_class::Robot& robot,
         mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
         const mwoibn::VectorN& contact_vel,
-        mwoibn::VectorN init_pose, double K_icm, double K_sp, double K_v, double dt,
+        double K_icm, double K_sp, double K_v, double dt,
         double margin_icm, double margin_sp, double margin, double max)
-        : SteeringReference(robot, plane, init_pose, K_icm, K_sp, dt, margin, max), _K_v(K_v), _contact_vel(contact_vel)
+        : SteeringReference(robot, plane, K_icm, K_sp, dt, margin, max), _K_v(K_v), _contact_vel(contact_vel)
 {
         _pb_icm.setZero(_size);
         _pb_sp.setZero(_size);
@@ -20,7 +20,11 @@ mgnss::higher_level::SteeringReactif::SteeringReactif(
         _treshhold_icm = margin_icm/dt;
         _treshhold_sp = margin_sp/dt;
 
-        _last_state = _plane.getState(); // will it initialize correctly?
+        _plane.updateState();
+        _last_state[0] = _plane.baseX(); // will it initialize correctly?
+        _last_state[1] = _plane.baseY(); // will it initialize correctly?
+
+        _last_state[2] = _plane.heading(); // will it initialize correctly?
 
 }
 
@@ -98,18 +102,18 @@ void mgnss::higher_level::SteeringReactif::_steerICM(int i, const mwoibn::Vector
 
 void mgnss::higher_level::SteeringReactif::_reactifGain(int i){
 
-        double z = (_plane.getState()[2] - _last_state[2]);
-        mwoibn::eigen_utils::wrapToPi(z);
+        double th = (_plane.heading() - _last_state[2]);
+        mwoibn::eigen_utils::wrapToPi(th);
 
         _plane_ref.noalias() = _plane.getReferenceError(i).head(2);
 
-        double x = std::cos(_heading) * (_plane.getState()[0] - _last_state[0]);
-        x += std::sin(_heading) * (_plane.getState()[1] - _last_state[1]);
-        x -= _plane_ref[1] * z;
+        double x = std::cos(_heading) * (_plane.baseX() - _last_state[0]);
+        x += std::sin(_heading) * (_plane.baseY() - _last_state[1]);
+        x -= _plane_ref[1] * th;
 
-        double y = -std::sin(_heading) * (_plane.getState()[0] - _last_state[0]);
-        y += std::cos(_heading) * (_plane.getState()[1] - _last_state[1]);
-        y += _plane_ref[0] * z;
+        double y = -std::sin(_heading) * (_plane.baseX() - _last_state[0]);
+        y += std::cos(_heading) * (_plane.baseY() - _last_state[1]);
+        y += _plane_ref[0] * th;
 
         double b = std::atan2(y, x);
 
