@@ -96,20 +96,14 @@ bool mgnss::ros_callbacks::wheels_controller_extend::eventsHandler(custom_servic
 }
 
 
-void mgnss::ros_callbacks::wheels_controller_extend::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mwoibn::VectorN* support, mgnss::controllers::WheelsControllerExtend* controller_ptr)
+void mgnss::ros_callbacks::wheels_controller_extend::supportHandler(const custom_messages::CustomCmndConstPtr& msg, mgnss::controllers::WheelsControllerExtend* controller_ptr)
 {
         if(msg->position.size() > 12 && msg->position[12] == mwoibn::IS_VALID) {
-                for(int i = 0; i < 12; i++) {
-                        (*support)[i] = msg->position[i];
-                }
-                controller_ptr->setSupport(*support);
+                for(int i = 0; i < 12; i++) controller_ptr->setSupport(i, msg->position[i]);
         }
 
         if(msg->velocity.size() > 12 && msg->velocity[12] == mwoibn::IS_VALID) {
-                for(int i = 0; i < 12; i++) {
-                        (*support)[i] = msg->velocity[i];
-                }
-                controller_ptr->setSupportVel(*support);
+                for(int i = 0; i < 12; i++) controller_ptr->setSupportVel(i, msg->velocity[i]);
         }
 
 }
