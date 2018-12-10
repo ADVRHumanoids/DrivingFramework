@@ -48,9 +48,9 @@ mwoibn::robot_class::Robot& init(std::string config_file, std::string config_nam
         return get();
 }
 
-mwoibn::robot_class::Robot& init(YAML::Node config, std::string config_name){
+mwoibn::robot_class::Robot& init(YAML::Node config, std::string config_name, std::string controller_source){
         //load config
-        _robot.reset(create(config, config_name).release());
+        _robot.reset(create(config, config_name, controller_source).release());
 
         return get();
 }
@@ -140,7 +140,7 @@ static std::unique_ptr<mwoibn::robot_class::Robot> create(std::string config_fil
                                     std::string("Unknow middleware ") + config["middleware"].as<std::string>());
 }
 
-static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std::string config_name){
+static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std::string config_name, std::string controller_source){
 
         std::string error = std::string("\n robot configuration: \t ") +
                             config_name + std::string("\nerror:\t");
@@ -152,9 +152,9 @@ static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std
  #if ROS
         if (config["middleware"].as<std::string>() == "ROS") {
                 if (type == "NRT" || type == "ROS_NRT")
-                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name));
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name, controller_source));
                 else if (type == "EMPTY")
-                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRos(config, config_name));
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRos(config, config_name, controller_source));
                 else if (type == "RT")
                         throw std::invalid_argument(error +
                                                     std::string("Real time is not supported for ROS"));
@@ -167,16 +167,148 @@ static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std
  #if XBOT
         if (config["middleware"].as<std::string>() == "XBOT") {
                 if (type == "EMPTY")
-                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotFeedback(config, config_name));
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotFeedback(config, config_name, controller_source));
                 else if (type == "RT")
                         throw std::invalid_argument(error +
                                                     std::string("Real time robot requires access to the shared memory. Please use a RT loader method "));
                 //        _robot.reset(new mwoibn::robot_class::RobotXbotRT(config_file, config_name, secondary_file));
        #if ROS
                 else if (type == "NRT")
-                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotNRT(config, config_name));
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotNRT(config, config_name, controller_source));
                 else if (type == "ROS_NRT")
-                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name));
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name, controller_source));
+       #endif
+                else
+                        throw std::invalid_argument(error +
+                                                    std::string("Unknow robot type"));
+
+        }
+#endif
+
+        throw std::invalid_argument(error +
+                                    std::string("Unknow middleware ") + config["middleware"].as<std::string>());
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static std::unique_ptr<mwoibn::robot_class::Robot> create(std::string config_file, std::string config_name, mwoibn::communication_modules::Shared& shared,
+                                                          std::string controller_source, std::string secondary_file = ""){
+
+        std::string error = "config file:\t" + config_file +
+                            std::string("\n robot configuration: \t ") +
+                            config_name + std::string("\nerror:\t");
+
+        YAML::Node config = readConfig(config_file, config_name, secondary_file);
+
+        std::string type = config["robot"]["layer"].as<std::string>();
+
+ #if ROS
+        if (config["middleware"].as<std::string>() == "ROS") {
+                if (type == "NRT" || type == "ROS_NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config_file, config_name, shared, controller_source, secondary_file));
+                else if (type == "EMPTY")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRos(config_file, config_name, controller_source, secondary_file));
+                else if (type == "RT")
+                        throw std::invalid_argument(error +
+                                                    std::string("Real time is not supported for ROS"));
+                else
+                        throw std::invalid_argument(error +
+                                                    std::string("Unknow robot type"));
+                //return *_robot;
+        }
+ #endif
+ #if XBOT
+        if (config["middleware"].as<std::string>() == "XBOT") {
+                if (type == "EMPTY")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotFeedback(config_file, config_name, controller_source, secondary_file));
+                else if (type == "RT")
+                        throw std::invalid_argument(error +
+                                                    std::string("Real time robot requires access to the shared memory. Please use a RT loader method "));
+                //        _robot.reset(new mwoibn::robot_class::RobotXbotRT(config_file, config_name, secondary_file));
+       #if ROS
+                else if (type == "NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotNRT(config_file, config_name, controller_source, secondary_file));
+                else if (type == "ROS_NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config_file, config_name, controller_source, secondary_file));
+       #endif
+                else
+                        throw std::invalid_argument(error +
+                                                    std::string("Unknow robot type"));
+
+        }
+#endif
+
+        throw std::invalid_argument(error +
+                                    std::string("Unknow middleware ") + config["middleware"].as<std::string>());
+}
+
+static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std::string config_name, mwoibn::communication_modules::Shared& shared, std::string controller_source){
+
+        std::string error = std::string("\n robot configuration: \t ") +
+                            config_name + std::string("\nerror:\t");
+
+        checkConfig(config, config_name, error);
+
+        std::string type = config["robot"]["layer"].as<std::string>();
+
+ #if ROS
+        if (config["middleware"].as<std::string>() == "ROS") {
+                if (type == "NRT" || type == "ROS_NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name, shared, controller_source));
+                else if (type == "EMPTY")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRos(config, config_name, controller_source));
+                else if (type == "RT")
+                        throw std::invalid_argument(error +
+                                                    std::string("Real time is not supported for ROS"));
+                else
+                        throw std::invalid_argument(error +
+                                                    std::string("Unknow robot type"));
+                //return *_robot;
+        }
+ #endif
+ #if XBOT
+        if (config["middleware"].as<std::string>() == "XBOT") {
+                if (type == "EMPTY")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotFeedback(config, config_name, controller_source));
+                else if (type == "RT")
+                        throw std::invalid_argument(error +
+                                                    std::string("Real time robot requires access to the shared memory. Please use a RT loader method "));
+                //        _robot.reset(new mwoibn::robot_class::RobotXbotRT(config_file, config_name, secondary_file));
+       #if ROS
+                else if (type == "NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotXBotNRT(config, config_name, controller_source));
+                else if (type == "ROS_NRT")
+                        return std::unique_ptr<mwoibn::robot_class::Robot>(new mwoibn::robot_class::RobotRosNRT(config, config_name, controller_source));
        #endif
                 else
                         throw std::invalid_argument(error +
@@ -191,7 +323,6 @@ static std::unique_ptr<mwoibn::robot_class::Robot> create(YAML::Node config, std
 
 protected:
 std::unique_ptr<mwoibn::robot_class::Robot> _robot;
-//, XBot::SharedMemory::Ptr shared_memory;
 };
 
 
