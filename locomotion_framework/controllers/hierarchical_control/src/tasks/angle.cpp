@@ -2,30 +2,25 @@
 
 
 
-mwoibn::hierarchical_control::tasks::Angle::Angle(robot_class::angles::Basic& angle, mwoibn::robot_class::Robot& robot)
-        : BasicTask(), _angle(angle)
-{
-        _init(1, robot.getDofs());
-}
 
 void mwoibn::hierarchical_control::tasks::Angle::updateError()
 {
         _last_error.noalias() = _error;
 
-        _angle.update();
-        _error[0] = _ref - _angle.get();
+        _angle_ptr->update();
+        _error[0] = _ref - _angle_ptr->get();
 
         eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
 }
 
 double mwoibn::hierarchical_control::tasks::Angle::getCurrent(){
-        return _angle.get();
+        return _angle_ptr->get();
 }
 
 void mwoibn::hierarchical_control::tasks::Angle::updateJacobian() {
 
         _last_jacobian.noalias() = _jacobian;
-        _jacobian.noalias() = -_angle.getJacobian();
+        _jacobian.noalias() = -_angle_ptr->getJacobian();
 }
 
 double mwoibn::hierarchical_control::tasks::Angle::getReference() const {
@@ -41,15 +36,14 @@ void mwoibn::hierarchical_control::tasks::Angle::setReference(double reference) 
 
 }
 
+void mwoibn::hierarchical_control::tasks::Angle::reset(){
+    setReference(getCurrent());
+}
+
 // double mwoibn::hierarchical_control::tasks::Angle::det(){
 //         return _jacobian.cwiseAbs().maxCoeff();
 // }
 
-mwoibn::hierarchical_control::tasks::SoftAngle::SoftAngle(robot_class::angles::Basic& angle, mwoibn::robot_class::Robot& robot)
-        : Angle(angle, robot)
-{
-        _resteer = false;
-}
 
 
 void mwoibn::hierarchical_control::tasks::SoftAngle::updateError()
@@ -57,11 +51,11 @@ void mwoibn::hierarchical_control::tasks::SoftAngle::updateError()
         _last_error.noalias() = _error;
 
         _resteer = false;
-        _angle.update();
+        _angle_ptr->update();
 
         mwoibn::eigen_utils::wrapToPi(_ref);
 
-        _error[0] = _ref - _angle.get();
+        _error[0] = _ref - _angle_ptr->get();
 
         _limit2PI();
 
@@ -104,12 +98,12 @@ void mwoibn::hierarchical_control::tasks::SoftAngle::_limit2PI(){
 
         if(_error[0] - _last_error[0] > mwoibn::PI) {
                 _ref -= mwoibn::TWO_PI;
-                _error[0] = _ref - _angle.get();
+                _error[0] = _ref - _angle_ptr->get();
                 _limit2PI();
         }
         else if (_last_error[0] - _error[0] > mwoibn::PI) {
                 _ref += mwoibn::TWO_PI;
-                _error[0] = _ref - _angle.get();
+                _error[0] = _ref - _angle_ptr->get();
                 _limit2PI();
         }
 }
