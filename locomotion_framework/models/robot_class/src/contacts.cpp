@@ -187,6 +187,35 @@ mwoibn::robot_class::Contacts::getMinimumJacobians()
   return jacobians;
 }
 
+const mwoibn::VectorN& mwoibn::robot_class::Contacts::getReactionForce()
+{
+
+  _forces.setZero();
+
+  unsigned int i = 0;
+
+  for (auto& contact : _contacts)
+  {
+    _forces.segment(i,contact->jacobianSize()) = contact->getReactionForce();
+    i += contact->jacobianSize();
+  }
+
+  return _forces;
+}
+
+std::vector<mwoibn::VectorN>
+mwoibn::robot_class::Contacts::getReactionForces()
+{
+  std::vector<mwoibn::VectorN> forces;
+
+  for (auto& contact : _contacts)
+  {
+    forces.push_back(contact->getReactionForce());
+  }
+  return forces;
+}
+
+
 const mwoibn::VectorN& mwoibn::robot_class::Contacts::getPosition()
 {
 
