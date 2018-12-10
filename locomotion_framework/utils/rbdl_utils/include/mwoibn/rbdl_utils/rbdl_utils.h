@@ -65,6 +65,23 @@ fromMatrix(const RigidBodyDynamics::Math::Matrix3d& rotation, double eps = 1e-4)
       (-rotation(1,0) + rotation(0,1)) / s);
 }
 
+/** helping function to provide functinoality of calling functions through
+ * frames RBDL names */
+inline unsigned int checkBody(std::string body_name,
+                        RigidBodyDynamics::Model& model)
+{
+
+  unsigned int body_id = model.GetBodyId(body_name.c_str());
+
+  if (body_id == std::numeric_limits<unsigned int>::max())
+  {
+
+    throw(std::invalid_argument("unknown body, " + body_name +
+                                " couldn't find it in a RBDL model"));
+  }
+  return body_id;
+}
+
 } // namespace package
 } // namespace library
 #endif
