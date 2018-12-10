@@ -26,10 +26,16 @@ virtual void close() = 0;
 virtual void setRate(double rate){
         _robot.setRate(rate);
 }
-virtual void startLog(mwoibn::common::Logger& logger) = 0;
+
+virtual void startLog(mwoibn::common::Logger& logger){
+        initLog(logger);
+        logger.start();
+}
+virtual void initLog(mwoibn::common::Logger& logger) = 0;
 virtual void log(mwoibn::common::Logger& logger, double time) = 0;
 protected:
 mwoibn::robot_class::Robot& _robot;
+std::string _name = "";
 };
 }
 }

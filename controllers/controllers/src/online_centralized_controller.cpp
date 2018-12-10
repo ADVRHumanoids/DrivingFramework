@@ -1,9 +1,10 @@
 #include "mgnss/controllers/online_centralized_controller.h"
 
 
-mgnss::controllers::OnlineCentralizedController::OnlineCentralizedController(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& reference, std::string config_file) :  modules::Base(robot), _reference(reference){
+mgnss::controllers::OnlineCentralizedController::OnlineCentralizedController(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& reference, std::string config_file, std::string name) :  modules::Base(robot), _reference(reference){
 
-        YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"]["wheeled_motion"];
+        YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
+        config["name"] = name;
         _construct(config);
 }
 
@@ -21,6 +22,8 @@ void mgnss::controllers::OnlineCentralizedController::_construct(YAML::Node conf
 
         if(!config["compliance"])
                 throw std::invalid_argument(std::string("Centralized controller: configuration doesn't containt required filed 'compliance'."));
+
+        _name = config["name"].as<std::string>();
 
         if(config["type"].as<std::string>() == "online")
                 _dynamic_model_ptr.reset(

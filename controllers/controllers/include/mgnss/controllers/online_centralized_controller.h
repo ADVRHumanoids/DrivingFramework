@@ -14,7 +14,7 @@ namespace controllers {
 class OnlineCentralizedController : public mgnss::modules::Base {
 
 public:
-OnlineCentralizedController(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& reference, std::string config_file);
+OnlineCentralizedController(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& reference, std::string config_file, std::string name);
 OnlineCentralizedController(mwoibn::robot_class::Robot& robot, mwoibn::robot_class::Robot& reference, YAML::Node config);
 
 virtual ~OnlineCentralizedController(){
@@ -31,13 +31,12 @@ virtual void stop(){
 virtual void close(){
 }
 
-virtual void startLog(mwoibn::common::Logger& logger){
+virtual void initLog(mwoibn::common::Logger& logger){
         logger.addField("time", 0);
-        logger.start();
 }
+
 virtual void log(mwoibn::common::Logger& logger, double time){
         logger.addEntry("time", time);
-        logger.write();
 }
 
 protected:

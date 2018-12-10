@@ -3,11 +3,10 @@
 
 bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
 {
-
+        _n = handle->getRosHandle();
         // Read XBotCore config file
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(handle->getPathToConfigFile());
 
-        _name = _setName();
 
         // Read path to mwoibn config file
         if (!config["config_file"])
@@ -20,41 +19,45 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
         YAML::Node plugin_config = mwoibn::robot_class::Robot::getConfig(config_file);
 
         if (!plugin_config["modules"])
-                throw std::invalid_argument(config_file +
-                                            std::string("\t Could not find modules configuration."));
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Could not find modules configuration."));
         if (!plugin_config["modules"][_name])
-                throw std::invalid_argument(config_file +
-                                            std::string("\t Could not find ") + _name + std::string(" module configuration."));
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Could not find ") + _name + std::string(" module configuration."));
 
         plugin_config = plugin_config["modules"][_name];
 
         if (!plugin_config["robot"])
-                throw std::invalid_argument(config_file +
-                                            std::string("\t Could not find robot configuration in module parameters."));
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Could not find robot configuration in module parameters."));
         if (!plugin_config["layer"])
-                throw std::invalid_argument(config_file +
-                                            std::string("\t Please specify robot layer."));
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify robot layer."));
         if (!plugin_config["mode"])
-                throw std::invalid_argument(config_file +
-                                            std::string("\t Please specify controller mode."));
-
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify controller mode."));
+        if (!plugin_config["controller"])
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify controllers to be loaded ."));
         // read a secondary file for the plugin
         std::string secondary_file = "";
         if (plugin_config["secondary_file"])
-                secondary_file = plugin_config["secondary_file"].as<std::string>();
+              secondary_file = mwoibn::robot_class::Robot::readPath(plugin_config["secondary_file"]);
 
         config = mwoibn::robot_class::Robot::getConfig(config_file, secondary_file);
 
         config["robot"]["layer"] = plugin_config["layer"].as<std::string>();
         config["robot"]["mode"] = plugin_config["mode"].as<std::string>();
 
-        _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config, plugin_config["robot"].as<std::string>(), handle->getSharedMemory()));
+
+
+        _robot_ptr.reset(new mwoibn::robot_class::RobotXBotRT(handle->getRobotInterface(), config, plugin_config["robot"].as<std::string>(), plugin_config["controller"].as<std::string>(), handle->getSharedMemory()));
 
         config = mwoibn::robot_class::Robot::readFullConfig(config, plugin_config["robot"].as<std::string>());
         config = config["modules"][_name];
 
         _resetPrt(config);
-        _initCallbacks(handle);
+        _initCallbacks(config);
 
         _logger_ptr.reset(new mwoibn::common::XbotLogger(_name));
         _logger_ptr->addField("update", 0.0);
@@ -86,9 +89,9 @@ void mgnss::plugins::XbotBase::on_stop(double time) {
         _controller_ptr->stop();
 }
 
-void mgnss::plugins::XbotBase::control_loop(double time, double period)
+void mgnss::plugins::XbotBase::control_loop(double time)
 {
-        _begin = std::chrono::high_resolution_clock::now();
+        //_begin = std::chrono::high_resolution_clock::now();
 
         _valid = _robot_ptr->get();
 
@@ -110,12 +113,12 @@ void mgnss::plugins::XbotBase::control_loop(double time, double period)
         _controller_ptr->update();
         _controller_ptr->send();
 
-        _end = std::chrono::high_resolution_clock::now();
+        //_end = std::chrono::high_resolution_clock::now();
 
-        _logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+        //_logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
         _controller_ptr->log(*_logger_ptr.get(), time-_start);
+        _logger_ptr->write();
 
-//   std::cout <<  _robot_ptr->commad.velocity.get.transpose() << std::endl;
 
 }
 

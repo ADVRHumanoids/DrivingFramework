@@ -15,7 +15,7 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS wheeled_motion centralized_controllers joint_space_controllers)
+LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
 LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules mgnss_higher_level)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -27,9 +27,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES
-        wheeled_motion
-        centralized_controllers
-        joint_space_controllers
+        mgnss_controllers_wheels
+        mgnss_controllers_centralized
+        mgnss_controllers_joint_space
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -42,43 +42,45 @@ include_directories(
 )
 
 
-add_library(wheeled_motion
+add_library(mgnss_controllers_wheels
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp
    src/wheeled_motion_event_v3.cpp
-   src/wheeled_motion_actions.cpp
+#   src/wheeled_motion_actions.cpp
    src/wheeled_motion_merge_v1.cpp
    src/wheeled_motion_world.cpp
    src/wheels_reactif.cpp
+   src/wheels_zmp.cpp
  )
 
-add_dependencies(wheeled_motion ${catkin_EXPORTED_TARGETS})
+add_dependencies(mgnss_controllers_wheels ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(wheeled_motion
+target_link_libraries(mgnss_controllers_wheels
    ${catkin_LIBRARIES}
  )
 
 
-add_library(centralized_controllers
+add_library(mgnss_controllers_centralized
    src/online_centralized_controller.cpp
+   src/compliance_compensation.cpp
+   src/centralized_controller.cpp
  )
 
-add_dependencies(centralized_controllers ${catkin_EXPORTED_TARGETS})
+add_dependencies(mgnss_controllers_centralized ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(centralized_controllers
+target_link_libraries(mgnss_controllers_centralized
    ${catkin_LIBRARIES}
  )
 
 
-add_library(joint_space_controllers
+add_library(mgnss_controllers_joint_space
    src/joint_states.cpp
  )
 
-add_dependencies(joint_space_controllers wheeled_motion ${catkin_EXPORTED_TARGETS})
+add_dependencies(mgnss_controllers_joint_space ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(joint_space_controllers
-   wheeled_motion
+target_link_libraries(mgnss_controllers_joint_space
    ${catkin_LIBRARIES}
  )
 
