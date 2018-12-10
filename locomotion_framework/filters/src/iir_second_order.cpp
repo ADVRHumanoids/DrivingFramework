@@ -13,6 +13,16 @@ mwoibn::filters::IirSecondOrder::IirSecondOrder(int size, double omega,
   _b << 1, 2, 1;
 }
 
+mwoibn::filters::IirSecondOrder::IirSecondOrder(IirSecondOrder& other)
+    : _damp(other._damp), _omega(other._omega)
+{
+    _y = other._y;
+     _u = other._u;
+    _a = other._a;
+    _b = other._b;
+
+}
+
 void mwoibn::filters::IirSecondOrder::resize(int size)
 {
   _u.setZero(3, size);
