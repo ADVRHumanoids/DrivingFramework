@@ -25,7 +25,7 @@
 
 #include <urdf/model.h>
 #include "mwoibn/point_handling/raw_positions_handler.h"
-#include "mwoibn/robot_points/center_of_pressure_fast.h"
+#include "mwoibn/robot_points/center_of_pressure.h"
 
 mwoibn::robot_class::Robot::Robot(std::string urdf_description,
                                   std::string srdf_description)
@@ -37,8 +37,9 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
                                        std::string srdf_description)
 {
         urdf::Model urdf;
-        _is_static = _initUrdf(urdf_description, urdf);
 
+
+        _is_static = _initUrdf(urdf_description, urdf);
         srdf::Model srdf = _initSrdf(srdf_description, urdf);
 
         // Init RBDL model
@@ -81,7 +82,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
         _contacts.reset(new Contacts(getDofs()));
 
         _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
-        _center_of_pressure.reset(new robot_points::CenterOfPressureFast(_model, state, *_contacts));
+        _center_of_pressure.reset(new robot_points::CenterOfPressure(_model, state, *_contacts, *_center_of_mass));
 
         // set to unactuated all dofs not in the model
         if (!_is_static)
@@ -537,10 +538,11 @@ void mwoibn::robot_class::Robot::compareEntry(YAML::Node entry_main,
 void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
 {
         //  for (auto contact : contacts_config)
+        YAML::Node loaded_contacts;
+
         for (int i = 0; i < contacts_config.size() - 1; i++)
         {
                 YAML::Node contact = contacts_config["contact" + std::to_string(i)];
-
                 if (!contact["type"])
                         throw std::invalid_argument(
                                       std::string("Please specify a contact types"));
@@ -554,6 +556,7 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                                 _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
                                                        new mwoibn::robot_points::ContactV2(
                                                                _model, state, contact)));
+                                loaded_contacts[_contacts->end()[-1]->getName()] = contact;
                                 continue;
                         }
                         if (type.compare("wheel") == 0)
@@ -561,6 +564,7 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                                 _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
                                                        new mwoibn::robot_points::WheelContactV2(
                                                                _model, state, contact)));
+                                loaded_contacts[_contacts->end()[-1]->getName()] = contact;
                                 continue;
                         }
                         // if (type.compare("wheel_locked") == 0)
@@ -579,7 +583,7 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                 }
         }
         _center_of_pressure->init();
-
+        contacts_config = loaded_contacts;
 }
 
 void mwoibn::robot_class::Robot::_loadActuators(YAML::Node actuators_config)
@@ -873,11 +877,17 @@ YAML::Node mwoibn::robot_class::Robot::readFullConfig(YAML::Node full_config, st
 
 YAML::Node
 mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
-                                             std::string config_name)
+                                             std::string config_name,
+                                             std::string controller_source)
 {
         full_config = readFullConfig(full_config, config_name);
         // in config_robot all the data that are used later should be stored
         YAML::Node config = full_config["robot"][config_name];
+
+
+        if(!full_config["controllers"][controller_source])
+          throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string("\nconfig_name: ") + config_name + "\n" +
+                                    "\tcontroller source " + controller_source + " undefined in a config file.\n"));
 
         // extend config_robot by robot name
         config["name"] = (full_config["robot"]["name"])
@@ -895,17 +905,17 @@ mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
                                             "\tfeedback\n" + e.what()));
         }
 
+
         try
         {
                 config["controller"] =
-                        _readConfig(full_config["controllers"], full_config["controller"],
-                                    config["controller"]);
+                        _readConfig(YAML::Node(), full_config["controller"],
+                                    full_config["controllers"][controller_source]);
                 config["controller"]["mode"] = full_config["robot"]["mode"];
         }
         catch (const std::invalid_argument& e)
         {
-                throw(std::invalid_argument("config_name: " + config_name + "\n" +
-                                            "\tcontroller\n" + e.what()));
+                throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string(" reading controllers\n\t") + e.what()));
         }
         return config;
 }
@@ -916,8 +926,8 @@ YAML::Node mwoibn::robot_class::Robot::_readConfig(const YAML::Node lists,
 {
         YAML::Node reduced;
         //  //load expected feedbacks
-        if (!config || !lists || !defined)
-                throw std::invalid_argument(std::string("Received an empty argument. "));
+        if (!config || !defined)
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string("Received an empty argument. "));
 
         // get zero options
         if (!config["layer"] && !config["list"])
@@ -1123,6 +1133,7 @@ bool mwoibn::robot_class::Robot::_initUrdf(std::string& urdf_description,
                               std::invalid_argument(std::string("Could not load urdf description")));
         }
 
+        _name = urdf.getName();
         return (urdf.getRoot()->child_joints[0]->type == urdf::Joint::FLOATING)
                ? false
                : true;

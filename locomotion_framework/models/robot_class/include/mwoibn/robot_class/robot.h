@@ -8,13 +8,15 @@
 #include "mwoibn/robot_points/contact_v2.h"
 
 #include "mwoibn/robot_class/contacts.h"
-#include "mwoibn/robot_class/controllers.h"
-#include "mwoibn/robot_class/feedbacks.h"
 
+#include "mwoibn/communication_modules/communications.h"
 #include "mwoibn/robot_class/actuators.h"
 #include "mwoibn/robot_points/center_of_mass.h"
 
 #include "mwoibn/robot_points/center_of_pressure.h"
+
+#include "mwoibn/communication_modules/shared.h"
+
 
 #include "mwoibn/common/all.h"
 #include "mwoibn/robot_class/mappings.h"
@@ -91,8 +93,8 @@ virtual void update() {
 void updateKinematics()
 {
 //    RigidBodyDynamics::UpdateKinematicsCustom(
-//        _model, &state.state(INTERFACE::POSITION),
-//        &state.state(INTERFACE::VELOCITY), nullptr);
+//        _model, &state.state("POSITION"),
+//        &state.state("VELOCITY"), nullptr);
 
         RigidBodyDynamics::UpdateKinematics(
                 _model, state.position.get(), state.velocity.get(), _zeroVec);
@@ -102,12 +104,12 @@ virtual bool isRunning() {
         return true;
 }
 virtual bool get(){
-        return feedbacks.get();
+        return feedbacks.run();
 }
 virtual bool send(){
-        return controllers.send();
+        return controllers.run();
 }
-virtual void wait(){
+virtual void wait(bool spin = true){
 }
 ///@}
 ///
@@ -156,8 +158,8 @@ robot_class::State lower_limits;   // read from urdf?
 robot_class::State upper_limits;
 
 /** @brief Keeps pointers for all external controllers */
-Controllers controllers;
-Feedbacks feedbacks;
+communication_modules::Communications controllers;
+communication_modules::Communications feedbacks;
 
 /** @brief return vector of links associated with given dofs**/
 /** @param dofs - vector of model dofs
@@ -169,13 +171,39 @@ std::vector<std::string> getLinks(std::string chain, bool unique = true);
 
 std::string getLinks(unsigned int dof);
 
-
+mwoibn::Vector3 gravity(){return _model.gravity;}
 /** @brief return rbdl state vetor dofs associated with given links **/
 /** @note For floating base system it gathers all flaoting base dofs in the
  * last
  * link, for previous joints it returns en empty vector
  */
 mwoibn::VectorInt getDof(std::string link_name);
+
+std::string getBodyName(int id){
+    return _model.GetBodyName(id);
+}
+
+std::vector<std::string> getBodyName(mwoibn::VectorInt ids){
+    std::vector<std::string> links;
+
+    for(int i = 0; i < ids.size(); i++)
+      links.push_back(getBodyName(ids[i]));
+
+    return links;
+}
+
+double getBodyId(std::string link_name){
+    mwoibn::rbdl_utils::checkBody(link_name, _model);
+}
+
+mwoibn::VectorInt getBodyId(std::vector<std::string> link_names){
+    mwoibn::VectorInt links(link_names.size());
+
+    for(int i = 0; i < link_names.size(); i++)
+      links[i] = mwoibn::rbdl_utils::checkBody(link_names[i], _model);
+
+    return links;
+}
 
 /** @brief return rbdl state vetor dofs associated with given links **/
 mwoibn::VectorInt getDof(std::vector<std::string> link_names);
@@ -220,6 +248,17 @@ static void compareEntry(YAML::Node entry_main, YAML::Node entry_second);
 
 static YAML::Node readFullConfig(YAML::Node full_config, std::string config_name);
 
+virtual void loadControllers(std::string config_file, std::string config_name,
+                     mwoibn::communication_modules::Shared& shared,
+                     std::string controller_source, std::string secondary_file){}
+
+
+virtual void loadControllers(YAML::Node full_config, std::string config_name,
+                     mwoibn::communication_modules::Shared& shared,  std::string controller_source){}
+
+
+std::string name(){return _name;}
+
 protected:
 //! Alternative robot class initializer,
 /**  it is provited as protected method as it should only be used by the
@@ -235,7 +274,7 @@ RigidBodyDynamics::Model _model;
 
 //! Keeps information whether the robot is static or not
 bool _is_static;
-
+std::string _name;
 double _rate = 0;
 //! Keeps data about considered contacts
 std::unique_ptr<Contacts> _contacts;
@@ -295,7 +334,7 @@ virtual void _loadMapFromModel(YAML::Node config);
 
 
 YAML::Node _readRobotConfig(YAML::Node full_config,
-                            std::string config_name);
+                            std::string config_name, std::string controller_source);
 YAML::Node _readConfig(const YAML::Node lists, const YAML::Node defined,
                        YAML::Node config);
 void _readJointLimits(urdf::Model& urdf);
