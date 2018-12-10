@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 #  collision_model
   robot_class
   basic_controllers
+  mwoibn_dynamic_points
 )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
@@ -40,6 +41,7 @@ catkin_package(
     	robot_point_handling
       basic_controllers
       robot_class
+      mwoibn_dynamic_points
   DEPENDS
 	   Eigen3
 )
