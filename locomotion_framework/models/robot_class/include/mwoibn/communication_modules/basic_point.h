@@ -5,7 +5,7 @@
 #include "mwoibn/point_handling/wrench.h"
 #include "mwoibn/robot_class/map.h"
 #include "mwoibn/filters/iir_second_order.h"
-
+#include "mwoibn/communication_modules/communication_base.h"
 #include <rbdl/rbdl.h>
 
 namespace mwoibn
@@ -14,17 +14,20 @@ namespace mwoibn
 namespace communication_modules
 {
 
-class BasicPoint
+class BasicPoint: public CommunicationBase
 {
 
 public:
-  BasicPoint(mwoibn::point_handling::Wrench& point)
-      : _wrench(point)
+  BasicPoint(BasicPoint& other)
+      : CommunicationBase(other), _point(other._point)
   {
   }
-
-  BasicPoint(mwoibn::point_handling::Wrench& point, YAML::Node config)
-      : _wrench(point)
+  BasicPoint(BasicPoint&& other)
+      : CommunicationBase(other), _point(other._point)
+  {
+  }
+  BasicPoint(mwoibn::point_handling::State& point, YAML::Node config)
+      : CommunicationBase(point.size()), _point(point)
   {
 
     if(config["filter"]){
@@ -52,7 +55,11 @@ public:
 
   virtual ~BasicPoint() {}
 
-  virtual bool update() = 0;
+  virtual bool update() { run(); }
+
+  virtual mwoibn::VectorInt map() const {
+    return mwoibn::eigen_utils::iota(6);
+  }
 
 
   virtual bool reset(){return true;}
@@ -62,7 +69,7 @@ public:
     return initialized();}
 
 protected:
-  mwoibn::point_handling::Wrench& _wrench;
+  mwoibn::point_handling::State& _point;
   std::unique_ptr<mwoibn::filters::IirSecondOrder> _linear_filter_ptr, _angular_filter_ptr;
 
   bool _filter;

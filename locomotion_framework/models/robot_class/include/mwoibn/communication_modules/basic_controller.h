@@ -12,17 +12,27 @@ namespace communication_modules {
 class BasicController : public BasicModule {
 
 public:
-  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, bool position, bool velocity, bool torque): BasicModule(command, map, position, velocity, torque, false){}
+  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap& map, bool position, bool velocity, bool torque): BasicModule(command, map, position, velocity, torque, false){}
 
-  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap map, YAML::Node config): BasicModule(command, map, false, config){}
+  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap& map, YAML::Node config): BasicModule(command, map, false, config){}
+
+  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap&& map, bool position, bool velocity, bool torque): BasicModule(command, map, position, velocity, torque, false){}
+
+  BasicController(mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap&& map, YAML::Node config): BasicModule(command, map, false, config){}
+
+  BasicController(BasicController& other): BasicModule(other){}
+
+  BasicController(BasicController&& other)
+          : BasicModule(other) {  }
+
 
   virtual ~BasicController(){}
 
 
-  mwoibn::VectorInt getSelector() const {return _map.reversed();}
+  virtual mwoibn::VectorInt map() const {return _map.reversed();}
 
-  virtual bool send() = 0;
-  virtual bool update() {send();}
+  virtual bool update() {run();}
+
 
 };
 

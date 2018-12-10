@@ -16,23 +16,41 @@ class BasicFeedback : public BasicModule
 
 public:
   BasicFeedback(mwoibn::robot_class::State& command,
-                mwoibn::robot_class::BiMap map, bool position, bool velocity,
+                mwoibn::robot_class::BiMap& map, bool position, bool velocity,
                 bool torque)
       : BasicModule(command, map, position, velocity, torque, true)
   {  }
 
   BasicFeedback(mwoibn::robot_class::State& command,
-                mwoibn::robot_class::BiMap map, YAML::Node config)
+                mwoibn::robot_class::BiMap& map, YAML::Node config)
       : BasicModule(command, map, true, config)
   {  }
 
+  BasicFeedback(mwoibn::robot_class::State& command,
+                mwoibn::robot_class::BiMap&& map, bool position, bool velocity,
+                bool torque)
+      : BasicModule(command, map, position, velocity, torque, true)
+  {  }
+
+  BasicFeedback(mwoibn::robot_class::State& command,
+                mwoibn::robot_class::BiMap&& map, YAML::Node config)
+      : BasicModule(command, map, true, config)
+  {  }
+
+
+  BasicFeedback(BasicFeedback& other)
+      : BasicModule(other) {  }
+
+  BasicFeedback(BasicFeedback&& other)
+          : BasicModule(other) {  }
+
+
   virtual ~BasicFeedback() {}
 
-  mwoibn::VectorInt getSelector() const { return _map.get(); }
-  virtual bool get() = 0;
+  virtual mwoibn::VectorInt map() const {return _map.get();}
 
 
-  virtual bool update() { get(); }
+  virtual bool update() { run(); }
 };
 }
 }

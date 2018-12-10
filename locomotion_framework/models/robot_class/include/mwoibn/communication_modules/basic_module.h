@@ -1,8 +1,7 @@
 #ifndef COMMUNICATION_MODULES_BASIC_MODULE_H
 #define COMMUNICATION_MODULES_BASIC_MODULE_H
 
-#include "mwoibn/common/all.h"
-#include "mwoibn/common/all.h"
+#include "mwoibn/communication_modules/communication_base.h"
 #include "mwoibn/robot_class/map.h"
 #include "mwoibn/filters/iir_second_order.h"
 
@@ -14,69 +13,73 @@ namespace mwoibn
 namespace communication_modules
 {
 
-class BasicModule
+class BasicModule: public CommunicationBase
 {
 
 public:
   BasicModule(mwoibn::robot_class::State& command,
-              mwoibn::robot_class::BiMap map, bool position, bool velocty,
+              mwoibn::robot_class::BiMap& map, bool position, bool velocity,
               bool torque, bool direct)
-      : _command(command), _map(map), _position(position), _velocity(velocty),
+      : CommunicationBase(), _command(command), _map(map), _position(position), _velocity(velocity),
         _torque(torque)
   {
-
     _resize(direct);
   }
 
   BasicModule(mwoibn::robot_class::State& command,
-              mwoibn::robot_class::BiMap map, bool direct, YAML::Node config)
-      : _command(command), _map(map)
+              mwoibn::robot_class::BiMap&& map, bool position, bool velocity,
+              bool torque, bool direct)
+      : CommunicationBase(), _command(command), _map(map), _position(position), _velocity(velocity),
+        _torque(torque)
   {
-
-    if (!config["interface"])
-      throw(std::invalid_argument("Missing required parameter: interface"));
-    if (!config["interface"]["position"])
-      throw(std::invalid_argument(
-          "Missing required parameter: interface:position"));
-    if (!config["interface"]["velocity"])
-      throw(std::invalid_argument(
-          "Missing required parameter: interface:velocity"));
-    if (!config["interface"]["effort"])
-      throw(std::invalid_argument(
-          "Missing required parameter: interface:effort"));
-
-    _position = config["interface"]["position"].as<bool>();
-    _velocity = config["interface"]["velocity"].as<bool>();
-    _torque = config["interface"]["effort"].as<bool>();
-
     _resize(direct);
-
-    if(config["filter"]){
-      if(!config["filter"]["run"])
-        throw(std::invalid_argument("Missing required filter parameter: run"));
-
-      _filter = config["filter"]["run"].as<bool>();
-
-      if(_filter){
-        if(!config["filter"]["frequency"])
-          throw(std::invalid_argument("Missing required filter parameter: frequency"));
-        if(!config["filter"]["damping"])
-          throw(std::invalid_argument("Missing required filter parameter: damping"));
-
-        if(_position)
-          _position_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
-        if(_velocity)
-          _velocity_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
-        if(_torque)
-          _torque_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
-
-        std::cout << "Filter has been enabled. Cut-off frequency " << config["filter"]["frequency"] << ", damping " << config["filter"]["damping"] << "." << std::endl;
-      }
-    }
-    else
-      _filter = false;
-
   }
+
+
+
+  BasicModule(mwoibn::robot_class::State& command,
+                mwoibn::robot_class::BiMap& map, bool direct, YAML::Node config)
+      : CommunicationBase(), _command(command), _map(map){
+        _resize(direct);
+
+          _init(config);
+      }
+
+  BasicModule(mwoibn::robot_class::State& command,
+                    mwoibn::robot_class::BiMap&& map, bool direct, YAML::Node config)
+      : CommunicationBase(), _command(command), _map(map){
+        _resize(direct);
+
+              _init(config);
+        }
+
+
+
+  BasicModule(BasicModule& other)
+      : CommunicationBase(other), _command(other._command), _map(other._map),
+        _position(other._position), _velocity(other._velocity), _torque(other._torque), _filter(other._filter)
+  {
+    if(other._position_filter_ptr != nullptr)
+      _position_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._position_filter_ptr));
+    if(other._velocity_filter_ptr != nullptr)
+      _velocity_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._velocity_filter_ptr));
+      if(other._torque_filter_ptr != nullptr)
+      _torque_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._torque_filter_ptr));
+  }
+
+
+
+    BasicModule(BasicModule&& other)
+        : CommunicationBase(other), _command(other._command), _map(other._map),
+          _position(other._position), _velocity(other._velocity), _torque(other._torque), _filter(other._filter)
+    {
+      if(other._position_filter_ptr != nullptr)
+        _position_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._position_filter_ptr));
+      if(other._velocity_filter_ptr != nullptr)
+        _velocity_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._velocity_filter_ptr));
+        if(other._torque_filter_ptr != nullptr)
+        _torque_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(*other._torque_filter_ptr));
+    }
 
   virtual ~BasicModule() {}
 
@@ -107,36 +110,27 @@ public:
     _map.mapDirect(q_controller, q_rbdl, selector);
   }
 
-  virtual mwoibn::VectorInt getSelector() const = 0;
+  // virtual mwoibn::VectorInt getSelector() const = 0;
 
-  virtual bool update() = 0;
+  bool is(mwoibn::Interface interface){
 
-  int getDofs() const { return _dofs; }
-
-  bool is(mwoibn::robot_class::INTERFACE interface){
-
-    if(interface == mwoibn::robot_class::INTERFACE::POSITION)
+    if(interface == "POSITION")
       return _position;
-    if(interface == mwoibn::robot_class::INTERFACE::VELOCITY)
+    if(interface == "VELOCITY")
       return _velocity;
-    if(interface == mwoibn::robot_class::INTERFACE::TORQUE)
+    if(interface == "TORQUE")
       return _torque;
 
     return false;
   }
 
-  virtual bool raw(mwoibn::VectorN& _raw, mwoibn::robot_class::INTERFACE interface)
+  virtual bool raw(mwoibn::VectorN& _raw, mwoibn::Interface interface)
   {
       return false;
   }
 
   std::string getMapName(){ return _map.getName();}
 
-  virtual bool reset(){return true;}
-  virtual bool initialized(){return _initialized;}
-  virtual bool initialize(){
-    _initialized = true;
-    return initialized();}
 
 protected:
   mwoibn::robot_class::BiMap _map;
@@ -155,8 +149,52 @@ protected:
   bool _velocity;
   bool _torque;
   bool _filter;
-  bool _initialized = false;
-  int _dofs;
+
+  void _init(YAML::Node config)
+  {
+
+    if (!config["interface"])
+      throw(std::invalid_argument("Missing required parameter: interface"));
+    if (!config["interface"]["position"])
+      throw(std::invalid_argument(
+          "Missing required parameter: interface:position"));
+    if (!config["interface"]["velocity"])
+      throw(std::invalid_argument(
+          "Missing required parameter: interface:velocity"));
+    if (!config["interface"]["effort"])
+      throw(std::invalid_argument(
+          "Missing required parameter: interface:effort"));
+
+    _position = config["interface"]["position"].as<bool>();
+    _velocity = config["interface"]["velocity"].as<bool>();
+    _torque = config["interface"]["effort"].as<bool>();
+
+    if(config["filter"]){
+      if(!config["filter"]["run"])
+        throw(std::invalid_argument("Missing required filter parameter: run"));
+
+      _filter = config["filter"]["run"].as<bool>();
+
+      if(_filter){
+        if(!config["filter"]["frequency"])
+          throw(std::invalid_argument("Missing required filter parameter: frequency"));
+        if(!config["filter"]["damping"])
+          throw(std::invalid_argument("Missing required filter parameter: damping"));
+
+        if(_position)
+          _position_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        if(_velocity)
+          _velocity_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        if(_torque)
+          _torque_filter_ptr.reset(new mwoibn::filters::IirSecondOrder(_dofs, config["filter"]["frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+
+        std::cout << "Filter has been enabled. Cut-off frequency " << config["filter"]["frequency"] << ", damping " << config["filter"]["damping"] << "." << std::endl;
+      }
+    }
+    else
+      _filter = false;
+
+  }
 };
 }
 }
