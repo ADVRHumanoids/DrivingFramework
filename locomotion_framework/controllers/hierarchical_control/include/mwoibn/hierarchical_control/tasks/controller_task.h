@@ -26,6 +26,18 @@ BasicTask(int i, int dof){
         _init(i, dof);
 }
 
+BasicTask(BasicTask&& other) {
+        _init(other._jacobian.rows(), other._jacobian.cols());
+}
+
+BasicTask(const BasicTask& other) {
+        _init(other._jacobian.rows(), other._jacobian.cols());
+}
+
+const BasicTask& operator=(const BasicTask& task){
+        return task;
+}
+
 virtual ~BasicTask(){
 }
 

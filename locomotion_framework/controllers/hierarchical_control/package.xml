@@ -48,6 +48,7 @@
   <depend>robot_class</depend>
   <!-- <depend>collision_model</depend> -->
   <depend>point_handling</depend>
+  <depend>mwoibn_dynamic_points</depend>
   <depend>robot_point_handling</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <depend>mwoibn_std_utils</depend>

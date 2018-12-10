@@ -2,7 +2,12 @@
 #define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_TRACKING_TASK_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
-#include "mwoibn/hierarchical_control/tasks/cartesian_world_task.h"
+#include "mwoibn/hierarchical_control/tasks/controller_task.h"
+#include "mwoibn/robot_points/handler.h"
+#include "mwoibn/robot_points/point.h"
+#include "mwoibn/robot_points/rotation.h"
+#include "mwoibn/robot_points/minus.h"
+
 
 namespace mwoibn
 {
@@ -16,7 +21,7 @@ namespace tasks
  ********to control the position of a point defined in one of a robot reference frames
  *
  */
-class ContactPointTracking : public CartesianWorld
+class ContactPointTracking : public BasicTask
 {
 
 public:
@@ -26,78 +31,180 @@ public:
  ********prevent outside user from modifying a controlled point
  *
  */
-ContactPointTracking(point_handling::PositionsHandler ik,
-                     mwoibn::robot_class::Robot& robot)
-        : CartesianWorld(ik), _robot(robot)
-{
-}
+ContactPointTracking(mwoibn::robot_class::Robot& robot, mwoibn::robot_points::Point& base_point, std::string base_link)
+        : BasicTask(), _robot(robot), _contacts(_robot.getDofs()), _base_point(base_point),
+         _base(mwoibn::point_handling::Orientation( base_link, robot.getModel(), robot.state)), base(_base_point),
+         _minus(_robot.getDofs()), _ground_normal(_robot.contacts()[0].getGroundNormal())
+{ }
 
 virtual ~ContactPointTracking() {
 }
 
-virtual void init() = 0;
+virtual void reset()
+{
 
+  updateState();
 
-virtual void updateState() = 0;
-
-virtual mwoibn::VectorN getReference(int i) const = 0;
-
-virtual void setReference(int i, const mwoibn::Vector3& reference) = 0;
-
-using CartesianWorld::getReference;
-using CartesianWorld::setReference;
-
-virtual double getTwist() const {
-        return 0;
-}
-virtual mwoibn::Vector3 twistTransform(mwoibn::Vector3 vec) const {
-        return vec;
+  for (int i = 0; i < _contacts.size(); i++)
+  {
+    _reference.segment<3>(3 * i) = getPointStateReference(i);
+  }
 }
 
-virtual mwoibn::Vector3 twistReference(int i){
 
-        mwoibn::Vector3 reference;
-        reference = _reference.segment(i * 3, 3);
+virtual void updateState(){
+  _contacts.update(true);
+  _q_twist = _base.getWorld().twistSwing(_ground_normal); // this has heading
+  for(auto& wheel: _wheel_transforms)
+    wheel->compute();
 
-        return reference;
+  _minus.update(true);
 }
-virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference, bool update) = 0;
 
-virtual mwoibn::Vector3
-getReferenceWorld(int i) = 0;
+  virtual const mwoibn::VectorN& getReference() const {
+          return _reference;
+  }
 
-virtual const mwoibn::Vector3& getPointStateReference(int i) = 0;
+  virtual void setReference(const mwoibn::VectorN& reference)
+  {
+          for (int i = 0; i < _reference.size(); i++)
+                  _reference[i] = reference[i];
+  }
 
-const mwoibn::VectorN& getState() const {
-        return _state;
-}
+  virtual mwoibn::VectorN getReference(int i) const
+  {
+    return _reference.segment<3>(i * 3);
+  }
+
+  virtual void setReference(int i, const mwoibn::Vector3& reference)
+  {
+    _reference.segment(i * 3, 3) = reference;
+  }
+
+
+    virtual void setReferenceWorld(int i, const mwoibn::Vector3& reference,
+                                   bool update)
+    {
+
+      if (update)
+        updateState();
+
+      _reference.segment<3>(i*3) = _worldToBase(reference);
+
+    }
+
+    virtual mwoibn::Vector3
+    getReferenceWorld(int i) // it can have update as it uses RBDL
+                                          // call and cannot be constant anyway
+    {
+
+      mwoibn::Vector3 reference;
+      reference = _reference.segment(i * 3, 3);
+
+      return _baseToWorld(reference);
+    }
+
+
+    virtual const mwoibn::Vector3& getPointStateReference(int i)
+    {
+      _point.noalias() = _worldToBase(_contacts[i].get());
+      return _point;
+    }
+
+    virtual const mwoibn::Vector3& getReferenceError(int i)
+    {
+      _point.noalias() = _q_twist.transposed().rotate(_full_error.segment<3>(3 * i));
+      return _point;
+    }
+
+const mwoibn::VectorN& getFullError(){return _full_error;}
+
 const mwoibn::VectorN& getWorldError() const {
         return _error;
 }
 
-virtual const mwoibn::Vector3& getReferenceError(int i) = 0;
+virtual const mwoibn::VectorN& getForce(){return _force;}
 
-virtual void releaseContact(int i) {
+virtual void releaseContact(int i) { _selector[i] = true; }
+virtual void claimContact(int i) { _selector[i] = false; }
+
+//virtual int getFullTaskSize() = 0;
+
+
+virtual double heading(){
+      return _q_twist.angle();
 }
 
-virtual void claimContact(int i) {
+virtual double baseX(){
+      return base.get()[0];
 }
 
-virtual int getFullTaskSize(){
-        return getTaskSize();
+virtual double baseY(){
+      return base.get()[1];
 }
 
 protected:
-mwoibn::VectorN _state;
-mwoibn::robot_class::Robot& _robot;
-mwoibn::Matrix3 _transform;
-virtual const mwoibn::Matrix3& _getTransform(){
-        return _transform;
-}
-//mwoibn::Vector3 _point_flat, _temp_point;
-//mwoibn::Matrix _jacobian_3D, _jacobian_flat_3D, _jacobian_flat_2D, _rotation,
-//    _jacobian6, _jacobian_2D;
-//mwoibn::PseudoInverse _inverser;
+  mwoibn::robot_class::Robot& _robot;
+
+  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contacts;
+  mwoibn::robot_points::Point& _base_point;
+  //mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _minus;
+  mwoibn::point_handling::Orientation _base;
+  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>> _wheel_transforms;
+  mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _minus;
+
+  mwoibn::VectorBool _selector;
+
+  mwoibn::Vector3 _point;
+  mwoibn::VectorN _reference, _full_error, _force;
+  mwoibn::Quaternion _q_twist;
+  const mwoibn::Vector3& _ground_normal;
+
+
+  virtual mwoibn::Vector3 _worldToBase(mwoibn::Vector3 point)
+  {
+
+          mwoibn::Vector3 basePoint;
+          basePoint.noalias() = point;
+          basePoint.head<2>() -= _base_point.get().head<2>();
+
+          return _q_twist.transposed().rotate(basePoint);
+  }
+
+  virtual mwoibn::Vector3 _baseToWorld(mwoibn::Vector3 point)
+  {
+
+          mwoibn::Vector3 basePoint;
+          basePoint.noalias() = _q_twist.rotate(point);
+          basePoint.head<2>() += _base_point.get().head<2>();
+
+          return basePoint;
+  }
+
+  virtual void _allocate(){
+    _init(_contacts.rows(), _contacts.cols());
+    _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
+    _reference.setZero(_contacts.rows());
+    _full_error.setZero(_contacts.rows());
+    _force.setZero(_robot.contacts().size()*3);
+
+    for(auto& contact: _contacts)
+      _minus.add(mwoibn::robot_points::Minus(*contact, _base_point));
+  }
+
+    virtual mwoibn::Vector3 _referencePoint(int i)
+    {
+
+      mwoibn::Vector3 _temp_point = _reference.segment<3>(3 * i);
+
+      return _baseToWorld(_temp_point);
+    }
+
+public:
+  const mwoibn::robot_points::Point& base;
+
+
+
 };
 }
 } // namespace package
