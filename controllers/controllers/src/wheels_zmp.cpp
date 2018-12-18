@@ -1,7 +1,9 @@
 #include "mgnss/controllers/wheels_zmp.h"
 #include "mgnss/higher_level/steering_v8.h"
 
-#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
+//#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
+#include <mgnss/controllers/devel/contact_point_zmp.h>
+
 #include <mwoibn/hierarchical_control/tasks/contact_point_3D_rbdl_task.h>
 
 #include <mwoibn/robot_points/torus_model.h>
@@ -12,15 +14,15 @@
 void mgnss::controllers::WheelsZMP::compute()
 {
         _com_ptr->update();
-
-        if(!_steering_select.all()){
-          _steering_ptr->updateState();
-          _steering_ptr->update();
-        }
-        if(_steering_select.any()){
-          _steering_ptr_2->updateState();
-          _steering_ptr_2->update();
-        }
+        //
+        // if(!_steering_select.all()){
+        //   _steering_ptr->updateState();
+        //   _steering_ptr->update();
+        // }
+        // if(_steering_select.any()){
+        //   _steering_ptr_2->updateState();
+        //   _steering_ptr_2->update();
+        // }
         // std::cout << _robot.centerOfPressure().get().transpose() << std::endl;
 
         // std::cout << "ZMP\t" << _steering_ptr_2->getError().transpose() << std::endl;
@@ -34,16 +36,16 @@ void mgnss::controllers::WheelsZMP::compute()
 void mgnss::controllers::WheelsZMP::steering()
 {
 
-        // _steering_ref_ptr->compute(_next_step);
-        //
-        // steerings.noalias() = _steering_ref_ptr->get();
-        //
-        // for (int i = 0; i < 4; i++)
-        // {
-        //         steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
-        //         steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
-        //         setSteering(i, steerings[i]);
-        // }
+        _steering_ref_ptr->compute(_next_step);
+
+        steerings.noalias() = _steering_ref_ptr->get();
+
+        for (int i = 0; i < 4; i++)
+        {
+                 steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
+                 steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
+                 setSteering(i, steerings[i]);
+        }
 }
 
 
@@ -61,10 +63,10 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         _leg_tasks["CAMBER"].first.updateError();
         _leg_tasks["CASTER"].first.updateError();
 
-  if(!_steering_select.all())
-        _steering_ptr->updateState();
-  if(_steering_select.any())
-        _steering_ptr_2->updateState();
+  // if(!_steering_select.all())
+  //       _steering_ptr->updateState();
+  // if(_steering_select.any())
+  //       _steering_ptr_2->updateState();
 
 
         for(int i = 0, k = 0; i < _steering_select.size(); i++){
@@ -84,7 +86,8 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         _pelvis_position_ptr->setReference(0, _position);
         _com_ptr->setReference(_position);
 
-
+        if(_steering_select.any())
+              _steering_ptr_2->start();
 }
 
 
@@ -98,9 +101,10 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
 
     WheelsController::_initIK(config);
 
-    _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
-          _robot, *_steering_ptr_2, _support_vel, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
+    YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
+    _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
+                          _robot, *_steering_ptr_2, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 }
 
 void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
@@ -155,11 +159,13 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
           if(_steering_select.count() < 4){
             _steering_ptr.reset(
                   new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl({}, _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
+            _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
           }
           if(_steering_select.count()){
             _steering_ptr_2.reset(new mwoibn::hierarchical_control::tasks::ContactPointZMP(contact_points,
                                 _robot, "pelvis", config["position_gain"].as<double>()));
+            _steering_ptr_2->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr_2);
           }
 
@@ -186,39 +192,39 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
 
 void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double time){
-  // logger.addEntry("com_x", getComFull()[0]);
-  // logger.addEntry("com_y", getComFull()[1]);
+  // logger.add("com_x", getComFull()[0]);
+  // logger.add("com_y", getComFull()[1]);
 
-  // logger.addEntry("r_com_x", refCom()[0]);
-  // logger.addEntry("r_com_y", refCom()[1]);
+  // logger.add("r_com_x", refCom()[0]);
+  // logger.add("r_com_y", refCom()[1]);
 
-   logger.addEntry("th", _robot.state.position.get()[5]);
-   logger.addEntry("r_th", _heading);
+   logger.add("th", _robot.state.position.get()[5]);
+   logger.add("r_th", _heading);
    //
        for(int i = 0; i < 3; i++){
 
-         logger.addEntry(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-         logger.addEntry(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
-         logger.addEntry(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
+         logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
+         logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
+         logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
 
          for(int point = 0, k = 0; point < _steering_select.size(); point++){
 
-           logger.addEntry("cp_"   + std::to_string(point+1) + "_" + char('x'+i),
+           logger.add("cp_"   + std::to_string(point+1) + "_" + char('x'+i),
                            _steering_select[point] ? _steering_ptr_2->getPointStateReference(k)[i] : _steering_ptr->getPointStateReference(point-k)[i]);
 
-           logger.addEntry("r_cp_" + std::to_string(point+1) + "_" + char('x'+i),
+           logger.add("r_cp_" + std::to_string(point+1) + "_" + char('x'+i),
                            _steering_select[point] ? _steering_ptr_2->getReference()[k*3+i] : _steering_ptr->getReference()[(point-k)*3+i]);
 
-           // logger.addEntry("position_error_" + std::to_string(point+1) + "_" + char('x'+i),
+           // logger.add("position_error_" + std::to_string(point+1) + "_" + char('x'+i),
            //                 _steering_select[point] ? _steering_ptr_2->getPositionError()[k*3+i] : 0);
 
-           logger.addEntry("full_error_" + std::to_string(point+1) + "_" + char('x'+i),
+           logger.add("full_error_" + std::to_string(point+1) + "_" + char('x'+i),
                            _steering_select[point] ? _steering_ptr_2->getFullError()[k*3+i] : 0);
 
-           logger.addEntry("getForce_" + std::to_string(point+1) + "_" + char('x'+i),
+           logger.add("getForce_" + std::to_string(point+1) + "_" + char('x'+i),
                            _steering_select[point] ? _steering_ptr_2->getForce()[k*3+i] :0);
 
-           // logger.addEntry("com_error_" + std::to_string(point+1) + "_" + char('x'+i),
+           // logger.add("com_error_" + std::to_string(point+1) + "_" + char('x'+i),
            //                _steering_select[point] ? _steering_ptr_2->getTestError()[k*3+i] : 0);
 
            k += _steering_select[point];
@@ -226,50 +232,12 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
          }
        }
 
-}
-
-
-void mgnss::controllers::WheelsZMP::initLog(mwoibn::common::Logger& logger){
-
-        // logger.addField("com_x", getComFull()[0]);
-        // logger.addField("com_y", getComFull()[1]);
-
-        // logger.addField("r_com_x", refCom()[0]);
-        // logger.addField("r_com_y", refCom()[1]);
-        logger.addField("th", _robot.state.position.get()[5]);
-        logger.addField("r_th", _heading);
-
-        for(int i = 0; i < 3; i++){
-
-          logger.addField(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-          logger.addField(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
-          logger.addField(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
-
-          for(int point = 0, k = 0; point < _steering_select.size(); point++){
-
-            logger.addField("cp_"   + std::to_string(point+1) + "_" + char('x'+i),
-                            _steering_select[point] ? _steering_ptr_2->getPointStateReference(k)[i] : _steering_ptr->getPointStateReference(point-k)[i]);
-
-            logger.addField("r_cp_" + std::to_string(point+1) + "_" + char('x'+i),
-                            _steering_select[point] ? _steering_ptr_2->getReference()[k*3+i] : _steering_ptr->getReference()[(point-k)*3+i]);
-
-            // logger.addField("position_error_" + std::to_string(point+1) + "_" + char('x'+i),
-            //                 _steering_select[point] ? _steering_ptr_2->getPositionError()[k*3+i] : 0);
-
-            logger.addField("full_error_" + std::to_string(point+1) + "_" + char('x'+i),
-                            _steering_select[point] ? _steering_ptr_2->getFullError()[k*3+i] : 0);
-
-            logger.addField("getForce_" + std::to_string(point+1) + "_" + char('x'+i),
-                            _steering_select[point] ? _steering_ptr_2->getForce()[k*3+i] : 0);
-
-            // logger.addField("com_error_" + std::to_string(point+1) + "_" + char('x'+i),
-            //                 _steering_select[point] ? _steering_ptr_2->getTestError()[k*3+i] : 0);
-
-
-
-            k += _steering_select[point];
-          }
-        }
-
-
+      for(auto& state_: {"MINUS_TORQUE","CONTACT_TORQUE","COM_TORQUE"}){
+        for(int i = 0; i < _robot.state[state_].size(); i++)
+          logger.add(state_ + std::string("_") + _robot.getLinks(i), _robot.state[state_][i]);
+      }
+      for(auto& state_: {"CONTACT_FORCE","COM_FORCE", "COM_CONTACT_FORCE"}){
+          for(int i = 0; i < _robot.state[state_].size(); i++)
+            logger.add(state_ + std::string("_") + std::to_string(i/3+1) + std::string("_") + char('x'+(i%3)), _robot.state[state_][i]);
+      }
 }
