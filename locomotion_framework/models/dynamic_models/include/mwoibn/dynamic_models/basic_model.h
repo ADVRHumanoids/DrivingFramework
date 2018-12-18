@@ -17,14 +17,19 @@ namespace dynamic_models
  * It directly implements RBDL methods for a robot model.
  *
  **/
+ enum class DYNAMIC_MODEL
+ {
+   INERTIA,
+   GRAVITY,
+   NON_LINEAR
+ };
+
+
 class BasicModel
 {
 
 public:
-BasicModel(mwoibn::robot_class::Robot& robot, std::initializer_list<robot_class::DYNAMIC_MODEL> update = {}) : _robot(robot),
-           _manager(*this, {{robot_class::DYNAMIC_MODEL::GRAVITY, &dynamic_models::BasicModel::_updateGravity},
-                     {robot_class::DYNAMIC_MODEL::INERTIA, &dynamic_models::BasicModel::_updateInertia},
-                     {robot_class::DYNAMIC_MODEL::NON_LINEAR, &dynamic_models::BasicModel::_updateNonlinearEffects}})
+BasicModel(mwoibn::robot_class::Robot& robot, std::initializer_list<DYNAMIC_MODEL> update = {}) : _robot(robot)
             {
 
         _zero.setZero(_robot.getDofs());
@@ -33,7 +38,11 @@ BasicModel(mwoibn::robot_class::Robot& robot, std::initializer_list<robot_class:
         _inertia.setZero(_robot.getDofs(),
                          _robot.getDofs());
 
-        _manager.subscribe(update);
+       for(auto& entry_: _update_map)
+          _function_map[entry_.first] = (_manager.signIn(entry_.second)); // register functions
+
+        subscribe(update);
+
 
 }
 
@@ -48,6 +57,7 @@ mwoibn::robot_class::Robot& getRobot() const {
 
 virtual const mwoibn::VectorN& getGravity()
 {
+        _function_map[DYNAMIC_MODEL::GRAVITY]->count();
         return _gravity;
 }
 
@@ -55,30 +65,36 @@ virtual const mwoibn::VectorN& getGravity()
  * dynamic **/
 virtual const mwoibn::VectorN& getNonlinearEffects()
 {
+        _function_map[DYNAMIC_MODEL::NON_LINEAR]->count();
         return _non_linear;
 }
 
 /** @brief returns inertia matrix**/
 virtual const mwoibn::Matrix& getInertia()
 {
+        _function_map[DYNAMIC_MODEL::INERTIA]->count();
         return _inertia;
 }
 
-virtual void update(){_manager.update();}
-virtual void unsubscribe(robot_class::DYNAMIC_MODEL interface){_manager.unsubscribe(interface);}
-virtual void subscribe(robot_class::DYNAMIC_MODEL interface){_manager.subscribe(interface);}
-virtual void subscribe(std::vector<robot_class::DYNAMIC_MODEL> interface){_manager.subscribe(interface);}
-virtual void isSubscribed(robot_class::DYNAMIC_MODEL interface){_manager.is(interface);}
-
-
-//const mwoibn::common::UpdateManager<robot_class::DYNAMIC_MODEL, dynamic_models::QrDecomposition>& manager() const {return _manager;}
-
+virtual void update(){_manager.update();} // Do I want to log status somewhere?
+virtual void unsubscribe(DYNAMIC_MODEL interface){_function_map[interface]->unsubscribe();}
+virtual void subscribe(DYNAMIC_MODEL interface){_function_map[interface]->subscribe();}
+virtual void subscribe(std::vector<DYNAMIC_MODEL> interfaces){
+  for(auto interface: interfaces)
+    subscribe(interface);
+  }
 
 protected:
 mwoibn::robot_class::Robot& _robot;
 mwoibn::VectorN _gravity, _non_linear, _zero;
 mwoibn::Matrix _inertia;
-mwoibn::common::UpdateManager<robot_class::DYNAMIC_MODEL, dynamic_models::BasicModel> _manager;
+mwoibn::update::UpdateManager _manager;
+std::map<DYNAMIC_MODEL, std::function<void()> > _update_map = {
+          {DYNAMIC_MODEL::GRAVITY, std::bind(&dynamic_models::BasicModel::_updateGravity, this)},
+          {DYNAMIC_MODEL::INERTIA, std::bind(&dynamic_models::BasicModel::_updateInertia, this)},
+          {DYNAMIC_MODEL::NON_LINEAR, std::bind(&dynamic_models::BasicModel::_updateNonlinearEffects, this)}};
+
+std::map<DYNAMIC_MODEL, std::shared_ptr<mwoibn::update::Function> > _function_map;
 
 /** @brief returns gravity effect computed **/
 virtual void _updateGravity()

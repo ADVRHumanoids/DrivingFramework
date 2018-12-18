@@ -47,12 +47,6 @@ enum class CONTACT_TYPE
   WHEEL,
 };
 
-enum class DYNAMIC_MODEL
-{
-  INERTIA,
-  GRAVITY,
-  NON_LINEAR
-};
 
 // eventually I can think about changing CONTACT_TYPE to a string enum
 const std::map<std::string, CONTACT_TYPE> contact_type = {{"point_foot", CONTACT_TYPE::POINT_FOOT}, {"unknown", CONTACT_TYPE::UNKNOWN}, {"wheel_locked", CONTACT_TYPE::WHEEL_LOCKED}, {"wheel", CONTACT_TYPE::WHEEL}};

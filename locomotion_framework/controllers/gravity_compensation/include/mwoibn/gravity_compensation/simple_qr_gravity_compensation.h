@@ -30,7 +30,7 @@ SimpleQRGravityCompensation(
                 dynamic_model.getRobot(), interface),
         _dynamic_model(dynamic_model)
 {
-        _dynamic_model.subscribe(mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY);
+        _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -47,7 +47,7 @@ SimpleQRGravityCompensation(
         : mwoibn::basic_controllers::LowerLevelController(robot_real, interface),
         _dynamic_model(dynamic_model)
 {
-       _dynamic_model.subscribe(mwoibn::robot_class::DYNAMIC_MODEL::GRAVITY);
+       _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -55,6 +55,8 @@ SimpleQRGravityCompensation(
         compute();
 }
 virtual ~SimpleQRGravityCompensation() {
+  _dynamic_model.unsubscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
+
 }
 
 /** @brief update Dynamic Model of the robot according to the current state of

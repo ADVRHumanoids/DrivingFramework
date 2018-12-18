@@ -54,7 +54,10 @@ public:
     _init();
   }
 
-  virtual ~Force() {}
+  virtual ~Force() {
+    _dynamic_model.unsubscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA);
+
+  }
 
   using Point::operator=;
 
@@ -67,18 +70,23 @@ protected:
   //mwoibn::point_handling::LinearVelocity _velocity;
   std::unique_ptr<mwoibn::PseudoInverse> _inertia_inverse, _contacts_inverse;
   mwoibn::dynamic_models::BasicModel& _dynamic_model;
-  mwoibn::Matrix _temp;
-  mwoibn::Matrix3 _inverse;
+  //mwoibn::Matrix _temp;
+  mwoibn::Matrix _point_jacobian, _point_transposed, _point_inverse, _point_temp;
+  //mwoibn::Matrix3 _inverse;
   mwoibn::robot_points::Point& _frame;
   mwoibn::Interface _interface;
   void _init(){
-    _dynamic_model.subscribe(mwoibn::robot_class::DYNAMIC_MODEL::INERTIA);
+    _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA);
 
     _inertia_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix::Zero(_state.acceleration.size(), _state.acceleration.size())));
     _contacts_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix3::Zero()));
-    _jacobian.setZero(3, 3);
-    _temp.setZero(3, _state.velocity.size());
-    _point.setZero(3);
+    _jacobian.setZero(_frame.size(), _frame.size());
+    _point_jacobian.setZero(_frame.rows(), _frame.cols());
+    _point_transposed.setZero(_frame.cols(), _frame.rows());
+    _point_inverse.setZero(_frame.rows(), _frame.cols());
+    _point_temp.setZero(_frame.rows(), _frame.rows());
+
+    _point.setZero(_frame.size());
   }
 };
 

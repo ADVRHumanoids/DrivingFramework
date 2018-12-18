@@ -79,6 +79,8 @@ SteeringReference(mwoibn::robot_class::Robot& robot,
         _steer.setConstant(_size, false);
         _treshhold = margin/ dt;
 
+        _plane.subscribe(true, false, false);
+
 }
 
 virtual ~SteeringReference() {
@@ -144,9 +146,9 @@ void resteer(const mwoibn::VectorBool& steer)
 
 virtual void compute(const mwoibn::Vector3 next_step){
 
-        _plane.updateState();
-        _heading = _plane.heading();
+        //_plane.updateState();
         _plane.updateError();
+        _heading = _plane.heading();
 
         _ICM(next_step); // returns a velue in a robot space
 

@@ -18,7 +18,7 @@ class QrDecomposition : public BasicModel
 {
 
 public:
-QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<robot_class::DYNAMIC_MODEL> update = {}) : BasicModel(robot, update)
+QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<dynamic_models::DYNAMIC_MODEL> update = {}) : BasicModel(robot, update)
 {
         _qr_ptr.reset(new Eigen::ColPivHouseholderQR<Eigen::MatrixXd>(
                               _robot.contacts().jacobianCols(), _robot.contacts().jacobianRows()));
@@ -33,18 +33,24 @@ virtual ~QrDecomposition() {
 
 virtual const mwoibn::VectorN& getGravity()
 {
+        _function_map[DYNAMIC_MODEL::GRAVITY]->count();
+
         return _qr_gravity;
 }
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamics, computed for a non-constrained directions **/
 virtual const mwoibn::VectorN& getNonlinearEffects()
 {
+        _function_map[DYNAMIC_MODEL::NON_LINEAR]->count();
+
         return _qr_non_linear;
 }
 
 /** @brief returns inertia, computed for a non-constrained directions **/
 virtual const mwoibn::Matrix& getInertia()
 {
+        _function_map[DYNAMIC_MODEL::INERTIA]->count();
+
         return _qr_inertia;
 }
 
