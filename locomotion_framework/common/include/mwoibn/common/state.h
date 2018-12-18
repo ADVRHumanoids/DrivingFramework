@@ -53,6 +53,15 @@ bool add(mwoibn::Interface interface){
   return true;
 }
 
+bool add(mwoibn::Interface interface, int size){
+  if(_interfaces.count(interface))
+    return false;
+
+  _interfaces[interface] = mwoibn::robot_class::Pipe(size);
+  return true;
+}
+
+
 bool has(mwoibn::Interface interface){
   return _interfaces.count(interface);
 }
