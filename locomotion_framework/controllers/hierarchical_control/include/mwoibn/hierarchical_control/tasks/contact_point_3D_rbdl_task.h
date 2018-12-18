@@ -68,7 +68,8 @@ public:
 
 
 
-  virtual void updateError()
+protected:
+  virtual void _updateError()
   {
 
     _last_error.noalias() = _error; // save previous state
@@ -88,15 +89,19 @@ public:
   }
 
 
-  virtual void updateJacobian()
+  virtual void _updateJacobian()
   {
 
     _last_jacobian.noalias() = _jacobian;
 
     for (int i = 0; i < _contacts.size(); i++)
     {
-      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*_minus[i].getJacobian();
-
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      _projected = _ground_normal*_ground_normal.transpose();
+      mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
+      _rot_project = _rot*_projected;
+      _rot = _wheel_transforms[i]->rotation.transpose()*_rot_project;
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
       if (_selector[i])
         _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();
     }

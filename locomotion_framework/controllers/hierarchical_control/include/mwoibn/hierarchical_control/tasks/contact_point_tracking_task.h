@@ -7,7 +7,7 @@
 #include "mwoibn/robot_points/point.h"
 #include "mwoibn/robot_points/rotation.h"
 #include "mwoibn/robot_points/minus.h"
-
+#include "mwoibn/common/update_manager.h"
 
 namespace mwoibn
 {
@@ -33,17 +33,36 @@ public:
  */
 ContactPointTracking(mwoibn::robot_class::Robot& robot, mwoibn::robot_points::Point& base_point, std::string base_link)
         : BasicTask(), _robot(robot), _contacts(_robot.getDofs()), _base_point(base_point),
-         _base(mwoibn::point_handling::Orientation( base_link, robot.getModel(), robot.state)), base(_base_point),
+         _base( base_link, robot.getModel(), robot.state), _base_ang_vel(_base), base(_base_point),
          _minus(_robot.getDofs()), _ground_normal(_robot.contacts()[0].getGroundNormal())
-{ }
+{
+      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateError, this)));
+      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateJacobian, this)));
+      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateState, this)));
+}
 
-virtual ~ContactPointTracking() {
+void subscribe(bool error, bool jacobian, bool state){
+    if(error) {_update[0]->subscribe(); _update[2]->subscribe();}
+    if(jacobian) {_update[1]->subscribe(); _update[2]->subscribe();}
+    if(state) _update[2]->subscribe();
+}
+
+void unsubscribe(bool error, bool jacobian, bool state){
+    if(error) {_update[0]->unsubscribe(); _update[2]->unsubscribe();}
+    if(jacobian) {_update[1]->unsubscribe(); _update[2]->unsubscribe();}
+    if(state) _update[2]->unsubscribe();
+}
+
+virtual ~ContactPointTracking() { }
+
+virtual void start(){
+  _manager.reset();
 }
 
 virtual void reset()
 {
 
-  updateState();
+  _updateState();
 
   for (int i = 0; i < _contacts.size(); i++)
   {
@@ -52,14 +71,19 @@ virtual void reset()
 }
 
 
-virtual void updateState(){
-  _contacts.update(true);
-  _q_twist = _base.getWorld().twistSwing(_ground_normal); // this has heading
-  for(auto& wheel: _wheel_transforms)
-    wheel->compute();
+virtual void updateState() final {
+      _updater(_update[2]);
+  }
 
-  _minus.update(true);
-}
+  virtual void updateError() final {
+        updateState();
+        _updater(_update[0]);
+    }
+  virtual void updateJacobian() final {
+          updateState();
+          _updater(_update[1]);
+  }
+
 
   virtual const mwoibn::VectorN& getReference() const {
           return _reference;
@@ -148,8 +172,8 @@ protected:
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contacts;
   mwoibn::robot_points::Point& _base_point;
-  //mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _minus;
-  mwoibn::point_handling::Orientation _base;
+  mwoibn::point_handling::FramePlus _base;
+  mwoibn::point_handling::AngularVelocity _base_ang_vel;
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>> _wheel_transforms;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _minus;
 
@@ -159,6 +183,21 @@ protected:
   mwoibn::VectorN _reference, _full_error, _force;
   mwoibn::Quaternion _q_twist;
   const mwoibn::Vector3& _ground_normal;
+  mwoibn::Matrix3 _rot, _projected, _rot_project;
+
+  mwoibn::update::UpdateManager _manager;
+  std::vector<std::shared_ptr<mwoibn::update::Function>> _update;
+  void _updater(std::shared_ptr<mwoibn::update::Function>& func){
+    if(func->done()) func->call();
+    func->count();
+
+  }
+
+  //! generic function to provide the same syntax for Jacobian update of all derived classes
+  virtual void _updateJacobian() = 0;
+  //! generic function to provide the same syntax for error update of all derived classes
+  virtual void _updateError() = 0;
+
 
 
   virtual mwoibn::Vector3 _worldToBase(mwoibn::Vector3 point)
@@ -200,8 +239,20 @@ protected:
       return _baseToWorld(_temp_point);
     }
 
+
+    virtual void _updateState(){
+      _contacts.update(true);
+      _q_twist = _base.orientation.getWorld().twistSwing(_ground_normal); // this has heading
+      for(auto& wheel: _wheel_transforms)
+        wheel->compute();
+
+      _minus.update(true);
+    }
+
 public:
   const mwoibn::robot_points::Point& base;
+
+
 
 
 
