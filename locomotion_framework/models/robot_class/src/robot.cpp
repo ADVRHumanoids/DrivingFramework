@@ -1171,6 +1171,90 @@ void mwoibn::robot_class::Robot::_initModel(bool is_static,
 
 }
 
+void mwoibn::robot_class::Robot::_initContactsCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared){
+        for(auto& contact : *_contacts) {
+                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback;
+                callback = std::move(_generateContactCallback(*contact, config[contact->getName()], shared));
+                if (callback == nullptr)
+                        callback = std::move(_generateContactCallback(*contact, config[contact->getName()]));
+                if (callback != nullptr)
+                        feedbacks.add(std::move(callback), contact->getName());
+                else
+                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
+        }
+}
+
+std::unique_ptr<mwoibn::communication_modules::CommunicationBase> mwoibn::robot_class::Robot::_generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config, mwoibn::communication_modules::Shared& shared){
+    if (!config["name"])
+      throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
+
+    if (shared.startsWith(config["name"].as<std::string>()))
+    return  std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                                   new mwoibn::communication_modules::SharedPointGet(config, shared, contact.wrench()));
+
+    return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+
+}
+
+void mwoibn::robot_class::Robot::_initContactsCallbacks(YAML::Node config){
+        for(auto& contact : *_contacts) {
+                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback = _generateContactCallback(*contact, config[contact->getName()]);
+                if (callback != nullptr)
+                        feedbacks.add(std::move(callback), contact->getName());
+                else
+                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
+
+        }
+}
+
+
+void mwoibn::robot_class::Robot::_shareFeedbacks(YAML::Node config, mwoibn::communication_modules::Shared& share)
+{
+        for (auto entry : config)
+        {
+                if (!_loadFeedback(entry.second, entry.first.as<std::string>()))
+                        continue;
+
+                BiMap map = readBiMap(entry.second["dofs"]);
+
+                entry.second["rate"] = rate();
+                mwoibn::robot_class::State& state_ref = (entry.second["function"] && entry.second["function"].as<std::string>() == "reference") ? command : state;
+                if(share.startsWith(entry.second["name"].as<std::string>())) {
+                        feedbacks.add(mwoibn::communication_modules::SharedFeedback(state_ref, map, entry.second, share),  entry.second["name"].as<std::string>());
+
+                        continue;
+                }
+        }
+}
+
+void mwoibn::robot_class::Robot::_shareControllers(YAML::Node config, mwoibn::communication_modules::Shared& shared)
+{
+
+        for (auto entry : config)
+        {
+                if (entry.first.as<std::string>() == "mode") continue;
+
+
+                if (!entry.second["type"])
+                        throw(std::invalid_argument(std::string("Unknown controller type for " +
+                                                                entry.first.as<std::string>())));
+
+              try{
+                if (entry.second["type"].as<std::string>() == "reference")
+                        controllers.add(std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                                                new mwoibn::communication_modules::SharedController(
+                                                        static_cast<mwoibn::communication_modules::BasicController&>(controllers[entry.first.as<std::string>()]),
+                                                        shared, entry.first.as<std::string>())), entry.first.as<std::string>());  // thats unsafe
+                }
+              catch (const std::invalid_argument& e)
+                {
+                  std::cout << "WARNING: " <<  e.what() << std::endl;
+                }
+        }
+}
+
+
+
 void mwoibn::robot_class::Robot::_loadMapFromModel(YAML::Node config)
 {
 

@@ -36,7 +36,9 @@ protected:
   virtual void _loadFeedbacks(YAML::Node config, XBot::SharedMemory::Ptr shared_memory);
 
   virtual void _loadControllers(YAML::Node config, XBot::SharedMemory::Ptr shared_memory);
-
+  virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> _generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config, XBot::SharedMemory::Ptr shared);
+  using Robot::_generateContactCallback;
+  virtual void _initContactsCallbacks(YAML::Node config, XBot::SharedMemory::Ptr shared);
 };
 } // namespace package
 } // namespace library

@@ -43,21 +43,6 @@ public:
      throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + std::string(": Communication module ") + std::string(name) + " has already been registered in the stack." );
       _modules[name] = std::unique_ptr<CommunicationBase>(new Type(module));
    }
-   //
-   // template<typename Type>
-   // void add(Type* module, std::string name = ""){
-   //    _modules[name] = std::unique_ptr<CommunicationBase>(new Type(module));
-   // }
-
-   // virtual bool remove(int i){
-   //     if (i < 0 || i >= _feedbacks.size())
-   //       return false;
-   //
-   //     _feedbacks.erase(_feedbacks.begin() + i);
-   //     _names.erase(_names.begin() + i);
-   //
-   //     return true;
-   // }
 
    bool run()
    {
@@ -86,29 +71,6 @@ public:
      return success;
    }
 
-   // mwoibn::communication_modules::BasicFeedback& feedback(unsigned int id){
-   //   if (id < _feedbacks.size())
-   //     return *_feedbacks.at(id);
-   //   else
-   //     throw std::out_of_range("Given ID is beyond a vector scope");
-   // }
-
-   // int getId(std::string name)
-   // {
-   //
-   //   auto name_ptr =
-   //       std::find_if(_names.begin(), _names.end(), [&name](std::string names)
-   //                    {
-   //                      return names == name;
-   //                    });
-   //   if (name_ptr == _names.end())
-   //   {
-   //     throw std::invalid_argument("Couldn't find controller " + name);
-   //   }
-   //
-   //   return std::distance(_names.begin(), name_ptr);
-   // }
-
    mwoibn::communication_modules::CommunicationBase& module(std::string name)
    {
      return *_modules[name];
@@ -118,6 +80,14 @@ public:
 
    bool has(std::string name){
      return _modules.count(name);
+   }
+
+   bool startsWith(std::string start){
+     auto i = _modules.lower_bound(start);
+     if (i != _modules.end())
+            return (i->first.compare(0, start.size(), start) == 0); // Really a prefix?
+
+     return false;
    }
 
    std::map<std::string, std::unique_ptr<CommunicationBase>>::iterator begin(){return _modules.begin();}

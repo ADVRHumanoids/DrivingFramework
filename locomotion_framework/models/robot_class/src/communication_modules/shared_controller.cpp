@@ -6,40 +6,50 @@ bool mwoibn::communication_modules::SharedController::run()
   if(!_initialized) {initialize();}
 
     if(_position)
-      mapTo(_command.position.get(), _shared[_name+".position"]);
+      mapTo(_command.position.get(), _shared[_name_position]);
     if(_velocity)
-      mapTo(_command.velocity.get(), _shared[_name+".velocity"]);
+      mapTo(_command.velocity.get(), _shared[_name_velocity]);
     if(_torque)
-      mapTo(_command.torque.get(), _shared[_name+".torque"]);
+      mapTo(_command.torque.get(), _shared[_name_torque]);
 
 
   return _initialized;
 }
 
 void mwoibn::communication_modules::SharedController::_init(std::string name){
+
+        _name = name;
+
+        _name_position = name + ".position";
+        _name_velocity = name + ".velocity";
+        _name_torque = name + ".torque";
+
         if(_shared.has(name))
           throw(std::invalid_argument("Shared object " + name + std::string(" already exists.")));
-        if(_position && _shared.has(name+".position"))
+        if(_position && _shared.has(_name_position))
             throw(std::invalid_argument("Position interface for shared object " + name + std::string(" has already been initialized.")));
-        if(_velocity && _shared.has(name+".velocity"))
+        if(_velocity && _shared.has(_name_velocity))
                 throw(std::invalid_argument("Velocity interface for shared object " + name + std::string(" has already been initialized.")));
-        if(_torque && _shared.has(name+".torque"))
+        if(_torque && _shared.has(_name_torque))
                         throw(std::invalid_argument("Torque interface for shared object " + name + std::string(" has already been initialized.")));
 
 
         mwoibn::VectorRT temp;
 
         mapFrom(_command.position.get(), temp);
-        _shared.add(name+".position", temp);
+        if(_position)
+        _shared.add(_name_position, temp);
 
         mapFrom(_command.velocity.get(), temp);
-        _shared.add(name+".velocity", temp);
+        if(_velocity)
+        _shared.add(_name_velocity, temp);
 
         mapFrom(_command.torque.get(), temp);
-        _shared.add(name+".torque", temp);
+
+        if(_torque)
+        _shared.add(_name_torque, temp);
 
 
-        _name = name;
 
         std::cout << "Initialized shared controller " << _name << "\n";
 

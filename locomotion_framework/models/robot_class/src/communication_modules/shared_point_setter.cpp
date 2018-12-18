@@ -6,9 +6,9 @@ bool mwoibn::communication_modules::SharedPointSetter::run()
   if(!_initialized) {initialize();}
 
     if(_world)
-      _shared[_name+".world"].head<6>() = _point.getWorld();
+      _shared[_name].head<6>() = _point.getWorld();
     else
-      _shared[_name+".fixed"].head<6>() = _point.getFixed();
+      _shared[_name].head<6>() = _point.getFixed();
 
 
   return _initialized;
@@ -26,17 +26,15 @@ void mwoibn::communication_modules::SharedPointSetter::_init(std::string name){
 
           if(_world){
             temp.head<6>() = _point.getWorld();
-            _shared.add(name+".world", temp);
+            _name = name+".world";
           }
           else{
             temp.head<6>() = _point.getFixed();
-            _shared.add(name+".fixed", temp);
+            _name = name+".fixed";
           }
 
-          _name = name;
+            _shared.add(_name, temp);
 
           std::cout << "Initialized shared point " << _name << " ";
 
-          std::string info = (_world)? "world":"fixed";
-          std::cout << "interface: " << info  << std::endl;
   }

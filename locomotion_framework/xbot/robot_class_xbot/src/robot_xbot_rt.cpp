@@ -1,4 +1,6 @@
 #include "mwoibn/robot_class/robot_xbot_rt.h"
+#include "mwoibn/communication_modules/communication_base.h"
+#include "mwoibn/communication_modules/xbot_point_get.h"
 
 mwoibn::robot_class::RobotXBotRT::RobotXBotRT(
     XBot::RobotInterface::Ptr robot, std::string config_file,
@@ -81,7 +83,8 @@ void mwoibn::robot_class::RobotXBotRT::_init(
 {
 
   biMaps().add(makeBiMap(getLinks(_robot->getEnabledJointNames()), "XBOT"));
-  //  _xbot_map = biMaps().getId("XBOT");
+  //  _xbot_map = biMaps().getId("XBOT")
+  _initContactsCallbacks(robot["contacts"], shared_memory);
   _loadMappings(robot["mapping"]);
 
   _loadFeedbacks(robot["feedback"], shared_memory);
@@ -144,6 +147,36 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
     }
   }
 }
+
+void mwoibn::robot_class::RobotXBotRT::_initContactsCallbacks(YAML::Node config, XBot::SharedMemory::Ptr shared){
+        // std::cout << __PRETTY_FUNCTION__ << std::endl;
+        // for(auto entry: config) std::cout << entry.first << std::endl;
+
+
+        for(auto& contact : *_contacts) {
+                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback;
+                callback = std::move(_generateContactCallback(*contact, config[contact->getName()], shared));
+                if (callback == nullptr)
+                        callback = std::move(_generateContactCallback(*contact, config[contact->getName()]));
+                if (callback != nullptr)
+                        feedbacks.add(std::move(callback), contact->getName());
+                else
+                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
+        }
+}
+
+
+std::unique_ptr<mwoibn::communication_modules::CommunicationBase> mwoibn::robot_class::RobotXBotRT::_generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config, XBot::SharedMemory::Ptr shared){
+
+  if (!config["name"])
+    throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
+
+  return  std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                                 new mwoibn::communication_modules::XBotPointGet(config, contact.wrench(), shared));
+
+
+}
+
 
 void mwoibn::robot_class::RobotXBotRT::_loadControllers(
     YAML::Node config, XBot::SharedMemory::Ptr shared_memory)

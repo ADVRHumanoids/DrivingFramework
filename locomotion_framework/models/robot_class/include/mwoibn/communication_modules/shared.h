@@ -25,6 +25,16 @@ bool add(std::string name, ShareObj share)
   _shared[name] = share;
 }
 
+
+int size() const {
+        return _shared.size();
+}                                               // RT?
+
+bool remove(std::string name)
+{
+  _shared.erase(name);
+}
+
 bool has(std::string name){
   return _shared.count(name);
 }
@@ -35,15 +45,6 @@ bool startsWith(std::string start){
          return (i->first.compare(0, start.size(), start) == 0); // Really a prefix?
 
   return false;
-}
-
-int size() const {
-        return _shared.size();
-}                                               // RT?
-
-bool remove(std::string name)
-{
-  _shared.erase(name);
 }
 
 typename std::map<std::string, ShareObj>::iterator begin(){return _shared.begin();}

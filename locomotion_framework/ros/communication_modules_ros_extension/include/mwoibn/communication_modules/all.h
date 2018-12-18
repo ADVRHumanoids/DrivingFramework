@@ -16,4 +16,9 @@
 #include "mwoibn/communication_modules/ros_operational_euler.h"
 #include "mwoibn/communication_modules/shared_controller.h"
 #include "mwoibn/communication_modules/shared_feedback.h"
+#include "mwoibn/communication_modules/ros_contact_simulation.h"
+#include "mwoibn/communication_modules/communication_base.h"
+#include "mwoibn/communication_modules/ros_point_feeback.h"
+#include "mwoibn/communication_modules/ros_point_set.h"
+
 #endif

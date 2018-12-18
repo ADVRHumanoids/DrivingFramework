@@ -44,11 +44,13 @@ public:
   }
 
   SharedController(SharedController& other)
-      : BasicController(other), _filtered(other._filtered), _shared(other._shared), _interface(other._interface), _name(other._name)
+      : BasicController(other), _filtered(other._filtered), _shared(other._shared), _interface(other._interface), _name(other._name),
+       _name_position(other._name_position), _name_velocity(other._name_velocity), _name_torque(other._name_torque)
   {  }
 
   SharedController(SharedController&& other)
-      : BasicController(other), _filtered(other._filtered), _shared(other._shared), _interface(other._interface), _name(other._name)
+      : BasicController(other), _filtered(other._filtered), _shared(other._shared), _interface(other._interface), _name(other._name),
+       _name_position(other._name_position), _name_velocity(other._name_velocity), _name_torque(other._name_torque)
   {  }
 
   SharedController(BasicController& other, mwoibn::communication_modules::Shared& shared, std::string name)
@@ -66,7 +68,7 @@ protected:
   mwoibn::VectorN _filtered;
   mwoibn::communication_modules::Shared& _shared;
   mwoibn::Interface _interface;
-  std::string _name;
+  std::string _name, _name_position, _name_velocity, _name_torque;
   virtual void _init(std::string name);
 };
 }

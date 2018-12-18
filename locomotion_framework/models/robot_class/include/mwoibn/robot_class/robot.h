@@ -16,6 +16,7 @@
 #include "mwoibn/robot_points/center_of_pressure.h"
 
 #include "mwoibn/communication_modules/shared.h"
+#include "mwoibn/communication_modules/shared_all.h"
 
 
 #include "mwoibn/common/all.h"
@@ -318,6 +319,10 @@ virtual bool _initUrdf( std::string& urdf_description, urdf::Model& urdf);
 virtual srdf::Model _initSrdf( std::string& srdf_description, urdf::Model& urdf);
 
 virtual void _initModel(bool is_static, const std::string& source, RigidBodyDynamics::Model& model);
+virtual void _initContactsCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
+virtual void _initContactsCallbacks(YAML::Node config);
+
+
 
 virtual void _loadContacts(YAML::Node contacts_config);
 virtual void _loadActuators(YAML::Node actuators_config);
@@ -325,6 +330,9 @@ virtual void _loadConfig(YAML::Node config, YAML::Node robot);
 
 virtual void _loadFeedbacks(YAML::Node config) {
 }
+virtual void _shareFeedbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
+virtual void _shareControllers(YAML::Node config, mwoibn::communication_modules::Shared& shared);
+
 virtual void _loadControllers(YAML::Node config) {
 }
 
@@ -349,7 +357,8 @@ bool _loadFeedback(YAML::Node entry, std::string name);
 mwoibn::VectorN _zeroVec;
 
 void _loadGroup(const srdf::Model::Group& group, mwoibn::VectorInt& map, const std::vector<srdf::Model::Group>& groups);
-
+virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> _generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config, mwoibn::communication_modules::Shared& shared);
+virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> _generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config){return nullptr;}
 };
 } // namespace package
 } // namespace library

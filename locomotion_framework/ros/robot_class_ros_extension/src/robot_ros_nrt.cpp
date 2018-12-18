@@ -133,52 +133,8 @@ void mwoibn::robot_class::RobotRosNRT::loadControllers(std::string config_file,
 
 
 
-void mwoibn::robot_class::RobotRosNRT::_initContactsCallbacks(YAML::Node config){
-        for(auto& contact : *_contacts) {
-                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback = contact->generateCallback(config[contact->getName()]);
-                if (callback != nullptr)
-                        feedbacks.add(std::move(callback), contact->getName());
-                else
-                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
-
-        }
-
-}
-void mwoibn::robot_class::RobotRosNRT::_initContactsCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared){
-        for(auto& contact : *_contacts) {
-                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback;
-                callback = std::move(contact->generateCallback(config[contact->getName()], shared));
-                if (callback == nullptr)
-                        callback = std::move(contact->generateCallback(config[contact->getName()]));
-                if (callback != nullptr)
-                        feedbacks.add(std::move(callback), contact->getName());
-                else
-                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
-        }
 
 
-}
-
-
-
-void mwoibn::robot_class::RobotRosNRT::_shareFeedbacks(YAML::Node config, mwoibn::communication_modules::Shared& share)
-{
-        for (auto entry : config)
-        {
-                if (!_loadFeedback(entry.second, entry.first.as<std::string>()))
-                        continue;
-
-                BiMap map = readBiMap(entry.second["dofs"]);
-
-                entry.second["rate"] = rate();
-                mwoibn::robot_class::State& state_ref = (entry.second["function"] && entry.second["function"].as<std::string>() == "reference") ? command : state;
-                if(share.startsWith(entry.second["name"].as<std::string>())) {
-                        feedbacks.add(mwoibn::communication_modules::SharedFeedback(state_ref, map, entry.second, share),  entry.second["name"].as<std::string>());
-
-                        continue;
-                }
-        }
-}
 
 
 void mwoibn::robot_class::RobotRosNRT::_loadFeedbacks(YAML::Node config)
@@ -378,85 +334,77 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
         }
 }
 
+std::unique_ptr<mwoibn::communication_modules::CommunicationBase> mwoibn::robot_class::RobotRosNRT::_generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config){
 
-void mwoibn::robot_class::RobotRosNRT::_shareControllers(YAML::Node config, mwoibn::communication_modules::Shared& shared)
-{
+  if(!config["topic"]) return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);;
+  //if(!config["settings"]["feedback"].as<bool>()) return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);;
 
-        for (auto entry : config)
-        {
-                if (entry.first.as<std::string>() == "mode") continue;
+  if(!config["message"]) return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);;
 
 
-                if (!entry.second["type"])
-                        throw(std::invalid_argument(std::string("Unknown controller type for " +
-                                                                entry.first.as<std::string>())));
+  if(config["message"].as<std::string>() == "gazebo_msgs::ContactsState")
+       return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(new mwoibn::communication_modules::RosContactSimulation(contact.wrench(), config));
+  else if(config["message"].as<std::string>() == "geometry_msgs::Twist"){
+       config["source"] = config["topic"];
+    return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(new mwoibn::communication_modules::RosPointFeedback(contact.wrench(), config));
+  }
 
-              try{
-                if (entry.second["type"].as<std::string>() == "reference")
-                        controllers.add(std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
-                                                new mwoibn::communication_modules::SharedController(
-                                                        static_cast<mwoibn::communication_modules::BasicController&>(controllers[entry.first.as<std::string>()]),
-                                                        shared, entry.first.as<std::string>())), entry.first.as<std::string>());  // thats unsafe
-                }
-              catch (const std::invalid_argument& e)
-                {
-                  std::cout << "WARNING: " <<  e.what() << std::endl;
-                }
-        }
+   return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+
 }
 
-
-void mwoibn::robot_class::RobotRosNRT::_loadContacts(YAML::Node contacts_config)
-{
-        YAML::Node loaded_contacts;
-
-        for (int i = 0; i < contacts_config.size() - 1; i++)
-        {
-                YAML::Node contact = contacts_config["contact" + std::to_string(i)];
-                //    if (contact.first.as<std::string>() == "settings")
-                //      continue;
-                contact["settings"] = contacts_config["settings"];
-
-                if (!contact["type"])
-                        throw std::invalid_argument(
-                                      std::string("Please specify a contact type for ") +
-                                      contact["name"].as<std::string>());
-                try
-                {
-                        //      contact.second["name"] = contact.first.as<std::string>();
-                        std::string type = contact["type"].as<std::string>();
-
-                        if (type.compare("point_foot") == 0)
-                        {
-                                _contacts->add(std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::ContactV2>(
-                                                                                                robot_points::ContactV2(_model, state, contact), contact)));
-                                loaded_contacts[_contacts->end()[-1]->getName()] = contact;
-                                continue;
-                        }
-                        if (type.compare("wheel") == 0)
-                        {
-                                _contacts->add(
-                                        std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::WheelContactV2>(
-                                                                                         robot_points::WheelContactV2(_model, state, contact), contact)));
-                                loaded_contacts[_contacts->end()[-1]->getName()] = contact;
-                                continue;
-                        }
-                        // if (type.compare("wheel_locked") == 0)
-                        // {
-                        //         _contacts->add(std::unique_ptr<ContactV2>(new ContactRos<WheelContact>(
-                        //                                                           WheelContact(_model, state.state("POSITION"), contact),
-                        //                                                           contact)));
-                        //         continue;
-                        // }
-
-                        throw std::invalid_argument(std::string("Uknown contacy type: ") + type);
-                }
-                catch (std::invalid_argument& e)
-                {
-                        std::cout << e.what() << std::endl;
-                }
-        }
-
-        _center_of_pressure->init(); // bacuse it needs contact feeback
-        contacts_config = loaded_contacts;
-}
+//
+// void mwoibn::robot_class::RobotRosNRT::_loadContacts(YAML::Node contacts_config)
+// {
+//         YAML::Node loaded_contacts;
+//
+//         for (int i = 0; i < contacts_config.size() - 1; i++)
+//         {
+//                 YAML::Node contact = contacts_config["contact" + std::to_string(i)];
+//                 //    if (contact.first.as<std::string>() == "settings")
+//                 //      continue;
+//                 contact["settings"] = contacts_config["settings"];
+//
+//                 if (!contact["type"])
+//                         throw std::invalid_argument(
+//                                       std::string("Please specify a contact type for ") +
+//                                       contact["name"].as<std::string>());
+//                 try
+//                 {
+//                         //      contact.second["name"] = contact.first.as<std::string>();
+//                         std::string type = contact["type"].as<std::string>();
+//
+//                         if (type.compare("point_foot") == 0)
+//                         {
+//                                 _contacts->add(std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::ContactV2>(
+//                                                                                                 robot_points::ContactV2(_model, state, contact), contact)));
+//                                 loaded_contacts[_contacts->end()[-1]->getName()] = contact;
+//                                 continue;
+//                         }
+//                         if (type.compare("wheel") == 0)
+//                         {
+//                                 _contacts->add(
+//                                         std::unique_ptr<robot_points::ContactV2>(new ContactRos<robot_points::WheelContactV2>(
+//                                                                                          robot_points::WheelContactV2(_model, state, contact), contact)));
+//                                 loaded_contacts[_contacts->end()[-1]->getName()] = contact;
+//                                 continue;
+//                         }
+//                         // if (type.compare("wheel_locked") == 0)
+//                         // {
+//                         //         _contacts->add(std::unique_ptr<ContactV2>(new ContactRos<WheelContact>(
+//                         //                                                           WheelContact(_model, state.state("POSITION"), contact),
+//                         //                                                           contact)));
+//                         //         continue;
+//                         // }
+//
+//                         throw std::invalid_argument(std::string("Uknown contacy type: ") + type);
+//                 }
+//                 catch (std::invalid_argument& e)
+//                 {
+//                         std::cout << e.what() << std::endl;
+//                 }
+//         }
+//
+//         _center_of_pressure->init(); // bacuse it needs contact feeback
+//         contacts_config = loaded_contacts;
+// }

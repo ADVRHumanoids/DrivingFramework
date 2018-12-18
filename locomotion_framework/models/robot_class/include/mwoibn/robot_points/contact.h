@@ -79,22 +79,12 @@ Contact(Contact& other)
         mwoibn::point_handling::computeChain( 0, _model, _wrench, _chain, ext_empty);
 }
 using Point::operator=;
+//
+// virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> generateCallback(YAML::Node config){
+//   return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+// }
 
-virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> generateCallback(YAML::Node config){
-  return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
-}
 
-virtual std::unique_ptr<mwoibn::communication_modules::CommunicationBase> generateCallback(YAML::Node config, mwoibn::communication_modules::Shared& shared){
-    if (!config["name"])
-      throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
-
-    if (shared.startsWith(config["name"].as<std::string>()))
-    return  std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
-                                   new mwoibn::communication_modules::SharedPointGet(config, shared, _wrench));
-
-    return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
-
-}
 
 virtual void compute(){
   _point = getPosition();

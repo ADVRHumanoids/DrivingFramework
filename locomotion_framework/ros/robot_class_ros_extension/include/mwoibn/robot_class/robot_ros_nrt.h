@@ -10,7 +10,7 @@
 #include <climits>
 
 #include "mwoibn/communication_modules/all.h"
-#include "mwoibn/robot_class/contact_ros.h"
+//#include "mwoibn/robot_class/contact_ros.h"
 
 
 namespace mwoibn
@@ -116,6 +116,7 @@ public:
                                            communication_modules::Communications& external_feedbacks,
                                            State& external_state,
                                            BiMap& external_map);
+
   static bool loadRosControllers(YAML::Node config,
                                  communication_modules::Communications& external_controllers,
                                  State& external_state, BiMap& external_map);
@@ -130,20 +131,17 @@ public:
 
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
-  virtual void _shareFeedbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
 
   void _loadControllers(YAML::Node config);
-  void _shareControllers(YAML::Node config, mwoibn::communication_modules::Shared& shared);
 
-  virtual void _loadContacts(YAML::Node contacts_config);
-  virtual void _initContactsCallbacks(YAML::Node config);
-  virtual void _initContactsCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& shared);
+  // virtual void _loadContacts(YAML::Node contacts_config);
+  //virtual void _initContactsCallbacks(YAML::Node config);
   virtual void _loadMapFromTopic(YAML::Node config);
   virtual void _loadMap(YAML::Node config);
 
   virtual void _init(YAML::Node full_config, std::string config_name, std::string controller_source);
   virtual void _init(YAML::Node full_config, std::string config_name, mwoibn::communication_modules::Shared& shared, std::string controller_source);
-
+  std::unique_ptr<mwoibn::communication_modules::CommunicationBase> _generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config);
 };
 } // namespace package
 } // namespace library
