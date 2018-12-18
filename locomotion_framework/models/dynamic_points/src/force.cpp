@@ -12,11 +12,16 @@ namespace dynamic_points
   void Force::compute(){
 
     _inertia_inverse->compute(_dynamic_model.getInertia());
-    _temp = _frame.getJacobian();
-    _contacts_inverse->compute(_temp*_inertia_inverse->get()*_temp.transpose()); // NOT RT SAVE - this should be separated
-    mwoibn::Vector3 force = _temp*_inertia_inverse->get()*_state[_interface].get();
-    _jacobian = _contacts_inverse->get()*_temp*_inertia_inverse->get();
-    _point = _contacts_inverse->get()*force;
+    _point_jacobian = _frame.getJacobian();
+    _point_transposed = _point_jacobian.transpose();
+
+    _point_inverse.noalias() = _point_jacobian*_inertia_inverse->get();
+    _point_temp.noalias() = _point_inverse*_point_transposed;
+
+    _contacts_inverse->compute(_point_temp); 
+
+    _jacobian.noalias() = _contacts_inverse->get()*_point_inverse;
+    _point.noalias() = _jacobian*_state[_interface].get();
 
   }
 

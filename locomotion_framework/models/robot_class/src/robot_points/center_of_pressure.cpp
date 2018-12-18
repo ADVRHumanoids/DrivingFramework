@@ -29,15 +29,19 @@ void CenterOfPressure::compute()
     _forces.setZero();
     _point.setZero();
 
-    for(auto id: _contacts.getActive()){
-        mwoibn::Vector3 n = _contacts.contact(id).getGroundNormal();
+    int id = 0;
+    for(auto& contact: _contacts){
+        if (!contact->isActive()) continue;
 
-        _forces[id] = n.dot(_contacts.contact(id).wrench().force.getWorld());
+        mwoibn::Vector3 n = contact->getGroundNormal();
+
+        _forces[id] = n.dot(contact->wrench().force.getWorld());
         _sum_force += _forces[id];
         _null_space[id] = n*n.transpose();
         _null_space[id] = mwoibn::Matrix3::Identity() - _null_space[id];
-        _temp = _null_space[id]*_contacts.contact(id).get().head<3>();
+        _temp = _null_space[id]*contact->get().head<3>();
         _point += _temp*_forces[id];
+        id++;
         //_contacts.contact(id).getPosition()
     }
 
