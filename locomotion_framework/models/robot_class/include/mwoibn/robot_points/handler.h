@@ -20,32 +20,6 @@ public:
     Handler(unsigned int dofs) : _dofs(dofs) {}
     Handler(int dofs) : _dofs(dofs) {}
 
-    // Handler(Handler& other)
-    //       : _positions(other._positions), _jacobian(other._jacobian), _dofs(other._dofs)
-    // {
-    //     for (auto& point : other._points)
-    //         _points.push_back(std::move(point));
-    //     resize();
-    // }
-
-    // Handler(Handler&& other)
-    //       : _positions(other._positions), _jacobian(other._jacobian), _dofs(other._dofs)
-    // {
-    //     for (auto& point : other._points)
-    //         _points.push_back(std::move(point));
-    //     resize();
-    // }
-
-    // template<typename Other>
-    // Handler(Other& other)
-    //       : _positions(other.getState()), _jacobian(other.getJacobian()), _dofs(other.jacobianCols())
-    // {
-    //     for (auto& point : other)
-    //       _points.push_back(std::move(point));
-    //
-    //     resize();
-    // }
-
     template<typename Other>
     Handler(Other&& other)
           : _positions(other.getState()), _jacobian(other.getJacobian()), _dofs(other._dofs)
