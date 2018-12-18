@@ -142,7 +142,6 @@ virtual void release(int i){
         _constraints_ptr->releaseContact(i);
 }
 
-virtual void initLog(mwoibn::common::Logger& logger);
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 

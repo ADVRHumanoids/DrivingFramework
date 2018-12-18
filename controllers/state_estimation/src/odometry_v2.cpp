@@ -85,7 +85,9 @@ void mgnss::state_estimation::OdometryV2::_allocate(std::vector<std::string> nam
         __es_2.setZero(2);
         __st_2.setZero(2);
         _base_ids.setZero(3);
-
+        _base_map.setZero(6);
+        _base_map << 0, 1, 2, 3, 4, 5;
+        
         for (const auto& name : names)
                 _wheels_ph.addPoint(name);
 
@@ -172,7 +174,7 @@ void mgnss::state_estimation::OdometryV2::update()
         mwoibn::Quaternion temp = _twist_es*_swing;
         _base.tail<3>() = temp.toMatrix().eulerAngles(0,1,2);
         // std::cout << "base" << _base.transpose() << std::endl;
-        _robot.command.position.set(_base, {0, 1, 2, 3, 4, 5});
+        _robot.command.position.set(_base, _base_map);
 
         _previous_state.noalias() = _state;
         //_end = std::chrono::high_resolution_clock::now();
@@ -535,49 +537,26 @@ int mgnss::state_estimation::OdometryV2::_min(mwoibn::VectorBool& selector, cons
         return id;
 }
 
-void mgnss::state_estimation::OdometryV2::initLog(mwoibn::common::Logger& logger){
-        // logger.addField("time", 0);
-        // logger.addField("q_raw_x", _twist_raw.x());
-        // logger.addField("q_raw_y", _twist_raw.y());
-        // logger.addField("q_raw_z", _twist_raw.z());
-        // logger.addField("q_raw_w", _twist_raw.w());
-        // logger.addField("q_es_x", _twist_es.x());
-        // logger.addField("q_es_y", _twist_es.y());
-        // logger.addField("q_es_z", _twist_es.z());
-        // logger.addField("q_es_w", _twist_es.w());
-//  logger.addField("raw_x", getRaw()[0]);
-//  logger.addField("raw_y", getRaw()[1]);
-//  logger.addField("raw_z", getRaw()[2]);
-//  logger.addField("raw_tx", getRaw()[3]);
-//  logger.addField("raw_ty", getRaw()[4]);
-//  logger.addField("raw_tz", getRaw()[5]);
-//  logger.addField("fil_x", getFiltered()[0]);
-//  logger.addField("fil_y", getFiltered()[1]);
-//  logger.addField("fil_z", getFiltered()[2]);
-//  logger.addField("fil_tx", getFiltered()[3]);
-//  logger.addField("fil_ty", getFiltered()[4]);
-//  logger.addField("fil_tz", getFiltered()[5]);
-}
 void mgnss::state_estimation::OdometryV2::log(mwoibn::common::Logger& logger, double time){
-        // logger.addEntry("time", time);
-        // logger.addEntry("q_raw_x", _twist_raw.x());
-        // logger.addEntry("q_raw_y", _twist_raw.y());
-        // logger.addEntry("q_raw_z", _twist_raw.z());
-        // logger.addEntry("q_raw_w", _twist_raw.w());
-        // logger.addEntry("q_es_x", _twist_es.x());
-        // logger.addEntry("q_es_y", _twist_es.y());
-        // logger.addEntry("q_es_z", _twist_es.z());
-        // logger.addEntry("q_es_w", _twist_es.w());
-//  logger.addEntry("raw_x", getRaw()[0]);
-//  logger.addEntry("raw_y", getRaw()[1]);
-//  logger.addEntry("raw_z", getRaw()[2]);
-//  logger.addEntry("raw_tx", getRaw()[3]);
-//  logger.addEntry("raw_ty", getRaw()[4]);
-//  logger.addEntry("raw_tz", getRaw()[5]);
-//  logger.addEntry("fil_x", getFiltered()[0]);
-//  logger.addEntry("fil_y", getFiltered()[1]);
-//  logger.addEntry("fil_z", getFiltered()[2]);
-//  logger.addEntry("fil_tx", getFiltered()[3]);
-//  logger.addEntry("fil_ty", getFiltered()[4]);
-//  logger.addEntry("fil_tz", getFiltered()[5]);
+        // logger.add("time", time);
+        // logger.add("q_raw_x", _twist_raw.x());
+        // logger.add("q_raw_y", _twist_raw.y());
+        // logger.add("q_raw_z", _twist_raw.z());
+        // logger.add("q_raw_w", _twist_raw.w());
+        // logger.add("q_es_x", _twist_es.x());
+        // logger.add("q_es_y", _twist_es.y());
+        // logger.add("q_es_z", _twist_es.z());
+        // logger.add("q_es_w", _twist_es.w());
+//  logger.add("raw_x", getRaw()[0]);
+//  logger.add("raw_y", getRaw()[1]);
+//  logger.add("raw_z", getRaw()[2]);
+//  logger.add("raw_tx", getRaw()[3]);
+//  logger.add("raw_ty", getRaw()[4]);
+//  logger.add("raw_tz", getRaw()[5]);
+//  logger.add("fil_x", getFiltered()[0]);
+//  logger.add("fil_y", getFiltered()[1]);
+//  logger.add("fil_z", getFiltered()[2]);
+//  logger.add("fil_tx", getFiltered()[3]);
+//  logger.add("fil_ty", getFiltered()[4]);
+//  logger.add("fil_tz", getFiltered()[5]);
 }

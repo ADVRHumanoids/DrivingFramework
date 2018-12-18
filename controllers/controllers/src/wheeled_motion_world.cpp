@@ -35,6 +35,7 @@ void mgnss::controllers::WheeledMotionWorld::_createTasks(YAML::Node config){
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
                         _robot.getLinks("wheels"), _robot, config, _world, _robot.getLinks("base")[0]));
+        _steering_ptr->subscribe(true, true, false);
 
         _tasks["CONTACT_POINTS"] = _steering_ptr.get();
         _tasks["BASE_GROUND"] = _com_ptr.get();
@@ -47,8 +48,11 @@ void mgnss::controllers::WheeledMotionWorld::_createTasks(YAML::Node config){
 void mgnss::controllers::WheeledMotionWorld::_initIK(YAML::Node config){
         WheelsController::_initIK(config);
 
+        YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
+
         _steering_ref_ptr.reset(new mgnss::higher_level::Steering5(
-                                _robot, *_steering_ptr, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), _robot.rate(), config["steer_damp"].as<double>()));
+                                _robot, *_steering_ptr, steering["icm"].as<double>(), steering["sp"].as<double>(), _robot.rate(), steering["damp"].as<double>()));
+
 }
 
 void mgnss::controllers::WheeledMotionWorld::_allocate(){
@@ -69,14 +73,8 @@ void mgnss::controllers::WheeledMotionWorld::_setInitialConditions(){
         _com_ptr->setReference(_position);
 }
 
-
-void mgnss::controllers::WheeledMotionWorld::initLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0.0);
-        mgnss::controllers::WheelsControllerExtend::initLog(logger);
-}
-
 void mgnss::controllers::WheeledMotionWorld::log(mwoibn::common::Logger& logger, double time){
-        logger.addEntry("time", time);
+        logger.add("time", time);
         mgnss::controllers::WheelsControllerExtend::log(logger ,time);
 
 }

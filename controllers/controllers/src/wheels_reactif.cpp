@@ -12,9 +12,10 @@ void mgnss::controllers::WheelsReactif::_initIK(YAML::Node config){
 
         WheelsController::_initIK(config);
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
-                _robot, *_steering_ptr, _support_vel, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
+        YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
+        _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
+                  _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 }
 
 void mgnss::controllers::WheelsReactif::_createTasks(YAML::Node config){
@@ -35,6 +36,7 @@ void mgnss::controllers::WheelsReactif::_createTasks(YAML::Node config){
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
                         _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
 
+        _steering_ptr->subscribe(true, true, false);
         _tasks["CONTACT_POINTS"] = _steering_ptr.get();
 
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
@@ -68,31 +70,16 @@ void mgnss::controllers::WheelsReactif::compute()
 }
 
 
-void mgnss::controllers::WheelsReactif::initLog(mwoibn::common::Logger& logger){
-  mgnss::controllers::WheelsControllerExtend::initLog(logger);
-
-  logger.addField("com_x", _robot.centerOfMass().get()[0]);
-  logger.addField("com_y", _robot.centerOfMass().get()[1]);
-
-  logger.addField("base_x", getBaseGroundX());
-  logger.addField("base_y", getBaseGroundY());
-
-  logger.addField("r_base_x", _pelvis_position_ptr->getReference()[0]);
-  logger.addField("r_base_y", _pelvis_position_ptr->getReference()[1]);
-
-}
-
-
   void mgnss::controllers::WheelsReactif::log(mwoibn::common::Logger& logger, double time){
      mgnss::controllers::WheelsControllerExtend::log(logger ,time);
 
-     logger.addEntry("com_x", _robot.centerOfMass().get()[0]);
-     logger.addEntry("com_y", _robot.centerOfMass().get()[1]);
+     logger.add("com_x", _robot.centerOfMass().get()[0]);
+     logger.add("com_y", _robot.centerOfMass().get()[1]);
 
-     logger.addEntry("base_x", getBaseGroundX());
-     logger.addEntry("base_y", getBaseGroundY());
+     logger.add("base_x", getBaseGroundX());
+     logger.add("base_y", getBaseGroundY());
 
-     logger.addEntry("r_base_x", _pelvis_position_ptr->getReference()[0]);
-     logger.addEntry("r_base_y", _pelvis_position_ptr->getReference()[1]);
+     logger.add("r_base_x", _pelvis_position_ptr->getReference()[0]);
+     logger.add("r_base_y", _pelvis_position_ptr->getReference()[1]);
 
 }

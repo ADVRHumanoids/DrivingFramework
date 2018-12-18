@@ -144,14 +144,14 @@ void mgnss::controllers::WheelsController::_initIK(YAML::Node config){
 
   YAML::Node ik =  config["IK"];
 
-  config = config["tunnings"][config["tunning"].as<std::string>()];
+  YAML::Node tunning = config["tunnings"][config["tunning"].as<std::string>()];
 
   std::cout << "Loaded tunning" << std::endl;
-  for(auto entry : config)
+  for(auto entry : tunning)
         std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
   std::cout << "Initializing Inverse Kinematics..." << std::endl;
-  for(auto entry : ik)  _ik_ptr->addAction(_createAction(entry.as<std::string>(), config));
+  for(auto entry : ik)  _ik_ptr->addAction(_createAction(entry.as<std::string>(), tunning));
 
    _ik_ptr->update();
 

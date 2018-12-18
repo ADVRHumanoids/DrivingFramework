@@ -38,12 +38,10 @@ virtual void stop(){
 }
 virtual void close(){
 }
-virtual void initLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0);
-}
+
 
 virtual void log(mwoibn::common::Logger& logger, double time){
-        logger.addEntry("time", time);
+        logger.add("time", time);
 }
 protected:
 mwoibn::VectorN _position, _velocity, _last_ankle, _last_position, _des_ankle, _init_ankle;

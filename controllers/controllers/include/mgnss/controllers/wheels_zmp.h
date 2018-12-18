@@ -17,7 +17,9 @@
 #include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 
-#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
+#include <mgnss/controllers/devel/contact_point_zmp.h>
+
+//#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
 //#include "mgnss/higher_level/steering_reactif_zmp.h"
@@ -65,7 +67,6 @@ void release(int i){
         _constraints_ptr->releaseContact(i);
 }
 
-virtual void initLog(mwoibn::common::Logger& logger);
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 

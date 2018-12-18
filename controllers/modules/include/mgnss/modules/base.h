@@ -28,10 +28,10 @@ virtual void setRate(double rate){
 }
 
 virtual void startLog(mwoibn::common::Logger& logger){
-        initLog(logger);
+        log(logger, 0);
         logger.start();
 }
-virtual void initLog(mwoibn::common::Logger& logger) = 0;
+
 virtual void log(mwoibn::common::Logger& logger, double time) = 0;
 protected:
 mwoibn::robot_class::Robot& _robot;

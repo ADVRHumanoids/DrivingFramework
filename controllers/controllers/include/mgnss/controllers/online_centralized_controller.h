@@ -31,12 +31,9 @@ virtual void stop(){
 virtual void close(){
 }
 
-virtual void initLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0);
-}
 
 virtual void log(mwoibn::common::Logger& logger, double time){
-        logger.addEntry("time", time);
+        logger.add("time", time);
 }
 
 protected:

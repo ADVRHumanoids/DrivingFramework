@@ -40,20 +40,6 @@ virtual ~RosLogger(){
 }
 
 
-virtual void addField(std::string name, double init_value){
-        if(!_print.size())
-                _file << name;
-        else
-                _file << "," << name;
-        _map.insert(std::pair<std::string, double>(name, _print.size()));
-        _print.conservativeResize(_print.size()+1);
-        _print.tail<1>()[0] = init_value;
-
-}  //allocates memory, slow
-virtual void addEntry(std::string name, double value){
-        _print[_map[name]] = value;
-}  // doesn't allocate memory
-
 virtual void write(){
         _file << _print.format(fmt) << "\n";
 }
@@ -64,10 +50,7 @@ virtual void flush(){
 virtual void close(){
         _file.close();
 }
-virtual void start(){
-        _file << "\n";
-        flush();
-}
+
 
 
 protected:
@@ -77,6 +60,28 @@ std::map<std::string, int> _map;
 
 //  double start,now;
 mwoibn::VectorNT _print;
+
+virtual void _start(){
+        _file << "\n";
+        flush();
+}
+
+
+virtual void _addField(std::string name, double init_value){
+        if(!_print.size())
+                _file << name;
+        else
+                _file << "," << name;
+        _map.insert(std::pair<std::string, double>(name, _print.size()));
+        _print.conservativeResize(_print.size()+1);
+        _print.tail<1>()[0] = init_value;
+
+}  //allocates memory, slow
+virtual void _addEntry(std::string name, double value){
+        _print[_map[name]] = value;
+}  // doesn't allocate memory
+
+
 
 };
 

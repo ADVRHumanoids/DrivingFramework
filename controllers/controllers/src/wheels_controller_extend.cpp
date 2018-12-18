@@ -172,6 +172,8 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
             for(auto& angle_: item_.second.second)
                   angle_.reset();
 
+        if(_steering_ptr != nullptr)
+          _steering_ptr->start();
 }
 
 
@@ -189,33 +191,16 @@ void mgnss::controllers::WheelsControllerExtend::steering()
 
 }
 
-void mgnss::controllers::WheelsControllerExtend::initLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0);
-        //
-        logger.addField("th", _robot.state.position.get()[5]);
-        logger.addField("r_th", _heading);
-        //
-
-        for(int i = 0; i < 3; i++){
-          for(int point = 0; point < 4; point++){
-            logger.addField("cp_"   + std::to_string(point+1) + "_" + char('x'+i), getCp(point)[i]);
-            logger.addField("r_cp_" + std::to_string(point+1) + "_" + char('x'+i), refCp()[point*3+i]);
-            logger.addField("force_" + std::to_string(point+1) + "_" + char('x'+i), _steering_ptr->getForce()[3*point+i]);
-          }
-        }
-
-}
-
 void mgnss::controllers::WheelsControllerExtend::log(mwoibn::common::Logger& logger, double time){
-   logger.addEntry("time", time);
-   logger.addEntry("th", _robot.state.position.get()[5]);
-   logger.addEntry("r_th", _heading);
+   logger.add("time", time);
+   logger.add("th", _robot.state.position.get()[5]);
+   logger.add("r_th", _heading);
 
    for(int i = 0; i < 3; i++){
        for(int point = 0; point < 4; point++){
-           logger.addEntry("cp_"   + std::to_string(point+1) + "_" + char('x'+i), getCp(point)[i]);
-           logger.addEntry("r_cp_" + std::to_string(point+1) + "_" + char('x'+i), refCp()[point*3+i]);
-           logger.addEntry("force_" + std::to_string(point+1) + "_" + char('x'+i), _steering_ptr->getForce()[3*point+i]);
+           logger.add("cp_"   + std::to_string(point+1) + "_" + char('x'+i), getCp(point)[i]);
+           logger.add("r_cp_" + std::to_string(point+1) + "_" + char('x'+i), refCp()[point*3+i]);
+           logger.add("force_" + std::to_string(point+1) + "_" + char('x'+i), _steering_ptr->getForce()[3*point+i]);
        }
    }
 }

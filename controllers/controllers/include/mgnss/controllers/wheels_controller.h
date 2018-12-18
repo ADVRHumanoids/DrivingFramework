@@ -38,11 +38,8 @@ virtual void init(){
         _robot.centerOfMass().update();
 
         _setInitialConditions();
-
 }
 
-virtual void initLog(mwoibn::common::Logger& logger){
-}
 
 virtual void log(mwoibn::common::Logger& logger, double time){
 }
@@ -236,6 +233,7 @@ virtual void _createTasks(YAML::Node config);
 virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config);
 virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Compute> _taskAction(std::string task, YAML::Node config);
 virtual void _initIK(YAML::Node config);
+//virtual void _initSteering(YAML::Node config, std::function<>);
 
 
 };

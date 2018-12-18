@@ -32,22 +32,22 @@ public:
   }
   ~XbotLogger(){}
 
-
-  virtual void addField(std::string name, double init_value){
-    _logger->add(name, init_value);
-  }
-  virtual void addEntry(std::string name, double value){
-    _logger->add(name, value);
-  }
-
   virtual void write(){}
 
   virtual void flush(){_logger->flush();}
   virtual void close(){}
-  virtual void start(){}
 
 protected:
   XBot::MatLogger::Ptr _logger;
+
+  virtual void _addField(std::string name, double init_value){
+    _logger->add(name, init_value);
+  }
+  virtual void _addEntry(std::string name, double value){
+    _logger->add(name, value);
+  }
+
+  virtual void _start(){}
 
 };
 

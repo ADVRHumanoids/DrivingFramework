@@ -60,7 +60,7 @@ bool mgnss::plugins::XbotBase::init_control_plugin(XBot::Handle::Ptr handle)
         _initCallbacks(config);
 
         _logger_ptr.reset(new mwoibn::common::XbotLogger(_name));
-        _logger_ptr->addField("update", 0.0);
+        _logger_ptr->add("update", 0.0);
         _controller_ptr->startLog(*_logger_ptr.get());
 
         _robot_ptr->get();
@@ -115,7 +115,7 @@ void mgnss::plugins::XbotBase::control_loop(double time)
 
         //_end = std::chrono::high_resolution_clock::now();
 
-        //_logger_ptr->addEntry("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
+        //_logger_ptr->add("update", std::chrono::duration_cast<std::chrono::microseconds>((_end-_begin)).count());
         _controller_ptr->log(*_logger_ptr.get(), time-_start);
         _logger_ptr->write();
 

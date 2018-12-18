@@ -15,8 +15,10 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
 
         WheelsController::_initIK(config);
 
+        YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
+
         _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
-                                _robot, *_steering_ptr, _support_vel, config["steer_open_loop"].as<double>(), config["steer_feedback"].as<double>(), config["tracking_gain"].as<double>(), _robot.rate(), config["damp_icm"].as<double>(), config["damp_sp"].as<double>(), config["steer_damp"].as<double>()));
+                                _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
 
 }
@@ -43,6 +45,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
                              _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
 
+        _steering_ptr->subscribe(true, true, false);
 
 
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
@@ -72,25 +75,15 @@ void mgnss::controllers::WheeledMotionEvent3::_setInitialConditions(){
         _com_ptr->setReference(_position);
 }
 
-void mgnss::controllers::WheeledMotionEvent3::initLog(mwoibn::common::Logger& logger){
-        mgnss::controllers::WheelsControllerExtend::initLog(logger);
-
-        logger.addField("com_x", getComFull()[0]);
-        logger.addField("com_y", getComFull()[1]);
-        //
-        logger.addField("r_com_x", refCom()[0]);
-        logger.addField("r_com_y", refCom()[1]);
-
-}
 
 void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger, double time){
    mgnss::controllers::WheelsControllerExtend::log(logger ,time);
 
-   logger.addEntry("com_x", getComFull()[0]);
-   logger.addEntry("com_y", getComFull()[1]);
+   logger.add("com_x", getComFull()[0]);
+   logger.add("com_y", getComFull()[1]);
    //
-   logger.addEntry("r_com_x", refCom()[0]);
-   logger.addEntry("r_com_y", refCom()[1]);
+   logger.add("r_com_x", refCom()[0]);
+   logger.add("r_com_y", refCom()[1]);
 
 
 

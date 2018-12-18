@@ -76,38 +76,21 @@ void mgnss::state_estimation::AccelerationTest::update()
   _point_acc = _acceleration.getWorld();
 }
 
-void mgnss::state_estimation::AccelerationTest::initLog(mwoibn::common::Logger& logger){
-        logger.addField("time", 0);
-
-        logger.addField("x", _point_acc[0]);
-        logger.addField("y", _point_acc[1]);
-        logger.addField("z", _point_acc[2]);
-        // logger.addField("unfil_5", _acc_est[5]);
-        // logger.addField("unfil_6", _acc_est[6]);
-        // logger.addField("unfil_7", _acc_est[7]);
-        // logger.addField("unfil_8", _acc_est[8]);
-        //
-        // logger.addField("fil_5", _f_acc_est[5]);
-        // logger.addField("fil_6", _f_acc_est[6]);
-        // logger.addField("fil_7", _f_acc_est[7]);
-        // logger.addField("fil_8", _f_acc_est[8]);
-
-}
 void mgnss::state_estimation::AccelerationTest::log(mwoibn::common::Logger& logger, double time){
-        logger.addEntry("time", time);
+        logger.add("time", time);
 
-        logger.addEntry("x", _point_acc[0]);
-        logger.addEntry("y", _point_acc[1]);
-        logger.addEntry("z", _point_acc[2]);
+        logger.add("x", _point_acc[0]);
+        logger.add("y", _point_acc[1]);
+        logger.add("z", _point_acc[2]);
 
-        // logger.addEntry("unfil_5", _acc_est[5]);
-        // logger.addEntry("unfil_6", _acc_est[6]);
-        // logger.addEntry("unfil_7", _acc_est[7]);
-        // logger.addEntry("unfil_8", _acc_est[8]);
+        // logger.add("unfil_5", _acc_est[5]);
+        // logger.add("unfil_6", _acc_est[6]);
+        // logger.add("unfil_7", _acc_est[7]);
+        // logger.add("unfil_8", _acc_est[8]);
         //
-        // logger.addEntry("fil_5", _f_acc_est[5]);
-        // logger.addEntry("fil_6", _f_acc_est[6]);
-        // logger.addEntry("fil_7", _f_acc_est[7]);
-        // logger.addEntry("fil_8", _f_acc_est[8]);
+        // logger.add("fil_5", _f_acc_est[5]);
+        // logger.add("fil_6", _f_acc_est[6]);
+        // logger.add("fil_7", _f_acc_est[7]);
+        // logger.add("fil_8", _f_acc_est[8]);
 
 }

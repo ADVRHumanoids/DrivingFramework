@@ -31,7 +31,6 @@ public:
 virtual ~WheelsReactif() {
 }
 
-virtual void initLog(mwoibn::common::Logger& logger);
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 void updateBase(){

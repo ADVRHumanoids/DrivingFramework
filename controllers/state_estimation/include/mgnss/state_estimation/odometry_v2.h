@@ -49,8 +49,7 @@ virtual void send(){
 virtual void stop(){
 }
 virtual void close(){
-}                      
-virtual void initLog(mwoibn::common::Logger& logger);
+}
 virtual void log(mwoibn::common::Logger& logger, double time);
 
 protected:
@@ -74,6 +73,8 @@ mwoibn::VectorN _twists, _sum_twists, __es_2, __st_2;
 mwoibn::point_handling::PositionsHandler _wheels_ph;
 mwoibn::VectorBool _selector_th, _selector, _contacts;
 mwoibn::Axis _x, _y, _z;
+
+mwoibn::VectorInt _base_map;
 
 
 void _compute1();
