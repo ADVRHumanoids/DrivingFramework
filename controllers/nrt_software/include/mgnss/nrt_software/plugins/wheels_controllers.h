@@ -1,7 +1,7 @@
 #ifndef __MGNSS_ROS_PLUGINS_WHEELS_CONTROLLERS_H
 #define __MGNSS_ROS_PLUGINS_WHEELS_CONTROLLERS_H
 
-#include "mgnss/plugins/ros_base.h"
+#include "mgnss/plugins/generator.h"
 
 #include "mgnss/controllers/wheels_controller_extend.h"
 
@@ -17,7 +17,7 @@
 
 #include "mgnss/ros_callbacks/wheels_controller_extend.h"
 #include "mgnss/ros_callbacks/wheels_controller_events.h"
-#include "mgnss/ros_callbacks/wheels_controller_actions.h"
+//#include "mgnss/ros_callbacks/wheels_controller_actions.h"
 #include "mgnss/ros_callbacks/wheels_controller_merge_v1.h"
 
 
@@ -25,122 +25,138 @@ namespace mgnss {
 namespace nrt_software {
 namespace plugins {
 
-class WheelsControllerExtend : public mgnss::plugins::RosBase
-{
+  template<typename Subscriber, typename Service, typename Node>
+  class WheelsControllerExtend : public mgnss::plugins::Generator<Subscriber, Service, Node>
+  {
+    typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
 
-public:
-// WheelsControllerExtend(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv, "wheeled_motion"){
-// }
-WheelsControllerExtend(std::string name = "") : mgnss::plugins::RosBase(){
-}
+  public:
+    WheelsControllerExtend() : Generator_("wheeled_motion"){
+    }
 
-bool init(){
-        mgnss::plugins::RosBase::init();
-}
 
-mgnss::controllers::WheelsControllerExtend& get(){
-        return static_cast<mgnss::controllers::WheelsControllerExtend&>(*_controller_ptr);
-}
-mwoibn::robot_class::Robot& robot(){
-        return *_robot_ptr.begin()->second;
-}
+    mgnss::controllers::WheelsControllerExtend& get(){
+        return static_cast<mgnss::controllers::WheelsControllerExtend&>(*Generator_::controller_ptr);
+    }
+    mwoibn::robot_class::Robot& robot(){
+            return *Generator_::_robot_ptr.begin()->second;
+    }
 
-virtual ~WheelsControllerExtend(){
-}
+    virtual ~WheelsControllerExtend(){
+    }
 
-protected:
+    protected:
     virtual void _initCallbacks(YAML::Node config){
-        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+        Generator_::_srv.push_back(Generator_::n->template advertiseService<custom_services::updatePDGains::Request,
+                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(Generator_::controller_ptr.get()))));
 
-        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
-}
+        Generator_::_sub.push_back(Generator_::n->template subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(Generator_::controller_ptr.get()))));
+    }
 
-};
+    };
 
-class WheeledMotionEvent3 : public WheelsControllerExtend {
+template<typename Subscriber, typename Service, typename Node>
+class WheeledMotionEvent3 : public WheelsControllerExtend<Subscriber, Service, Node>
+{
+  typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
 public:
-// WheeledMotionEvent3(int argc, char** argv) : WheelsControllerExtend(argc, argv){
-// }
-WheeledMotionEvent3() : WheelsControllerExtend(){}
-virtual ~WheeledMotionEvent3(){
-}
+
+  WheeledMotionEvent3() : Precedesor_(){}
+  virtual ~WheeledMotionEvent3(){
+  }
 
 protected:
-virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent3(*_robot_ptr.begin()->second, config));
-}
+  virtual void _resetPrt(YAML::Node config){
+          Precedesor_::controller_ptr.reset(new mgnss::controllers::WheeledMotionEvent3(*Precedesor_::_robot_ptr.begin()->second, config));
+  }
 
-virtual void _initCallbacks(YAML::Node config){
-        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_events::eventsHandler,  _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+  virtual void _initCallbacks(YAML::Node config){
+          Precedesor_::_srv.push_back(Precedesor_::n->template advertiseService<custom_services::updatePDGains::Request,
+                                          custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_events::eventsHandler,  _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(Precedesor_::controller_ptr.get()))));
 
-        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+          Precedesor_::_sub.push_back(Precedesor_::n->template subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(Precedesor_::controller_ptr.get()))));
 
-        _sub.push_back(_n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+          Precedesor_::_sub.push_back(Precedesor_::n->template subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(Precedesor_::controller_ptr.get()))));
 
-}
-
-};
-
-class WheelsReactif : public WheeledMotionEvent3 {
-public:
-
-WheelsReactif() : WheeledMotionEvent3(){}
-virtual ~WheelsReactif(){
-}
-
-protected:
-virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheelsReactif(*_robot_ptr.begin()->second, config));
-}
+  }
 
 };
 
-class WheeledMotionWorld : public WheelsControllerExtend {
-public:
-WheeledMotionWorld() : WheelsControllerExtend(){}
-virtual ~WheeledMotionWorld(){
-}
+template<typename Subscriber, typename Service, typename Node>
+class WheelsReactif : public WheeledMotionEvent3<Subscriber, Service, Node>
+{
+  typedef WheeledMotionEvent3<Subscriber, Service, Node> Precedesor_;
 
-protected:
-virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionWorld(*_robot_ptr.begin()->second, config));
-}
-};
-
-class WheelsZMP : public WheelsControllerExtend {
 public:
 
-  WheelsZMP() : WheelsControllerExtend(){}
+  WheelsReactif() : Precedesor_(){}
+  virtual ~WheelsReactif(){
+  }
+
+  protected:
+  virtual void _resetPrt(YAML::Node config){
+          Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsReactif(*Precedesor_::_robot_ptr.begin()->second, config));
+  }
+
+  };
+
+
+  template<typename Subscriber, typename Service, typename Node>
+  class WheeledMotionWorld : public WheelsControllerExtend<Subscriber, Service, Node>
+  {
+    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+  public:
+  WheeledMotionWorld() : Precedesor_(){}
+  virtual ~WheeledMotionWorld(){
+  }
+
+  protected:
+  virtual void _resetPrt(YAML::Node config){
+          Precedesor_::controller_ptr.reset(new mgnss::controllers::WheeledMotionWorld(*Precedesor_::_robot_ptr.begin()->second, config));
+  }
+  };
+
+  template<typename Subscriber, typename Service, typename Node>
+  class WheelsZMP : public WheelsControllerExtend<Subscriber, Service, Node>
+  {
+    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+public:
+  WheelsZMP() : Precedesor_(){}
   virtual ~WheelsZMP(){
   }
 
 protected:
   virtual void _resetPrt(YAML::Node config){
-          _controller_ptr.reset(new mgnss::controllers::WheelsZMP(*_robot_ptr.begin()->second, config));
+          Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMP(*Precedesor_::_robot_ptr.begin()->second, config));
   }
 };
 
 
-class WheeledMotionMergeV1 : public WheeledMotionEvent3 {
+template<typename Subscriber, typename Service, typename Node>
+class WheeledMotionMergeV1 : public WheeledMotionEvent3<Subscriber, Service, Node>
+{
+  typedef WheeledMotionEvent3<Subscriber, Service, Node> Precedesor_;
+
 public:
 
-WheeledMotionMergeV1() : WheeledMotionEvent3(){}
+WheeledMotionMergeV1() : Precedesor_(){}
 virtual ~WheeledMotionMergeV1(){
 }
 
 protected:
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::WheeledMotionMergeV1(*_robot_ptr.begin()->second, config));
+        Precedesor_::controller_ptr.reset(new mgnss::controllers::WheeledMotionMergeV1(*Precedesor_::_robot_ptr.begin()->second, config));
 }
 virtual void _initCallbacks(YAML::Node config){
-        _srv.push_back(_n->advertiseService<custom_services::updatePDGains::Request,
-                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_merge::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheeledMotionMergeV1*>(_controller_ptr.get()))));
+        Precedesor_::_srv.push_back(Precedesor_::n->template advertiseService<custom_services::updatePDGains::Request,
+                                       custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_merge::eventsHandler,_1, _2, static_cast<mgnss::controllers::WheeledMotionMergeV1*>(Precedesor_::controller_ptr.get()))));
 
-        _sub.push_back(_n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+        Precedesor_::_sub.push_back(Precedesor_::n->template subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_extend::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(Precedesor_::controller_ptr.get()))));
 
-        _sub.push_back(_n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get()))));
+        Precedesor_::_sub.push_back(Precedesor_::n->template subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(Precedesor_::controller_ptr.get()))));
 }
 
 };

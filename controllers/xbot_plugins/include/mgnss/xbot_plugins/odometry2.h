@@ -13,15 +13,23 @@ namespace xbot_plugins
 {
 class Odometry2 : public mgnss::plugins::XbotBase
 {
+public:
+  Odometry2(int argc, char** argv) : mgnss::plugins::XbotBase(argc, argv, "odometry"){
+  }
+
+  Odometry2() : mgnss::plugins::XbotBase("odometry"){}
+
+  virtual ~Odometry2(){}
+
+
 protected:
   virtual void _resetPrt(YAML::Node config)
   {
     _controller_ptr.reset(new mgnss::state_estimation::OdometryV2(*_robot_ptr, config));
   }
-  virtual void _initCallbacks(XBot::Handle::Ptr handle)
+  virtual void _initCallbacks(YAML::Node config)
   {
   }
-  virtual std::string _setName(){return "odometry";}
 
 };
 }

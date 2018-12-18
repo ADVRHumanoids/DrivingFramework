@@ -23,7 +23,7 @@ virtual void on_start(double time);
 virtual void on_stop(double time);
 
 protected:
-virtual void control_loop(double time, double period);
+virtual void control_loop(double time);
 
 private:
 void _readReference();

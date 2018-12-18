@@ -51,7 +51,7 @@ void mgnss::xbot_plugins::MyTest::on_stop(double time)
 }
 
 
-void mgnss::xbot_plugins::MyTest::control_loop(double time, double period)
+void mgnss::xbot_plugins::MyTest::control_loop(double time)
 {
 }
 

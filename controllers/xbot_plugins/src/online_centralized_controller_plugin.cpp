@@ -30,7 +30,7 @@ void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::on_stop(double time
 }
 
 void mgnss::xbot_plugins::OnlineCentralizedControllerPlugin::control_loop(
-        double time, double period)
+        double time)
 {
         if (!_robot_ptr->get())
                 return;

@@ -47,7 +47,7 @@ void mgnss::xbot_plugins::CombinedController::_readReference() {
 
 }
 
-void mgnss::xbot_plugins::CombinedController::control_loop(double time, double period)
+void mgnss::xbot_plugins::CombinedController::control_loop(double time)
 {
 
         if(!_robot_ptr->get()) return;

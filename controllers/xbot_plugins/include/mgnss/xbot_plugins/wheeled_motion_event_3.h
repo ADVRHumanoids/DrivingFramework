@@ -24,14 +24,14 @@ virtual void _resetPrt(YAML::Node config){
 }
 
 
-virtual void _initCallbacks(XBot::Handle::Ptr handle){
-        _srv_rt = handle->getRosHandle()->advertiseService<custom_services::updatePDGains::Request,
+virtual void _initCallbacks(YAML::Node config){
+        _srv_rt = _n->advertiseService<custom_services::updatePDGains::Request,
                                        custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_events::eventsHandler,
                                                                                                                _1, _2, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
 
-        _sub_rt = handle->getRosHandle()->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, &_support, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+        _sub_rt = _n->subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::supportHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
 
-		_state_rt = handle->getRosHandle()->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
+		_state_rt = _n->subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_events::stateHandler,_1, static_cast<mgnss::controllers::WheelsControllerExtend*>(_controller_ptr.get())));
 
 }
 //ros::Subscriber _state_rt;

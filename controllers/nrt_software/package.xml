@@ -44,32 +44,11 @@
   <depend>roscpp</depend> <!-- all programs -->
   <depend>robot_class_ros_extension</depend> <!-- all programs -->
   <depend>robot_class_xbot</depend> <!-- all programs -->
-  <depend>robot_class</depend> <!-- all programs -->
 
-  <depend>visualization_tools</depend> <!-- optional -->
-
-  <depend>point_handling</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>hierarchical_control</depend> <!--TRAJECTORY_GENERATION -->
-  <!-- <depend>collision_model_ros_extension</depend> TRAJECTORY_GENERATION -->
-  <!-- <depend>reference_generation</depend> TRAJECTORY_GENERATION -->
-
-  <depend>message_generation</depend> <!--COLLISION_MODEL -->
-  <depend>std_msgs</depend> <!--COLLISION_MODEL -->
-
-  <depend>gravity_compensation</depend> <!-- CENTRALIZED_CONTROLLER -->
-  <depend>motor_side_reference</depend> <!-- CENTRALIZED_CONTROLLER -->
-  <depend>std_srvs</depend> <!--CENTRALIZED_CONTROLLER -->
-
-  <!--<depend>hierarchical_control</depend>--> <!-- CENTER_OF_MASS_CONTROLLER -->
-  <depend>robot_point_handling</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>custom_services</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>custom_messages</depend>
   <depend>controllers</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <depend>communication</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>state_estimation</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>plugins</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <depend>ros_callbacks</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
-  <!-- The export tag contains other, unspecified, tags -->
 
   <depend>common</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
   <export>

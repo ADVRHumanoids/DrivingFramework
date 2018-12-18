@@ -1,7 +1,7 @@
 #ifndef __MGNSS_ROS_PLUGINS__GROUND_FORCES_H
 #define __MGNSS_ROS_PLUGINS__GROUND_FORCES_H
 
-#include "mgnss/plugins/ros_base.h"
+#include "mgnss/plugins/generator.h"
 #include "mgnss/state_estimation/ground_forces.h"
 #include "mwoibn/communication_modules/ros_point_feeback.h"
 #include "mwoibn/communication_modules/shared_point_setter.h"
@@ -11,13 +11,16 @@ namespace mgnss
 namespace nrt_software {
 namespace plugins
 {
-class GroundForces : public mgnss::plugins::RosBase
-{
+  template<typename Subscriber, typename Service, typename Node>
+  class GroundForces : public mgnss::plugins::Generator<Subscriber, Service, Node>
+  {
+    typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+
 
 public:
 // GroundForces(int argc, char** argv) : mgnss::plugins::RosBase(argc, argv, "ground_forces"){
 // }
-GroundForces() : mgnss::plugins::RosBase(){
+GroundForces() : Generator_("ground_forces"){
 
 }
 
@@ -28,7 +31,7 @@ virtual ~GroundForces(){
 protected:
 
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::state_estimation::GroundForces(*_robot_ptr.begin()->second, config));
+        Generator_::controller_ptr.reset(new mgnss::state_estimation::GroundForces(*Generator_::_robot_ptr.begin()->second, config));
 }
 
 
@@ -42,7 +45,7 @@ virtual void _initCallbacks(YAML::Node config){
   for(auto entry: contacts)
       std::cout << "YAML " << entry.first << std::endl;
 
-  for(auto& contact: _robot_ptr.begin()->second->contacts()){
+  for(auto& contact: Generator_::_robot_ptr.begin()->second->contacts()){
       std::cout << "contact " << contact->getName() << std::endl;
           //_robot_ptr.begin()->second->controllers.add( mwoibn::communication_modules::RosPointSet(contact, contacts[contact.getName()]));
   }
@@ -53,7 +56,7 @@ virtual void _initCallbacks(YAML::Node config, mwoibn::communication_modules::Sh
   if(!config["contact_source"])
     throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string(" Could not find a contact source.")));
 
-  std::string prefix = config["prefix"] ? config["prefix"].as<std::string>() : "";
+  std::string prefix = config["prefix"] ? config["prefix"].template as<std::string>() : "";
   std::string file = mwoibn::robot_class::Robot::readPath(config["contact_source"]);
   YAML::Node contacts;
 
@@ -72,14 +75,14 @@ virtual void _initCallbacks(YAML::Node config, mwoibn::communication_modules::Sh
   }
 
    YAML::Node loaded;
-  for(auto entry: contacts[_robot_ptr.begin()->second->name()]["contacts"]){
-      loaded[entry.second["name"].as<std::string>()] = entry.second;
-      loaded[entry.second["name"].as<std::string>()]["name"]  = prefix + loaded[entry.second["name"].as<std::string>()]["name"].as<std::string>();
+  for(auto entry: contacts[Generator_::_robot_ptr.begin()->second->name()]["contacts"]){
+      loaded[entry.second["name"].template as<std::string>()] = entry.second;
+      loaded[entry.second["name"].template as<std::string>()]["name"]  = prefix + loaded[entry.second["name"].template as<std::string>()]["name"].template as<std::string>();
   }
 
 
-  for(auto& contact: _robot_ptr.begin()->second->contacts())
-      _robot_ptr.begin()->second->controllers.add(mwoibn::communication_modules::SharedPointSetter(
+  for(auto& contact: Generator_::_robot_ptr.begin()->second->contacts())
+      Generator_::_robot_ptr.begin()->second->controllers.add(mwoibn::communication_modules::SharedPointSetter(
                               loaded[contact->getName()], share, contact->wrench()), prefix+contact->getName());
 }
 

@@ -55,7 +55,7 @@ void mgnss::xbot_plugins::CentralizedController::on_start(double time)
 void mgnss::xbot_plugins::CentralizedController::on_stop(double time) {
 }
 
-void mgnss::xbot_plugins::CentralizedController::control_loop(double time, double period)
+void mgnss::xbot_plugins::CentralizedController::control_loop(double time)
 {
         if(!_robot_ptr->get()) return;
 

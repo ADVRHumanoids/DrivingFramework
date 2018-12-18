@@ -52,7 +52,7 @@ void mgnss::plugins::RosShared::_initModules(YAML::Node plugin_config){
 
           mgnss::plugins::RosBase* temp = mgnss::plugins::make(lib);
           temp->init(_robot_ptr, _logger_ptr, _n, _shared, name);
-          _controller_ptrs.push_back(std::move(temp->releaseController()));
+          _controller_ptrs.push_back(std::move(temp->plugin().releaseController()));
           std::cout << "RosShared: loaded " << plugin.as<std::string>() << std::endl;
       }
 }

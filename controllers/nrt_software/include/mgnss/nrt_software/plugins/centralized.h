@@ -1,7 +1,7 @@
 #ifndef __MGNSS_ROS_PLUGINS_CENTRALIZED_H
 #define __MGNSS_ROS_PLUGINS_CENTRALIZED_H
 
-#include "mgnss/plugins/ros_base.h"
+#include "mgnss/plugins/generator.h"
 #include "mgnss/controllers/online_centralized_controller.h"
 #include "mgnss/ros_callbacks/centralized.h"
 #include <mwoibn/loaders/robot.h>
@@ -10,11 +10,11 @@ namespace mgnss {
 namespace nrt_software {
 namespace plugins {
 
-class Centralized : public mgnss::plugins::RosBase
+class Centralized : public mgnss::plugins::Generator
 {
 
 public:
-Centralized() : mgnss::plugins::RosBase(){}
+Centralized() : mgnss::plugins::Generator(){}
 virtual std::string _checkConfig(YAML::Node plugin_config, std::string config_file){
         std::string secondary_file =  RosBase::_checkConfig(plugin_config, config_file);
 
@@ -52,7 +52,7 @@ void start(double time)
 }
 
 mgnss::controllers::OnlineCentralizedController& get(){
-        return static_cast<mgnss::controllers::OnlineCentralizedController&>(*_controller_ptr);
+        return static_cast<mgnss::controllers::OnlineCentralizedController&>(*controller_ptr);
 }
 mwoibn::robot_class::Robot& robot(){
         return *_robot_ptr.begin()->second;
@@ -69,7 +69,7 @@ std::shared_ptr<mwoibn::robot_class::Robot> _reference_ptr;
 
 
 virtual void _resetPrt(YAML::Node config){
-        _controller_ptr.reset(new mgnss::controllers::OnlineCentralizedController(*_robot_ptr.begin()->second, *_reference_ptr, config));
+        controller_ptr.reset(new mgnss::controllers::OnlineCentralizedController(*_robot_ptr.begin()->second, *_reference_ptr, config));
 }
 
 virtual void _initCallbacks(YAML::Node config){

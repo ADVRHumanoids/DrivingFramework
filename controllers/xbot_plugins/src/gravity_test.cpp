@@ -94,7 +94,7 @@ void mgnss::xbot_plugins::GravityTest::_getReference() {
 void mgnss::xbot_plugins::GravityTest::on_stop(double time) {
 }
 
-void mgnss::xbot_plugins::GravityTest::control_loop(double time, double period)
+void mgnss::xbot_plugins::GravityTest::control_loop(double time)
 {
         _valid = _robot_ptr->get();
 
