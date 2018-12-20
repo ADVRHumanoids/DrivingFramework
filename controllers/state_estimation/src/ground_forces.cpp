@@ -1,9 +1,10 @@
 #include "mgnss/state_estimation/ground_forces.h"
+
 #include <iomanip>
 
 mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot,
                                                 std::string config_file, std::string name)
-        : mgnss::modules::Base(robot), _gravity(robot), _points_force(_robot.getDofs())
+        : mgnss::modules::Base(robot), _gravity(robot), _points_force(_robot.getDofs()), _linear_force(_robot.getDofs())
 {
         //_n << 0,0,1;
 
@@ -25,7 +26,7 @@ mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& 
 
 mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot,
                                                 YAML::Node config)
-        : mgnss::modules::Base(robot), _gravity(robot), _points_force(_robot.getDofs())
+        : mgnss::modules::Base(robot), _gravity(robot), _points_force(_robot.getDofs()), _linear_force(_robot.getDofs())
 {
         //_n << 0,0,1;
 
@@ -39,8 +40,10 @@ void mgnss::state_estimation::GroundForces::_initConfig(YAML::Node config){
         _filter_torque_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.getDofs(), config["filter"]["torque"]["cut_off_frequency"].as<double>(), config["filter"]["torque"]["damping"].as<double>()));
         _allocate();
 
-        for(auto& contact: _robot.contacts())
+        for(auto& contact: _robot.contacts()){
           _points_force.add(mwoibn::dynamic_points::Force(_robot, _gravity, *contact));
+          _linear_force.add(mwoibn::dynamic_points::LinearForce(contact->wrench().frame, _gravity));
+        }
 
 }
 void mgnss::state_estimation::GroundForces::_checkConfig(YAML::Node config){
@@ -70,9 +73,9 @@ void mgnss::state_estimation::GroundForces::_allocate(){
 
   _filter_torque_ptr->reset(_robot.state.torque.get());
 
-  for(auto& contact: _robot.contacts()){
-      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame));
-    }
+  for(auto& contact: _robot.contacts())
+      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame, "ZERO"));
+
 
 }
 
@@ -107,10 +110,11 @@ void mgnss::state_estimation::GroundForces::update()
 
       _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get();
       _force_2.noalias() = _contacts_inversed*_force_1;
-      _force_3 = _force_2  - _accelerations.getWorld();
+      _force_3 = _force_2  - _accelerations.getWorld(); // ??
 
       _world_contacts.noalias() = _contacts_inverse->get()*_force_3;
 
+      // then this is exactly the same computeation?
       for(int i = 0; i < _robot.contacts().size(); i++){
             _robot.contacts()[i].wrench().force.setWorld(_world_contacts.segment<3>(3*i));
             _robot.contacts()[i].wrench().synch();
@@ -123,7 +127,7 @@ void mgnss::state_estimation::GroundForces::update()
       // check measured acceleration/forces at contact point
       _robot.state["OVERALL_FORCE"].set(_state);
       _points_force.update(true);
-
+      _linear_force.update(false);
       // TEST
       // compute current contact point with respect to the CoM force and torques out of that and see if there is a difference
 
@@ -147,6 +151,7 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
               logger.add(_name + std::string("__model_")+std::to_string(contact) + "_" + char('x'+i), _robot.contacts()[contact].wrench().force.getWorld()[i]);
 //              logger.add(_name + std::string("__residue_")+std::to_string(contact) + "_" + char('x'+i), _world_contacts[contact*3+i]);
               logger.add(_name + std::string("__point_")+std::to_string(contact) + "_" + char('x'+i), _points_force[contact].get()[i]);
+              logger.add(_name + std::string("__linear_")+std::to_string(contact) + "_" + char('x'+i), _linear_force[contact].get()[i]);
              // logger.add("force_contact_"+std::to_string(contact) + "_" + char('x'+i), _estimations[contact][i]);
             }
            // logger.add("wheel_"+std::to_string(contact), _robot.state.acceleration.get(_robot.contacts()[contact].wrench().getBodyId()));

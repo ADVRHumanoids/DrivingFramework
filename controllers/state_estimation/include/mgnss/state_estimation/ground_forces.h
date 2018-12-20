@@ -13,6 +13,7 @@
 #include "mwoibn/point_handling/handler.h"
 #include "mwoibn/robot_points/handler.h"
 #include "mwoibn/dynamic_points/force.h"
+#include "mwoibn/dynamic_points/linear_force.h"
 
 //#include <mwoibn/filters/iir_second_order.h>
 //#include <chrono>
@@ -59,6 +60,7 @@ void _initConfig(YAML::Node config);
 mwoibn::point_handling::Handler<mwoibn::point_handling::LinearAcceleration> _accelerations;
 mwoibn::dynamic_models::BasicModel _gravity;
 mwoibn::robot_points::Handler<mwoibn::dynamic_points::Force> _points_force;
+mwoibn::robot_points::Handler<mwoibn::dynamic_points::LinearForce> _linear_force;
 
 std::unique_ptr<mwoibn::PseudoInverse> _inertia_inverse, _contacts_inverse;
 mwoibn::VectorN _world_contacts, _force_1, _force_2, _force_3, _state;
