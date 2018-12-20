@@ -79,7 +79,31 @@ void mwoibn::communication_modules::XBotOperationalEuler::getPosition(mwoibn::Ma
                 .eulerAngles(_angels[0], _angels[1],
                              _angels[2]); // Check if the convention is met here
 
+       mwoibn::Vector3 _n, _x, _y, _z;
+        _n << 0,0,1;
+        _z << 0,0,1;
+        _y << 0,1,0;
+        _x << 1,0,0;
+        
+//        std::cout << "reading" << mwoibn::Quaternion::fromMatrix(orientation).angle() << "\t" << mwoibn::Quaternion::fromMatrix(orientation).axis().transpose()<< std::endl;
+//        std::cout << "twist" << mwoibn::Quaternion::fromMatrix(_offset_orientation).angle() << "\t" << mwoibn::Quaternion::fromMatrix(_offset_orientation).axis().transpose()<< std::endl;
+//        std::cout << "final" << mwoibn::Quaternion::fromMatrix(_offset_orientation*orientation).twistSwing(_n).angle() << std::endl;
         //_base.tail<1>()[0] -= _offset_z;
+        
+//        mwoibn::Quaternion _imu = mwoibn::Quaternion::fromAxisAngle(_x, _base[3]);
+//        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_y, _base[4]);
+//        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_z, _base[5]);
+
+//        std::cout << "measure\n" << _offset_orientation*orientation << std::endl;
+//        std::cout << "base\n" << _base.transpose() << std::endl;
+
+//        std::cout << "imu\n" << _imu.toMatrix() << std::endl;
+//        // std::cout << _imu << std::endl;
+//        // remove the rotation ground ground component
+//        std::cout << "raw\t " << _imu.twistSwing(_z).angle() << std::endl;
+//        std::cout << "_map_dofs\t " << _map_dofs.transpose() << std::endl;
+//        std::cout << "_angles\t " << _angels.transpose() << std::endl;
+
         _command.position.set(_base, _map_dofs);
 }
 
@@ -90,18 +114,27 @@ bool mwoibn::communication_modules::XBotOperationalEuler::reset(){
                 return _initialized;
         }
 
+//        std::cout << _rotation << std::endl;
 
-        _rot_z = _offset_org*_rotation;
+//        _rot_z = _offset_org*_rotation;
+//
+//        _rot_z(2,0)  = 0;
+//        _rot_z(2,1)  = 0;
+//        _rot_z(1,1)  = _rot_z(0,0);
+//        _rot_z(0,1)  = -_rot_z(1,0);
+//        _rot_z(2,2)  = _rot_z(2,2)/std::fabs(_rot_z(2,2));
+//        _rot_z(0,2)  = 0;
+//        _rot_z(1,2)  = 0;
+//
+//        _offset_orientation = _rot_z.transpose();
+//        std::cout << _offset_orientation << std::endl;
 
-        _rot_z(2,0)  = 0;
-        _rot_z(2,1)  = 0;
-        _rot_z(1,1)  = _rot_z(0,0);
-        _rot_z(0,1)  = -_rot_z(1,0);
-        _rot_z(2,2)  = _rot_z(2,2)/std::fabs(_rot_z(2,2));
-        _rot_z(0,2)  = 0;
-        _rot_z(1,2)  = 0;
-
-        _offset_orientation = _rot_z.transpose();
+        mwoibn::Vector3 _n;
+        _n << 0,0,1;
+        mwoibn::Quaternion twist = mwoibn::Quaternion::fromMatrix(_offset_org*_rotation).twistSwing(_n);
+        _offset_orientation = twist.toMatrix().transpose();
+        //std::cout << _offset_orientation << std::endl;
+        
 
         _initialized = true;
 
