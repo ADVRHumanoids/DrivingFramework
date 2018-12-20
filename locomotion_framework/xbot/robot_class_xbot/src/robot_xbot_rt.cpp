@@ -152,17 +152,17 @@ void mwoibn::robot_class::RobotXBotRT::_initContactsCallbacks(YAML::Node config,
         // std::cout << __PRETTY_FUNCTION__ << std::endl;
         // for(auto entry: config) std::cout << entry.first << std::endl;
 
-
-        for(auto& contact : *_contacts) {
-                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback;
-                callback = std::move(_generateContactCallback(*contact, config[contact->getName()], shared));
-                if (callback == nullptr)
-                        callback = std::move(_generateContactCallback(*contact, config[contact->getName()]));
-                if (callback != nullptr)
-                        feedbacks.add(std::move(callback), contact->getName());
-                else
-                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
-        }
+//
+//        for(auto& contact : *_contacts) {
+//                std::unique_ptr<mwoibn::communication_modules::CommunicationBase> callback;
+//                callback = std::move(_generateContactCallback(*contact, config[contact->getName()], shared));
+//                if (callback == nullptr)
+//                        callback = std::move(_generateContactCallback(*contact, config[contact->getName()]));
+//                if (callback != nullptr)
+//                        feedbacks.add(std::move(callback), contact->getName());
+//                else
+//                        std::cout << __PRETTY_FUNCTION__ << std::string("Could not initialize callback for ") << contact->getName() << std::endl;
+//        }
 }
 
 

@@ -1,0 +1,20 @@
+mwoibn:
+        controller:
+                position_controller:
+                        dofs:
+                                chain: upper_body
+        ros:
+                source:
+                       urdf: "/robot_upper_body"
+        controllers:
+                higher_level: [upper_body]
+        feedbacks:
+                online: [link_side_online]              
+
+#                       srdf: "/robot_srdf"
+#        xbot:
+#                source:
+#                        urdf:
+#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
+#                        srdf:
+#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"

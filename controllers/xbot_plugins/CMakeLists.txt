@@ -246,8 +246,8 @@ LIST( APPEND INSTALL_TARGETS WheelsEvents3 )
 #################### INSTALL ####################
 #################################################
 
-message(WARNING "CMAKE_INSTALL_PREFIX: " ${ADVR_SUPERBUILD_DIR}/build/install/lib/)
-message(WARNING "INSTALL_TARGETS: " ${INSTALL_TARGETS})
+#message(WARNING "CMAKE_INSTALL_PREFIX: " ${ADVR_SUPERBUILD_DIR}/build/install/lib/)
+#message(WARNING "INSTALL_TARGETS: " ${INSTALL_TARGETS})
 
 
 

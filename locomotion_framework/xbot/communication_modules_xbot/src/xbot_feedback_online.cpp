@@ -41,13 +41,14 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::_inLimits(int i, mwoibn:
     in_limits = _command[interface].get(i) < _upper_limits[interface].get(i) && in_limits;
 
 
-    if(!in_limits)
+/*    if(!in_limits)
       std::cout << "Encoder reading for " << _robot.getJointByDofIndex(_map.get()[i])->getJointName()
                 << " is outside defined joint limits.\n"
                 << "\t reading: " << _command[interface].get(i)
                 << "\n\t lower limit" << _lower_limits[interface].get(i)
                 << "\n\t upper limit" << _upper_limits[interface].get(i);
-    return in_limits;
+*/ 
+   return in_limits;
 
 }
 

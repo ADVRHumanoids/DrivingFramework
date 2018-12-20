@@ -9,8 +9,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::run()
 
     _limit("POSITION");
     mapTo(_command.position.get(), pub);
-
-//    std::cout << "position after\t" << pub.transpose() << std::endl;
+    
     _robot.setPositionReference(pub);
   }
   if (_velocity)

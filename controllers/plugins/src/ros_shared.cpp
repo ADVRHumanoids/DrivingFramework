@@ -1,6 +1,5 @@
 #include "mgnss/plugins/ros_shared.h"
 
-
 void mgnss::plugins::RosShared::connect(std::string name)
 {
         _name = name;

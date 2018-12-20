@@ -226,6 +226,7 @@ bool _reference = false;
 mwoibn::VectorInt _select_steer, _select_ik;
 mwoibn::VectorN _l_limits, _u_limits;
 int count = 0;
+std::vector<std::string> _log_names;
 
 virtual void _setInitialConditions();
 virtual void _allocate();

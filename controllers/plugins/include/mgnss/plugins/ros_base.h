@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include "mwoibn/std_utils/map.h"
 
+
 #define MGNSS_REGISTER_ROS_PLUGIN_(constructor) \
 extern "C" mgnss::plugins::RosBase* make() \
 { \

@@ -1,0 +1,32 @@
+XBotCore:
+  config_path: "configs/ADVR_shared/centauro/configs/config_centauro_upper_body.yaml"
+
+XBotInterface:
+  urdf_path: "../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_upperbody.urdf"
+  srdf_path: "../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_upperbody.srdf"
+  joint_map_path: "../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/joint_map/centauro_joint_map.yaml"
+
+RobotInterface:
+  framework_name: "ROS"
+
+ModelInterface:
+  model_type: "RBDL"
+  is_model_floating_base: "true"
+  
+MasterCommunicationInterface:
+  framework_name: "ROS"
+
+XBotRTPlugins:
+  plugins: ["HomingExample", "CartesianImpedanceControl"]
+  io_plugins: []
+  
+NRTPlugins:
+  plugins: ["HomingExample"]
+  
+WebServer:
+  enable: "true"
+  address: "127.0.0.1"
+  port: "8081"
+
+SimulationOptions:
+  verbose_mode: "false"    

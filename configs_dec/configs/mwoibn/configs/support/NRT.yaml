@@ -1,0 +1,16 @@
+mwoibn:
+        robot:
+                rate: 200
+        modules:
+                odometry:
+                        filter:
+                                damping: 1
+                                cut_off_frequency: 200
+                acceleration_test:
+                        filter:
+                                damping: 2.0
+                                cut_off_frequency: 200
+                ground_forces:
+                        filter:
+                                damping: 1.0
+                                cut_off_frequency: 200

@@ -1,5 +1,4 @@
 #include "mgnss/state_estimation/ground_forces.h"
-
 #include <iomanip>
 
 mgnss::state_estimation::GroundForces::GroundForces(mwoibn::robot_class::Robot& robot,
@@ -60,7 +59,7 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _contacts_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix(_robot.contacts().jacobianRows(), _robot.contacts().jacobianRows() )));
   _world_contacts.setZero(_robot.contacts().jacobianRows());
   _contacts_jacobian = _robot.contacts().getWorldJacobian();
-  _contacts_inversed.setZero(_robot.state.velocity.size(), _robot.state.velocity.size());
+  _contacts_inversed.setZero(_robot.contacts().jacobianRows(), _robot.state.velocity.size());
   _contacts_temp.setZero(_robot.contacts().jacobianRows(), _robot.contacts().jacobianRows());
   _contacts_transposed = _contacts_jacobian.transpose();
 
@@ -73,9 +72,22 @@ void mgnss::state_estimation::GroundForces::_allocate(){
 
   _filter_torque_ptr->reset(_robot.state.torque.get());
 
-  for(auto& contact: _robot.contacts())
-      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame, "ZERO"));
+  for(auto& contact: _robot.contacts()){
+      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame));
+    }
+    
+   for(int i = 0; i < 3; i++){
+       _log_names.push_back(std::string("__com_")+char('x'+i));
+       _log_names.push_back(std::string("__cop_")+char('x'+i));
+   }
+   
+   for(int contact = 0; contact < _robot.contacts().size(); contact++){
+       for(int i = 0; i < 3; i++)
+           _log_names.push_back(_name + std::string("__RF_")+std::to_string(contact) + "_" + char('x'+i));            
+   }
 
+  for(int i =6; i< _robot.getDofs(); i++)
+      _log_names.push_back(_name + std::string("__torque_") + _robot.getLinks(i));
 
 }
 
@@ -110,11 +122,10 @@ void mgnss::state_estimation::GroundForces::update()
 
       _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get();
       _force_2.noalias() = _contacts_inversed*_force_1;
-      _force_3 = _force_2  - _accelerations.getWorld(); // ??
+      _force_3 = _force_2  - _accelerations.getWorld();
 
       _world_contacts.noalias() = _contacts_inverse->get()*_force_3;
 
-      // then this is exactly the same computeation?
       for(int i = 0; i < _robot.contacts().size(); i++){
             _robot.contacts()[i].wrench().force.setWorld(_world_contacts.segment<3>(3*i));
             _robot.contacts()[i].wrench().synch();
@@ -127,6 +138,7 @@ void mgnss::state_estimation::GroundForces::update()
       // check measured acceleration/forces at contact point
       _robot.state["OVERALL_FORCE"].set(_state);
       _points_force.update(true);
+
       _linear_force.update(false);
       // TEST
       // compute current contact point with respect to the CoM force and torques out of that and see if there is a difference
@@ -139,23 +151,24 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
         _robot.centerOfMass().compute();
         _robot.centerOfPressure().compute();
 
+        int id = 0;
         for(int i = 0; i < 3; i++){
-           logger.add(_name + std::string("__com_")+char('x'+i), _robot.centerOfMass().get()[i]);
-           logger.add(_name + std::string("__cop_")+char('x'+i), _robot.centerOfPressure().get()[i]);
-        //   logger.add(_name + std::string("__s_cop_")+char('x'+i), _f_cop[i]);
-        //   logger.add(_name + std::string("__a_cop_")+char('x'+i), _a_cop[i]);
+           logger.add(_log_names[id], _robot.centerOfMass().get()[i]);
+           logger.add(_log_names[id+1], _robot.centerOfPressure().get()[i]);
+            id += 2;
         }
 
         for(int contact = 0; contact < _robot.contacts().size(); contact++){
             for(int i = 0; i < 3; i++){
-              logger.add(_name + std::string("__model_")+std::to_string(contact) + "_" + char('x'+i), _robot.contacts()[contact].wrench().force.getWorld()[i]);
-//              logger.add(_name + std::string("__residue_")+std::to_string(contact) + "_" + char('x'+i), _world_contacts[contact*3+i]);
-              logger.add(_name + std::string("__point_")+std::to_string(contact) + "_" + char('x'+i), _points_force[contact].get()[i]);
-              logger.add(_name + std::string("__linear_")+std::to_string(contact) + "_" + char('x'+i), _linear_force[contact].get()[i]);
-             // logger.add("force_contact_"+std::to_string(contact) + "_" + char('x'+i), _estimations[contact][i]);
+              logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]);
+//              logger.add(_log_names[id+1], _points_force[contact].get()[i]);
+              id += 1;
             }
-           // logger.add("wheel_"+std::to_string(contact), _robot.state.acceleration.get(_robot.contacts()[contact].wrench().getBodyId()));
         }
 
+        for(int i =6; i< _robot.getDofs(); i++){
+              logger.add(_log_names[id], _robot.state.torque.get()[i]); 
+              id++;
+        }
 
 }

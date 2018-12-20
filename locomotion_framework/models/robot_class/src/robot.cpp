@@ -369,7 +369,7 @@ mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
 std::string
 mwoibn::robot_class::Robot::getLinks(unsigned int dof)
 {
-        std::string links;
+        //std::string links;
         bool found = false;
 
         for (int k = 0; k < _model.mJoints.size(); k++)
@@ -384,29 +384,28 @@ mwoibn::robot_class::Robot::getLinks(unsigned int dof)
                                         {
                                                 if (_model.mJoints[l].q_index < 6 &&
                                                     _model.mJoints[l].q_index + _model.mJoints[l].mDoFCount == 6)
-                                                {
-
-                                                        links = _model.GetBodyName(l);
-                                                        found = true;
-                                                        break;
-                                                }
+ //                                               {
+                                                        return _model.GetBodyName(l);
+//                                                        found = true;
+//                                                        break;
+//                                                }
                                         }
                                 }
-                                else
-                                {
-                                        links = _model.GetBodyName(k);
-                                        found = true;
-                                        break;
-                                }
+//                                else
+//                                {
+                                        return _model.GetBodyName(k);
+//                                        found = true;
+//                                        break;
+//                                }
                         }
-            }
+        }
 
-            if (!found)
+ //           if (!found)
                     throw std::invalid_argument(
                               std::string("No link is associated with dof ") +
                           std::to_string(dof));
 
-        return links;
+//        return links;
 }
 
 mwoibn::VectorInt mwoibn::robot_class::Robot::getDof(std::string link_name)
