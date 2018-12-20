@@ -38,6 +38,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ## Declare a C++ library
 add_library(mwoibn_dynamic_points
                 src/force.cpp
+                src/linear_force.cpp
 )
 
 add_dependencies(mwoibn_dynamic_points ${catkin_EXPORTED_TARGETS})
