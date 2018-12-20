@@ -15,28 +15,28 @@ class LinearAcceleration: public State
 
 public:
 
-  LinearAcceleration(point_handling::FramePlus& frame, std::string name = "")
-      : State(frame, 3, name)
+  LinearAcceleration(point_handling::FramePlus& frame, mwoibn::Interface interface = "ACCELERATION", std::string name = "")
+      : State(frame, 3, name), _interface(interface)
   {  }
 
-  LinearAcceleration(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
-      : State(current, frame, name)
+  LinearAcceleration(Point::Current current, point_handling::FramePlus& frame, mwoibn::Interface interface = "ACCELERATION", std::string name = "")
+      : State(current, frame, name), _interface(interface)
   { _size = 3; }
 
   LinearAcceleration( LinearAcceleration&& other)
-      : State(other)
+      : State(other), _interface(other._interface)
   {  }
 
   LinearAcceleration(const LinearAcceleration& other)
-      : State(other)
+      : State(other), _interface(other._interface)
   {  }
 
   LinearAcceleration( LinearAcceleration&& other, point_handling::FramePlus& frame)
-      : State(other, frame)
+      : State(other, frame), _interface(other._interface)
   {  }
 
   LinearAcceleration(const LinearAcceleration& other, point_handling::FramePlus& frame)
-      : State(other, frame)
+      : State(other, frame), _interface(other._interface)
   {  }
 
   virtual ~LinearAcceleration() {}
@@ -87,6 +87,9 @@ public:
                             bool update = false){
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
+
+protected:
+  Interface _interface;
 
 };
 
