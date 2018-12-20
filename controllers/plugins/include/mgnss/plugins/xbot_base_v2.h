@@ -50,7 +50,8 @@ protected:
 
   std::string _configFile(XBot::Handle::Ptr handle);
 
-  virtual void control_loop(double time, double period){_plugin_ptr->control_loop(time);}
+  virtual void control_loop(double time, double period){
+      _plugin_ptr->control_loop(time);}
 
 
 };

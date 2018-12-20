@@ -36,6 +36,9 @@ void mgnss::controllers::WheelsControllerExtend::_allocate(){
         _reset_count.setZero(_select_steer.size());
         _test_steer.setZero(_select_steer.size());
 
+
+        for(int i =0; i< _robot.getDofs(); i++)
+           _log_names.push_back(_robot.getLinks(i));
 }
 
 
@@ -174,6 +177,8 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
 
         if(_steering_ptr != nullptr)
           _steering_ptr->start();
+          
+
 }
 
 
@@ -196,6 +201,11 @@ void mgnss::controllers::WheelsControllerExtend::log(mwoibn::common::Logger& log
    logger.add("th", _robot.state.position.get()[5]);
    logger.add("r_th", _heading);
 
+//   for(int i = 6; i < _command.size(); i++)
+//          logger.add(_log_names[i], _command[i]);
+
+
+/*
    for(int i = 0; i < 3; i++){
        for(int point = 0; point < 4; point++){
            logger.add("cp_"   + std::to_string(point+1) + "_" + char('x'+i), getCp(point)[i]);
@@ -203,4 +213,6 @@ void mgnss::controllers::WheelsControllerExtend::log(mwoibn::common::Logger& log
            logger.add("force_" + std::to_string(point+1) + "_" + char('x'+i), _steering_ptr->getForce()[3*point+i]);
        }
    }
+    * 
+    */
 }

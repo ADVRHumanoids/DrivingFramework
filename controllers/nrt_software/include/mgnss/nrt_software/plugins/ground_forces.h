@@ -27,7 +27,6 @@ GroundForces() : Generator_("ground_forces"){
 virtual ~GroundForces(){
 }
 
-
 protected:
 
 virtual void _resetPrt(YAML::Node config){

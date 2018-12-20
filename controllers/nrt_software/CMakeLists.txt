@@ -5,14 +5,16 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/configs )
 
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
-   message(WARNING "enable_xeno")
+#   message(WARNING "enable_xeno")
    find_package(Xenomai REQUIRED)
    find_package(RTnet REQUIRED)
 endif()
+
+find_package(XCM REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
@@ -29,8 +31,6 @@ option(GRAVITY_TEST ON)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
 include_directories(${CMAKE_BINARY_DIR})
 configure_file(
@@ -150,6 +150,8 @@ catkin_package(
     ${catkin_INCLUDE_DIRS}
     ${XCM_INCLUDE_DIRS}
     ${Eigen3_INCLUDE_DIRS}
+  LIBRARIES
+    ${XCM_LIBRARIES}
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -159,7 +161,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-#  ${XBotCore-interfaces_INCLUDE_DIRS}
+  ${XCM_INCLUDE_DIRS}
 )
 
 LIST( APPEND INSTALL_TARGETS
@@ -169,7 +171,9 @@ LIST( APPEND INSTALL_TARGETS
  add_executable(shared src/exec/shared.cpp)
  add_dependencies(shared ${catkin_EXPORTED_TARGETS})
  target_link_libraries(shared
+     -ldl
      ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}     
   )
 
 
@@ -181,7 +185,14 @@ LIST( APPEND INSTALL_TARGETS
   add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
   target_link_libraries(joint_states
      ${catkin_LIBRARIES}
-   )
+     ${XCM_LIBRARIES}
+  )
+   
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(joint_states)
+  endif()
+
 
 #   LIST( APPEND INSTALL_TARGETS centralized )
 #
@@ -201,9 +212,14 @@ LIST( APPEND INSTALL_TARGETS
    add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
    target_link_libraries(odometry
       ${catkin_LIBRARIES}
+      ${XCM_LIBRARIES}
     )
 
-
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(odometry)
+  endif()
+  
     LIST( APPEND INSTALL_TARGETS NwheelsWorld )
 
     add_library(NwheelsWorld SHARED
@@ -212,7 +228,13 @@ LIST( APPEND INSTALL_TARGETS
     add_dependencies(NwheelsWorld ${catkin_EXPORTED_TARGETS})
     target_link_libraries(NwheelsWorld
        ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
      )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(NwheelsWorld)
+  endif()
 
     LIST( APPEND INSTALL_TARGETS Nwheels3 )
 
@@ -222,7 +244,13 @@ LIST( APPEND INSTALL_TARGETS
     add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
     target_link_libraries(Nwheels3
        ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
      )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(Nwheels3)
+  endif()
 
      LIST( APPEND INSTALL_TARGETS NwheelsReactif )
 
@@ -232,9 +260,15 @@ LIST( APPEND INSTALL_TARGETS
      add_dependencies(NwheelsReactif ${catkin_EXPORTED_TARGETS})
      target_link_libraries(NwheelsReactif
         ${catkin_LIBRARIES}
-      )
+        ${XCM_LIBRARIES}
+    )
 
-      LIST( APPEND INSTALL_TARGETS NwheelsMerge )
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(NwheelsReactif)
+  endif()
+
+LIST( APPEND INSTALL_TARGETS NwheelsMerge )
 
       add_library(NwheelsMerge SHARED
          src/plugins/wheels_merge.cpp
@@ -242,7 +276,13 @@ LIST( APPEND INSTALL_TARGETS
       add_dependencies(NwheelsMerge ${catkin_EXPORTED_TARGETS})
       target_link_libraries(NwheelsMerge
          ${catkin_LIBRARIES}
-       )
+         ${XCM_LIBRARIES}
+     )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(NwheelsMerge)
+  endif()
 
       LIST( APPEND INSTALL_TARGETS NwheelsZMP )
 
@@ -252,7 +292,13 @@ LIST( APPEND INSTALL_TARGETS
       add_dependencies(NwheelsZMP ${catkin_EXPORTED_TARGETS})
       target_link_libraries(NwheelsZMP
          ${catkin_LIBRARIES}
-       )
+         ${XCM_LIBRARIES}
+    )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(NwheelsZMP)
+  endif()
 
      LIST( APPEND INSTALL_TARGETS ground_forces )
 
@@ -262,7 +308,13 @@ LIST( APPEND INSTALL_TARGETS
      add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
      target_link_libraries(ground_forces
         ${catkin_LIBRARIES}
-      )
+        ${XCM_LIBRARIES}
+    )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(ground_forces)
+  endif()
 
       LIST( APPEND INSTALL_TARGETS gravity_compensation )
 
@@ -272,7 +324,14 @@ LIST( APPEND INSTALL_TARGETS
       add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
       target_link_libraries(gravity_compensation
          ${catkin_LIBRARIES}
-       )
+         ${XCM_LIBRARIES}
+     )
+
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(gravity_compensation)
+  endif()
 
       LIST( APPEND INSTALL_TARGETS acceleration )
 
@@ -282,8 +341,14 @@ LIST( APPEND INSTALL_TARGETS
       add_dependencies(acceleration ${catkin_EXPORTED_TARGETS})
       target_link_libraries(acceleration
          ${catkin_LIBRARIES}
-  )
+         ${XCM_LIBRARIES}
+      )
 
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(acceleration)
+  endif()
 
 
 #if(COLLISION_CHECK)

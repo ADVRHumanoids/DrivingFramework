@@ -8,7 +8,7 @@ set (LOG_INFO ${PROJECT_NAME})
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 #LIST( APPEND CMAKE_MODULE_PATH ${XBOTCORE} )
 
-message(WARNING "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
+#message(WARNING "CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
 
 set(ENABLE_XENO CACHE BOOL "ON")
 if ( ${ENABLE_XENO} )
@@ -96,7 +96,7 @@ if ( Xenomai_FOUND )
     set_xeno_flags(BasePlugin)
 endif()
 
-target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES})
+target_link_libraries(BasePlugin ${XCM_LIBRARIES} ${catkin_LIBRARIES} ${Eigen3_LIBRARIES} -ldl)
 add_dependencies(BasePlugin ${catkin_EXPORTED_TARGETS} ${XCM_EXPORTED_TARGETS} ${Eigen3_EXPORTED_TARGETS})
 
 LIST( APPEND INSTALL_TARGETS BasePlugin )
@@ -105,9 +105,12 @@ LIST( APPEND INSTALL_TARGETS
   plugin
 )
 add_executable(plugin src/ros.cpp)
-add_dependencies(plugin ${catkin_EXPORTED_TARGETS})
+add_dependencies(plugin BasePlugin ${catkin_EXPORTED_TARGETS})
 target_link_libraries(plugin
     ${catkin_LIBRARIES}
+    BasePlugin
+    -lboost_program_options
+    ${XCM_LIBRARIES}
  )
 
 #################################################

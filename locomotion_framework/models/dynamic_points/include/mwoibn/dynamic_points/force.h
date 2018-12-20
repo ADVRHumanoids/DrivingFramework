@@ -80,9 +80,9 @@ protected:
 
     _inertia_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix::Zero(_state.acceleration.size(), _state.acceleration.size())));
     _contacts_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix3::Zero()));
-    _jacobian.setZero(_frame.size(), _frame.size());
+    _jacobian.setZero(_frame.size(), _frame.cols());
     _point_jacobian.setZero(_frame.rows(), _frame.cols());
-    _point_transposed.setZero(_frame.cols(), _frame.rows());
+    _point_transposed.setZero(_frame.rows(), _frame.rows());
     _point_inverse.setZero(_frame.rows(), _frame.cols());
     _point_temp.setZero(_frame.rows(), _frame.rows());
 

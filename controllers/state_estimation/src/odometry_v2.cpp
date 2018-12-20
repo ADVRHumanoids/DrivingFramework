@@ -140,9 +140,11 @@ void mgnss::state_estimation::OdometryV2::init(){
                 _estimated[i].noalias() = _contact_points[i];
         }
 
+        
+
         _previous_state.noalias() = _state;
 
-        update();
+        update(); // in here I should set it up to zero
 
 
 }
@@ -189,10 +191,9 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
         _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_y, _robot.state.position.get()[4]);
         _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_z, _robot.state.position.get()[5]);
 
-        // std::cout << _imu << std::endl;
         // remove the rotation ground ground component
         _twist_raw = _imu.twistSwing(_z,_swing);
-
+        
         mwoibn::Position _euler;
         // get robot base eueler angles
         _euler = _swing.toMatrix().eulerAngles(0, 1, 2);
@@ -230,7 +231,6 @@ void mgnss::state_estimation::OdometryV2::_increment(){
         {
                 // compute world position of the wheel axis
                 _directions[i] = _wheels_ph.point(i).getRotationWorld().col(2); // z axis
-                // std::cout << _directions[i].transpose() << std::endl;
                 // compute the wheel direction of motion
                 _directions[i] = _directions[i].cross(_axes[i]);
 
@@ -538,11 +538,15 @@ int mgnss::state_estimation::OdometryV2::_min(mwoibn::VectorBool& selector, cons
 }
 
 void mgnss::state_estimation::OdometryV2::log(mwoibn::common::Logger& logger, double time){
-        // logger.add("time", time);
-        // logger.add("q_raw_x", _twist_raw.x());
-        // logger.add("q_raw_y", _twist_raw.y());
-        // logger.add("q_raw_z", _twist_raw.z());
-        // logger.add("q_raw_w", _twist_raw.w());
+        logger.add("time", time);
+        logger.add("heading", _twist_es.angle());
+        logger.add("raw", _twist_raw.angle());
+        logger.add("base", _robot.state.position.get()[3]);   
+//
+//        logger.add("q_raw_x", _twist_raw.x());
+//        logger.add("q_raw_y", _twist_raw.y());
+//        logger.add("q_raw_z", _twist_raw.z());
+//        logger.add("q_raw_w", _twist_raw.w());
         // logger.add("q_es_x", _twist_es.x());
         // logger.add("q_es_y", _twist_es.y());
         // logger.add("q_es_z", _twist_es.z());

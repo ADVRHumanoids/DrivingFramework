@@ -431,7 +431,7 @@ mwoibn:
                 source:
                         config:
                                 path: *config
-                                file: "xbot/higher/simulaton.yaml"
+                                file: "xbot/higher/centauro_working_aug_2018.yaml"
                         urdf:
                                 path: *config
                                 file: "mwoibn/urdf/centauro.urdf"
@@ -439,11 +439,11 @@ mwoibn:
                                 path: *config
                                 file: "mwoibn/srdf/centauro_full_wheels.srdf"
                         actuators:
-                                path: *config
-                                file: "mwoibn/configs/support/actuators.yaml"
+                                path: *simulator
+                                file: "DrivingFramework/locomotion_framework/configs/actuators.yaml"
                         contacts:
-                                path: *config
-                                file: "mwoibn/configs/support/contacts.yaml"
+                                path: *simulator
+                                file: "DrivingFramework/locomotion_framework/configs/contacts.yaml"
                         controller:
                                 path: *config
                                 file: ""
@@ -481,9 +481,6 @@ mwoibn:
                         whole_body:
                                 layer: NRT
                                 source: "desired_state"
-                        upper_body:
-                                layer: NRT
-                                source: "upper_body"
                         torque_reference:
                                 layer: NRT
                                 source: "desired_state"
@@ -508,9 +505,6 @@ mwoibn:
                         whole_body:
                                 layer: NRT
                                 sink: "desired_state"
-                        upper_body:
-                                layer: NRT
-                                sink: "upper_body"
                         torque_reference:
                                 layer: NRT
                                 sink: "desired_state"
@@ -538,19 +532,17 @@ mwoibn:
                         layer: "NRT"
                         robot: default
                         controller: "direct"
-                        mode: "idle"
+                        mode: "full"
                         chain: "lower_body"
                         secondary_file:
                             path: *support
                             file: "lower_body.yaml"
+#                        tunning: ZMP_1
                         tunning: odom_NRT_5
-                        steering: open_loop
-                        position_gain: 200
-#                        tunning: odom_NRT_5
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: "wheels"
-
+                        position_gain: 400
                         reference_axis:
                                 wheel_1:
                                   x: 0
@@ -585,46 +577,25 @@ mwoibn:
                                   y: -1
                                   z: 0
                         IK: ["CONSTRAINTS", "STEERING", "BASE", "CONTACT_POINTS", "CAMBER", "CASTER"]
-                        steerings:
-                                open_loop:
-                                        icm: 1.00
-                                        sp:  0.01
-                                        damp_icm: 0.0008
-                                        damp_sp: 0.0015
-                                        damp: 0.001
-                                        tracking: 1.0
-                                reactif:
-                                        icm: 1.00 # 0.95
-                                        sp: 0.01 # 0.05
-                                        damp_icm: 0.0015
-                                        damp_sp: 0.003
-                                        damp: 0.002
-                                        tracking: 1.0
                         tunnings:
-                                ZMP_2: # circular - odom,
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 90
-                                        BASE: [45, 45, 45, 35, 35, 30]
-#                                        CONTACT_POINTS: 15
-                                        CONTACT_POINTS: 0.020
-                                        CAMBER: 15 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.08
-                                        CASTER_DAMP: 0.12
                                 ZMP_1: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 90
                                         BASE: [45, 45, 45, 35, 35, 30]
-                                        CONTACT_POINTS: 0.010
-#                                        CONTACT_POINTS: 20
+#                                        CONTACT_POINTS: 0.007
+                                        CONTACT_POINTS: 20
                                         CAMBER: 15 # 100
                                         CASTER: 30 # 14
                                         CAMBER_DAMP: 0.01
                                         CASTER_DAMP: 0.12
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 0.01 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.0015
+                                        tracking_gain: 1.0
                                 odom_NRT_5: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
@@ -632,11 +603,16 @@ mwoibn:
                                         STEERING: 90
                                         BASE: [45, 45, 45, 35, 35, 30]
                                         CONTACT_POINTS: 15
-#                                        CONTACT_POINTS: 0.01
                                         CAMBER: 15 # 100
                                         CASTER: 30 # 14
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 0.01 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.0015
+                                        tracking_gain: 1.0
                                 HW_str_1:
                                         ratio: 1.15
                                         damping: 0.0001
@@ -651,6 +627,12 @@ mwoibn:
                                         castor: 15
                                         camber_damp: 0.04
                                         castor_damp: 0.12
+                                        steer_open_loop: 1.0
+                                        steer_feedback: 10.0
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                 HW_1:
                                         ratio: 1.0
                                         damping: 0.0001
@@ -665,6 +647,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.08
                                         castor_damp: 0.12
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                 switch_configuration:
                                         ratio: 1.0
                                         damping: 0.0001
@@ -679,6 +667,12 @@ mwoibn:
                                         castor: 5 # 14
                                         camber_damp: 0.04
                                         castor_damp: 0.0005
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: -0.008
                                         camber_speed: 80
                                 odom_NRT_6: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -695,6 +689,12 @@ mwoibn:
                                         castor: 5 # 14
                                         camber_damp: 0.0001
                                         castor_damp: 0.0005
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.008
                                         camber_speed: 80
                                 reactif_1: # fast
@@ -711,6 +711,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.01
                                         castor_damp: 0.012
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.0005
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.012
                                         camber_speed: 50
                                 reactif_2: # smooth
@@ -727,6 +733,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.03
                                         castor_damp: 0.012
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.0005
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.05
                                         camber_speed: 50
                                 reactif_3: # smooth
@@ -743,6 +755,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.05
                                         castor_damp: 0.012
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.0005
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.04
                                         camber_speed: 50
                                 reactif_4: # slow
@@ -759,6 +777,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.05
                                         castor_damp: 0.012
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.0005
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.04
                                         camber_speed: 1
                                 reactif_5: # camber
@@ -775,6 +799,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.08
                                         castor_damp: 0.012
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.0 # 0.05
+                                        steer_damp: 0.0005
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.001
+                                        tracking_gain: 1.0
                                         camber_tolerance: 0.08
                                         camber_speed: 1
                                 reactif_old: # circular - odom,
@@ -791,6 +821,12 @@ mwoibn:
                                         castor: 30 # 14
                                         camber_damp: 0.08
                                         castor_damp: 0.12
+                                        steer_open_loop: 1.00 # 0.95
+                                        steer_feedback: 10.00 # 0.05
+                                        steer_damp: 0.001
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.0015
+                                        tracking_gain: 1.0
                 odometry:
                         layer: "NRT"
                         robot: odometry
@@ -803,7 +839,7 @@ mwoibn:
                         wheel_radius: 0.078
                         chain: "wheels"
                 gravity_compensation:
-                        layer: "RT"
+                        layer: "NRT"
                         robot: default
                         controller: "torque_reference"
                         secondary_file:

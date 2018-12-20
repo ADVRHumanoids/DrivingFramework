@@ -56,7 +56,8 @@ virtual void start(double time)
 {
         _start = time;
 
-        for(auto& robot: _robot_ptr)  _valid = robot.second->get() && _valid;
+        for(auto& robot: _robot_ptr)  //_valid = robot.second->get() && _valid;
+        _valid = robot.second->get() && robot.second->feedbacks.reset() && _valid;
 
 
         _rate = true;
@@ -79,16 +80,18 @@ virtual void stop(){
 virtual void control_loop(double time)
 {
   int i = 0;
-  
   _valid = true;
+
   for(auto& robot: _robot_ptr)
     _valid = robot.second->get() && _valid;
 
         if (!_valid)
                 return;
-
-  for(auto& robot: _robot_ptr)
-        robot.second->updateKinematics();
+                
+  //std::cout << "here!" << std::endl;
+  
+  for(auto& robot: _robot_ptr) robot.second->updateKinematics();
+        
         if (!_initialized)
         {
 //      if(!_rate){
@@ -145,6 +148,7 @@ virtual void initModule(YAML::Node config, YAML::Node plugin_config){
     robot.second->updateKinematics();
   }
 }
+
 virtual void initModule(YAML::Node config, YAML::Node plugin_config, mwoibn::communication_modules::Shared& share){
   config = mwoibn::robot_class::Robot::readFullConfig(config, plugin_config["robot"].as<std::string>());
   config = config["modules"][name];

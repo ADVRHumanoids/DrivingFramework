@@ -1,11 +1,11 @@
-driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
-config_path: &config "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/"
-support_path: &support "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/"
+driving_path: &driving  "/home/embedded/malgorzata_exp/ws/src/"
+simulator_path: &simulator "/home/embedded/malgorzata_exp/ws/src/"
+config_path: &config "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/"
+support_path: &support "/home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/support/"
 
 mwoibn:
-        middleware: "ROS"
-        system: "SM" # SM
+        middleware: "XBOT"
+        system: "HW" # SM
         layers:
             RT:
                         path: *config
@@ -434,7 +434,7 @@ mwoibn:
                                 file: "xbot/higher/simulaton.yaml"
                         urdf:
                                 path: *config
-                                file: "mwoibn/urdf/centauro.urdf"
+                                file: "mwoibn/urdf/centauro_new.urdf"
                         srdf:
                                 path: *config
                                 file: "mwoibn/srdf/centauro_full_wheels.srdf"
@@ -522,7 +522,7 @@ mwoibn:
                                 sink: "base_odometry"
         modules:
                 joint_states:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: joint_space
                         controller: "direct"
                         mode: "full"
@@ -535,14 +535,14 @@ mwoibn:
 #                            file: "upper_body.yaml"
                         mode: "full"
                 wheeled_motion:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: default
                         controller: "direct"
-                        mode: "idle"
+                        mode: "full"
                         chain: "lower_body"
                         secondary_file:
-                            path: *support
-                            file: "lower_body.yaml"
+                            path: *driving
+                            file: "DrivingFramework/configs_dec/configs/mwoibn/configs/support/lower_body.yaml"
                         tunning: odom_NRT_5
                         steering: open_loop
                         position_gain: 200
@@ -630,7 +630,7 @@ mwoibn:
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 90
-                                        BASE: [45, 45, 45, 35, 35, 30]
+                                        BASE: [45, 45, 45, 35, 35, 40]
                                         CONTACT_POINTS: 15
 #                                        CONTACT_POINTS: 0.01
                                         CAMBER: 15 # 100
@@ -792,7 +792,7 @@ mwoibn:
                                         camber_damp: 0.08
                                         castor_damp: 0.12
                 odometry:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: odometry
                         controller: odometry
                         secondary_file:
@@ -825,13 +825,13 @@ mwoibn:
                         reference: "reference"
                         compliance: True
                 ground_forces:
-                        layer: "NRT"
+                        layer: "RT"
                         robot: default
                         controller: "empty"
                         mode: "full"
                         secondary_file:
-                            path: *support
-                            file: "lower_body.yaml"
+                            path: *driving
+                            file: "DrivingFramework/configs_dec/configs/mwoibn/configs/support/lower_body.yaml"
                         contact_source:
                                 path: *config
                                 file: "mwoibn/configs/support/contacts.yaml"
@@ -839,7 +839,7 @@ mwoibn:
                         layer: "NRT"
                         robot: force_test
                         controller: "empty"
-                        mode: "full"
+                        mode: "idle"
                         secondary_file:
                             path: *support
                             file: "torque.yaml"
