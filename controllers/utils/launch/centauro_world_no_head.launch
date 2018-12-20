@@ -30,9 +30,11 @@
   <arg name="ft_sensors" default="true"/>
   <arg name="bumbers" default="true"/>
   <arg name="imu" default="true"/>
+  <arg name="kinect" default="false"/>
+  <arg name="velodyne" default="false"/>
 
   <arg name="middleware" default="ros_control"/>
-  <arg name="xbot_config_file"  default="../../catkin_ws/src/DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/config_centauro.yaml" />
+  <arg name="xbot_config_file"  default="../../catkin_ws/src/DrivingFramework/configs/xbot/lower/centauro.yaml" />
 
   <arg name="collision_model" default="primitives"/>
   <arg name="visual_model" default="mesh"/>
@@ -59,6 +61,8 @@
       <arg name="ft_sensors" value="$(arg ft_sensors)"/>
       <arg name="bumbers" value="$(arg bumbers)"/>
       <arg name="imu" value="$(arg imu)"/>
+      <arg name="kinect" value="$(arg kinect)"/>
+      <arg name="velodyne" value="$(arg velodyne)"/>
 
       <arg name="xbot_config_file" value="$(arg xbot_config_file)"/>
       <arg name="middleware" value="$(arg middleware)"/>
@@ -78,6 +82,7 @@
       <arg name="arms" value="$(arg arms)"/>
       <arg name="torso" value="$(arg torso)"/>
       <arg name="legs" value="$(arg legs)"/>
+      <arg name="head" value="$(arg head)"/>
       <arg name="wheels" value="$(arg wheels)"/>
       <arg name="static" value="$(arg static)"/>
 
@@ -123,7 +128,7 @@
         "/>
   <param name="robot_srdf" textfile="$(find configs)/mgnss/configs/mwoibn/srdf/centauro_full_wheels.srdf"/>
   <param name="mwoibn_config" value="$(find configs)/mgnss/configs/mwoibn/configs/mwoibn_2_5.yaml"/>
-
+  <param name="centauro/contacts_yaml" textfile="$(find configs)/mgnss/configs/mwoibn/configs/support/contacts.yaml" />
   <!-- run gazebo -->
   <group if="$(arg gazebo)">
   	<group if="$(eval middleware in ['ros_control'])">
