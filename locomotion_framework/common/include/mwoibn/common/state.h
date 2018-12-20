@@ -19,11 +19,13 @@ public:
 State(int dofs = 0): _interfaces({{"POSITION", mwoibn::robot_class::Pipe()},
                                  {"VELOCITY", mwoibn::robot_class::Pipe()},
                                  {"TORQUE", mwoibn::robot_class::Pipe()},
-                                 {"ACCELERATION", mwoibn::robot_class::Pipe()}}),
+                                 {"ACCELERATION", mwoibn::robot_class::Pipe()},
+                                 {"ZERO", mwoibn::robot_class::Pipe()},}),
                       position(_interfaces["POSITION"]),
                       velocity(_interfaces["VELOCITY"]),
                       torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"])
+                      acceleration(_interfaces["ACCELERATION"]),
+                      zero(_interfaces["ZERO"])
 {
         init(dofs);
 }
@@ -32,7 +34,8 @@ State(State& other): _interfaces(other._interfaces),
                       position(_interfaces["POSITION"]),
                       velocity(_interfaces["VELOCITY"]),
                       torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"])
+                      acceleration(_interfaces["ACCELERATION"]),
+                      zero(_interfaces["ZERO"])
 {
 }
 
@@ -41,7 +44,8 @@ State(State&& other): _interfaces(other._interfaces),
                       position(_interfaces["POSITION"]),
                       velocity(_interfaces["VELOCITY"]),
                       torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"])
+                      acceleration(_interfaces["ACCELERATION"]),
+                      zero(_interfaces["ZERO"])
 {
 }
 
@@ -116,6 +120,7 @@ public:
   mwoibn::robot_class::Pipe& velocity;
   mwoibn::robot_class::Pipe& torque;
   mwoibn::robot_class::Pipe& acceleration;
+  mwoibn::robot_class::Pipe& zero;
 };
 }
 }
