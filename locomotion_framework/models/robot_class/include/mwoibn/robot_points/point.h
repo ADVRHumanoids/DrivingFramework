@@ -9,6 +9,8 @@ namespace mwoibn
 namespace robot_points
 {
 
+class Rotation;
+
 class Point
 {
 
@@ -31,11 +33,7 @@ public:
 
   virtual void computeJacobian() = 0;
 
-  void update(bool jacobian = true) {
-      compute();
-      if(jacobian)
-        computeJacobian();
-    }
+  void update(bool jacobian = true);
 
   const mwoibn::Matrix& getJacobian() const {return _jacobian;}
 
@@ -46,47 +44,21 @@ public:
   int rows() {return _jacobian.rows();}
   int cols() {return _jacobian.cols();}
 
-  Point& operator=(const Point& other) {
-      if (this != &other){
-          _jacobian = other._jacobian;
-          _point = other._point;
-      }
-      return *this;
-  }
+  Point& operator=(const Point& other);
 
-  Point& operator+(const Point& other) {
-      _jacobian += other._jacobian;
-      _point += other._point;
-  return *this;
-  }
+  Point& operator+(const Point& other);
 
-  Point& operator-(const Point& other) {
-      _jacobian -= other._jacobian;
-      _point -= other._point;
-  return *this;
-  }
+  Point& operator-(const Point& other);
 
-  Point& operator+=(const Point& other){
-      _jacobian += other._jacobian;
-      _point += other._point;
-      return *this;
-  }
+  Point& operator+=(const Point& other);
 
-  Point& operator-=(const Point& other){
-      _jacobian -= other._jacobian;
-      _point -= other._point;
-      return *this;
-  }
-  // 
-  // void rotateFrom(const mwoibn::robot_points::Rotation& rotation){
-  //     rotation.from(_point);
-  //     rotation.from(_jacobian);
-  // }
-  //
-  // void rotateTo(const mwoibn::robot_points::Rotation& rotation){
-  //     rotation.to(_point);
-  //     rotation.to(_jacobian);
-  // }
+  Point& operator-=(const Point& other);
+
+  void multiplyJacobian(double factor);
+
+  void rotateFrom(mwoibn::robot_points::Rotation& rotation, bool jacobian = false);
+
+  void rotateTo(mwoibn::robot_points::Rotation& rotation, bool jacobian = false);
 
 protected:
 
