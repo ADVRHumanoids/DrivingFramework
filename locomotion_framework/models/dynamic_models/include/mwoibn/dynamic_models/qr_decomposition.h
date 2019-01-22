@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__DYNAMIC_MODELS__QR_DECOMPOSITION_H
 #define __MWOIBN__DYNAMIC_MODELS__QR_DECOMPOSITION_H
 
-#include <rbdl/rbdl.h>
+// #include <rbdl/rbdl.h>
 #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/dynamic_models/dynamic_models.h"
 #include "mwoibn/dynamic_models/basic_model.h"

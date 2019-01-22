@@ -2,7 +2,7 @@
 #define __MWOIBN__ROBOT_CLASS__CONTACTS_H
 
 #include "mwoibn/robot_points/contact.h"
-#include <rbdl/rbdl.h>
+// #include <rbdl/rbdl.h>
 #include "mwoibn/point_handling/position.h"
 #include <memory>
 #include "mwoibn/eigen_utils/eigen_utils.h"

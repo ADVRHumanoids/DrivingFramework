@@ -1,7 +1,7 @@
 #ifndef ROBOT_CLASS_ROBOT_H
 #define ROBOT_CLASS_ROBOT_H
 
-#include <rbdl/rbdl.h>
+//#include <rbdl/rbdl.h>
 #include "mwoibn/robot_class/robot_class.h"
 #include "mwoibn/robot_points/contact.h"
 #include "mwoibn/robot_points/wheel_contact.h"

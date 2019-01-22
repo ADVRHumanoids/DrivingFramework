@@ -2,7 +2,7 @@
 #define __MWOIBN_ROBOT_CLASS_ANGLES_BASIC_H
 
 #include "mwoibn/point_handling/robot_points_handler.h"
-#include <rbdl/rbdl.h>
+// #include <rbdl/rbdl.h>
 
 namespace mwoibn
 {

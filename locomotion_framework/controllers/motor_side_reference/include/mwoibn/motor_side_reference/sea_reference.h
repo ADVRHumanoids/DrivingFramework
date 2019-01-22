@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__MOTOR_SIDE_REFERENCE__SEA_REFERENCE_H
 #define __MWOIBN__MOTOR_SIDE_REFERENCE__SEA_REFERENCE_H
 
-#include <rbdl/rbdl.h>
+// #include <rbdl/rbdl.h>
 #include "mwoibn/eigen_utils/eigen_utils.h"
 #include "mwoibn/basic_controllers/lower_level_controller.h"
 //#include "mwoibn/dynamic_models/basic_model.h"

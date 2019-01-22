@@ -2,7 +2,7 @@
 #define ROBOT_CLASS_ACTUATOR_H
 
 #include "mwoibn/robot_class/robot_class.h"
-#include <rbdl/rbdl.h>
+// #include <rbdl/rbdl.h>
 
 namespace mwoibn
 {
