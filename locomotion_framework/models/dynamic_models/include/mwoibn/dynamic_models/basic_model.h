@@ -21,7 +21,8 @@ namespace dynamic_models
  {
    INERTIA,
    GRAVITY,
-   NON_LINEAR
+   NON_LINEAR,
+   INERTIA_INVERSE
  };
 
 
@@ -37,9 +38,10 @@ BasicModel(mwoibn::robot_class::Robot& robot, std::initializer_list<DYNAMIC_MODE
         _non_linear.setZero(_robot.getDofs());
         _inertia.setZero(_robot.getDofs(),
                          _robot.getDofs());
+        _inverser_ptr.reset(new mwoibn::Inverse(_inertia, 0.000));
 
-       for(auto& entry_: _update_map)
-          _function_map[entry_.first] = (_manager.signIn(entry_.second)); // register functions
+        for(auto& entry_: _update_map)
+          _function_map[entry_.first] = (_manager.signIn(entry_.second.first)); // register functions
 
         subscribe(update);
 
@@ -76,9 +78,27 @@ virtual const mwoibn::Matrix& getInertia()
         return _inertia;
 }
 
+virtual const mwoibn::Matrix& getInertiaInverse()
+{
+        _function_map[DYNAMIC_MODEL::INERTIA_INVERSE]->count();
+        return _inverser_ptr->get();
+}
+
 virtual void update(){_manager.update();} // Do I want to log status somewhere?
-virtual void unsubscribe(DYNAMIC_MODEL interface){_function_map[interface]->unsubscribe();}
-virtual void subscribe(DYNAMIC_MODEL interface){_function_map[interface]->subscribe();}
+virtual void unsubscribe(DYNAMIC_MODEL interface){
+  unsubscribe(_update_map[interface].second);
+  _function_map[interface]->unsubscribe();}
+
+virtual void subscribe(DYNAMIC_MODEL interface){
+  subscribe(_update_map[interface].second);
+  _function_map[interface]->subscribe();}
+
+virtual void unsubscribe(std::vector<DYNAMIC_MODEL> interfaces){
+    for(auto interface: interfaces)
+      unsubscribe(interface);
+    }
+
+
 virtual void subscribe(std::vector<DYNAMIC_MODEL> interfaces){
   for(auto interface: interfaces)
     subscribe(interface);
@@ -89,10 +109,14 @@ mwoibn::robot_class::Robot& _robot;
 mwoibn::VectorN _gravity, _non_linear, _zero;
 mwoibn::Matrix _inertia;
 mwoibn::update::UpdateManager _manager;
-std::map<DYNAMIC_MODEL, std::function<void()> > _update_map = {
-          {DYNAMIC_MODEL::GRAVITY, std::bind(&dynamic_models::BasicModel::_updateGravity, this)},
-          {DYNAMIC_MODEL::INERTIA, std::bind(&dynamic_models::BasicModel::_updateInertia, this)},
-          {DYNAMIC_MODEL::NON_LINEAR, std::bind(&dynamic_models::BasicModel::_updateNonlinearEffects, this)}};
+std::unique_ptr<mwoibn::Inverse> _inverser_ptr;
+
+std::map<DYNAMIC_MODEL, std::pair< std::function<void()>, std::vector<DYNAMIC_MODEL> > > _update_map = {
+          {DYNAMIC_MODEL::GRAVITY, {std::bind(&dynamic_models::BasicModel::_updateGravity, this),{} } },
+          {DYNAMIC_MODEL::INERTIA, {std::bind(&dynamic_models::BasicModel::_updateInertia, this),{} } },
+          {DYNAMIC_MODEL::NON_LINEAR, {std::bind(&dynamic_models::BasicModel::_updateNonlinearEffects, this), {} } },
+          {DYNAMIC_MODEL::INERTIA_INVERSE, {std::bind(&dynamic_models::BasicModel::_updateInertiaInverse, this), {DYNAMIC_MODEL::INERTIA} } }
+         };
 
 std::map<DYNAMIC_MODEL, std::shared_ptr<mwoibn::update::Function> > _function_map;
 
@@ -126,7 +150,13 @@ virtual void _updateInertia()
 
 }
 
+virtual void _updateInertiaInverse()
+{
+      _function_map[DYNAMIC_MODEL::INERTIA]->count();
 
+      _inverser_ptr->compute(_inertia);
+
+}
 
 };
 } // namespace package
