@@ -46,10 +46,10 @@ add_library(ros_callbacks
    src/wheels_controller_extend.cpp
    src/wheels_controller_events.cpp
 
-   src/wheels_zmp.cpp
+   #src/wheels_zmp.cpp
 
    #src/wheels_controller_actions.cpp
-   src/wheels_controller_merge_v1.cpp
+   #src/wheels_controller_merge_v1.cpp
  )
 
 add_dependencies(ros_callbacks ${catkin_EXPORTED_TARGETS})
