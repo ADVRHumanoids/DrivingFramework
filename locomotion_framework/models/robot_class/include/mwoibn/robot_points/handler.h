@@ -68,7 +68,7 @@ public:
               		  size += point->size();
           		      rows += point->rows();
           	}
-          	_jacobian = mwoibn::Matrix::Zero(size, _dofs);
+          	_jacobian = mwoibn::Matrix::Zero(size, _points[0]->cols());
             _positions = mwoibn::VectorN::Zero(rows);
     }
 
@@ -113,7 +113,7 @@ public:
 
       for (auto& point : _points)
       {
-        _jacobian.block(i, 0, point->rows(), _dofs) = point->getJacobian();
+        _jacobian.block(i, 0, point->rows(), point->cols()) = point->getJacobian();
         i += point->rows();
       }
 
