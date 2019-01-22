@@ -10,6 +10,7 @@ namespace mwoibn
 namespace point_handling
 {
 
+// Computes the actuation torques component to excert given force at the point
 class Force: public State
 {
 
