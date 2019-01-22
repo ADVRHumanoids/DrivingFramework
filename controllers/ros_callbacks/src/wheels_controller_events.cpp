@@ -36,7 +36,7 @@ bool mgnss::ros_callbacks::wheels_controller_events::stateHandler(const custom_m
         controller_ptr->setBaseDotX(msg->x);
         controller_ptr->setBaseDotY(msg->y);
         controller_ptr->setBaseDotZ(msg->z);
-
+        // std::cout << "BaseX " << msg->x << std::endl;
         controller_ptr->setBaseDotHeading(msg->rz);
 
         if(msg->cs.size() == 4) {
