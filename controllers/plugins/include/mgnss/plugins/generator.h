@@ -87,11 +87,11 @@ virtual void control_loop(double time)
 
         if (!_valid)
                 return;
-                
+
   //std::cout << "here!" << std::endl;
-  
+
   for(auto& robot: _robot_ptr) robot.second->updateKinematics();
-        
+
         if (!_initialized)
         {
 //      if(!_rate){
@@ -122,8 +122,8 @@ virtual std::vector<std::string> readRobots(std::string config_file, std::string
 virtual std::string readRobot(std::string config_file, std::string secondary_file, YAML::Node config, YAML::Node plugin_config){
   config = mwoibn::robot_class::Robot::getConfig(config_file, secondary_file);
 
-  config["robot"]["layer"] = plugin_config["layer"].as<std::string>();
-  config["robot"]["mode"] = plugin_config["mode"].as<std::string>();
+  config["robot"]["layer"] = plugin_config["layer"];//.as<std::string>();
+  config["robot"]["mode"] = plugin_config["mode"];//.as<std::string>();
 
   return config_file + "__" + plugin_config["robot"].as<std::string>() + "__" + secondary_file;
 
