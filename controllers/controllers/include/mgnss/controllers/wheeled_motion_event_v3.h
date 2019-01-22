@@ -79,6 +79,10 @@ const mwoibn::VectorN& getBaseError(){
         return _pelvis_position_ptr->getError();
 }
 
+mwoibn::VectorN getBaseReference(){
+        return _pelvis_position_ptr->getReference(0);
+}
+
 
 protected:
   WheeledMotionEvent3(mwoibn::robot_class::Robot& robot) : WheelsControllerExtend(robot){ }
