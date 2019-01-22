@@ -44,6 +44,7 @@
   <depend>motor_side_reference</depend>
   <depend>gravity_compensation</depend>
   <depend>dynamic_models</depend>
+  <depend>robot_class</depend>
   <depend>modules</depend>
   <depend>mgnss_higher_level</depend>
 
