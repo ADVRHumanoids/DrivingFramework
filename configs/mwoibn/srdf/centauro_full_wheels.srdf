@@ -1,7 +1,5 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <robot name="centauro">
-
-
    <group name="front_left_leg">
       <chain base_link="pelvis" tip_link="wheel_1"/>
    </group>
@@ -65,11 +63,18 @@
       <link name="ankle2_4"/>
    </group>
 
-   <group name="yaws">
+   <group name="hips">
       <link name="hip1_1"/>
       <link name="hip1_2"/>
       <link name="hip1_3"/>
       <link name="hip1_4"/>
+   </group>
+
+   <group name="yaws">
+      <link name="ankle2_1"/>
+      <link name="ankle2_2"/>
+      <link name="ankle2_3"/>
+      <link name="ankle2_4"/>
    </group>
 
    <group name="front_left_leg_no_wheel">
