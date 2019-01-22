@@ -24,28 +24,22 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 find_package(catkin REQUIRED ${CATKIN_DEPENDS_SET} common)
 
 ## System dependencies are found with CMake's conventions
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
+##find_package(RBDL REQUIRED)
+##find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR}
-  ${Eigen3_INCLUDE_DIRS}
 )
 
 catkin_package(
   LIBRARIES
     points_handler
-    ${RBDL_LIBRARY}
   CATKIN_DEPENDS ${CATKIN_DEPENDS_SET}
   INCLUDE_DIRS
     include
     ${catkin_INCLUDE_DIRS}
-    ${RBDL_INCLUDE_DIR}
-  DEPENDS
-    Eigen3
 )
 
  add_library(points_handler
@@ -63,12 +57,14 @@ catkin_package(
    src/wrench.cpp
  )
 
- add_dependencies(points_handler ${catkin_EXPORTED_TARGETS} ${RBDL_EXPORTED_TARGETS})
+ add_dependencies(points_handler ${catkin_EXPORTED_TARGETS})
 
  target_link_libraries(points_handler
    ${catkin_LIBRARIES}
-   ${RBDL_LIBRARY}
  )
+
+ 
+
 
 #############
 ## Install ##

@@ -44,9 +44,6 @@ LIST( APPEND CATKIN_DEPENDS_SET simple_log)
 
 endif(LOGGER)
 
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
-
 LIST( APPEND CATKIN_DEPENDS_SET roscpp)
 
 
@@ -67,16 +64,13 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
         ${catkin_INCLUDE_DIRS}
-        ${RBDL_INCLUDE_DIR}
   LIBRARIES
         ${LIBRARIES}
-        ${RBDL_LIBRARY}
   CATKIN_DEPENDS
         roscpp
         ${CATKIN_DEPENDS_SET}
   DEPENDS
         ${DEPENDS_OPTIONAL}
-        Eigen3
 )
 ###########
 ## Build ##
@@ -88,8 +82,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR}
-  ${Eigen3_INCLUDE_DIRS}
 )
 
 add_library(communication_modules_ros ${SOURCE_FILES})

@@ -14,21 +14,19 @@ set(CATKIN_DEPENDS_SET "")
 
 if(LOGGER)
 
-LIST(APPEND CATKIN_DEPENDS_SET 
+LIST(APPEND CATKIN_DEPENDS_SET
 	simple_log
     )
 
 endif(LOGGER)
 
-LIST(APPEND CATKIN_DEPENDS_SET 
+LIST(APPEND CATKIN_DEPENDS_SET
         robot_class
     )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
-find_package(catkin REQUIRED ${CATKIN_DEPENDS_SET} common) 
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(catkin REQUIRED ${CATKIN_DEPENDS_SET} common)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -121,17 +119,14 @@ find_package(Eigen3 REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-  INCLUDE_DIRS 
-	include 
-	${catkin_INCLUDE_DIRS} 
-	${RBDL_INCLUDE_DIR} 
-  LIBRARIES 
-	${catkin_LIBRARIES} 
-	${RBDL_LIBRARY} 
+  INCLUDE_DIRS
+	include
+	${catkin_INCLUDE_DIRS}
+  LIBRARIES
+	${catkin_LIBRARIES}
   CATKIN_DEPENDS
         ${CATKIN_DEPENDS_SET}
-  DEPENDS 
-	Eigen3
+  DEPENDS
 )
 
 ###########

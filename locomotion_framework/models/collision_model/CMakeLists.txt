@@ -16,6 +16,9 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+message(WARNING RBDL_INCLUDE_DIRS $RBDL_INCLUDE_DIRS)
+
+
 LIST( APPEND /usr/lib/x86_64-linux-gnu)
 find_package(sch-core REQUIRED)
 
@@ -53,7 +56,7 @@ include_directories(
  add_dependencies(robot_collision ${catkin_EXPORTED_TARGETS})
 
  target_link_libraries(robot_collision
-   ${catkin_LIBRARIES} 
+   ${catkin_LIBRARIES}
    ${RBDL_LIBRARY}
    ${sch-core_LIBRARIES}
  )

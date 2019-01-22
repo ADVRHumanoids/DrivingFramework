@@ -34,6 +34,8 @@ message(STATUS " Flags:")
 message(STATUS " LOGGER ${LOGGER}")
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+LIST( INSERT CMAKE_PREFIX_PATH 1 /usr/local )
+
 find_package(RBDL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -43,11 +45,14 @@ catkin_package(
 		${catkin_INCLUDE_DIRS}
 		${RBDL_INCLUDE_DIR}
 		${LOGGER_INCLUDE_DIRS}
+    ${RBDL_URDFReader_INCLUDE_DIR}
+    ${Eigen3_INCLUDE_DIRS}
   LIBRARIES
 		mwoibn_common
 		${catkin_LIBRARIES}
 		${RBDL_LIBRARY}
 		${LOGGER_LIBRARIES}
+    ${RBDL_URDFReader_LIBRARY}
   DEPENDS
 		Eigen3
 	CATKIN_DEPENDS
@@ -56,14 +61,16 @@ catkin_package(
 		mwoibn_std_utils
 )
 
+
 include_directories(
 include
-${catkin_INCLUDE_DIRS}
 ${RBDL_INCLUDE_DIR}
+${catkin_INCLUDE_DIRS}
 ${RBDL_URDFReader_INCLUDE_DIR}
 ${Eigen3_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
+
 
 add_library(mwoibn_common
 	src/state.cpp

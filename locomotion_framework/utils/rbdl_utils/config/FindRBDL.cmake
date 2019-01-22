@@ -14,30 +14,28 @@ SET (RBDL_FOUND FALSE)
 SET (RBDL_LuaModel_FOUND FALSE)
 SET (RBDL_URDFReader_FOUND FALSE)
 
-MESSAGE( WARNINIG "SUPERBUILD:         " ${ADVR_SUPERBUILD_DIR}/build/install/include )
-
 FIND_PATH (RBDL_INCLUDE_DIR rbdl/rbdl.h
 	HINTS
+	/usr/local/include
 	$ENV{HOME}/local/include
 	$ENV{RBDL_PATH}/src
 	$ENV{RBDL_PATH}/include
 	$ENV{RBDL_INCLUDE_PATH}
 	${ADVR_SUPERBUILD_DIR}/build/install/include
-	/usr/local/include
 	/usr/include
 	)
 
 FIND_LIBRARY (RBDL_LIBRARY NAMES rbdl
 	PATHS
+
 	$ENV{HOME}/local/lib
 	$ENV{HOME}/local/lib/x86_64-linux-gnu
 	$ENV{RBDL_PATH}/lib
 	$ENV{RBDL_LIBRARY_PATH}
-	/usr/local/lib
 	/usr/local/lib/x86_64-linux-gnu
 	/usr/lib
+	${ADVR_SUPERBUILD_DIR}/build/install/lib
 	/usr/lib/x86_64-linux-gnu
-        ${ADVR_SUPERBUILD_DIR}/build/install/lib
 	)
 
 FIND_PATH (RBDL_LuaModel_INCLUDE_DIR rbdl/addons/luamodel/luamodel.h

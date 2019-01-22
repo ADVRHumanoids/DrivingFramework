@@ -17,15 +17,11 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS 
 	include
-	${RBDL_INCLUDE_DIR}
   LIBRARIES 
-	${RBDL_LIBRARY}
   CATKIN_DEPENDS 
 	roscpp 
 	robot_class
@@ -34,7 +30,6 @@ catkin_package(
         basic_controllers
         dynamic_models
   DEPENDS 
-	Eigen3
 )
 
 ###########
@@ -48,8 +43,6 @@ include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR}
-  ${Eigen3_INCLUDE_DIRS}
 )
 
 

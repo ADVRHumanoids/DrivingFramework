@@ -20,18 +20,14 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
 	    include
-	    ${RBDL_INCLUDE_DIR}
   LIBRARIES
 	    hierarchical_controller
       controller_tasks
       controller_actions
-	    ${RBDL_LIBRARY}
   CATKIN_DEPENDS
     	roscpp
     	eigen_utils
@@ -43,7 +39,6 @@ catkin_package(
       robot_class
       mwoibn_dynamic_points
   DEPENDS
-	   Eigen3
 )
 
 ###########
@@ -57,8 +52,6 @@ include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR}
-  ${Eigen3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -79,7 +72,6 @@ include_directories(
   add_dependencies(controller_tasks ${catkin_EXPORTED_TARGETS})
   target_link_libraries(controller_tasks
      ${catkin_LIBRARIES}
-     ${RBDL_LIBRARY}
   )
 
 
@@ -96,7 +88,6 @@ include_directories(
  add_dependencies(controller_actions ${catkin_EXPORTED_TARGETS})
  target_link_libraries(controller_actions
     ${catkin_LIBRARIES}
-    ${RBDL_LIBRARY}
  )
 
 
@@ -111,7 +102,6 @@ include_directories(
   add_dependencies(actions_merge ${catkin_EXPORTED_TARGETS})
   target_link_libraries(actions_merge
      ${catkin_LIBRARIES}
-     ${RBDL_LIBRARY}
   )
 
 
@@ -125,7 +115,6 @@ include_directories(
 
    target_link_libraries(hierarchical_controller
      ${catkin_LIBRARIES}
-     ${RBDL_LIBRARY}
    )
 
 
@@ -157,8 +146,6 @@ if(CATKIN_ENABLE_TESTING)
  find_package(centauro REQUIRED)
 
  LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
- find_package(RBDL REQUIRED)
- find_package(Eigen3 REQUIRED)
  include_directories(${tests_common_INCLUDE_DIRS} ${centauro_INCLUDE_DIRS})
 
  catkin_add_gtest(controller_task-test test/src/tasks/test_controller_task.cpp)
@@ -178,7 +165,6 @@ if(CATKIN_ENABLE_TESTING)
   add_dependencies(cartesian_world_task-test ${catkin_EXPORTED_TARGETS} ${tests_common_EXPORTED_TARGETS} ${centauro_EXPORTED_TARGETS})
   target_link_libraries(cartesian_world_task-test
         controller_tasks
-        ${RBDL_LIBRARY}
         ${catkin_LIBRARIES}
         ${tests_common_LIBRARIES}
         ${centauro_LIBRARIES}
@@ -191,7 +177,6 @@ if(CATKIN_ENABLE_TESTING)
   add_dependencies(self_collision_task-test ${catkin_EXPORTED_TARGETS} ${tests_common_EXPORTED_TARGETS} ${centauro_EXPORTED_TARGETS})
   target_link_libraries(self_collision_task-test
         controller_tasks
-        ${RBDL_LIBRARY}
         ${catkin_LIBRARIES}
         ${tests_common_LIBRARIES}
         ${centauro_LIBRARIES}
@@ -204,7 +189,6 @@ if(CATKIN_ENABLE_TESTING)
   add_dependencies(self_collisions_task-test ${catkin_EXPORTED_TARGETS} ${tests_common_EXPORTED_TARGETS} ${centauro_EXPORTED_TARGETS})
   target_link_libraries(self_collisions_task-test
         controller_tasks
-        ${RBDL_LIBRARY}
         ${catkin_LIBRARIES}
         ${tests_common_LIBRARIES}
         ${centauro_LIBRARIES}
@@ -218,7 +202,6 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(hierarchical_control-test
         hierarchical_controller
         controller_tasks
-        ${RBDL_LIBRARY}
         ${catkin_LIBRARIES}
         ${tests_common_LIBRARIES}
         ${centauro_LIBRARIES}
@@ -232,7 +215,6 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(center_of_mass_task-test
         hierarchical_controller
         controller_tasks
-        ${RBDL_LIBRARY}
         ${catkin_LIBRARIES}
         ${tests_common_LIBRARIES}
         ${centauro_LIBRARIES}

@@ -150,7 +150,7 @@ set(ROBOT_CLASS_SOURCE "")
  )
 
  add_dependencies(robot_class_ros_extension ${catkin_EXPORTED_TARGETS} ${ROBOT_ROS_EXPORTED_TARGETS} ${ROBOT_ROS_NRT_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARGETS})
-
+ target_compile_definitions(robot_class_ros_extension PUBLIC RBDL_BUILD_ADDON_URDFREADER)
  target_link_libraries(robot_class_ros_extension
    ${catkin_LIBRARIES}
    ${ROBOT_ROS_LIBRARIES}

@@ -35,26 +35,19 @@ endif(LOGGER)
 
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
 find_package(YamlCpp REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS
 			include
-			${catkin_INCLUDE_DIRS}
-			${RBDL_INCLUDE_DIR}
-			${RBDL_URDFReader_INCLUDE_DIR}
 			${LOGGER_INCLUDE_DIRS}
   LIBRARIES
 			robot_class
 			communication
-			${catkin_LIBRARIES}
-			${RBDL_LIBRARY}
-			${RBDL_URDFReader_LIBRARY}
 			${LOGGER_LIBRARIES}
+	CATKIN_DEPENDS
+			point_handling urdf srdfdom common eigen_utils filters
   DEPENDS
-	Eigen3
         YamlCpp
 
 )
@@ -66,9 +59,6 @@ catkin_package(
 include_directories(
 include
 ${catkin_INCLUDE_DIRS}
-${RBDL_INCLUDE_DIR}
-${RBDL_URDFReader_INCLUDE_DIR}
-${Eigen3_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
 
@@ -85,33 +75,31 @@ add_dependencies(communication ${catkin_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARG
 
 target_link_libraries(communication
 	${catkin_LIBRARIES}
-	${RBDL_LIBRARY}
-	${RBDL_URDFReader_LIBRARY}
 	${LOGGER_LIBRARIES}
 )
 
 
  add_library(robot_class
- src/robot.cpp
- src/robot_points/wheel_contact.cpp
- src/robot_points/contact_v2.cpp
- src/robot_points/contact.cpp
- src/robot_points/handler.cpp
- src/robot_points/center_of_mass.cpp
- src/robot_points/center_of_pressure.cpp
-# src/robot_points/center_of_pressure_fast.cpp
- src/robot_points/torus_model.cpp
- src/contacts.cpp
- src/actuators.cpp
- src/actuator.cpp )
+                 src/robot.cpp
+                 src/robot_points/wheel_contact.cpp
+                 src/robot_points/contact_v2.cpp
+                 src/robot_points/contact.cpp
+                 src/robot_points/handler.cpp
+                 src/robot_points/center_of_mass.cpp
+                 src/robot_points/center_of_pressure.cpp
+								 src/robot_points/point.cpp
+								 src/robot_points/rotation.cpp
+                # src/robot_points/center_of_pressure_fast.cpp
+                 src/robot_points/torus_model.cpp
+                 src/contacts.cpp
+                 src/actuators.cpp
+                 src/actuator.cpp )
 
  add_dependencies(robot_class ${catkin_EXPORTED_TARGETS} ${LOGGER_EXPORTED_TARGETS})
-
+ target_compile_definitions(robot_class PUBLIC RBDL_BUILD_ADDON_URDFREADER)
  target_link_libraries(robot_class
- 	 communication
+# 	 communication
    ${catkin_LIBRARIES}
-   ${RBDL_LIBRARY}
-   ${RBDL_URDFReader_LIBRARY}
    ${LOGGER_LIBRARIES}
 )
 

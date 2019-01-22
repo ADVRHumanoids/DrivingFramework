@@ -17,39 +17,32 @@ set(LOGGER_INCLUDE_DIRS "")
 set(LOGGER_LIBRARIES "")
 set(LOGGER_EXPORTED_TARGETS "")
 
-find_package(catkin REQUIRED robot_class) 
+find_package(catkin REQUIRED robot_class)
 
 if(LOGGER)
 find_package(simple_log REQUIRED)
-LIST(APPEND LOGGER_LIBRARIES 
+LIST(APPEND LOGGER_LIBRARIES
 	${simple_log_LIBRARIES}
 )
-LIST(APPEND LOGGER_INCLUDE_DIRS 
+LIST(APPEND LOGGER_INCLUDE_DIRS
 	${simple_log_INCLUDE_DIRS}
 )
-LIST(APPEND LOGGER_EXPORTED_TARGETS 
+LIST(APPEND LOGGER_EXPORTED_TARGETS
 	${simple_log_EXPORTED_TARGETS}
 )
 endif(LOGGER)
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS 
-	include 
-	${catkin_INCLUDE_DIRS} 
-	${RBDL_INCLUDE_DIR} 
-	${RBDL_URDFReader_INCLUDE_DIR} 
+  INCLUDE_DIRS
+	include
 	${LOGGER_INCLUDE_DIRS}
-  LIBRARIES 
-	${catkin_LIBRARIES} 
-	${RBDL_LIBRARY} 
-	${RBDL_URDFReader_LIBRARY} 
+  LIBRARIES
 	${LOGGER_LIBRARIES}
-  DEPENDS 
-	Eigen3
+	CATKIN_DEPENDS
+		robot_class
+	DEPENDS
 )
 
 
@@ -60,9 +53,6 @@ catkin_package(
 include_directories(
 include
 ${catkin_INCLUDE_DIRS}
-${RBDL_INCLUDE_DIR}
-${RBDL_URDFReader_INCLUDE_DIR}
-${Eigen3_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
 

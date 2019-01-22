@@ -19,23 +19,19 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-find_package(RBDL REQUIRED)
-find_package(Eigen3 REQUIRED)
+
 
 catkin_package(
   INCLUDE_DIRS
 	include
-	${RBDL_INCLUDE_DIR}
   LIBRARIES
 	motor_side_reference
-	${RBDL_LIBRARY}
   CATKIN_DEPENDS
         basic_controllers
 	eigen_utils
 	simple_log
         dynamic_models
   DEPENDS
-	Eigen3
 )
 
 ## Specify additional locations of header files
@@ -45,8 +41,6 @@ include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${RBDL_INCLUDE_DIR}
-  ${Eigen3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -62,7 +56,6 @@ include_directories(
 
    target_link_libraries(motor_side_reference
      ${catkin_LIBRARIES}
-     ${RBDL_LIBRARY}
    )
 
 
@@ -87,8 +80,6 @@ if(CATKIN_ENABLE_TESTING)
     ${robot_class_ros_extension_EXPORTED_TARGETS})
   target_link_libraries(motor_side_reference_test
     motor_side_reference
-    ${RBDL_LIBRARY}
-    ${RBDL_URDFReader_LIBRARY}
     ${catkin_LIBRARIES}
     ${gravity_compensation_LIBRARIES}
     ${tests_common_LIBRARIES}
