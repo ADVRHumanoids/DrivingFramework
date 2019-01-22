@@ -24,13 +24,20 @@ public:
 
   virtual void computeJacobian();
 
+  virtual void computeDerivative();
+
+  virtual void accelerationComponent();
+
+  const mwoibn::Vector3& derivative(){return _d_com;}
+  const mwoibn::Vector3& acceleration(){return _dd_com;}
+
   double mass(){return _mass;}
 
 protected:
   point_handling::RawPositionsHandler _points;
   std::vector<double> _masses;
   double _mass = 0;
-  mwoibn::Vector3 _com;
+  mwoibn::Vector3 _com, _d_com, _dd_com;
 };
 
 } // namespace package
