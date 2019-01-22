@@ -118,6 +118,100 @@ double _tolerance, _epsilon;
 Dynamic_Matrix _inversedMatrix, _tempMatrix, _dampedSingularValues;
 };
 
+
+template <typename Dynamic_Matrix, typename Scalar>
+class Inverse
+{
+public:
+Inverse(const Dynamic_Matrix& matrix,
+               Scalar damping = std::numeric_limits<Scalar>::epsilon())
+{
+        init(matrix, damping);
+        // compute(matrix);
+}
+Inverse(const Dynamic_Matrix& matrix,
+               const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping)
+{
+        init(matrix, damping);
+        // compute(matrix);
+}
+
+Inverse(
+        const Inverse &other) : _inverse_ptr(std::move(other._inverse_ptr)), _damping(other._damping),  _inversed(other._inversed), _identity(other._identity)
+{
+}
+
+Inverse(Inverse&& other) : _inverse_ptr(std::move(other._inverse_ptr)), _damping(other._damping), _inversed(other._inversed), _identity(other._identity)
+{
+
+}
+
+Inverse() { }
+
+void compute(const Dynamic_Matrix& matrix)
+{
+        _inversed = matrix;
+        for (int i = 0; i < _inversed.rows(); i++)
+                _inversed(i, i) += _damping[i];
+
+        _inverse_ptr->compute(_inversed);
+        _inversed.noalias() = _inverse_ptr->solve(_identity);
+}
+
+void init(const Dynamic_Matrix& matrix, Scalar damping){
+        _damping.setConstant(std::min(matrix.rows(), matrix.cols()), damping);
+        _init(matrix);
+}
+
+void init(const Dynamic_Matrix& matrix, const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damping){
+        if(damping.size() != std::min(matrix.rows(), matrix.cols()))
+                throw(std::invalid_argument("Couldn't initialize pseudo inverse, incompatibile damping size"));
+        _damping = damping;
+        _init(matrix);
+}
+
+Scalar damping(int i){
+        return _damping[i];
+}
+
+void setDamping(int i, double damp){
+        _damping[i] = damp;
+}
+
+void setDamping(const Eigen::Matrix<Scalar, Eigen::Dynamic, 1>& damp){
+        for(int i = 0; i < _damping.size(); i++)
+            _damping[i] = damp[i];
+}
+
+Eigen::Matrix<Scalar, Eigen::Dynamic, 1> damping() {return _damping;}
+
+
+const Dynamic_Matrix& get() const {
+        return _inversed;
+}
+virtual ~Inverse() {
+}
+
+protected:
+std::unique_ptr<Eigen::LDLT<Dynamic_Matrix> > _inverse_ptr;
+Eigen::Matrix<Scalar, Eigen::Dynamic, 1> _damping;
+Dynamic_Matrix _inversed, _identity;
+
+void _init(const Dynamic_Matrix& matrix)
+{
+      if(matrix.rows() != matrix.cols())
+        throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Can not initialize matrix inversed, expected square matrix."));
+
+        _inversed.setZero(matrix.rows(), matrix.cols());
+        _inverse_ptr.reset(new Eigen::LDLT<Dynamic_Matrix>(matrix.rows()));
+        _damping = _damping.cwiseProduct(_damping);
+        _identity.setIdentity(matrix.rows(), matrix.cols());
+}
+};
+
+
+
+
 template <typename Dynamic_Matrix, typename Scalar> class PseudoInverse2
 {
 
