@@ -59,6 +59,7 @@ typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, 0, RT_SIZE, RT_SIZ
 typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, 0, RT_SIZE, 1> VectorLimited;
 
 typedef eigen_utils::PseudoInverse2<mwoibn::Matrix, mwoibn::Scalar> PseudoInverse;
+typedef eigen_utils::Inverse<mwoibn::Matrix, mwoibn::Scalar> Inverse;
 typedef eigen_utils::PseudoInverse2<mwoibn::MatrixLimited, mwoibn::Scalar> PseudoInverseLimited;
 typedef mwoibn::eigen_utils::AgumentedNullSpaceProjection<mwoibn::Matrix, mwoibn::Scalar> Projection;
 
