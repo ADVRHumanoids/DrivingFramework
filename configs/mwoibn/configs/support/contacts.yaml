@@ -6,7 +6,7 @@ centauro:
          position: [0.0, 0.0, 0.0]
          offset: [0.0, 0.0, -0.078]
          constraint_matrix: # required, at least one subelement is required to initialize the contact, normal of a force/moment constraint
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force 
+            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
             force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
             force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
             momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
@@ -24,7 +24,7 @@ centauro:
          position: [0.0, 0.0, 0.0]
          offset: [0.0, 0.0, -0.078]
          constraint_matrix:
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force 
+            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
             force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
             force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
             momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
@@ -37,12 +37,12 @@ centauro:
          initialize: true
          interface: fixed
       contact2:
-         name: rear_right_leg
+         name: rear_left_leg
          end_frame: wheel_3
          position: [0.0, 0.0, 0.0]
          offset: [0.0, 0.0, -0.078]
          constraint_matrix:
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force 
+            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
             force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
             force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
             momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
@@ -55,12 +55,12 @@ centauro:
          initialize: true
          interface: fixed
       contact3:
-         name: rear_left_leg
+         name: rear_right_leg
          end_frame: wheel_4
          position: [0.0, 0.0, 0.0]
          offset: [0.0, 0.0, -0.078]
          constraint_matrix:
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force 
+            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
             force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
             force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
             momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
