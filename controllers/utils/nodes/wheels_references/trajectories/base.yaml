@@ -1,0 +1,37 @@
+base now: [0.0, 0.0,  0.0, 0.0]
+
+base_const_vel: [0.0, -0.0, 0.0, 0.1]
+
+# default velocity, controller step 11
+vel:  0.01
+dt:   0.01
+
+# initial support position
+x cp: [0.0, 0.0, 0.0, 0.0 ]
+y cp: [0.0, 0.0, 0.0, 0.0 ]
+z cp: [0.0, 0.0, 0.0, 0.0 ]
+
+# predefined x references
+x cp ref:
+  - [ 0.0,  0.0,  0.0,  0.0]
+  - [ 0.0,  0.0,  0.1,  0.1]
+
+
+# predefined y references
+y cp ref:
+  - [0.0, 0.0, 0.0, 0.0]
+
+# predefined z references
+z cp ref:
+  - [0.0, 0.0, 0.0, 0.0]
+
+# predefined base references
+base ref:
+  - [0.0, 0.0, 0.0, 0.0]
+  - [0.0, -0.1, 0.0, 0.0]
+
+# pattern
+pattern:
+  1:
+    type: wait
+    steps: 1000

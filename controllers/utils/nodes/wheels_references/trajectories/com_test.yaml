@@ -1,0 +1,152 @@
+base now: [0.0, 0.0,  0.0, 0.0]
+
+base_const_vel: [0.0, 0.0, 0.0, 0.0]
+
+# default velocity, controller step 11
+vel:  0.05
+dt:   0.01
+
+# initial support position
+x cp: [0.0, 0.0, 0.0, 0.0 ]
+y cp: [0.0, 0.0, 0.0, 0.0 ]
+z cp: [0.0, 0.0, 0.0, 0.0 ]
+
+# predefined x references
+x cp ref:
+  - [ 0.0,  0.0,  0.0,  0.0]
+  - [-0.2,  0.0,  0.0,  0.0]
+  - [ 0.2,  0.0,  0.0,  0.0]
+  - [-0.2,  -0.2,  0.0,  0.0]
+  - [ 0.2,  0.2,  0.0,  0.0]
+  - [-0.2,  -0.2, -0.2,  -0.2]
+  - [ 0.2,   0.2,  0.2, 0.2]
+
+# predefined y references
+y cp ref:
+  - [0.0, 0.0, 0.0, 0.0]
+  - [-0.2,  0.0,  0.0,  0.0]
+  - [ 0.2,  0.0,  0.0,  0.0]
+  - [-0.2,  -0.2,  0.0,  0.0]
+  - [ 0.2,  0.2,  0.0,  0.0]
+  - [-0.2,  -0.2, -0.2,  -0.2]
+  - [ 0.2,   0.2,  0.2, 0.2]
+
+# predefined z references
+z cp ref:
+  - [0.0, 0.0, 0.0, 0.0]
+
+# predefined base references
+base ref:
+  - [0.1, 0.0, 0.0, 0.0]
+  - [0.15, 0, 0.0, 0.0]
+
+# pattern
+pattern:
+  1:
+    type: move
+    x_cp: 1
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  2:
+    type: move
+    x_cp: 2
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  3:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  4:
+    type: move
+    x_cp: 3
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  5:
+    type: move
+    x_cp: 4
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  6:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  7:
+    type: move
+    x_cp: 5
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  8:
+    type: move
+    x_cp: 6
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  9:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  10:
+    type: move
+    x_cp: 0
+    y_cp: 1
+    z_cp: 0
+    base: 0
+  11:
+    type: move
+    x_cp: 0
+    y_cp: 2
+    z_cp: 0
+    base: 0
+  12:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  13:
+    type: move
+    x_cp: 0
+    y_cp: 3
+    z_cp: 0
+    base: 0
+  14:
+    type: move
+    x_cp: 0
+    y_cp: 4
+    z_cp: 0
+    base: 0
+  15:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+  16:
+    type: move
+    x_cp: 0
+    y_cp: 5
+    z_cp: 0
+    base: 0
+  17:
+    type: move
+    x_cp: 0
+    y_cp: 6
+    z_cp: 0
+    base: 0
+  18:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
