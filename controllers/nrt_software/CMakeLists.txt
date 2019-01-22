@@ -44,12 +44,12 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 LIST( APPEND CATKIN_DEPENDS_SET
-  robot_class_xbot
-  robot_class_ros_extension
   controllers
   state_estimation
   plugins
   ros_callbacks
+  robot_class_ros_extension
+  robot_class_xbot
 )
 
 if(VISUALIZATION_TOOLS)
@@ -147,9 +147,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS
     include
+    ${Eigen3_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${XCM_INCLUDE_DIRS}
-    ${Eigen3_INCLUDE_DIRS}
   LIBRARIES
     ${XCM_LIBRARIES}
   CATKIN_DEPENDS
@@ -159,10 +159,19 @@ catkin_package(
 )
 
 include_directories(
+#  /usr/local/include
   include
   ${catkin_INCLUDE_DIRS}
   ${XCM_INCLUDE_DIRS}
 )
+
+#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+#foreach(dir ${dirs})
+#  message(WARNING "dir='${dir}'")
+#endforeach()
+
+
+
 
 LIST( APPEND INSTALL_TARGETS
   shared
@@ -173,7 +182,7 @@ LIST( APPEND INSTALL_TARGETS
  target_link_libraries(shared
      -ldl
      ${catkin_LIBRARIES}
-     ${XCM_LIBRARIES}     
+     ${XCM_LIBRARIES}
   )
 
 
@@ -187,7 +196,7 @@ LIST( APPEND INSTALL_TARGETS
      ${catkin_LIBRARIES}
      ${XCM_LIBRARIES}
   )
-   
+
   if ( Xenomai_FOUND )
     message(WARNING "set_xeno_flags")
     set_xeno_flags(joint_states)
@@ -219,7 +228,7 @@ LIST( APPEND INSTALL_TARGETS
     message(WARNING "set_xeno_flags")
     set_xeno_flags(odometry)
   endif()
-  
+
     LIST( APPEND INSTALL_TARGETS NwheelsWorld )
 
     add_library(NwheelsWorld SHARED
@@ -409,7 +418,7 @@ LIST( APPEND INSTALL_TARGETS NwheelsMerge )
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-message(WARNING "ADVR_SUPERBUILD_DIR: " ${ADVR_SUPERBUILD_DIR})
+#message(WARNING "ADVR_SUPERBUILD_DIR: " ${ADVR_SUPERBUILD_DIR})
 
  # Mark executables and/or libraries for installation
   install(TARGETS ${INSTALL_TARGETS}
