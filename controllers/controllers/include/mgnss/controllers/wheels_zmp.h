@@ -17,9 +17,7 @@
 #include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 
-#include <mgnss/controllers/devel/contact_point_zmp.h>
-
-//#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
+#include <mgnss/controllers/devel/contact_point_zmp_v2.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
 //#include "mgnss/higher_level/steering_reactif_zmp.h"
@@ -28,6 +26,14 @@
 #include <mwoibn/hierarchical_control/tasks/orientation_selective_task.h>
 
 #include <mwoibn/robot_points/linear_point.h>
+
+//TEMP
+#include <mwoibn/dynamic_models/basic_model.h>
+
+#include <mgnss/higher_level/support_shaping_v3_0.h>
+
+#include "mwoibn/robot_points/constant.h"
+
 namespace mgnss
 {
 
@@ -37,18 +43,26 @@ class WheelsZMP : public WheelsControllerExtend
 {
 
 public:
-WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot)
+WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), __dynamics(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
+        shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
+
         _create(config);
+        for(auto& name: _robot.getLinks("wheels"))
+          centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
 
 
-WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot)
+WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), __dynamics(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
+        shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
+
         _create(config);
+        for(auto& name: _robot.getLinks("wheels"))
+          centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
 virtual ~WheelsZMP() {
@@ -68,7 +82,6 @@ void release(int i){
 }
 
 virtual void log(mwoibn::common::Logger& logger, double time);
-
 
 void updateBase(){
         _com_ref << _position[0], _position[1];
@@ -112,16 +125,16 @@ virtual void setBaseRotVelY(double dth) {
 virtual void setBaseHeading(double th) {
         _heading = th;
 }
-
-virtual const mwoibn::Vector3& getCp(int i){
-        return _steering_ptr_2->getPointStateReference(i);
-}
-virtual mwoibn::VectorN errorCp(int i){
-        return _steering_ptr_2->getReferenceError(i);
-}
-virtual const mwoibn::VectorN& refCp(){
-        return _steering_ptr_2->getReference();
-}
+//
+// virtual const mwoibn::Vector3& getCp(int i){
+//         return _steering_ptr_2->getPointStateReference(i);
+// }
+// virtual mwoibn::VectorN errorCp(int i){
+//         return _steering_ptr_2->getReferenceError(i);
+// }
+// virtual const mwoibn::VectorN& refCp(){
+//         return _steering_ptr_2->getReference();
+// }
 
 virtual const mwoibn::VectorN& refSteer(){
         return steerings;
@@ -129,46 +142,73 @@ virtual const mwoibn::VectorN& refSteer(){
 
 //virtual void step();
 
-const mwoibn::VectorN& getSupportReference()
-{
-        return _steering_ptr_2->getReference();
-}
+// const mwoibn::VectorN& getSupportReference()
+// {
+//         return _steering_ptr_2->getReference();
+// }
 const mwoibn::VectorN& getBodyPosition()
 {
         return _pelvis_position_ptr->getReference();
 }
 
-//virtual void nextStep();
+virtual void nextStep(){
+
+    _robot.centerOfMass().update();
+
+    shape__->solve();
+    for(int i = 0; i < 4; i++)
+      _support_vel.segment<2>(3*i) = shape__->get().segment<2>(2*i);
+
+
+    step();
+
+    updateBase();
+    _updateSupport();
+
+    _next_step[0] = (_linear_vel[0]);
+    _next_step[1] = (_linear_vel[1]);
+    _next_step[2] = (_angular_vel[2]); // just limit the difference
+
+    steering();
+
+}
 
 
 protected:
 
-virtual void _updateSupport()
-{
-  for(int i = 0, k = 0; i < _steering_select.size(); i++){
-        _steering_select[i] ? _steering_ptr_2->setReference(k, _support.segment<3>(3*i)) : _steering_ptr->setReference(i-k, _support.segment<3>(3*i));
-        k += _steering_select[i];
-  }
-}
+  mwoibn::dynamic_models::BasicModel __dynamics;
+  std::unique_ptr<mgnss::higher_level::SupportShapingV3> shape__;
+  mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
+
+// virtual void _updateSupport()
+// {
+//   for(int i = 0, k = 0; i < _steering_select.size(); i++){
+//         _steering_select[i] ? _steering_ptr_2->setReference(k, _support.segment<3>(3*i)) : _steering_ptr->setReference(i-k, _support.segment<3>(3*i));
+//         k += _steering_select[i];
+//   }
+// }
 
 
-std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointZMP> _steering_ptr_2;
+// std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointZMPV2> _steering_ptr_2;
 std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
 
-mwoibn::VectorBool _steering_select;
+// mwoibn::VectorBool _steering_select;
 
 
 void _allocate(YAML::Node config);
 
 
 std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _contact_point;
-
+mwoibn::VectorN estimated__;
 mwoibn::VectorN _com_ref;
+
+mwoibn::robot_points::Constant _world;
 
 virtual void _setInitialConditions();
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
 virtual void _initIK(YAML::Node config);
+
 
 
 };

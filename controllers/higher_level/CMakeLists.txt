@@ -14,8 +14,8 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS steering)
-LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control robot_class)
+LIST( APPEND INSTALL_TARGETS steering support_shaping)
+LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control robot_class eiquadprog)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -27,6 +27,7 @@ catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   LIBRARIES
         steering
+        support_shaping
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -49,12 +50,26 @@ add_library(steering
    src/steering_reactif.cpp
 #   src/steering_reactif_zmp.cpp
  )
+ add_dependencies(steering ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(steering ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(steering
+    ${catkin_LIBRARIES}
+  )
 
-target_link_libraries(steering
-   ${catkin_LIBRARIES}
- )
+
+ add_library(support_shaping
+    src/support_shaping.cpp
+    src/support_shaping_v2_0.cpp
+    src/support_shaping_v3_0.cpp
+
+  )
+  add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})
+
+  target_link_libraries(support_shaping
+     ${catkin_LIBRARIES}
+   )
+
+
 
  ## Mark executables and/or libraries for installation
   install(TARGETS ${INSTALL_TARGETS}

@@ -30,7 +30,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         WheelsControllerExtend::_createTasks(config);
 
         mwoibn::Vector3 pelvis;
-        pelvis << 0, 0, 1;
+        pelvis << 1, 1, 1;
         mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
                                                            _robot.getLinks("base"));
         _pelvis_position_ptr.reset(
@@ -51,14 +51,14 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
         _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
-        _world_posture_ptr->addTask(*_com_ptr);
+        // _world_posture_ptr->addTask(*_com_ptr);
 
         mwoibn::VectorBool select(3);
-        select << false, false, true;
+        select << true, true, true;
         _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
 
         _tasks["CONTACT_POINTS"] = _steering_ptr.get();
-        _tasks["BASE_GROUND"] = _com_ptr.get();
+        // _tasks["BASE_GROUND"] = _com_ptr.get();
         _tasks["BASE_GRAVITY"] = _pelvis_position_ptr.get();
         _tasks["BASE"] = _world_posture_ptr.get();
 
@@ -77,14 +77,31 @@ void mgnss::controllers::WheeledMotionEvent3::_setInitialConditions(){
 
 
 void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger, double time){
-   mgnss::controllers::WheelsControllerExtend::log(logger ,time);
+  logger.add("time", time);
 
-   logger.add("com_x", getComFull()[0]);
-   logger.add("com_y", getComFull()[1]);
+   logger.add("th", _robot.state.position.get()[5]);
+   logger.add("r_th", _heading);
    //
-   logger.add("r_com_x", refCom()[0]);
-   logger.add("r_com_y", refCom()[1]);
+       for(int i = 0; i < 3; i++){
 
+         logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
+         logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
+         logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
+         logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
+
+         for(int k = 0; k < 4; k++){
+
+           logger.add("cp_"   + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getPointStateReference(k)[i]);
+
+           logger.add("r_cp_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getReference()[k*3+i]);
+
+           logger.add("full_error_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getFullError()[k*3+i]);
+
+           logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
+
+
+         }
+       }
 
 
 }

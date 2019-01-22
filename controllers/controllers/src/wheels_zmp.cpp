@@ -1,8 +1,7 @@
 #include "mgnss/controllers/wheels_zmp.h"
 #include "mgnss/higher_level/steering_v8.h"
 
-//#include <mwoibn/hierarchical_control/tasks/contact_point_zmp.h>
-#include <mgnss/controllers/devel/contact_point_zmp.h>
+#include <mgnss/controllers/devel/contact_point_zmp_v2.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point_3D_rbdl_task.h>
 
@@ -14,23 +13,10 @@
 void mgnss::controllers::WheelsZMP::compute()
 {
         _com_ptr->update();
-        //
-        // if(!_steering_select.all()){
-        //   _steering_ptr->updateState();
-        //   _steering_ptr->update();
-        // }
-        // if(_steering_select.any()){
-        //   _steering_ptr_2->updateState();
-        //   _steering_ptr_2->update();
-        // }
-        // std::cout << _robot.centerOfPressure().get().transpose() << std::endl;
 
-        // std::cout << "ZMP\t" << _steering_ptr_2->getError().transpose() << std::endl;
-        // std::cout << "COM\t" << _steering_ptr->getError().transpose() << std::endl;
-        // std::cout << "jZMP\t" << _steering_ptr_2->getJacobian() << std::endl;
-        // std::cout << "jCOM\t" << _steering_ptr->getJacobian() << std::endl;
-
-        WheelsControllerExtend::compute();
+        //_support = _support + _support_vel*_robot.rate();
+        // without resttering
+        WheelsController::compute();
 }
 
 void mgnss::controllers::WheelsZMP::steering()
@@ -51,11 +37,11 @@ void mgnss::controllers::WheelsZMP::steering()
 
 void mgnss::controllers::WheelsZMP::_setInitialConditions(){
 
-  if(!_steering_select.all())
+  // if(!_steering_select.all())
       _steering_ptr->reset();
 
-  if(_steering_select.any())
-        _steering_ptr_2->reset();
+  // if(_steering_select.any())
+  //       _steering_ptr_2->reset();
 
         _dt = _robot.rate();
 
@@ -64,15 +50,17 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         _leg_tasks["CASTER"].first.updateError();
 
   // if(!_steering_select.all())
-  //       _steering_ptr->updateState();
+        _steering_ptr->updateState();
   // if(_steering_select.any())
   //       _steering_ptr_2->updateState();
 
 
-        for(int i = 0, k = 0; i < _steering_select.size(); i++){
-          _support.segment<3>(3*i) = (_steering_select[i])? _steering_ptr_2->getReference(k): _steering_ptr->getReference(i-k);
-          k += _steering_select[i];
-        }
+        // for(int i = 0, k = 0; i < _steering_select.size(); i++){
+        //   _support.segment<3>(3*i) = (_steering_select[i])? _steering_ptr_2->getReference(k): _steering_ptr->getReference(i-k);
+        //   k += _steering_select[i];
+        // }
+        _support.noalias() = _steering_ptr->getReference();
+
         _support_vel.setZero();
 
         for(auto& item_: _leg_tasks)
@@ -82,19 +70,27 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         WheelsController::_setInitialConditions();
 
         _pelvis_position_ptr->points().point(0).getLinearWorld(_position);
-        _position.head<2>() = _robot.centerOfMass().get().head<2>();
+        // DIRECT COM CONTROL
+        //_position.head<2>() = _robot.centerOfMass().get().head<2>();
         _pelvis_position_ptr->setReference(0, _position);
         _com_ptr->setReference(_position);
 
-        if(_steering_select.any())
-              _steering_ptr_2->start();
+        // if(_steering_select.any())
+        //       _steering_ptr_2->start();
+        _robot.centerOfMass().update(true);
+        shape__->update();
+        estimated__ = shape__->margin();
 }
 
 
 void mgnss::controllers::WheelsZMP::_allocate(){
           WheelsControllerExtend::_allocate();
         _com_ref.setZero(2);
-
+        __dynamics.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
+        shape__->addTask(*_tasks["CONSTRAINTS"]);
+        shape__->addTask(*_tasks["BASE"]);
+        shape__->addTask(*_tasks["CAMBER"]);
+        shape__->init();
 }
 
 void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
@@ -104,7 +100,7 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
     _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
-                          _robot, *_steering_ptr_2, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
+                          _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 }
 
 void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
@@ -114,14 +110,17 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
         WheelsControllerExtend::_createTasks(config);
 
         mwoibn::Vector3 pelvis;
-        pelvis << 0, 0, 1;
+        // DIRECT COM
+        // pelvis << 0, 0, 1;
+        // INDIRECT CoM
+        pelvis << 1, 1, 1;
         mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
                                                            _robot.getLinks("base"));
         _pelvis_position_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::CartesianSelective(pelvis_ph,
                                                                             pelvis));
 
-        _steering_select.setConstant(4,false);
+        // _steering_select.setConstant(4,false);
 
         _com_ptr.reset(new mwoibn::hierarchical_control::tasks::CenterOfMass(_robot));
         _com_ptr->setDofs(_robot.selectors().get("lower_body").getBool());
@@ -130,61 +129,81 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
         mwoibn::robot_points::Handler<mwoibn::robot_points::TorusModel> contact_points(_robot.getDofs());
 
-        for(auto& contact: _robot.contacts())
-        {
-            std::string name = _robot.getBodyName(contact->wrench().getBodyId());
-            if(!std::count(names.begin(), names.end(), name)){
-              std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
-              names.erase(std::remove(names.begin(), names.end(), name), names.end());
-              continue;
-            }
-            _steering_select[contact_points.size()] = true;
-
-            mwoibn::robot_points::TorusModel torus_(
-                               _robot, mwoibn::point_handling::FramePlus(name,
-                               _robot.getModel(), _robot.state),
-                               mwoibn::Axis(config["reference_axis"][name]["x"].as<double>(),
-                                            config["reference_axis"][name]["y"].as<double>(),
-                                            config["reference_axis"][name]["z"].as<double>()),
-                                            config["minor_axis"].as<double>(), config["major_axis"].as<double>(),
-                                            contact->getGroundNormal());
-            contact_points.add(torus_);
-
-        }
+        // for(auto& contact: _robot.contacts())
+        // {
+        //     std::string name = _robot.getBodyName(contact->wrench().getBodyId());
+        //     if(!std::count(names.begin(), names.end(), name)){
+        //       std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+        //       names.erase(std::remove(names.begin(), names.end(), name), names.end());
+        //       continue;
+        //     }
+        //     _steering_select[contact_points.size()] = true;
+        //
+        //     mwoibn::robot_points::TorusModel torus_(
+        //                        _robot, mwoibn::point_handling::FramePlus(name,
+        //                        _robot.getModel(), _robot.state),
+        //                        mwoibn::Axis(config["reference_axis"][name]["x"].as<double>(),
+        //                                     config["reference_axis"][name]["y"].as<double>(),
+        //                                     config["reference_axis"][name]["z"].as<double>()),
+        //                                     config["minor_axis"].as<double>(), config["major_axis"].as<double>(),
+        //                                     contact->getGroundNormal());
+        //     contact_points.add(torus_);
+        //
+        // }
 
           _contact_point.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
           //_base_ptr.reset(new mwoibn::robot_points::LinearPoint(_robot.getLinks("base")[0], _robot));
 
-          if(_steering_select.count() < 4){
-            _steering_ptr.reset(
-                  new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl({}, _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
+          // if(_steering_select.count() < 4){
+          //   _steering_ptr.reset(
+          //         new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl({}, _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
+          //   _steering_ptr->subscribe(true, true, false);
+          //   _contact_point->addTask(*_steering_ptr);
+          // }
+          // if(_steering_select.count()){
+            // _steering_ptr_2.reset(new mwoibn::hierarchical_control::tasks::ContactPointZMP(contact_points,
+            //                     _robot, "pelvis", config["position_gain"].as<double>()));
+            YAML::Node tunning = config["tunnings"][config["tunning"].as<std::string>()];
+
+            std::cout << tunning << std::endl;
+            // _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
+            //                     _robot.getLinks("wheels"), _robot, config, _robot.getLinks("base")[0], tunning["COP"].as<double>()));
+            _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
+                                _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), "pelvis", tunning["COP"].as<double>()));
+
             _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
-          }
-          if(_steering_select.count()){
-            _steering_ptr_2.reset(new mwoibn::hierarchical_control::tasks::ContactPointZMP(contact_points,
-                                _robot, "pelvis", config["position_gain"].as<double>()));
-            _steering_ptr_2->subscribe(true, true, false);
-            _contact_point->addTask(*_steering_ptr_2);
-          }
+            // _contact_point->addTask(*_steering_ptr_2);
+          // }
 
           _tasks["CONTACT_POINTS"] = _contact_point.get();
           _tasks["CONTACT_POINTS_1"] = _steering_ptr.get();
-          _tasks["CONTACT_POINTS_2"] = _steering_ptr_2.get();
+          // _tasks["CONTACT_POINTS_2"] = _steering_ptr_2.get();
 
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
         _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
-        _world_posture_ptr->addTask(*_com_ptr);
 
+        // INDIRECT COM TRACKING
         mwoibn::VectorBool select(3);
-        select << false, false, true;
+        select << true, true, true;
         _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
-
-        _tasks["BASE_GROUND"] = _com_ptr.get();
+        // /_tasks["BASE_GROUND"] = _com_ptr.get();
         _tasks["BASE_GRAVITY"] = _pelvis_position_ptr.get();
         _tasks["BASE"] = _world_posture_ptr.get();
+
+        // DIRECT COM TRACKING
+        // _world_posture_ptr->addTask(*_com_ptr);
+
+        // mwoibn::VectorBool select(3);
+        // select << false, false, true;
+        // _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
+        //
+        //
+        // _tasks["BASE_GROUND"] = _com_ptr.get();
+        // _tasks["BASE_GRAVITY"] = _pelvis_position_ptr.get();
+        // _tasks["BASE"] = _world_posture_ptr.get();
 
 }
 
@@ -197,47 +216,99 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 
   // logger.add("r_com_x", refCom()[0]);
   // logger.add("r_com_y", refCom()[1]);
+  //mgnss::controllers::WheelsControllerExtend::log(logger ,time);
+  logger.add("time", time);
 
    logger.add("th", _robot.state.position.get()[5]);
    logger.add("r_th", _heading);
    //
        for(int i = 0; i < 3; i++){
 
-         logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
+         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
          logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
          logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
+         logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
 
-         for(int point = 0, k = 0; point < _steering_select.size(); point++){
+         for(int k = 0; k < 4; k++){
 
-           logger.add("cp_"   + std::to_string(point+1) + "_" + char('x'+i),
-                           _steering_select[point] ? _steering_ptr_2->getPointStateReference(k)[i] : _steering_ptr->getPointStateReference(point-k)[i]);
+           logger.add("cp_"   + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getPointStateReference(k)[i]);
 
-           logger.add("r_cp_" + std::to_string(point+1) + "_" + char('x'+i),
-                           _steering_select[point] ? _steering_ptr_2->getReference()[k*3+i] : _steering_ptr->getReference()[(point-k)*3+i]);
+           logger.add("r_cp_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getReference()[k*3+i]);
 
            // logger.add("position_error_" + std::to_string(point+1) + "_" + char('x'+i),
            //                 _steering_select[point] ? _steering_ptr_2->getPositionError()[k*3+i] : 0);
 
-           logger.add("full_error_" + std::to_string(point+1) + "_" + char('x'+i),
-                           _steering_select[point] ? _steering_ptr_2->getFullError()[k*3+i] : 0);
-
-           logger.add("getForce_" + std::to_string(point+1) + "_" + char('x'+i),
-                           _steering_select[point] ? _steering_ptr_2->getForce()[k*3+i] :0);
+           // logger.add("full_error_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getFullError()[k*3+i]);
+           //
+           // logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
 
            // logger.add("com_error_" + std::to_string(point+1) + "_" + char('x'+i),
            //                _steering_select[point] ? _steering_ptr_2->getTestError()[k*3+i] : 0);
 
-           k += _steering_select[point];
+           // k += _steering_select[point];
 
          }
        }
 
-      for(auto& state_: {"MINUS_TORQUE","CONTACT_TORQUE","COM_TORQUE"}){
-        for(int i = 0; i < _robot.state[state_].size(); i++)
-          logger.add(state_ + std::string("_") + _robot.getLinks(i), _robot.state[state_][i]);
-      }
-      for(auto& state_: {"CONTACT_FORCE","COM_FORCE", "COM_CONTACT_FORCE"}){
-          for(int i = 0; i < _robot.state[state_].size(); i++)
-            logger.add(state_ + std::string("_") + std::to_string(i/3+1) + std::string("_") + char('x'+(i%3)), _robot.state[state_][i]);
-      }
+//      for(auto& state_: {"MINUS_TORQUE","CONTACT_TORQUE","COM_TORQUE"}){
+//        for(int i = 0; i < _robot.state[state_].size(); i++)
+//          logger.add(state_ + std::string("_") + _robot.getLinks(i), _robot.state[state_][i]);
+//      }
+//      for(auto& state_: {"CONTACT_FORCE","COM_FORCE", "COM_CONTACT_FORCE"}){
+//          for(int i = 0; i < _robot.state[state_].size(); i++)
+//            logger.add(state_ + std::string("_") + std::to_string(i/3+1) + std::string("_") + char('x'+(i%3)), _robot.state[state_][i]);
+//      }
+
+// sprawdzić siłę, a potem spróbować drugą metodę
+// jeśli zadziała to ruszyć z support polygon i ewentualnie jak bede miec czas to pomyslec z admitance na contact point
+
+
+        // CHECK FORCE ESTIMATION
+        __dynamics.update();
+        // _robot.centerOfMass().accelerationComponent();
+        //
+        //
+        // mwoibn::Vector3 F_m__ = _robot.centerOfMass().mass()*_robot.centerOfMass().getJacobian()*__dynamics.getInertiaInverse()*(-_robot.state["OVERALL_FORCE"].get());
+        // F_m__ +=  _robot.centerOfMass().mass()*_robot.centerOfMass().acceleration();
+        //
+        // mwoibn::Vector3 F_des__ = F_m__;
+
+        // this does not use a CoM.mass because it is already included in the gain in this implementation
+        //F_des__.head<2>() += _tasks["BASE"]->getError().segment<2>(3).cwiseProduct(std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain().segment<2>(3));
+        // F_des__ += (_robot.centerOfMass().getJacobian()*_robot.command.velocity.get())*_robot.centerOfMass().mass()/_robot.rate(); // \d_q_des*CoM.m/robot.rate
+        //
+        //
+        // for(int i = 0; i < 3; i++){
+        //   logger.add(std::string("comForce_") + char('x'+i), F_m__[i]);
+        //   logger.add(std::string("comDes_") + char('x'+i), F_des__[i]);
+        //   logger.add(std::string("comDiff_") + char('x'+i), F_des__[i] - F_m__[i]);
+        // }
+        //
+        // logger.add(std::string("comFactor"), dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get())->comFactor() );
+        // logger.add(std::string("forceFactor"), dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get())->forceFactor() );
+
+        // i need a snap in solver
+        // shape__->solve(logger);
+        shape__->log(logger);
+        estimated__ =  shape__->margin();
+
+        estimated__ =  shape__->marginJ().leftCols<12>()*shape__->points().getJacobian()*_robot.command.velocity.get() *_robot.rate();
+        estimated__ +=  shape__->marginJ().rightCols<2>()*_robot.centerOfMass().getJacobian().topRows<2>()*_robot.command.velocity.get()*_robot.rate();
+
+        for(int i = 0; i < estimated__.size(); i++){
+        //   logger.add(std::string("margin_est")+std::to_string(i), estimated__[i]);
+          logger.add(std::string("margin")+std::to_string(i), shape__->margin()[i]);
+        }
+
+        // for(int i = 0; i < _tasks["BASE"]->getTaskSize(); i++){
+        //   logger.add(std::string("base_error_") + std::to_string(i), _tasks["BASE"]->getError()[i]);
+        //   logger.add(std::string("gain_") + std::to_string(i), std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain()[i]);
+        // }
+
+        //std::cout << std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain().transpose() << std::endl;
+
+        // F =  \tau - (JH^{-1}J^T)^{-1}JH^{-1} ( "OVERALL_FORCE"- state.torque - dJdq)
+        // F_des = M (\ddot m + K_p * (m_des - m)) - I save it an recompute after log? 0 to see how well it is tracked?
+        // \ddot m = JH^{-1} ("OVERALL_FORCE" - dJdq)
+
 }
