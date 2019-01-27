@@ -61,7 +61,8 @@ add_library(steering
     src/support_shaping.cpp
     src/support_shaping_v2_0.cpp
     src/support_shaping_v3_0.cpp
-
+    src/qr_tracking.cpp
+    src/state_machine.cpp
   )
   add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})
 

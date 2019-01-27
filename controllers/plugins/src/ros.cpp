@@ -19,7 +19,7 @@ int main(int argc, char** argv)
                 boost::program_options::store( boost::program_options::parse_command_line(argc, argv, desc), vm); // can throw
 
                 if ( !vm.count("plugin")  )
-                {  std::cout << "Please specify plugin name to load" << std::endl;
+                {  std::cout << "Please specify plugin to load (p, plugin)" << std::endl;
                    return 1; }
         }
         catch(boost::program_options::error& e)

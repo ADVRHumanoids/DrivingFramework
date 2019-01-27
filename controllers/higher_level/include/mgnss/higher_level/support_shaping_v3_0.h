@@ -16,12 +16,15 @@
 
 #include "mwoibn/common/logger.h"
 
+#include "mgnss/higher_level/state_machine.h"
+
 namespace mgnss
 {
 
 namespace higher_level
 {
 
+class Limit;
 /*
  *  Steering version with contact point open-loop reference
  *  For now, just hardcode everythong
@@ -30,12 +33,12 @@ class SupportShapingV3
 {
 
 public:
-  SupportShapingV3(mwoibn::robot_class::Robot& robot, YAML::Node config);
+  SupportShapingV3(mwoibn::robot_class::Robot& robot, YAML::Node config, std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace);
 
   ~SupportShapingV3(){}
 
-mwoibn::Matrix& marginJ(){return _margins_jacobian;}
-mwoibn::VectorN& margin(){return _margins;}
+// mwoibn::Matrix& marginJ(){return _margins_jacobian;}
+// mwoibn::VectorN& margin(){return _margins;}
 
 void init();
 void update();
@@ -43,36 +46,42 @@ void update();
 void solve();
 void log(mwoibn::common::Logger& logger);
 mwoibn::VectorN get(){return _optimal_state;}
-
-void addTask(mwoibn::hierarchical_control::tasks::BasicTask& task){_other_tasks.push_back(&task);}
-
-mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& points(){return _contact_points;}
+//
+// void addTask(mwoibn::hierarchical_control::tasks::BasicTask& task){_other_tasks.push_back(&task);}
+//
+// mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& points(){return _contact_points;}
 
 protected:
   mwoibn::robot_class::Robot& _robot;
-  mwoibn::robot_points::Point& _base;
-
+  // mwoibn::robot_points::Point& _base;
+  unsigned int _size;
   double _trace, cost__, _slack, _vars;
-  mwoibn::VectorN _safety, _workspace, _linear_cost, _vector_cost_;
+  mwoibn::VectorN _safety, _max_workspace, _linear_cost, _vector_cost_;
   mwoibn::Matrix _quadratic_cost;
-  mwoibn::VectorN _margins, _norms;
-  mwoibn::Matrix _margins_jacobian;
+  // mwoibn::VectorN _margins, _norms;
+  // mwoibn::Matrix _margins_jacobian;
   mwoibn::Matrix _equality_matrix, _inequality_matrix;
   mwoibn::VectorN _equality_vector, _inequality_vector;
   mwoibn::VectorN _optimal_state, _return_state;
 
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contact_points;
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _points;
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _base_points;
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _hips, _wheels;
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _workspace_points;
+  // const mwoibn::VectorN &_margins, &_workspace;
+  // const mwoibn::Matrix &_margins_jacobian, &_workspace_jacobian;
 
-  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>> _wheel_transforms;
+  const mgnss::higher_level::Limit &_margin, &_workspace;
+
+  // mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contact_points;
+  // mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _points;
+  // mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _base_points;
+  // mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _hips, _wheels;
+  // mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _workspace_points;
+
+  // std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>> _wheel_transforms;
+  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& _wheel_transforms;
 
   std::vector<std::pair<int,int>> _margin_pairs;
   Eigen::LLT<Eigen::MatrixXd,Eigen::Lower> _llt;
 
-  std::vector<mwoibn::hierarchical_control::tasks::BasicTask*> _other_tasks;
+  // std::vector<mwoibn::hierarchical_control::tasks::BasicTask*> _other_tasks;
 
   void _update();
 

@@ -52,12 +52,18 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
         _pb[i] = _b[i];
 
         _v[i] = _computeVelocity(i);
-        _damp[i] = std::tanh(std::fabs(_v[i]*_reactif_gain[i]/_dt) /_treshhold/ _treshhold_icm);
         _reactifGain(i);
+
+
+        _damp[i] = std::tanh(std::fabs(_v[i]*_reactif_gain[i]) /_treshhold/ _treshhold_icm);
+
+
+        double scale = (std::fabs(_reactif_gain[i]) < 0.1 && _v_sp[i]*_dt < 0.0002) ? std::fabs(1000*_reactif_gain[i]) : 1;
+
         _b[i] = std::atan2(  _K_icm * _v_icm[i]  * std::sin(_b_icm[i]) +
-                             _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::sin(_b_sp[i]),
+                             _K_sp  * scale * _v_sp[i]   * std::sin(_b_sp[i]),
                              _K_icm * _v_icm[i]  * std::cos(_b_icm[i]) +
-                             _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::cos(_b_sp[i]));
+                             _K_sp  * scale * _v_sp[i]   * std::cos(_b_sp[i]));
                              std::cout << std::fixed;
                              std::cout << std::setprecision(8);
         //std::cout << i << "\t_K_icm: " << _K_icm << "\t_K_sp: " << _K_sp << "\t_v_icm: " << _v_icm[i] << "\t_v_sp: " << _v_sp[i] <<  "\t_b_icm: " << _b_icm[i] << "\t_b_sp: " << _b_sp[i] << "\trg: " << _reactif_gain[i] << "\t_K_sp|_r_gain|_v_sp" << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i] << std::endl;
@@ -119,6 +125,11 @@ void mgnss::higher_level::SteeringReactif::_reactifGain(int i){
 
         _reactif_gain[i] = x * std::cos(b);
         _reactif_gain[i] += y * std::sin(b);
+
+        _reactif_gain[i] = _reactif_gain[i]/_dt;
+        std::cout << i << "\t" << _reactif_gain[i] << "\t" << _v_sp[i] << "\t" << _v_sp[i]*_dt << "\t" << _v_icm[i] << std::endl;
+
+
 }
 
 void mgnss::higher_level::SteeringReactif::_ICM(mwoibn::Vector3 next_step)

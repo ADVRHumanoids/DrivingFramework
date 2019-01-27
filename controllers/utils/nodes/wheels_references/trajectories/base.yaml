@@ -1,6 +1,6 @@
 base now: [0.0, 0.0,  0.0, 0.0]
 
-base_const_vel: [0.0, -0.0, 0.0, 0.1]
+base_const_vel: [0.0, 0.1, 0.0, 0.0]
 
 # default velocity, controller step 11
 vel:  0.01

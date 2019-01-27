@@ -1,6 +1,6 @@
 #include "mgnss/controllers/wheels_zmp.h"
-#include "mgnss/higher_level/steering_v8.h"
-
+// #include "mgnss/higher_level/steering_v8.h"
+#include "mgnss/higher_level/steering_reactif.h"
 #include <mgnss/controllers/devel/contact_point_zmp_v2.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point_3D_rbdl_task.h>
@@ -22,14 +22,16 @@ void mgnss::controllers::WheelsZMP::compute()
 void mgnss::controllers::WheelsZMP::steering()
 {
 
+
         _steering_ref_ptr->compute(_next_step);
+        std::cout << "_steerings\t" << steerings.transpose() << std::endl;
 
         steerings.noalias() = _steering_ref_ptr->get();
 
         for (int i = 0; i < 4; i++)
         {
-                 steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
-                 steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
+                 // steerings[i] = (steerings[i] < _l_limits[i]) ? steerings[i] + mwoibn::PI : steerings[i];
+                 // steerings[i] = (steerings[i] > _u_limits[i]) ? steerings[i] - mwoibn::PI : steerings[i];
                  setSteering(i, steerings[i]);
         }
 }
@@ -60,7 +62,7 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         //   k += _steering_select[i];
         // }
         _support.noalias() = _steering_ptr->getReference();
-
+        _modified_support.noalias() = _steering_ptr->getReference();
         _support_vel.setZero();
 
         for(auto& item_: _leg_tasks)
@@ -78,19 +80,43 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         // if(_steering_select.any())
         //       _steering_ptr_2->start();
         _robot.centerOfMass().update(true);
+        state_machine__->update();
+        restore__->update();
         shape__->update();
-        estimated__ = shape__->margin();
+        // estimated__ = shape__->margin();
 }
 
+void mgnss::controllers::WheelsZMP::step(){
+    if (state_machine__->state()){
+       std::cout << "step::restore\t" << restore__->get().transpose() * _robot.rate() << std::endl;
+       for(int i = 0; i < 4; i++)
+          _modified_support.segment<2>(3*i)  += restore__->get().segment<2>(2*i) * _robot.rate();
+        }
+   else {
+       std::cout << "step::shape" << shape__->get().transpose() * _robot.rate() << std::endl;
+       for(int i = 0; i < 4; i++)
+          _modified_support.segment<2>(3*i)  += shape__->get().segment<2>(2*i) * _robot.rate();
+
+        }
+
+        _position += _linear_vel  * _robot.rate();
+        _heading  += _angular_vel[2] * _robot.rate();
+        _heading  -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
+}
 
 void mgnss::controllers::WheelsZMP::_allocate(){
           WheelsControllerExtend::_allocate();
         _com_ref.setZero(2);
+        _modified_support.setZero(_tasks["CONTACT_POINTS"]->getTaskSize());
+
         __dynamics.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
-        shape__->addTask(*_tasks["CONSTRAINTS"]);
-        shape__->addTask(*_tasks["BASE"]);
-        shape__->addTask(*_tasks["CAMBER"]);
+        // shape__->addTask(*_tasks["CONSTRAINTS"]);
+        // shape__->addTask(*_tasks["BASE"]);
+        // shape__->addTask(*_tasks["CAMBER"]);
+        state_machine__->init();
+        restore__->init();
         shape__->init();
+
 }
 
 void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
@@ -99,9 +125,13 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
 
     YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
-    _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
-                          _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
+    _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
+              _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
+
+    // _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
+    //                       _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 }
+
 
 void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
@@ -171,6 +201,10 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             //                     _robot.getLinks("wheels"), _robot, config, _robot.getLinks("base")[0], tunning["COP"].as<double>()));
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
                                 _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), "pelvis", tunning["COP"].as<double>()));
+
+            state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
+            restore__.reset(new mgnss::higher_level::QrTracking(_robot, config, _support, _steering_ptr->getReference(), tunning["CONTACT_POINTS"].as<double>(), state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            shape__.reset(new mgnss::higher_level::SupportShapingV3(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
 
             _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
@@ -290,15 +324,17 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
         // i need a snap in solver
         // shape__->solve(logger);
         shape__->log(logger);
-        estimated__ =  shape__->margin();
+        restore__->log(logger);
 
-        estimated__ =  shape__->marginJ().leftCols<12>()*shape__->points().getJacobian()*_robot.command.velocity.get() *_robot.rate();
-        estimated__ +=  shape__->marginJ().rightCols<2>()*_robot.centerOfMass().getJacobian().topRows<2>()*_robot.command.velocity.get()*_robot.rate();
-
-        for(int i = 0; i < estimated__.size(); i++){
-        //   logger.add(std::string("margin_est")+std::to_string(i), estimated__[i]);
-          logger.add(std::string("margin")+std::to_string(i), shape__->margin()[i]);
-        }
+        // estimated__ =  shape__->margin();
+        //
+        // estimated__ =  shape__->marginJ().leftCols<12>()*shape__->points().getJacobian()*_robot.command.velocity.get() *_robot.rate();
+        // estimated__ +=  shape__->marginJ().rightCols<2>()*_robot.centerOfMass().getJacobian().topRows<2>()*_robot.command.velocity.get()*_robot.rate();
+        //
+        // for(int i = 0; i < estimated__.size(); i++){
+        // //   logger.add(std::string("margin_est")+std::to_string(i), estimated__[i]);
+        //   logger.add(std::string("margin")+std::to_string(i), shape__->margin()[i]);
+        // }
 
         // for(int i = 0; i < _tasks["BASE"]->getTaskSize(); i++){
         //   logger.add(std::string("base_error_") + std::to_string(i), _tasks["BASE"]->getError()[i]);

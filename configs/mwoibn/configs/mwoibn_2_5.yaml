@@ -1,50 +1,50 @@
-driving_path: &driving  "/home/malgorzata/catkin_ws/src/"
-simulator_path: &simulator "/home/malgorzata/catkin_ws/src/"
-config_path: &config "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/"
-support_path: &support "/home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/"
+driving_path: &driving  /home/malgorzata/catkin_ws/src/
+simulator_path: &simulator /home/malgorzata/catkin_ws/src/
+config_path: &config /home/malgorzata/catkin_ws/src/DrivingFramework/configs/
+support_path: &support /home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/
 
 mwoibn:
-        middleware: "ROS"
-        system: "SM" # SM
+        middleware: ROS
+        system: SM # SM
         layers:
             RT:
                         path: *config
-                        file: "mwoibn/configs/support/RT.yaml"
+                        file: mwoibn/configs/support/RT.yaml
             NRT:
                         path: *config
-                        file: "mwoibn/configs/support/NRT.yaml"
+                        file: mwoibn/configs/support/NRT.yaml
         robot:
-                name: "centauro"
+                name: centauro
                 systems:
                         HW:
                                 path: *config
-                                file: "mwoibn/configs/support/hardware.yaml"
+                                file: mwoibn/configs/support/hardware.yaml
                         SM:
                                 path: *config
-                                file: "mwoibn/configs/support/simulation.yaml"
+                                file: mwoibn/configs/support/simulation.yaml
                 default:
                         feedback:
-                                layer: "online"
+                                layer: online
                         actuators:
-                                read: "true"
+                                read: true
                         contacts:
-                                read: "true"
+                                read: true
                                 feedback: true
                 force_test:
                         feedback:
                                 list: [torque_reference, link_side_online, odometry]
                         actuators:
-                                read: "true"
+                                read: true
                         contacts:
-                                read: "true"
+                                read: true
                                 feedback: false
                 reference:
                         feedback:
-                                list: ["whole_body"]
+                                list: [whole_body]
                         actuators:
-                                read: "false"
+                                read: false
                         contacts:
-                                read: "true"
+                                read: true
                                 feedback: false
                 odometry:
                         feedback:
@@ -64,15 +64,15 @@ mwoibn:
                                 feedback: false
                 simulated:
                         feedback:
-                                layer: "simulated"
+                                layer: simulated
                         actuators:
-                                read: "true"
+                                read: true
                         contacts:
-                                read: "true"
+                                read: true
                                 feedback: false
                 empty:
                         feedback:
-                                layer: ""
+                                layer:
                         actuators:
                                 read: false
                         contacts:
@@ -111,7 +111,7 @@ mwoibn:
                                         position: 5
                                         velocity: 0
                                         torque: 0
-                        function: "state"
+                        function: state
                 simulation_state:
                         space: JOINT
                         dofs:
@@ -122,7 +122,7 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
-                        function: "state"
+                        function: state
                 motor_side_online:
                 floating_base:
                         space: OPERATIONAL
@@ -213,7 +213,7 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
-                        function: "state"
+                        function: state
                 torque_reference:
                         space: JOINT
                         dofs:
@@ -224,7 +224,7 @@ mwoibn:
                                 position: false
                                 velocity: false
                                 effort: true
-                        function: "state"
+                        function: state
                 lower_body:
                         space: JOINT
                         dofs:
@@ -235,7 +235,7 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
-                        function: "reference"
+                        function: reference
                 upper_body:
                         space: JOINT
                         dofs:
@@ -246,7 +246,7 @@ mwoibn:
                                 position: true
                                 velocity: true
                                 effort: false
-                        function: "reference"
+                        function: reference
                 odometry:
                         space: JOINT
                         dofs:
@@ -257,7 +257,7 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: false
-                        function: "state"
+                        function: state
                 velocity_reference:
                         space: JOINT
                         dofs:
@@ -268,7 +268,7 @@ mwoibn:
                                 position: false
                                 velocity: true
                                 effort: false
-                        function: "state"
+                        function: state
         controller:
                 position_controller:
                         dofs:
@@ -279,7 +279,7 @@ mwoibn:
                                 position: true
                                 velocity: false
                                 effort: true
-                        initialize: "link_side_online"
+                        initialize: link_side_online
                 velocity_controller:
                         dofs:
                                 chain: wheels
@@ -342,63 +342,63 @@ mwoibn:
                 mapping:
                         PYTHON:
                                 loading: topic
-                                source: "joint_states"
+                                source: joint_states
                                 message: sensor_msgs::JointState
                         RBDL_LOWER:
                                 loading: model
-                                urdf: "/robot_lower_body"
+                                urdf: /robot_lower_body
                         RBDL_UPPER:
                                 loading: model
-                                urdf: "/robot_upper_body"
+                                urdf: /robot_upper_body
                 source:
-                        urdf: "/robot_description"
-#                        urdf: "/robot_full"
-                        srdf: "/robot_srdf"
-                        actuators: "actuators_yaml"
-                        contacts: "contacts_yaml"
+                        urdf: /robot_description
+#                        urdf: /robot_full
+                        srdf: /robot_srdf
+                        actuators: actuators_yaml
+                        contacts: contacts_yaml
                 feedback:
                         link_side_online:
-                                source: "joint_states"
+                                source: joint_states
                                 message: sensor_msgs::JointState
                                 initialize: true
                         simulation_state:
-                                source: "joint_states"
+                                source: joint_states
                                 message: sensor_msgs::JointState
                                 initialize: true
                         simulation_base:
-                                source: "/gazebo/link_states"
+                                source: /gazebo/link_states
                                 message: gazebo_msgs::LinkStates
                                 reference: centauro::pelvis
                                 initialize: true
                         floating_base:
                                 initialize: true
                         imu_base:
-                                source: "/gazebo/link_states"
+                                source: /gazebo/link_states
                                 message: gazebo_msgs::LinkStates
                                 reference: centauro::pelvis
                                 initialize: true
                         whole_body:
-                                source: "desired_state"
+                                source: desired_state
                                 message: custom_messages::CustomCmnd
                                 initialize: false
                         torque_reference:
-                                source: "desired_state"
+                                source: desired_state
                                 message: custom_messages::CustomCmnd
                                 initialize: true
                         lower_body:
-                                source: "lower_body"
+                                source: lower_body
                                 message: custom_messages::CustomCmnd
                                 initialize: false
                         upper_body:
-                                source: "upper_body"
+                                source: upper_body
                                 message: custom_messages::CustomCmnd
                                 initialize: false
                         odometry:
-                                source: "base_odometry"
+                                source: base_odometry
                                 message: custom_messages::CustomCmnd
                                 initialize: true
                         velocity_reference:
-                                source: "desired_state"
+                                source: desired_state
                                 message: custom_messages::CustomCmnd
                                 initialize: false
                         motor_side_online:
@@ -413,51 +413,51 @@ mwoibn:
                                 type: custom_controller/ActuatorVelocityController
                                 sink: /command
                         whole_body:
-                                type: "reference"
-                                sink: "desired_state"
+                                type: reference
+                                sink: desired_state
                         torque_reference:
-                                type: "reference"
-                                sink: "desired_state"
+                                type: reference
+                                sink: desired_state
                         lower_body:
-                                type: "reference"
-                                sink: "lower_body"
+                                type: reference
+                                sink: lower_body
                         upper_body:
-                                type: "reference"
-                                sink: "upper_body"
+                                type: reference
+                                sink: upper_body
                         odometry:
-                                type: "reference"
-                                sink: "base_odometry"
+                                type: reference
+                                sink: base_odometry
         xbot:
                 source:
                         config:
                                 path: *config
-                                file: "xbot/higher/simulaton.yaml"
+                                file: xbot/higher/simulaton.yaml
                         urdf:
                                 path: *config
-                                file: "mwoibn/urdf/centauro.urdf"
+                                file: mwoibn/urdf/centauro.urdf
                         srdf:
                                 path: *config
-                                file: "mwoibn/srdf/centauro_full_wheels.srdf"
+                                file: mwoibn/srdf/centauro_full_wheels.srdf
                         actuators:
                                 path: *config
-                                file: "mwoibn/configs/support/actuators.yaml"
+                                file: mwoibn/configs/support/actuators.yaml
                         contacts:
                                 path: *config
-                                file: "mwoibn/configs/support/contacts.yaml"
+                                file: mwoibn/configs/support/contacts.yaml
                         controller:
                                 path: *config
-                                file: ""
+                                file:
                 mapping:
                         RBDL_LOWER:
                                 loading: model
                                 urdf:
                                         path: *config
-                                        file: "mwoibn/urdf/centauro_lower_body.urdf"
+                                        file: mwoibn/urdf/centauro_lower_body.urdf
                         RBDL_UPPER:
                                 loading: model
                                 urdf:
                                         path: *config
-                                        file: "mwoibn/urdf/centauro_upper_body.urdf"
+                                        file: mwoibn/urdf/centauro_upper_body.urdf
                 feedback:
                         link_side_online:
                                 layer: online
@@ -473,29 +473,29 @@ mwoibn:
                         floating_base:
                                 layer: NRT
                                 sensor: imu_link
-                                source: "floating_base"
+                                source: floating_base
                         imu_base:
                                 layer: online
                                 sensor: imu_link
-                                source: "floating_base"
+                                source: floating_base
                         whole_body:
                                 layer: NRT
-                                source: "desired_state"
+                                source: desired_state
                         upper_body:
                                 layer: NRT
-                                source: "upper_body"
+                                source: upper_body
                         torque_reference:
                                 layer: NRT
-                                source: "desired_state"
+                                source: desired_state
                         velocity_reference:
                                 layer: NRT
-                                source: "desired_state"
+                                source: desired_state
                         lower_body:
                                 layer: NRT
-                                source: "desired_state"
+                                source: desired_state
                         odometry:
                                 layer: RT
-                                source: "base_odometry"
+                                source: base_odometry
                 controller:
                         position_controller:
                                 layer: lower_level
@@ -507,49 +507,49 @@ mwoibn:
                                         mapping: XBOT
                         whole_body:
                                 layer: NRT
-                                sink: "desired_state"
+                                sink: desired_state
                         upper_body:
                                 layer: NRT
-                                sink: "upper_body"
+                                sink: upper_body
                         torque_reference:
                                 layer: NRT
-                                sink: "desired_state"
+                                sink: desired_state
                         lower_body:
                                 layer: NRT
-                                sink: "desired_state"
+                                sink: desired_state
                         odometry:
                                 layer: RT
-                                sink: "base_odometry"
+                                sink: base_odometry
         modules:
                 joint_states:
-                        layer: "NRT"
+                        layer: NRT
                         robot: joint_space
-                        controller: "direct"
-                        mode: "full"
+                        controller: direct
+                        mode: full
                 joint_reference:
-                        layer: "NRT"
+                        layer: NRT
                         robot: default
-                        controller: "position_reference"
+                        controller: position_reference
 #                        secondary_file:
 #                            path: *support
-#                            file: "upper_body.yaml"
-                        mode: "full"
+#                            file: upper_body.yaml
+                        mode: full
                 wheeled_motion:
-                        layer: "NRT"
+                        layer: NRT
                         robot: default
-                        controller: "direct"
-                        mode: "idle"
-                        chain: "lower_body"
+                        controller: direct
+                        mode: full
+                        chain: lower_body
                         secondary_file:
                             path: *support
-                            file: "lower_body.yaml"
-                        tunning: odom_NRT_5
-                        steering: open_loop
-                        position_gain: 200
-#                        tunning: odom_NRT_5
+                            file: lower_body.yaml
+#                        tunning: ZMP_INDIRECT
+                        steering: reactif
+#                        position_gain: 200
+                        tunning: reactif_6
                         minor_axis: 0.068
                         major_axis: 0.01
-                        track: "wheels"
+                        track: wheels
 
                         reference_axis:
                                 wheel_1:
@@ -584,8 +584,15 @@ mwoibn:
                                   x: 0
                                   y: -1
                                   z: 0
-                        IK: ["CONSTRAINTS", "STEERING", "BASE", "CONTACT_POINTS", "CAMBER", "CASTER"]
+                        IK: [CONSTRAINTS, STEERING, BASE, CONTACT_POINTS, CAMBER, CASTER]
                         steerings:
+                                test:
+                                        icm: 1.00 # 0.95
+                                        sp: 0.01 # 0.05
+                                        damp_icm: 0.0015
+                                        damp_sp: 0.0025
+                                        damp: 0.0015
+                                        tracking: 1.0
                                 open_loop:
                                         icm: 1.00
                                         sp:  0.01
@@ -595,12 +602,25 @@ mwoibn:
                                         tracking: 1.0
                                 reactif:
                                         icm: 1.00 # 0.95
-                                        sp: 0.01 # 0.05
-                                        damp_icm: 0.0015
-                                        damp_sp: 0.003
-                                        damp: 0.002
+                                        sp: 0.05 # 0.05
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.0008
+                                        damp: 0.0008
                                         tracking: 1.0
                         tunnings:
+                                reactif_6: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 30
+                                        BASE: [45, 45, 45, 20, 20, 30]
+                                        CONTACT_POINTS: 10
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 15 # 100
+                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.05
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 ZMP_2: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
@@ -613,18 +633,31 @@ mwoibn:
                                         CASTER: 30 # 14
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
-                                ZMP_1: # circular - odom,
+                                ZMP_DIRECT: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 90
+                                        STEERING: 45
                                         BASE: [45, 45, 45, 35, 35, 30]
-                                        CONTACT_POINTS: 0.010
-#                                        CONTACT_POINTS: 20
+                                        CONTACT_POINTS: 6
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 10 # 100
+#                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.030
+#                                        CASTER_DAMP: 0.12
+                                ZMP_INDIRECT: # circular - odom,
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 45
+                                        BASE: [45, 45, 45, 35, 35, 30]
+                                        CONTACT_POINTS: 5
+#                                        CONTACT_POINTS: 0.01
                                         CAMBER: 15 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.01
-                                        CASTER_DAMP: 0.12
+#                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.05
+                                        COP: 500 #
+#                                        CASTER_DAMP: 0.12
                                 odom_NRT_5: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
@@ -684,19 +717,16 @@ mwoibn:
                                 odom_NRT_6: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 60
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 18
-                                        camber: 10 # 100
-                                        castor: 5 # 14
-                                        camber_damp: 0.0001
-                                        castor_damp: 0.0005
-                                        camber_tolerance: 0.008
-                                        camber_speed: 80
+                                        CONSTRAINTS: 1
+                                        STEERING: 30
+                                        BASE: [45, 45, 45, 35, 35, 80]
+                                        CONTACT_POINTS: 15
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 15 # 100
+                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.05
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 reactif_1: # fast
                                         ratio: 1.0
                                         damping: 0.0001
@@ -792,75 +822,75 @@ mwoibn:
                                         camber_damp: 0.08
                                         castor_damp: 0.12
                 odometry:
-                        layer: "NRT"
+                        layer: NRT
                         robot: odometry
                         controller: odometry
                         secondary_file:
                             path: *support
-                            file: "odometry.yaml"
-#                        mode: "full"
-                        mode: "full"
+                            file: odometry.yaml
+#                        mode: full
+                        mode: full
                         wheel_radius: 0.078
-                        chain: "wheels"
+                        chain: wheels
                 gravity_compensation:
-                        layer: "RT"
+                        layer: RT
                         robot: default
-                        controller: "torque_reference"
+                        controller: torque_reference
                         secondary_file:
                              path: *support
-                             file: "lower_body.yaml"
-                        mode: "full"
-                        # type: "online"
-                        # reference: "reference"
+                             file: lower_body.yaml
+                        mode: full
+                        # type: online
+                        # reference: reference
                         # compliance: True
                 centralized:
-                        layer: "NRT"
+                        layer: NRT
                         robot: default
-                        controller: "torque_reference"
+                        controller: torque_reference
                         secondary_file:
                             path: *support
-                            file: "lower_body.yaml"
-                        mode: "full"
-                        type: "online"
-                        reference: "reference"
+                            file: lower_body.yaml
+                        mode: full
+                        type: online
+                        reference: reference
                         compliance: True
                 ground_forces:
-                        layer: "NRT"
+                        layer: NRT
                         robot: default
-                        controller: "empty"
-                        mode: "full"
+                        controller: empty
+                        mode: full
                         secondary_file:
                             path: *support
-                            file: "lower_body.yaml"
+                            file: lower_body.yaml
                         contact_source:
                                 path: *config
-                                file: "mwoibn/configs/support/contacts.yaml"
+                                file: mwoibn/configs/support/contacts.yaml
                 gravity_forces:
-                        layer: "NRT"
+                        layer: NRT
                         robot: force_test
-                        controller: "empty"
-                        mode: "full"
+                        controller: empty
+                        mode: full
                         secondary_file:
                             path: *support
-                            file: "torque.yaml"
-                        prefix: "gravity_forces_"
+                            file: torque.yaml
+                        prefix: gravity_forces_
                         contact_source:
                                 path: *support
-                                file: "contacts.yaml"
+                                file: contacts.yaml
                         filter:
                             torque:
                                 damping: 1.0
                                 cut_off_frequency: 200
 
                 acceleration_test:
-                        layer: "NRT"
+                        layer: NRT
                         robot: joint_space
-                        controller: "direct"
-                        mode: "full"
+                        controller: direct
+                        mode: full
                 shared:
-                        layer: "NRT"
-                        #plugins: ["odometry", "ground_forces", "Nwheels3::wheeled_motion", "gravity_compensation", "ground_forces::gravity_forces"]
-                        plugins: ["odometry", "ground_forces", "Nwheels3::wheeled_motion"]
-                        # plugins: ["odometry", "ground_forces", "Nwheels3::wheeled_motion", "gravity_compensation"]
-                        # plugins: ["joint_states::joint_reference", "odometry", "ground_forces",
-                        #           "Nwheels3::wheeled_motion", "centralized", "ground_forces::gravity_forces"]
+                        layer: NRT
+                        #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
+                        plugins: [odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
+                        # plugins: [joint_states::joint_reference, odometry, ground_forces,
+                        #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

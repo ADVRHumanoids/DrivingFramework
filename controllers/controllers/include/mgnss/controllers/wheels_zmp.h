@@ -30,7 +30,9 @@
 //TEMP
 #include <mwoibn/dynamic_models/basic_model.h>
 
+#include <mgnss/higher_level/state_machine.h>
 #include <mgnss/higher_level/support_shaping_v3_0.h>
+#include <mgnss/higher_level/qr_tracking.h>
 
 #include "mwoibn/robot_points/constant.h"
 
@@ -47,7 +49,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
-        shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
+        // shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -58,7 +60,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 
 WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), __dynamics(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
-        shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
+        // shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -70,6 +72,9 @@ virtual ~WheelsZMP() {
 
 void compute();
 void steering();
+
+void step();
+
 
 void claim(int i){
         //_steering_ptr_2->claimContact(i);
@@ -155,10 +160,30 @@ virtual void nextStep(){
 
     _robot.centerOfMass().update();
 
-    shape__->solve();
+    _support += _support_vel*_robot.rate();
+    state_machine__->update();
+    if(state_machine__->restart()){
+    // restore a desired postion from a current one
+      std::cout << "restart" << std::endl;
     for(int i = 0; i < 4; i++)
-      _support_vel.segment<2>(3*i) = shape__->get().segment<2>(2*i);
+      _modified_support.segment<3>(3*i) = _steering_ptr->getPointStateReference(i);
+    }
+    if(state_machine__->state()){
 
+      // std::cout << "nextStep::restore" << std::endl;
+      restore__->solve();
+    }
+    else{
+      // std::cout << "nextStep::shape" << std::endl;
+      shape__->solve();
+    }
+
+    // for(int i = 0; i < 4; i++)
+    //    _support_vel.segment<2>(3*i) = restore__->get().segment<2>(2*i);
+
+    // std::cout << "restore\t" << restore__->get().transpose() << std::endl;
+    // std::cout << "_support\t" << _support.transpose() << std::endl;
+    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
     step();
 
@@ -171,6 +196,38 @@ virtual void nextStep(){
 
     steering();
 
+   //  if (state_machine__->state()){
+   //     for(int i = 0; i < 4; i++)
+   //        _modified_support.segment<2>(3*i)  -= restore__->get().segment<2>(2*i) * _robot.rate();
+   //      }
+   // else {
+   //     for(int i = 0; i < 4; i++)
+   //        _modified_support.segment<2>(3*i)  -= shape__->get().segment<2>(2*i) * _robot.rate();
+   //      }
+   //
+   //  mwoibn::Vector3 temp_state__ = mwoibn::Vector3::Zero();
+   //  for(int i = 0; i < 4; i++){
+   //    temp_state__.setZero();
+   //    if (state_machine__->state())
+   //      temp_state__.head<2>() = restore__->get().segment<2>(2*i);
+   //    else
+   //      temp_state__.head<2>() = shape__->get().segment<2>(2*i);
+   //
+   //      mwoibn::Matrix3 rot;
+   //      rot << std::cos(steerings[i]), -std::sin(steerings[i]), 0, std::sin(steerings[i]), std::cos(steerings[i]), 0, 0, 0, 1;
+   //    temp_state__ = rot.transpose()*temp_state__; // this should be in a steering frames
+   //    temp_state__.tail<2>().setZero(); // remove other components
+
+   //    // Apply in a world frame - I am ignoring heading here!
+   //    _modified_support.segment<2>(3*i)  += (rot*temp_state__).head<2>() * _robot.rate();
+      // std::cout << "temp_state__\t" << temp_state__.transpose() << std::endl;
+      // std::cout << "modification\t" <<  ((rot*temp_state__).head<2>() * _robot.rate()).transpose() << std::endl;
+      // std::cout << "restore__ command\t" <<  (restore__->get().segment<2>(2*i) * _robot.rate()).transpose() << std::endl;
+      // std::cout << "shape__ command\t" <<  (shape__->get().segment<2>(2*i) * _robot.rate()).transpose() << std::endl;
+     // }
+
+    // _updateSupport();
+
 }
 
 
@@ -178,6 +235,10 @@ protected:
 
   mwoibn::dynamic_models::BasicModel __dynamics;
   std::unique_ptr<mgnss::higher_level::SupportShapingV3> shape__;
+  std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
+  std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
+
+
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
 
 // virtual void _updateSupport()
@@ -199,7 +260,7 @@ void _allocate(YAML::Node config);
 
 
 std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _contact_point;
-mwoibn::VectorN estimated__;
+mwoibn::VectorN estimated__, _modified_support;
 mwoibn::VectorN _com_ref;
 
 mwoibn::robot_points::Constant _world;
@@ -209,7 +270,10 @@ virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
 virtual void _initIK(YAML::Node config);
 
-
+virtual void _updateSupport()
+{
+        _steering_ptr->setReference(_modified_support);
+}
 
 };
 }

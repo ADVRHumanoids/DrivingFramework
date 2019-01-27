@@ -88,8 +88,8 @@ void mgnss::state_estimation::GroundForces::_allocate(){
            _log_names.push_back(_name + std::string("__RF_")+std::to_string(contact) + "_" + char('x'+i));
    }
 
-  for(int i =6; i< _robot.getDofs(); i++)
-      _log_names.push_back(_name + std::string("__torque_") + _robot.getLinks(i));
+  // for(int i =6; i< _robot.getDofs(); i++)
+  //     _log_names.push_back(_name + std::string("__torque_") + _robot.getLinks(i));
 
 }
 
@@ -164,14 +164,14 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
             for(int i = 0; i < 3; i++){
               logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]);
 //              logger.add(_log_names[id+1], _points_force[contact].get()[i]);
-              //id += 1;
+              id += 1;
             }
         }
 
-        for(int i =6; i< _robot.getDofs(); i++){
-              logger.add(_log_names[id], _robot.state.torque.get()[i]);
-              id++;
-        }
+        // for(int i =6; i< _robot.getDofs(); i++){
+        //       logger.add(_log_names[id], _robot.state.torque.get()[i]);
+        //       id++;
+        // }
 
         // std::cout << "com_inertia matrix\n" << _linear_force.getJacobian() << std::endl;
         // std::cout << "robot mass " << _robot.centerOfMass().mass() << std::endl;
