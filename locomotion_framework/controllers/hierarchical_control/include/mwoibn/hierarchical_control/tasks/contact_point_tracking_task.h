@@ -152,6 +152,7 @@ virtual const mwoibn::VectorN& getForce(){return _force;}
 virtual void releaseContact(int i) { _selector[i] = true; }
 virtual void claimContact(int i) { _selector[i] = false; }
 
+const mwoibn::VectorN& getOffset(){return _offset;}
 //virtual int getFullTaskSize() = 0;
 
 
@@ -167,9 +168,11 @@ virtual double baseY(){
       return base.get()[1];
 }
 
+virtual void setOffset(mwoibn::VectorN& offset){_offset = offset;}
+
 protected:
   mwoibn::robot_class::Robot& _robot;
-
+  mwoibn::VectorN _offset;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contacts;
   mwoibn::robot_points::Point& _base_point;
   mwoibn::point_handling::FramePlus _base;
@@ -198,8 +201,6 @@ protected:
   //! generic function to provide the same syntax for error update of all derived classes
   virtual void _updateError() = 0;
 
-
-
   virtual mwoibn::Vector3 _worldToBase(mwoibn::Vector3 point)
   {
 
@@ -226,6 +227,7 @@ protected:
     _reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());
     _force.setZero(_robot.contacts().size()*3);
+    _offset.setZero(_contacts.rows());
 
     for(auto& contact: _contacts)
       _minus.add(mwoibn::robot_points::Minus(*contact, _base_point));

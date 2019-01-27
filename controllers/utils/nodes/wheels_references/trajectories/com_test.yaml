@@ -20,6 +20,7 @@ x cp ref:
   - [ 0.2,  0.2,  0.0,  0.0]
   - [-0.2,  -0.2, -0.2,  -0.2]
   - [ 0.2,   0.2,  0.2, 0.2]
+  - [-0.0,  0.0,  -0.2,  0.0]
 
 # predefined y references
 y cp ref:
@@ -44,7 +45,7 @@ base ref:
 pattern:
   1:
     type: move
-    x_cp: 1
+    x_cp: 7
     y_cp: 0
     z_cp: 0
     base: 0

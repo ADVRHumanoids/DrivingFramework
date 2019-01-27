@@ -162,21 +162,21 @@ virtual void nextStep(){
 
     _support += _support_vel*_robot.rate();
     state_machine__->update();
-    if(state_machine__->restart()){
+    // if(state_machine__->restart()){
     // restore a desired postion from a current one
-      std::cout << "restart" << std::endl;
-    for(int i = 0; i < 4; i++)
-      _modified_support.segment<3>(3*i) = _steering_ptr->getPointStateReference(i);
-    }
-    if(state_machine__->state()){
-
-      // std::cout << "nextStep::restore" << std::endl;
-      restore__->solve();
-    }
-    else{
+      // std::cout << "restart" << std::endl;
+    // for(int i = 0; i < 4; i++)
+    //   _modified_support.segment<3>(3*i) = _steering_ptr->getPointStateReference(i);
+    // }
+    // if(state_machine__->state()){
+    //
+    //   // std::cout << "nextStep::restore" << std::endl;
+    //   restore__->solve();
+    // }
+    // else{
       // std::cout << "nextStep::shape" << std::endl;
       shape__->solve();
-    }
+    // }
 
     // for(int i = 0; i < 4; i++)
     //    _support_vel.segment<2>(3*i) = restore__->get().segment<2>(2*i);
@@ -272,7 +272,7 @@ virtual void _initIK(YAML::Node config);
 
 virtual void _updateSupport()
 {
-        _steering_ptr->setReference(_modified_support);
+        _steering_ptr->setReference(_support);
 }
 
 };

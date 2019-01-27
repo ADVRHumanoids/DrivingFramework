@@ -55,10 +55,9 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
         _reactifGain(i);
 
 
-        _damp[i] = std::tanh(std::fabs(_v[i]*_reactif_gain[i]) /_treshhold/ _treshhold_icm);
 
 
-        double scale = (std::fabs(_reactif_gain[i]) < 0.1 && _v_sp[i]*_dt < 0.0002) ? std::fabs(1000*_reactif_gain[i]) : 1;
+        double scale = (std::fabs(_reactif_gain[i]) < 0.1 && std::fabs(_v_sp[i]*_dt) < 0.0002) ? (std::fabs(1000*_reactif_gain[i])+std::fabs(_v_sp[i])) : 1;
 
         _b[i] = std::atan2(  _K_icm * _v_icm[i]  * std::sin(_b_icm[i]) +
                              _K_sp  * scale * _v_sp[i]   * std::sin(_b_sp[i]),
@@ -66,32 +65,41 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
                              _K_sp  * scale * _v_sp[i]   * std::cos(_b_sp[i]));
                              std::cout << std::fixed;
                              std::cout << std::setprecision(8);
-        //std::cout << i << "\t_K_icm: " << _K_icm << "\t_K_sp: " << _K_sp << "\t_v_icm: " << _v_icm[i] << "\t_v_sp: " << _v_sp[i] <<  "\t_b_icm: " << _b_icm[i] << "\t_b_sp: " << _b_sp[i] << "\trg: " << _reactif_gain[i] << "\t_K_sp|_r_gain|_v_sp" << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i] << std::endl;
-        //std::cout << i << "\t"
+        // std::cout << i << "\t_K_icm: " << _K_icm << "\t_K_sp: " << _K_sp << "\t_v_icm: " << _v_icm[i] << "\t_v_sp: " << _v_sp[i] <<  "\t_b_icm: " << _b_icm[i] << "\t_b_sp: " << _b_sp[i] << "\trg: " << _reactif_gain[i] << "\t_K_sp|_r_gain|_v_sp" << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i] << std::endl;
+        // std::cout << i << "\t"
         //               << _b[i];
-//                       << "\t"
-//                       << _K_icm * _v_icm[i]
-//                       << "\t"
-//                       << _K_icm * _v_icm[i]  * std::sin(_b_icm[i])
-//                       << "\t"
-//                       << _K_icm * _v_icm[i]  * std::cos(_b_icm[i])
-//                       << "\t"
-//                       << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i]/_dt
-//                       << "\t"
-//                       << _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::sin(_b_sp[i])
-//                       << "\t"
-//                       << _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::cos(_b_sp[i])
-//                       << std::endl;
+        //               << "\t"
+        //               << _K_icm * _v_icm[i]
+        //               << "\t"
+        //               << _K_icm * _v_icm[i]  * std::sin(_b_icm[i])
+        //               << "\t"
+        //               << _K_icm * _v_icm[i]  * std::cos(_b_icm[i])
+        //               << "\t"
+        //               << _K_sp  * std::fabs(_reactif_gain[i]) * _v_sp[i]/_dt
+        //               << "\t"
+        //               << _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::sin(_b_sp[i])
+        //               << "\t"
+        //               << _K_sp  * std::fabs(_reactif_gain[i]/_dt) * _v_sp[i]   * std::cos(_b_sp[i])
+        //               << std::endl;
 
         _raw[i] = _b[i];
         _limited[i] = _b[i];
 
         limit2PI(_pb[i], _limited[i]);
 
+        scale = (std::fabs(_v_icm[i]) < 0.1 && scale < 1) ? scale + std::fabs(1000*_v_icm[i]) : 1;
+
+        _damp[i] = std::tanh(std::fabs( _v[i]*scale /_treshhold/(_treshhold_sp + _treshhold_icm)));
+
+
+
         _b[i] = _pb[i] + _damp[i] * (_limited[i] - _pb[i]); // do give the result in the world frame
         //               std::cout << "\t" << _b[i] << "\t" << _damp[i] << std::endl;
 
         _b_st[i] = _b[i] + _heading;
+
+        // std::cout << "_merge\t" << _v_sp[i]*_dt  << "\tscale\t" << scale << "\tcond1\t" << (std::fabs(_reactif_gain[i]) < 0.1) <<
+        //              "\tcond2\t" << (std::fabs(_v_sp[i]*_dt) < 0.0002) << "\tcond\t" << (std::fabs(_reactif_gain[i]) < 0.1 && std::fabs(_v_sp[i]*_dt) < 0.0002) << std::endl;
 
 }
 
@@ -111,7 +119,7 @@ void mgnss::higher_level::SteeringReactif::_reactifGain(int i){
         double th = (_plane.heading() - _last_state[2]);
         mwoibn::eigen_utils::wrapToPi(th);
 
-        _plane_ref.noalias() = _plane.getReferenceError(i).head(2);
+        _plane_ref.noalias() = _plane.getReferenceError(i).head(2) + _plane.getOffset().segment<2>(3*i);
 
         double x = std::cos(_heading) * (_plane.baseX() - _last_state[0]);
         x += std::sin(_heading) * (_plane.baseY() - _last_state[1]);
@@ -127,7 +135,7 @@ void mgnss::higher_level::SteeringReactif::_reactifGain(int i){
         _reactif_gain[i] += y * std::sin(b);
 
         _reactif_gain[i] = _reactif_gain[i]/_dt;
-        std::cout << i << "\t" << _reactif_gain[i] << "\t" << _v_sp[i] << "\t" << _v_sp[i]*_dt << "\t" << _v_icm[i] << std::endl;
+
 
 
 }
@@ -172,7 +180,7 @@ void mgnss::higher_level::SteeringReactif::_PT(int i)
         _pb_sp[i] = _b_sp[i];
         double v_last = _v_sp[i];
 
-        _plane_ref.noalias() = _plane.getReferenceError(i).head(2); // size 2 // get_reference state and old support?
+        _plane_ref.noalias() = _plane.getReferenceError(i).head(2) + _plane.getOffset().segment<2>(3*i); // size 2 // get_reference state and old support?
 
         _steerSP(i);
         _velSP(i);

@@ -24,9 +24,9 @@ void mgnss::controllers::WheelsZMP::steering()
 
 
         _steering_ref_ptr->compute(_next_step);
-        std::cout << "_steerings\t" << steerings.transpose() << std::endl;
 
         steerings.noalias() = _steering_ref_ptr->get();
+        std::cout << "_steerings\t" << steerings.transpose() << std::endl;
 
         for (int i = 0; i < 4; i++)
         {
@@ -62,7 +62,7 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         //   k += _steering_select[i];
         // }
         _support.noalias() = _steering_ptr->getReference();
-        _modified_support.noalias() = _steering_ptr->getReference();
+        _modified_support.setZero(_support.size());
         _support_vel.setZero();
 
         for(auto& item_: _leg_tasks)
@@ -87,17 +87,18 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
 }
 
 void mgnss::controllers::WheelsZMP::step(){
-    if (state_machine__->state()){
-       std::cout << "step::restore\t" << restore__->get().transpose() * _robot.rate() << std::endl;
+    // if (state_machine__->state()){
+       // std::cout << "step::restore\t" << restore__->get().transpose() * _robot.rate() << std::endl;
+       // for(int i = 0; i < 4; i++)
+          // _modified_support.segment<2>(3*i)  += restore__->get().segment<2>(2*i) * _robot.rate();
+        // }
+   // else {
+       // std::cout << "step::shape" << shape__->get().transpose() * _robot.rate() << std::endl;
        for(int i = 0; i < 4; i++)
-          _modified_support.segment<2>(3*i)  += restore__->get().segment<2>(2*i) * _robot.rate();
-        }
-   else {
-       std::cout << "step::shape" << shape__->get().transpose() * _robot.rate() << std::endl;
-       for(int i = 0; i < 4; i++)
-          _modified_support.segment<2>(3*i)  += shape__->get().segment<2>(2*i) * _robot.rate();
+          _modified_support.segment<2>(3*i)  = shape__->get().segment<2>(2*i);
 
-        }
+          _steering_ptr->setOffset(_modified_support);
+        // }
 
         _position += _linear_vel  * _robot.rate();
         _heading  += _angular_vel[2] * _robot.rate();
@@ -200,7 +201,7 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             // _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
             //                     _robot.getLinks("wheels"), _robot, config, _robot.getLinks("base")[0], tunning["COP"].as<double>()));
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
-                                _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), "pelvis", tunning["COP"].as<double>()));
+                                _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
 
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
             restore__.reset(new mgnss::higher_level::QrTracking(_robot, config, _support, _steering_ptr->getReference(), tunning["CONTACT_POINTS"].as<double>(), state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
