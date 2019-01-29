@@ -128,7 +128,11 @@ virtual void updateState() final {
       return _baseToWorld(reference);
     }
 
-
+    virtual const mwoibn::Vector3& getVelocityReference(int i)
+    {
+      _point.noalias() = _worldToBase(_wheel_transforms[i]->rotation*_velocity.segment<3>(3*i));
+      return _point;
+    }
     virtual const mwoibn::Vector3& getPointStateReference(int i)
     {
       _point.noalias() = _worldToBase(_contacts[i].get());
@@ -152,7 +156,13 @@ virtual const mwoibn::VectorN& getForce(){return _force;}
 virtual void releaseContact(int i) { _selector[i] = true; }
 virtual void claimContact(int i) { _selector[i] = false; }
 
-const mwoibn::VectorN& getOffset(){return _offset;}
+void setVelocity(mwoibn::VectorN& velocity){
+  std::cout << __PRETTY_FUNCTION__ << "\t" << velocity.transpose() << std::endl;
+  for (int i = 0; i < _contacts.size(); i++)
+    _velocity.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
+
+  std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
+}
 //virtual int getFullTaskSize() = 0;
 
 
@@ -168,11 +178,9 @@ virtual double baseY(){
       return base.get()[1];
 }
 
-virtual void setOffset(mwoibn::VectorN& offset){_offset = offset;}
-
 protected:
   mwoibn::robot_class::Robot& _robot;
-  mwoibn::VectorN _offset;
+  // mwoibn::VectorN _velocity;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contacts;
   mwoibn::robot_points::Point& _base_point;
   mwoibn::point_handling::FramePlus _base;
@@ -227,7 +235,6 @@ protected:
     _reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());
     _force.setZero(_robot.contacts().size()*3);
-    _offset.setZero(_contacts.rows());
 
     for(auto& contact: _contacts)
       _minus.add(mwoibn::robot_points::Minus(*contact, _base_point));

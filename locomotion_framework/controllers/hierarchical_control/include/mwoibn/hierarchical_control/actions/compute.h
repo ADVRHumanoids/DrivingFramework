@@ -74,7 +74,7 @@ virtual ~Compute(){
 }
 
 virtual void run(){
-        _errors.noalias() = -(_gains.asDiagonal() * _task.getError());
+        _errors.noalias() = -(_gains.asDiagonal() * _task.getError() + _task.getVelocity());
         _errors.noalias() -= _task.getJacobian() * _command;
 
         _inverser_ptr->compute(_task.getJacobian(), _P);

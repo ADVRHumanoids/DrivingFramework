@@ -54,6 +54,13 @@ const mwoibn::Matrix& getPreviousJacobian() const {
 const mwoibn::VectorN& getError() const {
         return _error;
 }
+
+const mwoibn::VectorN& getVelocity() const {
+        return _velocity;
+}
+
+virtual void setVelocity(mwoibn::VectorN& velocity){_velocity = velocity;}
+
 //! Returnes previous task error
 const mwoibn::VectorN& getPreviousError() const {
         return _last_error;
@@ -99,7 +106,7 @@ BasicTask(){
 //! current jacobian task
 mwoibn::Matrix _jacobian;
 //! current task error
-mwoibn::VectorN _error;
+mwoibn::VectorN _error, _velocity;
 //! previous jacobian task
 mwoibn::Matrix _last_jacobian;
 //! previous task error
@@ -111,6 +118,7 @@ bool _init(int i, int dof){
         _jacobian = mwoibn::Matrix::Zero(i,dof);
         _last_error = mwoibn::VectorN::Zero(i);
         _last_jacobian = mwoibn::Matrix::Zero(i,dof);
+        _velocity = mwoibn::VectorN::Zero(i);
 }
 };
 }

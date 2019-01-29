@@ -71,14 +71,14 @@ public:
 protected:
   virtual void _updateError()
   {
-
+    std::cout << "_updateError" << std::endl;
     _last_error.noalias() = _error; // save previous state
 
     for (int i = 0; i < _contacts.size(); i++)
     {
 
       _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
-      _error.segment<3>(3 * i).noalias() = _wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i) + (_wheel_transforms[i]->rotation.transpose()*_offset)/10; // 10 is for a task gain should be automatic
+      _error.segment<3>(3 * i).noalias() = _wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i); // 10 is for a task gain should be automatic
 
       if (_selector[i])
         _error.segment<2>(3*i+1).setZero();

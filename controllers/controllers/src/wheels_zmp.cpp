@@ -87,7 +87,9 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
 }
 
 void mgnss::controllers::WheelsZMP::step(){
-    // if (state_machine__->state()){
+    if (state_machine__->state())
+        _tracking_task->tracking();
+    else _tracking_task->balance();
        // std::cout << "step::restore\t" << restore__->get().transpose() * _robot.rate() << std::endl;
        // for(int i = 0; i < 4; i++)
           // _modified_support.segment<2>(3*i)  += restore__->get().segment<2>(2*i) * _robot.rate();
@@ -97,7 +99,7 @@ void mgnss::controllers::WheelsZMP::step(){
        for(int i = 0; i < 4; i++)
           _modified_support.segment<2>(3*i)  = shape__->get().segment<2>(2*i);
 
-          _steering_ptr->setOffset(_modified_support);
+          _steering_ptr->setVelocity(_modified_support);
         // }
 
         _position += _linear_vel  * _robot.rate();
@@ -202,6 +204,7 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             //                     _robot.getLinks("wheels"), _robot, config, _robot.getLinks("base")[0], tunning["COP"].as<double>()));
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
                                 _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
+            _tracking_task = dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get());
 
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
             restore__.reset(new mgnss::higher_level::QrTracking(_robot, config, _support, _steering_ptr->getReference(), tunning["CONTACT_POINTS"].as<double>(), state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));

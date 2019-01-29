@@ -98,8 +98,8 @@ void mgnss::higher_level::SteeringReactif::_merge(int i){
 
         _b_st[i] = _b[i] + _heading;
 
-        // std::cout << "_merge\t" << _v_sp[i]*_dt  << "\tscale\t" << scale << "\tcond1\t" << (std::fabs(_reactif_gain[i]) < 0.1) <<
-        //              "\tcond2\t" << (std::fabs(_v_sp[i]*_dt) < 0.0002) << "\tcond\t" << (std::fabs(_reactif_gain[i]) < 0.1 && std::fabs(_v_sp[i]*_dt) < 0.0002) << std::endl;
+        std::cout << "_merge\t" << _v_sp[i]*_dt  << "\tscale\t" << scale << "\tcond1\t" << (std::fabs(_reactif_gain[i]) < 0.1) <<
+                     "\tcond2\t" << (std::fabs(_v_sp[i]*_dt) < 0.0002) << "\tcond\t" << (std::fabs(_reactif_gain[i]) < 0.1 && std::fabs(_v_sp[i]*_dt) < 0.0002) << std::endl;
 
 }
 
@@ -119,7 +119,8 @@ void mgnss::higher_level::SteeringReactif::_reactifGain(int i){
         double th = (_plane.heading() - _last_state[2]);
         mwoibn::eigen_utils::wrapToPi(th);
 
-        _plane_ref.noalias() = _plane.getReferenceError(i).head(2) + _plane.getOffset().segment<2>(3*i);
+        _plane_ref.noalias() = _plane.getReferenceError(i).head(2);
+        _plane_ref += _plane.getVelocityReference(i).head<2>();
 
         double x = std::cos(_heading) * (_plane.baseX() - _last_state[0]);
         x += std::sin(_heading) * (_plane.baseY() - _last_state[1]);
@@ -180,8 +181,13 @@ void mgnss::higher_level::SteeringReactif::_PT(int i)
         _pb_sp[i] = _b_sp[i];
         double v_last = _v_sp[i];
 
-        _plane_ref.noalias() = _plane.getReferenceError(i).head(2) + _plane.getOffset().segment<2>(3*i); // size 2 // get_reference state and old support?
-
+        _plane_ref.noalias() = _plane.getReferenceError(i).head<2>();
+        _plane_ref += _plane.getVelocityReference(i).head<2>(); // size 2 // get_reference state and old support?
+        std::cout << "getReferenceError " << i << "\t" << _plane.getReferenceError(i).head<2>() << std::endl;
+        std::cout << "getVelocityReference " << i << "\t" << _plane.getVelocityReference(i) << std::endl;
+        std::cout << "_plane_ref " << i << "\t" << (_plane.getReferenceError(i) + _plane.getVelocityReference(i)).head<2>() << std::endl;
+        
+        std::cout << "_plane_ref " << i << "\t" << _plane_ref.transpose() << std::endl;
         _steerSP(i);
         _velSP(i);
 

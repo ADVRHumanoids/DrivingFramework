@@ -240,7 +240,7 @@ protected:
 
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
-
+  mwoibn::hierarchical_control::tasks::ContactPointZMPV2* _tracking_task;
 // virtual void _updateSupport()
 // {
 //   for(int i = 0, k = 0; i < _steering_select.size(); i++){

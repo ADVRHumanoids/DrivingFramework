@@ -60,7 +60,7 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
         _margins.limit.setZero(4);
         _workspace.limit.setZero(4);
         _margins.limit << 0.18, 0.18, 0.18, 0.18;
-        _workspace.limit << 0.70, 0.70, 0.70, 0.70; // 0.70
+        _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
         _margins.state.setZero(_size);
         _workspace.state.setZero(_size);
         _margins.jacobian.setZero(_size, _size*3+2); // cp + base
