@@ -31,7 +31,7 @@ public:
 
   virtual mwoibn::VectorInt map() const {return _map.reversed();}
 
-  virtual bool update() {run();}
+  virtual bool update() {run(); return true;}
 
 
 };

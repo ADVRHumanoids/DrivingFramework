@@ -45,7 +45,7 @@ public:
 
   virtual ~BasicOperationalEuler() {}
 
-  virtual bool initialize(){}
+  virtual bool initialize(){ return _initialized;}
 
   virtual bool run() { return false; }
 

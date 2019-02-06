@@ -55,7 +55,7 @@ public:
     return false;
   }
 
-  virtual bool isRunning() { _robot->isRunning(); }
+  virtual bool isRunning() { return _robot->isRunning();  }
 
 protected:
   RobotXBotFeedback() {}

@@ -51,6 +51,7 @@ public:
 
     getPosition(_orientation, _linear_state);
     _initialized = true;
+    return true;
   }
 
 protected:

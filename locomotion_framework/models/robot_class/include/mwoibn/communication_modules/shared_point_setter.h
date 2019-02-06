@@ -41,7 +41,8 @@ public:
   virtual ~SharedPointSetter() {}
 
   virtual bool run();
-  virtual bool initialize(){ _initialized = true;}
+  virtual bool initialize(){ _initialized = true;
+                              return _initialized;}
 
 protected:
   mwoibn::VectorN _filtered;

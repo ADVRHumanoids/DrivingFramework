@@ -79,7 +79,7 @@ public:
   virtual ~RosController() {}
 
   virtual bool run();
-  virtual bool initialize(){_initFilters(); _initialized = true;}
+  virtual bool initialize(){_initFilters(); _initialized = true; return _initialized;}
 protected:
   ros::NodeHandle _node;
   ros::Publisher _command_pub;

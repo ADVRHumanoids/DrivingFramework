@@ -41,7 +41,7 @@ virtual ~RosBase(){
 virtual bool init();
 virtual bool init(robot_map& share_robots, std::shared_ptr<mwoibn::common::Logger>& logger_ptr, std::shared_ptr<ros::NodeHandle> n, mwoibn::communication_modules::Shared& share, std::string name);
 
-virtual bool close(){ _plugin_ptr->close();}
+virtual bool close(){ _plugin_ptr->close(); return true;}
 
 virtual void start(double time){_plugin_ptr->start(time);}
 

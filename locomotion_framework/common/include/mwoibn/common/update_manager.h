@@ -16,7 +16,7 @@ namespace update
   public:
     Function(update_function function_ptr, unsigned int subscribed = 0): _current(0), _subscribed(subscribed), _function(function_ptr){}
 
-    int count(){ _current--; }
+    void count(){ _current--; }
 
     int state(){return _current;}
 

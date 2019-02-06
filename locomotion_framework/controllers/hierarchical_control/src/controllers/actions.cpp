@@ -48,6 +48,8 @@ bool mwoibn::hierarchical_control::controllers::Actions::_setIdle(tasks::BasicTa
         actions::Secondary* ptr = _memory.secondary.get();
         ptr->assign(*_map[task]);
         _map[task] = ptr;
+
+        return true;
 }
 
 void mwoibn::hierarchical_control::controllers::Actions::addTask(tasks::BasicTask& new_task, mwoibn::VectorN gain, double damping){

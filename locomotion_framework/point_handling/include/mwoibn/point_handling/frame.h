@@ -311,7 +311,7 @@ public:
    *
    * @see getFullJacobian, getFullJacobianCols
    */
-  unsigned int getFullJacobianRows() const { _velocity.size(); }
+  unsigned int getFullJacobianRows() const { return _velocity.size(); }
 
   //virtual int size() const { return 3; }
 

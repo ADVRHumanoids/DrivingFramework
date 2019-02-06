@@ -21,6 +21,7 @@ virtual ~JointStates() {
 bool reset(){
         _pos_ref = _robot.state.position.get();
         _position = _robot.state.position.get();
+        return true;
 }
 bool setVelocity(std::string name, double vel);
 bool setPosition(std::string name, double pos);

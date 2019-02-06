@@ -72,6 +72,7 @@ public:
 
     _command_pub.publish(_des_q);
 
+    return true;
   }
 
 

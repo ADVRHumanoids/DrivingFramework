@@ -57,4 +57,6 @@ bool mgnss::ros_callbacks::wheels_controller_events::stateHandler(const custom_m
                 controller_ptr->setSteering(2, msg->st[2]);
                 controller_ptr->setSteering(3, msg->st[3]);
         }
+
+        return true;
 }

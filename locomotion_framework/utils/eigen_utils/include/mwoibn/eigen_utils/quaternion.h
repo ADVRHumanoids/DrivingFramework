@@ -43,6 +43,8 @@ Quaternion operator=(const Quaternion& q)
         (*this).x() = q.x();
         (*this).y() = q.y();
         (*this).z() = q.z();
+
+        return *this;
 }
 
 Quaternion inverse()

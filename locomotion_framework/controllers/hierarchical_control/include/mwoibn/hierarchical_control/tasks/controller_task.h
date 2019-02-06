@@ -119,6 +119,7 @@ bool _init(int i, int dof){
         _last_error = mwoibn::VectorN::Zero(i);
         _last_jacobian = mwoibn::Matrix::Zero(i,dof);
         _velocity = mwoibn::VectorN::Zero(i);
+        return true;
 }
 };
 }

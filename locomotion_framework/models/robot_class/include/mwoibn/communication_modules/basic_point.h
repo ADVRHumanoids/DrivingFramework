@@ -55,7 +55,7 @@ public:
 
   virtual ~BasicPoint() {}
 
-  virtual bool update() { run(); }
+  virtual bool update() { run(); return true;}
 
   virtual mwoibn::VectorInt map() const {
     return mwoibn::eigen_utils::iota(6);

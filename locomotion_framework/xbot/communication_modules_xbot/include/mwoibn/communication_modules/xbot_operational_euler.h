@@ -17,7 +17,7 @@ public:
                  mwoibn::robot_class::BiMap map, YAML::Node config,
                  XBot::RobotInterface& robot, double rate);
 
-  virtual bool initialize(){reset();}
+  virtual bool initialize(){reset(); return _initialized;}
 
   virtual bool reset();
   virtual void getPosition(mwoibn::Matrix3 orientation, mwoibn::Vector3 position);

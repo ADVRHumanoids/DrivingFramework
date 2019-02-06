@@ -23,6 +23,7 @@ virtual ~Shared() { }
 bool add(std::string name, ShareObj share)
 {
   _shared[name] = share;
+  return true;
 }
 
 
@@ -33,6 +34,7 @@ int size() const {
 bool remove(std::string name)
 {
   _shared.erase(name);
+  return true;
 }
 
 bool has(std::string name){

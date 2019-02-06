@@ -50,7 +50,7 @@ public:
   virtual mwoibn::VectorInt map() const {return _map.get();}
 
 
-  virtual bool update() { run(); }
+  virtual bool update() { run(); return true;}
 };
 }
 }

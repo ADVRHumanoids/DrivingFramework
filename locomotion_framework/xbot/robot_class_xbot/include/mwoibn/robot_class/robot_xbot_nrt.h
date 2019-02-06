@@ -38,7 +38,7 @@ public:
     }
 
   virtual void wait(bool spin = true) {_rate_ptr->sleep(); }
-  virtual bool isRunning() { _robot->isRunning(); }
+  virtual bool isRunning() { return _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);
   virtual void _init(YAML::Node config, YAML::Node robot);

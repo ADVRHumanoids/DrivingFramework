@@ -92,7 +92,7 @@ public:
 
   Type
   getReference(std::string reference_name, bool update = false) const{
-    getReference(TempBase<Type>::_checkBody(reference_name), update);
+    return getReference(TempBase<Type>::_checkBody(reference_name), update);
   }
 
   virtual void setReference(const Type& current,

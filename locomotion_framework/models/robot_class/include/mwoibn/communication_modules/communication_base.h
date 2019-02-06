@@ -43,7 +43,7 @@ public:
   // }
 
   virtual bool run() = 0;
-  virtual bool get(mwoibn::VectorN& state){}
+  virtual bool get(mwoibn::VectorN& state){  return true;}
 
   virtual mwoibn::VectorInt map() const = 0; // make it fake do not have to figrue it out for all now
 

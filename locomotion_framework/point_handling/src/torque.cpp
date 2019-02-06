@@ -9,6 +9,7 @@ namespace point_handling
   const Point::Current&
   Torque::getWorld(bool update){
         _temp_world = frame.rotation().getWorld(update)*(_current_fixed + frame.position.getWorld(false).head<3>().cross(force.getFixed().head<3>()));
+        return _temp_world;
   }
 
   Point::Current
