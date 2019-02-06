@@ -87,7 +87,7 @@ void mgnss::state_estimation::OdometryV2::_allocate(std::vector<std::string> nam
         _base_ids.setZero(3);
         _base_map.setZero(6);
         _base_map << 0, 1, 2, 3, 4, 5;
-        
+
         for (const auto& name : names)
                 _wheels_ph.addPoint(name);
 
@@ -140,7 +140,7 @@ void mgnss::state_estimation::OdometryV2::init(){
                 _estimated[i].noalias() = _contact_points[i];
         }
 
-        
+
 
         _previous_state.noalias() = _state;
 
@@ -193,7 +193,7 @@ void mgnss::state_estimation::OdometryV2::_removeTwist(){
 
         // remove the rotation ground ground component
         _twist_raw = _imu.twistSwing(_z,_swing);
-        
+
         mwoibn::Position _euler;
         // get robot base eueler angles
         _euler = _swing.toMatrix().eulerAngles(0, 1, 2);
@@ -541,7 +541,7 @@ void mgnss::state_estimation::OdometryV2::log(mwoibn::common::Logger& logger, do
         logger.add("time", time);
         logger.add("heading", _twist_es.angle());
         logger.add("raw", _twist_raw.angle());
-        logger.add("base", _robot.state.position.get()[3]);   
+        logger.add("base", _robot.state.position.get()[3]);
 //
 //        logger.add("q_raw_x", _twist_raw.x());
 //        logger.add("q_raw_y", _twist_raw.y());

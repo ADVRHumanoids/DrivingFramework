@@ -6,6 +6,7 @@
 #include <memory>
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 namespace mwoibn
 {
@@ -464,6 +465,7 @@ void skew(const _Vector_Type_& vec, _Matrix_Type_& mat){
 }
 
 
+
 template <typename _Matrix_Type1_, typename _Matrix_Type2_> inline
 int limitHalfPi(_Matrix_Type1_ b_ref, _Matrix_Type2_& b){
         //  _Matrix_Type_ limited = vec;
@@ -506,7 +508,8 @@ struct Hasher
 
 static Eigen::VectorXi iota(int size, int base = 0)
 {
-  Eigen::VectorXi iter(size);
+  Eigen::VectorXi iter;
+  iter.setZero(size);
 
   for(int i = 0; i < size; i++)
     iter[i] = i + base;
@@ -524,6 +527,11 @@ static Eigen::VectorXi enumerate(Eigen::Matrix<bool, Eigen::Dynamic, 1> bools)
   }
 
   return ids;
+}
+
+template <typename _Scalar, typename _Matrix> inline
+std::vector<_Scalar> toVector(const _Matrix& m){
+      return std::vector<_Scalar>(&m[0], m.data()+m.cols()*m.rows());
 }
 
 

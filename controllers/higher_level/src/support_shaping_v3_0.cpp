@@ -91,6 +91,9 @@ void mgnss::higher_level::SupportShapingV3::solve(){
 
   cost__ = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
 
+  std::cout << "_inequality_vector\t" << _inequality_vector.transpose() << std::endl;
+  std::cout << "_inequality_matrix\n" << _inequality_matrix << std::endl;
+
   std::cout << "_cost\t" << cost__ << std::endl;
   mwoibn::Vector3 temp__;
   temp__.setZero();

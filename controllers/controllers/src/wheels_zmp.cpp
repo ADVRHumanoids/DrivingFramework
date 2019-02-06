@@ -26,7 +26,7 @@ void mgnss::controllers::WheelsZMP::steering()
         _steering_ref_ptr->compute(_next_step);
 
         steerings.noalias() = _steering_ref_ptr->get();
-        std::cout << "_steerings\t" << steerings.transpose() << std::endl;
+        // std::cout << "_steerings\t" << steerings.transpose() << std::endl;
 
         for (int i = 0; i < 4; i++)
         {
@@ -80,9 +80,19 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         // if(_steering_select.any())
         //       _steering_ptr_2->start();
         _robot.centerOfMass().update(true);
-        state_machine__->update();
-        restore__->update();
+        state_machine__->update(shape__->get());
+        // restore__->update();
         shape__->update();
+
+        // shape_joint__->equality[1].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
+        // shape_joint__->equality[2].jacobian = _tasks["BASE"]->getJacobian();
+        // shape_joint__->equality[3].jacobian = _tasks["CAMBER"]->getJacobian();
+        // // shape_joint__->equality[3].jacobian = _tasks["STEERING"]->getJacobian();
+        // shape_joint__->equality[0].jacobian = state_machine__->steerJacobian()*state_machine__->stateJacobian();
+        //
+        // // shape_joint__->equality[3].jacobian = _tasks["CASTER"]->getJacobian();
+        //
+        // shape_joint__->update();
         // estimated__ = shape__->margin();
 }
 
@@ -98,9 +108,16 @@ void mgnss::controllers::WheelsZMP::step(){
        // std::cout << "step::shape" << shape__->get().transpose() * _robot.rate() << std::endl;
        for(int i = 0; i < 4; i++)
           _modified_support.segment<2>(3*i)  = shape__->get().segment<2>(2*i);
+       // mwoibn::VectorN command = state_machine__->worldJacobian()*shape_joint__->get();
+       // for(int i = 0; i < 4; i++)
+       //    _modified_support.segment<2>(3*i)  = command.segment<2>(2*i);// + 20*_tasks["BASE"]->getError().segment<2>(3);
 
-          _steering_ptr->setVelocity(_modified_support);
-        // }
+
+        // std::cout << "shape__\t" <<  shape__->get().transpose() << std::endl;
+        // std::cout << "shape_joint__\t" <<  (state_machine__->worldJacobian()*shape_joint__->get()).transpose() << std::endl;
+        // std::cout << "state_joint__\t" <<  (state_machine__->stateJacobian()*shape_joint__->get()).transpose() << std::endl;
+
+        _steering_ptr->setVelocity(_modified_support);
 
         _position += _linear_vel  * _robot.rate();
         _heading  += _angular_vel[2] * _robot.rate();
@@ -110,6 +127,7 @@ void mgnss::controllers::WheelsZMP::step(){
 void mgnss::controllers::WheelsZMP::_allocate(){
           WheelsControllerExtend::_allocate();
         _com_ref.setZero(2);
+        __last_steer.setZero(4);
         _modified_support.setZero(_tasks["CONTACT_POINTS"]->getTaskSize());
 
         __dynamics.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
@@ -117,8 +135,29 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         // shape__->addTask(*_tasks["BASE"]);
         // shape__->addTask(*_tasks["CAMBER"]);
         state_machine__->init();
-        restore__->init();
+        // restore__->init();
         shape__->init();
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["STEERING"]->getTaskSize(), _tasks["STEERING"]->getTaskDofs()));
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["STEERING"]->getTaskSize(), _tasks["STEERING"]->getTaskDofs()));
+        //
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["CONSTRAINTS"]->getTaskSize(), _tasks["CONSTRAINTS"]->getTaskDofs()));
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["BASE"]->getTaskSize(), _tasks["BASE"]->getTaskDofs()));
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["CAMBER"]->getTaskSize(), _tasks["CAMBER"]->getTaskDofs()));
+
+        // shape_joint__->equality.add(mgnss::higher_level::Constraint(_tasks["CASTER"]->getTaskSize(), _tasks["CASTER"]->getTaskDofs()));
+        // mwoibn::VectorInt dofs = mwoibn::eigen_utils::iota(_robot.getDofs());
+
+        // shape_joint__->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION"}));
+        // std::cout << "_robot.getDof(yaws)\n" << _robot.getDof(_robot.getLinks("yaws")) << std::endl;
+        // auto  dofs = _robot.getLinks("yaws");
+        // ranges::action::insert(dofs,  std::end(dofs), _robot.getLinks("wheels"));
+        //
+        // for(auto dof: dofs)
+        //   std::cout << "ranges\t" << dof << std::endl;
+
+        // shape_joint__->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, _robot.getDof( dofs), {"POSITION"}));
+        // shape_joint__->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION"}));
+        // shape_joint__->init();
 
 }
 
@@ -207,8 +246,9 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             _tracking_task = dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get());
 
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
-            restore__.reset(new mgnss::higher_level::QrTracking(_robot, config, _support, _steering_ptr->getReference(), tunning["CONTACT_POINTS"].as<double>(), state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
-            shape__.reset(new mgnss::higher_level::SupportShapingV3(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            // restore__.reset(new mgnss::higher_level::QrTracking(_robot, config, _support, _steering_ptr->getReference(), tunning["CONTACT_POINTS"].as<double>(), state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            shape__.reset(new mgnss::higher_level::SupportShapingV4(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            // shape_joint__.reset(new mgnss::higher_level::QRJointSpace(*shape__, state_machine__->stateJacobian(), _robot ));
 
             _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
@@ -328,7 +368,27 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
         // i need a snap in solver
         // shape__->solve(logger);
         shape__->log(logger);
-        restore__->log(logger);
+
+        mwoibn::Vector3 temp__ = mwoibn::Vector3::Zero();
+        for(int i = 0; i < 4; i++){
+          temp__.head<2>() = shape__->get().segment<2>(2*i);
+          temp__ = state_machine__->desiredSteer[i].transpose()* temp__;
+          logger.add("d_beta_est_"+std::to_string(i), (state_machine__->steerJacobian().block<1,2>(i,2*i)*temp__.head<2>()));
+        }
+
+        for(int i = 0; i < 4; i++){
+          temp__.head<2>() = shape__->get().segment<2>(2*i);
+          temp__ = state_machine__->desiredSteer[i].transpose()* temp__;
+          temp__ *= _robot.rate();
+          logger.add("beta_est_"+std::to_string(i), __last_steer[i] + state_machine__->steerJacobian().block<1,2>(i,2*i)*temp__.head<2>());
+        }
+
+        for(int i = 0; i < 4; i++){
+           __last_steer[i] =  std::atan2(shape__->get()[2*i+1], shape__->get()[2*i]);
+          logger.add("beta_des"+std::to_string(i), __last_steer[i]);
+         }
+        // shape_joint__->log(logger);
+        // restore__->log(logger);
 
         // estimated__ =  shape__->margin();
         //

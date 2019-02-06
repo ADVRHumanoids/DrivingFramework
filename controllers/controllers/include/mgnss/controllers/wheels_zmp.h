@@ -31,8 +31,10 @@
 #include <mwoibn/dynamic_models/basic_model.h>
 
 #include <mgnss/higher_level/state_machine.h>
-#include <mgnss/higher_level/support_shaping_v3_0.h>
+#include <mgnss/higher_level/support_shaping_v4_0.h>
 #include <mgnss/higher_level/qr_tracking.h>
+#include <mgnss/higher_level/qr_joint_space.h>
+#include <mgnss/higher_level/joint_constraint.h>
 
 #include "mwoibn/robot_points/constant.h"
 
@@ -161,7 +163,28 @@ virtual void nextStep(){
     _robot.centerOfMass().update();
 
     _support += _support_vel*_robot.rate();
-    state_machine__->update();
+    state_machine__->update(shape__->get());
+
+    // _tasks["BASE"]->update();
+    // _tasks["CONSTRAINTS"]->update();
+    // _tasks["CAMBER"]->update();
+    // _tasks["STEERING"]->update();
+    //
+    // shape_joint__->equality[1].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
+    // shape_joint__->equality[2].jacobian = _tasks["BASE"]->getJacobian(); // it is not updated yet?
+    // // shape_joint__->equality[1].jacobian = _tasks["STEERING"]->getJacobian()-state_machine__->steerJacobian()*state_machine__->worldJacobian();
+    // shape_joint__->equality[3].jacobian = _tasks["CAMBER"]->getJacobian();
+    // // shape_joint__->equality[3].jacobian = _tasks["STEERING"]->getJacobian();
+    // shape_joint__->equality[0].jacobian =  state_machine__->steerJacobian()*state_machine__->worldJacobian();
+    //
+    // // shape_joint__->equality[3].state.setConstant(4);
+    // // std::cout << shape_joint__->equality[3].state.transpose() << std::endl;
+    //
+
+    // std::cout << "steerEquality\n" << shape_joint__->equality[3].jacobian << std::endl;
+    // std::cout << "_tasks[STEERING]->getJacobian()\n" << _tasks["STEERING"]->getJacobian() << std::endl;
+    // std::cout << "state_machine__->steerJacobian()*state_machine__->worldJacobian()\n" << state_machine__->steerJacobian()*state_machine__->worldJacobian() << std::endl;
+
     // if(state_machine__->restart()){
     // restore a desired postion from a current one
       // std::cout << "restart" << std::endl;
@@ -176,6 +199,11 @@ virtual void nextStep(){
     // else{
       // std::cout << "nextStep::shape" << std::endl;
       shape__->solve();
+      // std::cout << "steerJacobian\n" << state_machine__->steerJacobian() << std::endl;
+
+
+
+      // shape_joint__->solve();
     // }
 
     // for(int i = 0; i < 4; i++)
@@ -233,10 +261,12 @@ virtual void nextStep(){
 
 protected:
 
+  mwoibn::VectorN __last_steer;
   mwoibn::dynamic_models::BasicModel __dynamics;
-  std::unique_ptr<mgnss::higher_level::SupportShapingV3> shape__;
+  std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
   std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
-  std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
+  //std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
+  std::unique_ptr<mgnss::higher_level::QRJointSpace> shape_joint__;
 
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;

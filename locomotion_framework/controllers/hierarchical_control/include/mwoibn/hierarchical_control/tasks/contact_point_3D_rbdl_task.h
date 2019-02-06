@@ -71,7 +71,7 @@ public:
 protected:
   virtual void _updateError()
   {
-    std::cout << "_updateError" << std::endl;
+    // std::cout << "_updateError" << std::endl;
     _last_error.noalias() = _error; // save previous state
 
     for (int i = 0; i < _contacts.size(); i++)

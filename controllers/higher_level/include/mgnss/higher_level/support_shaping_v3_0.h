@@ -16,7 +16,7 @@
 
 #include "mwoibn/common/logger.h"
 
-#include "mgnss/higher_level/state_machine.h"
+#include "mgnss/higher_level/constraint.h"
 
 namespace mgnss
 {
@@ -24,7 +24,7 @@ namespace mgnss
 namespace higher_level
 {
 
-class Limit;
+// class Limit;
 /*
  *  Steering version with contact point open-loop reference
  *  For now, just hardcode everythong

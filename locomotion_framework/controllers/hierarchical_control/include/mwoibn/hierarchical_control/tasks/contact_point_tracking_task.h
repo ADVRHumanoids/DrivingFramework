@@ -157,11 +157,12 @@ virtual void releaseContact(int i) { _selector[i] = true; }
 virtual void claimContact(int i) { _selector[i] = false; }
 
 void setVelocity(mwoibn::VectorN& velocity){
-  std::cout << __PRETTY_FUNCTION__ << "\t" << velocity.transpose() << std::endl;
+  // std::cout << __PRETTY_FUNCTION__ << "\n" << velocity.transpose() << std::endl;
   for (int i = 0; i < _contacts.size(); i++)
     _velocity.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
 
-  std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
+  // std::cout << "wheel 3\n" << _wheel_transforms[i]->rotation;
+  // std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
 }
 //virtual int getFullTaskSize() = 0;
 

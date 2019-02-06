@@ -2,7 +2,7 @@
 #define __MGNSS__HIGHER_LEVEL__STATE_MACHINE_H
 
 #include "mgnss/higher_level/support_shaping_v3_0.h"
-#include "mgnss/higher_level/qr_tracking.h"
+#include "mgnss/higher_level/constraint.h"
 
 #include "mwoibn/robot_class/robot.h"
 // #include "mwoibn/hierarchical_control/tasks/controller_task.h"
@@ -23,13 +23,7 @@ namespace mgnss
 namespace higher_level
 {
 
-struct Limit{
 
-  mwoibn::VectorN limit;
-  mwoibn::VectorN state;
-  mwoibn::Matrix jacobian;
-  mwoibn::VectorN error;
-};
 
 /*
  *  Steering version with contact point open-loop reference
@@ -45,34 +39,7 @@ public:
   ~StateMachine(){}
 
   void init();
-  void update(){
-    _update();
-    for(int i = 0; i < _size; i++)
-       _computeMargin(i);
-
-    _marginJacobians();
-    _computeWorkspace();
-    _workspaceJacobian();
-
-    _margins.error = (_margins.state - _margins.limit)/_robot.rate();
-    _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.state)/_robot.rate();
-
-    if(_margins.error.minCoeff() < 0 || _workspace.error.minCoeff() < 0) {
-      _time = 0;
-      _counter = 0;
-    }
-    else {
-      _time += _robot.rate();
-      _counter++;
-      }
-
-      _state = (_counter < 25) ? false : true;
-      _restart = (_counter == 25) ? true : false;
-
-    std::cout << "counter\t" << _counter << "\t" << _restart << std::endl;
-    std::cout << "_margins\t" << _margins.state.transpose() << std::endl;
-    std::cout << "_workspace\t" << _workspace.state.transpose() << std::endl;
-  }
+  void update(const mwoibn::VectorN& last_state);
 
   bool state(){ return _state; }
 
@@ -81,6 +48,7 @@ public:
   bool restart() { return _restart;}
 
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steeringFrames(){return _wheel_transforms;}
+  std::vector<mwoibn::Matrix3> desiredSteer;
   //
   // const mwoibn::VectorN& margins(){return _margins;}
   // const mwoibn::VectorN& workspace(){return _workspace;}
@@ -89,6 +57,11 @@ public:
   // const mwoibn::Matrix& workspaceJacobian(){return _workspace_jacobian;}
   const Limit& margin(){return _margins;}
   const Limit& workspace(){return _workspace;}
+
+  const mwoibn::Matrix& stateJacobian(){return _state_jacobian;}
+  const mwoibn::Matrix& worldJacobian(){return _world_jacobian;}
+  const mwoibn::Matrix& steerJacobian(){return _steer_jacobian;}
+
   // bool valid();
 
   // const mwoibn::VectorN& marginsLimits(){return _safety_margins;}
@@ -121,6 +94,7 @@ protected:
   Limit _margins, _workspace;
   // mwoibn::VectorN _safety_margins, _max_workspace, _margins, _workspace, _norms;
   mwoibn::VectorN _norms;
+  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian;
   // mwoibn::Matrix _margins_jacobian, _workspace_jacobian;
 
 
