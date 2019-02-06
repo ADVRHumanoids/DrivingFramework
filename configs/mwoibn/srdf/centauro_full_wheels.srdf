@@ -71,11 +71,16 @@
    </group>
 
    <group name="yaws">
+      <link name="hip1_1"/>
+      <link name="hip1_2"/>
+      <link name="hip1_3"/>
+      <link name="hip1_4"/>
       <link name="ankle2_1"/>
       <link name="ankle2_2"/>
       <link name="ankle2_3"/>
       <link name="ankle2_4"/>
    </group>
+
 
    <group name="front_left_leg_no_wheel">
       <chain base_link="pelvis" tip_link="ankle2_1"/>
@@ -141,20 +146,20 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.0"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-0.8"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="0.8"/>
       <joint name="j_arm1_4" value="-0.8"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="0.0"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="0.8"/>
-      <joint name="j_arm2_4" value="0.8"/>
-      <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.8"/>
-      <joint name="j_arm2_7" value="0.0"/>
+      <joint name="j_arm2_1" value="-0.0"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-0.8"/>
+      <joint name="j_arm2_4" value="-0.8"/>
+      <joint name="j_arm2_5" value="-0.0"/>
+      <joint name="j_arm2_6" value="-0.8"/>
+      <joint name="j_arm2_7" value="-0.0"/>
 
       <joint name="hip_yaw_1" value="1.5"/>
       <joint name="hip_pitch_1" value="0.5"/>
@@ -183,19 +188,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.5"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-0.8"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="0.8"/>
       <joint name="j_arm1_4" value="-1.8"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.5"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="0.8"/>
-      <joint name="j_arm2_4" value="1.8"/>
+      <joint name="j_arm2_1" value="0.5"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-0.8"/>
+      <joint name="j_arm2_4" value="-1.8"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_6" value="-0.8"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -205,20 +210,20 @@
        <joint name="torso_yaw" value="0.0"/>
 
        <joint name="j_arm1_1" value="0.5"/>
-       <joint name="j_arm1_2" value="-0.3"/>
-       <joint name="j_arm1_3" value="-0.8"/>
+       <joint name="j_arm1_2" value="0.3"/>
+       <joint name="j_arm1_3" value="0.8"/>
        <joint name="j_arm1_4" value="-1.8"/>
-       <joint name="j_arm1_5" value="-1.2"/>
+       <joint name="j_arm1_5" value="1.2"/>
        <joint name="j_arm1_6" value="-0.8"/>
-       <joint name="j_arm1_7" value="-0.5"/>
+       <joint name="j_arm1_7" value="0.5"/>
 
-       <joint name="j_arm2_1" value="-0.5"/>
-       <joint name="j_arm2_2" value="0.3"/>
-       <joint name="j_arm2_3" value="0.8"/>
-       <joint name="j_arm2_4" value="1.8"/>
-       <joint name="j_arm2_5" value="1.2"/>
-       <joint name="j_arm2_6" value="0.8"/>
-       <joint name="j_arm2_7" value="0.5"/>
+       <joint name="j_arm2_1" value="0.5"/>
+       <joint name="j_arm2_2" value="-0.3"/>
+       <joint name="j_arm2_3" value="-0.8"/>
+       <joint name="j_arm2_4" value="-1.8"/>
+       <joint name="j_arm2_5" value="-1.2"/>
+       <joint name="j_arm2_6" value="-0.8"/>
+       <joint name="j_arm2_7" value="-0.5"/>
 
     </group_state>
 
@@ -227,19 +232,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.5"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-1.0"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="1.0"/>
       <joint name="j_arm1_4" value="-1.8"/>
-      <joint name="j_arm1_5" value="-0.2"/>
+      <joint name="j_arm1_5" value="0.2"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.5"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="1.0"/>
-      <joint name="j_arm2_4" value="1.8"/>
-      <joint name="j_arm2_5" value="0.2"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_1" value="0.5"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-1.0"/>
+      <joint name="j_arm2_4" value="-1.8"/>
+      <joint name="j_arm2_5" value="-0.2"/>
+      <joint name="j_arm2_6" value="-0.8"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -249,19 +254,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.2"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-0.8"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="0.8"/>
       <joint name="j_arm1_4" value="-2.2"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-1.3"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.2"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="0.8"/>
-      <joint name="j_arm2_4" value="2.2"/>
+      <joint name="j_arm2_1" value="0.2"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-0.8"/>
+      <joint name="j_arm2_4" value="-2.2"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="1.3"/>
+      <joint name="j_arm2_6" value="-1.3"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -271,19 +276,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="-0.8"/>
-      <joint name="j_arm1_2" value="-0.5"/>
-      <joint name="j_arm1_3" value="-0.8"/>
+      <joint name="j_arm1_2" value="0.5"/>
+      <joint name="j_arm1_3" value="0.8"/>
       <joint name="j_arm1_4" value="-0.5"/>
-      <joint name="j_arm1_5" value="0.8"/>
+      <joint name="j_arm1_5" value="-0.8"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="0.8"/>
-      <joint name="j_arm2_2" value="0.5"/>
-      <joint name="j_arm2_3" value="0.8"/>
-      <joint name="j_arm2_4" value="0.5"/>
-      <joint name="j_arm2_5" value="-0.8"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_1" value="-0.8"/>
+      <joint name="j_arm2_2" value="-0.5"/>
+      <joint name="j_arm2_3" value="-0.8"/>
+      <joint name="j_arm2_4" value="-0.5"/>
+      <joint name="j_arm2_5" value="0.8"/>
+      <joint name="j_arm2_6" value="-0.8"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -293,19 +298,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="1.37"/>
-      <joint name="j_arm1_2" value="-0.13"/>
-      <joint name="j_arm1_3" value="1.53"/>
+      <joint name="j_arm1_2" value="0.13"/>
+      <joint name="j_arm1_3" value="-1.53"/>
       <joint name="j_arm1_4" value="-2.15"/>
-      <joint name="j_arm1_5" value="-0.3"/>
+      <joint name="j_arm1_5" value="0.3"/>
       <joint name="j_arm1_6" value="1.57"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-1.37"/>
-      <joint name="j_arm2_2" value="0.13"/>
-      <joint name="j_arm2_3" value="-1.53"/>
-      <joint name="j_arm2_4" value="2.15"/>
-      <joint name="j_arm2_5" value="0.3"/>
-      <joint name="j_arm2_6" value="-1.57"/>
+      <joint name="j_arm2_1" value="1.37"/>
+      <joint name="j_arm2_2" value="-0.13"/>
+      <joint name="j_arm2_3" value="1.53"/>
+      <joint name="j_arm2_4" value="-2.15"/>
+      <joint name="j_arm2_5" value="-0.3"/>
+      <joint name="j_arm2_6" value="1.57"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -315,19 +320,19 @@
       <joint name="torso_yaw" value="1.57"/>
 
       <joint name="j_arm1_1" value="-1.37"/>
-      <joint name="j_arm1_2" value="-2.3"/>
-      <joint name="j_arm1_3" value="-0.0"/>
+      <joint name="j_arm1_2" value="2.3"/>
+      <joint name="j_arm1_3" value="0.0"/>
       <joint name="j_arm1_4" value="-2.0"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.4"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="1.37"/>
-      <joint name="j_arm2_2" value="2.3"/>
+      <joint name="j_arm2_1" value="-1.37"/>
+      <joint name="j_arm2_2" value="-2.3"/>
       <joint name="j_arm2_3" value="0.0"/>
-      <joint name="j_arm2_4" value="2.0"/>
+      <joint name="j_arm2_4" value="-2.0"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.4"/>
+      <joint name="j_arm2_6" value="-0.4"/>
       <joint name="j_arm2_7" value="0.0"/>
 
    </group_state>
@@ -437,19 +442,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.5"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-0.3"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="0.3"/>
       <joint name="j_arm1_4" value="-2.2"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.5"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="0.3"/>
-      <joint name="j_arm2_4" value="2.2"/>
+      <joint name="j_arm2_1" value="0.5"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-0.3"/>
+      <joint name="j_arm2_4" value="-2.2"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_6" value="-0.8"/>
 	  <joint name="j_arm2_7" value="0.0"/>
 
       <joint name="hip_yaw_1" value="0.0"/>
@@ -591,19 +596,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.5"/>
-      <joint name="j_arm1_2" value="-0.25"/>
-      <joint name="j_arm1_3" value="-0.3"/>
+      <joint name="j_arm1_2" value="0.25"/>
+      <joint name="j_arm1_3" value="0.3"/>
       <joint name="j_arm1_4" value="-2.15"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.5"/>
-      <joint name="j_arm2_2" value="0.25"/>
-      <joint name="j_arm2_3" value="0.3"/>
-      <joint name="j_arm2_4" value="2.15"/>
+      <joint name="j_arm2_1" value="0.5"/>
+      <joint name="j_arm2_2" value="-0.25"/>
+      <joint name="j_arm2_3" value="-0.3"/>
+      <joint name="j_arm2_4" value="-2.15"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_6" value="-0.8"/>
 	  <joint name="j_arm2_7" value="0.0"/>
 
       <joint name="hip_yaw_1" value="-0.3"/>
@@ -636,19 +641,19 @@
       <joint name="torso_yaw" value="0.0"/>
 
       <joint name="j_arm1_1" value="0.5"/>
-      <joint name="j_arm1_2" value="-0.3"/>
-      <joint name="j_arm1_3" value="-0.3"/>
+      <joint name="j_arm1_2" value="0.3"/>
+      <joint name="j_arm1_3" value="0.3"/>
       <joint name="j_arm1_4" value="-2.2"/>
       <joint name="j_arm1_5" value="0.0"/>
       <joint name="j_arm1_6" value="-0.8"/>
       <joint name="j_arm1_7" value="0.0"/>
 
-      <joint name="j_arm2_1" value="-0.5"/>
-      <joint name="j_arm2_2" value="0.3"/>
-      <joint name="j_arm2_3" value="0.3"/>
-      <joint name="j_arm2_4" value="2.2"/>
+      <joint name="j_arm2_1" value="0.5"/>
+      <joint name="j_arm2_2" value="-0.3"/>
+      <joint name="j_arm2_3" value="-0.3"/>
+      <joint name="j_arm2_4" value="-2.2"/>
       <joint name="j_arm2_5" value="0.0"/>
-      <joint name="j_arm2_6" value="0.8"/>
+      <joint name="j_arm2_6" value="-0.8"/>
 	  <joint name="j_arm2_7" value="0.0"/>
 
       <joint name="hip_yaw_1" value="-0.3"/>
@@ -944,19 +949,19 @@
         <joint name="torso_yaw" value="0.0"/>
 
         <joint name="j_arm1_1" value="0.0"/>
-        <joint name="j_arm1_2" value="-0.3"/>
-        <joint name="j_arm1_3" value="-0.8"/>
+        <joint name="j_arm1_2" value="0.3"/>
+        <joint name="j_arm1_3" value="0.8"/>
         <joint name="j_arm1_4" value="-1.2"/>
         <joint name="j_arm1_5" value="0.0"/>
         <joint name="j_arm1_6" value="-0.8"/>
         <joint name="j_arm1_7" value="0.0"/>
 
         <joint name="j_arm2_1" value="0.0"/>
-        <joint name="j_arm2_2" value="0.3"/>
-        <joint name="j_arm2_3" value="0.8"/>
-        <joint name="j_arm2_4" value="1.2"/>
+        <joint name="j_arm2_2" value="-0.3"/>
+        <joint name="j_arm2_3" value="-0.8"/>
+        <joint name="j_arm2_4" value="-1.2"/>
         <joint name="j_arm2_5" value="0.0"/>
-        <joint name="j_arm2_6" value="0.8"/>
+        <joint name="j_arm2_6" value="-0.8"/>
         <joint name="j_arm2_7" value="0.0"/>
 
         <joint name="hip_yaw_1" value="0.0"/>
@@ -987,19 +992,19 @@
         <joint name="torso_yaw" value="0.0"/>
 
         <joint name="j_arm1_1" value="0.5"/>
-        <joint name="j_arm1_2" value="-0.3"/>
-        <joint name="j_arm1_3" value="-0.3"/>
+        <joint name="j_arm1_2" value="0.3"/>
+        <joint name="j_arm1_3" value="0.3"/>
         <joint name="j_arm1_4" value="-2.2"/>
         <joint name="j_arm1_5" value="0.0"/>
         <joint name="j_arm1_6" value="-0.8"/>
         <joint name="j_arm1_7" value="0.0"/>
 
-        <joint name="j_arm2_1" value="-0.5"/>
-        <joint name="j_arm2_2" value="0.3"/>
-        <joint name="j_arm2_3" value="0.3"/>
-        <joint name="j_arm2_4" value="2.2"/>
+        <joint name="j_arm2_1" value="0.5"/>
+        <joint name="j_arm2_2" value="-0.3"/>
+        <joint name="j_arm2_3" value="-0.3"/>
+        <joint name="j_arm2_4" value="-2.2"/>
         <joint name="j_arm2_5" value="0.0"/>
-        <joint name="j_arm2_6" value="0.8"/>
+        <joint name="j_arm2_6" value="-0.8"/>
         <joint name="j_arm2_7" value="0.0"/>
     </group_state>
 
@@ -1008,26 +1013,26 @@
         <joint name="torso_yaw" value="0.0"/>
 
         <joint name="j_arm1_1" value="0.5"/>
-        <joint name="j_arm1_2" value="-0.6"/>
-        <joint name="j_arm1_3" value="-0.9"/>
+        <joint name="j_arm1_2" value="0.6"/>
+        <joint name="j_arm1_3" value="0.9"/>
         <joint name="j_arm1_4" value="-1.9"/>
         <joint name="j_arm1_5" value="0.0"/>
         <joint name="j_arm1_6" value="-0.5"/>
         <joint name="j_arm1_7" value="0.0"/>
 
-        <joint name="j_arm2_1" value="-0.5"/>
-        <joint name="j_arm2_2" value="0.6"/>
-        <joint name="j_arm2_3" value="0.9"/>
-        <joint name="j_arm2_4" value="1.9"/>
+        <joint name="j_arm2_1" value="0.5"/>
+        <joint name="j_arm2_2" value="-0.6"/>
+        <joint name="j_arm2_3" value="-0.9"/>
+        <joint name="j_arm2_4" value="-1.9"/>
         <joint name="j_arm2_5" value="0.0"/>
-        <joint name="j_arm2_6" value="0.5"/>
+        <joint name="j_arm2_6" value="-0.5"/>
         <joint name="j_arm2_7" value="0.0"/>
     </group_state>
 
     <group_state name="reach_left" group="chains">
 
         <joint name="j_arm1_1" value="-2.75"/>
-        <joint name="j_arm1_2" value="-0.5"/>
+        <joint name="j_arm1_2" value="0.5"/>
         <joint name="j_arm1_3" value="0.0"/>
         <joint name="j_arm1_4" value="0.0"/>
         <joint name="j_arm1_5" value="0.0"/>
@@ -1095,19 +1100,19 @@
         <joint name="torso_yaw" value="-1.5"/>
 
         <joint name="j_arm1_1" value="-1.5"/>
-        <joint name="j_arm1_2" value="-2.0"/>
-        <joint name="j_arm1_3" value="1.8"/>
+        <joint name="j_arm1_2" value="2.0"/>
+        <joint name="j_arm1_3" value="-1.8"/>
         <joint name="j_arm1_4" value="-2.5"/>
         <joint name="j_arm1_5" value="0.0"/>
         <joint name="j_arm1_6" value="-0.9"/>
         <joint name="j_arm1_7" value="0.0"/>
 
-        <joint name="j_arm2_1" value="0.4"/>
-        <joint name="j_arm2_2" value="0.8"/>
-        <joint name="j_arm2_3" value="-0.4"/>
-        <joint name="j_arm2_4" value="2.5"/>
+        <joint name="j_arm2_1" value="-0.4"/>
+        <joint name="j_arm2_2" value="-0.8"/>
+        <joint name="j_arm2_3" value="0.4"/>
+        <joint name="j_arm2_4" value="-2.5"/>
         <joint name="j_arm2_5" value="0.0"/>
-        <joint name="j_arm2_6" value="0.5"/>
+        <joint name="j_arm2_6" value="-0.5"/>
         <joint name="j_arm2_7" value="0.0"/>
 
         <joint name="hip_yaw_1" value="0.0"/>
