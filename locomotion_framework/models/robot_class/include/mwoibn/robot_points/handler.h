@@ -35,10 +35,11 @@ public:
     virtual ~Handler() { }
 
     template<typename Other>
-    void add(std::unique_ptr<Other> point)
+    int add(std::unique_ptr<Other> point)
     {
             _points.push_back(std::move(point));
             resize();
+            return _points.size()-1;
     }
 
     // template<typename Other>
@@ -49,10 +50,11 @@ public:
     // }
 
     template<typename Other>
-    void add(Other point)
+    int add(Other point)
     {
            _points.push_back(std::unique_ptr<Type>(new Other(point)));
            resize();
+           return _points.size()-1;
     }
 
     // template<typename Other>
@@ -135,7 +137,6 @@ public:
 
     const mwoibn::VectorN& getState()
     {
-
       _positions.setZero();
 
       unsigned int i = 0;
