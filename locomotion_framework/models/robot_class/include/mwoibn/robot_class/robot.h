@@ -193,8 +193,8 @@ std::vector<std::string> getBodyName(mwoibn::VectorInt ids){
     return links;
 }
 
-double getBodyId(std::string link_name){
-    mwoibn::rbdl_utils::checkBody(link_name, _model);
+unsigned int getBodyId(std::string link_name){
+    return mwoibn::rbdl_utils::checkBody(link_name, _model);
 }
 
 mwoibn::VectorInt getBodyId(std::vector<std::string> link_names){
