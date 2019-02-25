@@ -3,7 +3,6 @@
 
 #include "mwoibn/robot_class/robot.h"
 #include "mgnss/higher_level/constraint.h"
-#include <range/v3/all.hpp>
 
 
 namespace mgnss
