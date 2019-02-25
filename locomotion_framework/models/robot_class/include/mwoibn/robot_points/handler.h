@@ -19,6 +19,7 @@ class Handler
 public:
     Handler(unsigned int dofs) : _dofs(dofs) {}
     Handler(int dofs) : _dofs(dofs) {}
+    Handler() : _dofs(0) {}
 
     template<typename Other>
     Handler(Other&& other)
@@ -72,6 +73,7 @@ public:
           	}
           	_jacobian = mwoibn::Matrix::Zero(size, _points[0]->cols());
             _positions = mwoibn::VectorN::Zero(rows);
+            _dofs = _points[0]->cols();
     }
 
 
@@ -98,6 +100,9 @@ public:
       return true;
     }
 
+    void clear(){
+      _points.clear();
+    }
 
     Type& point(unsigned int id)
     {
@@ -121,6 +126,8 @@ public:
 
       return _jacobian;
     }
+
+    const mwoibn::Matrix& passJacobian() const {return _jacobian;}
 
 
     std::vector<mwoibn::Matrix> getJacobians()
@@ -162,6 +169,7 @@ public:
     }
 
 
+
     int rows() const {
             int i = 0;
             for (auto& point : _points)
@@ -178,6 +186,10 @@ public:
 
     typename std::vector<std::unique_ptr<Type>>::const_iterator begin() const {return _points.begin();}
     typename std::vector<std::unique_ptr<Type>>::const_iterator end() const {return _points.end();}
+
+    virtual Type& end(int i) {
+            return *(_points.end()[i]);
+    }
 
     virtual Type& operator[](int i) {
             return *_points[i];
