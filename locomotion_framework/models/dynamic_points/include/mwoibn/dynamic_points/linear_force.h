@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__DYNAMIC_POINTS__LINEAR_FORCE_H
 #define __MWOIBN__DYNAMIC_POINTS__LINEAR_FORCE_H
 
-#include "mwoibn/robot_points/state.h"
+#include "mwoibn/dynamic_points/dynamic_point.h"
 #include "mwoibn/point_handling/frame_plus.h"
 #include "mwoibn/point_handling/linear_velocity.h"
 #include "mwoibn/point_handling/linear_acceleration.h"
@@ -14,37 +14,37 @@ namespace dynamic_points
 {
 
   // Computes the point force given desired accleration
-class LinearForce: public robot_points::State
+class LinearForce: public DynamicPoint
 {
 
 public:
 
 
   LinearForce(point_handling::FramePlus& frame, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::Vector3& des_acc):
-    robot_points::State(frame.getModel(), frame.getState()), _frame(frame), _velocity(_frame), _dynamic_model(dynamic_model), _des_acc(des_acc){
+    DynamicPoint(frame.getModel(), frame.getState()), _frame(frame), _velocity(_frame), _dynamic_model(dynamic_model), _des_acc(des_acc){
           _init();
   }
 
   LinearForce(const LinearForce& other, point_handling::FramePlus& frame)
-      : robot_points::State(other), _frame(frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
+      : DynamicPoint(other), _frame(frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
   {
     _init();
   }
 
   LinearForce( LinearForce&& other, point_handling::FramePlus& frame)
-      : robot_points::State(other), _frame(frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
+      : DynamicPoint(other), _frame(frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
   {
     _init();
   }
 
   LinearForce( LinearForce&& other)
-      : robot_points::State(other), _frame(other._frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
+      : DynamicPoint(other), _frame(other._frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
   {
     _init();
   }
 
   LinearForce(const LinearForce& other)
-      : robot_points::State(other), _frame(other._frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
+      : DynamicPoint(other), _frame(other._frame), _velocity(_frame), _dynamic_model(other._dynamic_model), _des_acc(other._des_acc)
   {
     _init();
   }

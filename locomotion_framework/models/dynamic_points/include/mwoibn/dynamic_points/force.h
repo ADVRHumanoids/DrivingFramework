@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__DYNAMIC_POINTS__FORCE_H
 #define __MWOIBN__DYNAMIC_POINTS__FORCE_H
 
-#include "mwoibn/robot_points/state.h"
+#include "mwoibn/dynamic_points/dynamic_point.h"
 #include "mwoibn/point_handling/frame_plus.h"
 #include "mwoibn/point_handling/linear_velocity.h"
 //#include "mwoibn/point_handling/linear_acceleration.h"
@@ -13,43 +13,43 @@ namespace mwoibn
 namespace dynamic_points
 {
 
-class Force: public robot_points::State
+class Force: public DynamicPoint
 {
 
 public:
 
 
   Force(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::robot_points::Point& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
-    robot_points::State(model, state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
+    DynamicPoint(model, state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
           _init();
   }
 
   Force(mwoibn::robot_class::Robot& robot, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::robot_points::Point& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
-      robot_points::State(robot.getModel(), robot.state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
+      DynamicPoint(robot.getModel(), robot.state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
     _init();
   }
 
 
   Force( Force&& other, robot_points::Point& frame)
-      : robot_points::State(other), _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
+      : DynamicPoint(other), _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
   }
 
   Force(const Force& other, robot_points::Point& frame)
-      : robot_points::State(other),  _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
+      : DynamicPoint(other),  _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
   }
 
   Force( Force&& other)
-      : robot_points::State(other),  _frame(other._frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
+      : DynamicPoint(other),  _frame(other._frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
   }
 
   Force(const Force& other)
-      : robot_points::State(other),  _frame(other._frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
+      : DynamicPoint(other),  _frame(other._frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
   }
