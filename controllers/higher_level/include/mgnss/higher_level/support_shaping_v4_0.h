@@ -24,6 +24,8 @@ namespace mgnss
 namespace higher_level
 {
 
+
+  class SupportShapingV6;
 /*
  *  Steering version with contact point open-loop reference
  *  For now, just hardcode everythong
@@ -32,39 +34,29 @@ class SupportShapingV4: public QrTask
 {
 
 public:
-  SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config, std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace);
+  SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config, std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin = true);
 
   ~SupportShapingV4(){}
 
+  friend class SupportShapingV6;
 
-void init();
-void update();
 
-void log(mwoibn::common::Logger& logger);
+  void init(){    _allocate();}
+  void update();
+
+  void log(mwoibn::common::Logger& logger);
 
 protected:
   mwoibn::robot_class::Robot& _robot;
   unsigned int _size;
-  mwoibn::VectorN _safety, _max_workspace,_vector_cost_;
-  // mwoibn::VectorN _return_state;
-
-  // Constraint _margin_constrain, _workspace_constraint;
-
+  mwoibn::VectorN _safety, _max_workspace;
+  bool _is_margin;
   const mgnss::higher_level::Limit &_margin, &_workspace;
 
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& _wheel_transforms;
 
-  // std::vector<std::pair<int,int>> _margin_pairs;
-
-
-  // void _update();
   virtual void _outputTransform();
-
-  // void _computeMargin(int i);
-  //
-  // double _marginJacobians();
-  //
-
+  virtual void _allocate();
 };
 }
 }

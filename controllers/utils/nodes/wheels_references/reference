@@ -344,7 +344,6 @@ if __name__ == '__main__':
 
     rate.sleep()
 
-
     parser = ArgumentParser(description="pass file name")
     parser.add_argument("-f", "--file", help="read parm from file", metavar="FILE")
     parser.add_argument("-b", "--base", help="send base referrence", metavar="BASE", type=str2bool, default=True)

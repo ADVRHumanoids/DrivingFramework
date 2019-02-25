@@ -2,52 +2,62 @@
 
 
 
-mgnss::higher_level::SupportShapingV4::SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace):
-  QrTask(8, 8), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace){
+mgnss::higher_level::SupportShapingV4::SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
+  QrTask(8, 4), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
+    if(!_is_margin) resize(8,0);
+}
 
-        _size = 4;
-        _return_state.setZero(_vars); // state + slack
+void mgnss::higher_level::SupportShapingV4::_allocate(){
 
-        _vector_cost_.setZero(_vars+_slack);
+          _size = 4;
+          _return_state.setZero(_vars); // state + slack
 
+          // _vector_cost_.setZero(_vars+_slack);
 
-            soft_inequality.add(Constraint(4,8)); // margin
-            soft_inequality.add(Constraint(4,8)); //limit
+            if(_is_margin)
+              soft_inequality.add(Constraint(4,_vars)); // margin
+              hard_inequality.add(Constraint(8,_vars)); //limit
 
-            QrTask::init();
+              QrTask::init();
 
-            for(int i = 0; i < 4; i++){
-              _vector_cost_[2*i] = 1;
-              _vector_cost_[2*i+1] = 3;
-              _vector_cost_[8+i] = 10;
-              _vector_cost_[12+i] = 1000;
-            }
+              for(int i = 0; i < 4; i++){
+                // _vector_cost_[2*i] = 1;
+                // _vector_cost_[2*i+1] = 3;
+                _cost.quadratic(2*i, 2*i) = 1;
+                _cost.quadratic(2*i+1, 2*i+1) = 1;
 
-            _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
+                // _vector_cost_[12+i] = 1000;
+              }
+              // _vector_cost_[8+i] = 50;
+
+              // _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
+              _cost.quadratic.block(_vars, _vars, _slack, _slack) = 100000*mwoibn::Matrix::Identity(_slack,_slack);
 
 }
 
-void mgnss::higher_level::SupportShapingV4::init(){
-
-}
 
 void mgnss::higher_level::SupportShapingV4::update(){
 
      _optimal_state.setZero();
 
     for(int i = 0; i < _size; i++){
+      if(_is_margin)
         soft_inequality[0].jacobian.block<4,2>(0,2*i) = _margin.jacobian.middleCols<2>(3*i);
-        soft_inequality[1].state[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.state[i])/_robot.rate();
+        hard_inequality[0].state[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.state[i])/_robot.rate();
+        hard_inequality[0].state[4+i] = _workspace.state[i]/_robot.rate();
     }
 
-    soft_inequality[1].jacobian = -_workspace.jacobian;
-    soft_inequality[0].state = (_margin.state - _margin.limit)/_robot.rate();
+    hard_inequality[0].jacobian.block<4,8>(0,0) = -_workspace.jacobian;
+    hard_inequality[0].jacobian.block<4,8>(4,0) = _workspace.jacobian;
+    if(_is_margin)
+      soft_inequality[0].state = (_margin.state - _margin.limit)/_robot.rate();
 
     QrTask::update();
-    // std::cout << "margin.state\t" << _margin.state.transpose() << std::endl;
-    // std::cout << "workspace.state\t" << _workspace.state.transpose() << std::endl;
+    // std::cout << "soft_inequality\n" << soft_inequality[0].jacobian << std::endl;
+    // std::cout << "hard_inequality\n" << hard_inequality[0].jacobian << std::endl;
+    // std::cout << "workspace.state\t" << soft_inequality[1].state.transpose() << std::endl;
     // std::cout << "margin.limit\t" << _margin.limit.transpose() << std::endl;
-    // std::cout << "workspace.limit\t" << _workspace.limit.transpose() << std::endl;
+    // std::cout << "workspace.limit\t" << hard_inequality.limit.transpose() << std::endl;
 
 }
 

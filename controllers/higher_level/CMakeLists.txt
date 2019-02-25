@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.6.0)
 project(mgnss_higher_level)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+
 
 set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
@@ -37,6 +40,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+
 )
 
 
@@ -61,7 +65,14 @@ add_library(steering
     src/support_shaping.cpp
     src/support_shaping_v2_0.cpp
     src/support_shaping_v3_0.cpp
+    src/support_shaping_v4_0.cpp
+    src/support_shaping_v5_0.cpp
+    src/support_shaping_v6_0.cpp
     src/qr_tracking.cpp
+    src/qr_task.cpp
+    src/qr_joint_space.cpp
+    src/qr_joint_space_v2.cpp
+
     src/state_machine.cpp
   )
   add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})
@@ -69,7 +80,7 @@ add_library(steering
   target_link_libraries(support_shaping
      ${catkin_LIBRARIES}
    )
-
+target_compile_features(support_shaping PRIVATE cxx_range_for)
 
 
  ## Mark executables and/or libraries for installation

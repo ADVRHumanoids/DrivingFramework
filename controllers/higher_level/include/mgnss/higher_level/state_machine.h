@@ -10,8 +10,11 @@
 #include "mwoibn/robot_points/point.h"
 #include "mwoibn/robot_points/handler.h"
 
+#include "mwoibn/dynamic_points/torus.h"
+
 #include "mwoibn/robot_points/torus_model.h"
 #include "mwoibn/robot_points/linear_point.h"
+#include "mwoibn/robot_points/frame_orientation.h"
 #include "mwoibn/robot_points/minus.h"
 #include "mwoibn/robot_points/rotation.h"
 #include "mwoibn/robot_points/ground_wheel.h"
@@ -60,8 +63,15 @@ public:
 
   const mwoibn::Matrix& stateJacobian(){return _state_jacobian;}
   const mwoibn::Matrix& worldJacobian(){return _world_jacobian;}
-  const mwoibn::Matrix& steerJacobian(){return _steer_jacobian;}
+  // const mwoibn::Matrix& steerJacobian(){return _steer_jacobian;}
+  const mwoibn::Matrix& desiredJacobian(){return _desired_jacobian;}
+  const mwoibn::VectorN& stateOffset(){return _state_offset;}
+  const mwoibn::VectorN& nextStateOffset(){return _next_state_offset;}
 
+  mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus>& accelerations(){return _torus_acceleration;}
+  const mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& wheelOrientation(){return _wheel_orientation;}
+  
+  void log(mwoibn::common::Logger& logger);
   // bool valid();
 
   // const mwoibn::VectorN& marginsLimits(){return _safety_margins;}
@@ -81,7 +91,11 @@ protected:
   bool _state, _restart;
   double _time = 0;
 
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contact_points;
+  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _wheel_orientation;
+
+  mwoibn::robot_points::Handler<mwoibn::robot_points::TorusModel> _contact_points;
+  mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus> _torus_acceleration;
+
   mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _points;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _base_points;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _hips, _wheels;
@@ -93,10 +107,11 @@ protected:
 
   Limit _margins, _workspace;
   // mwoibn::VectorN _safety_margins, _max_workspace, _margins, _workspace, _norms;
-  mwoibn::VectorN _norms;
-  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian;
+  mwoibn::VectorN _norms, _state_offset, _next_state_offset;
+  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian, _desired_jacobian;
   // mwoibn::Matrix _margins_jacobian, _workspace_jacobian;
-
+  mwoibn::Matrix3 _support_jacobian;
+  mwoibn::Vector3 _support_offset;
 
   void _computeMargin(int i);
   void _marginJacobians();

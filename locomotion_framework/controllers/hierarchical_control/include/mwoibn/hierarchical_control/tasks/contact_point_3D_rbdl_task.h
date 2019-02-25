@@ -45,7 +45,7 @@ public:
         }
 
         std::unique_ptr<mwoibn::robot_points::TorusModel> torus_(new mwoibn::robot_points::TorusModel(
-                           _robot, mwoibn::point_handling::FramePlus(name,
+                           _robot.getModel(), _robot.state, mwoibn::point_handling::FramePlus(name,
                            _robot.getModel(), _robot.state),
                            mwoibn::Axis(config["reference_axis"][name]["x"].as<double>(),
                                         config["reference_axis"][name]["y"].as<double>(),

@@ -3,7 +3,7 @@ base now: [0.0, 0.0,  0.0, 0.0]
 base_const_vel: [0.0, 0.0, 0.0, 0.0]
 
 # default velocity, controller step 11
-vel:  0.05
+vel:  0.3
 dt:   0.01
 
 # initial support position
@@ -39,11 +39,17 @@ z cp ref:
 # predefined base references
 base ref:
   - [0.0, 0.0, 0.0, 0.0]
-  - [0.15, 0, 0.0, 0.0]
+  - [2.0, 1.0, 0.0, 0.0]
 
 # pattern
 pattern:
   1:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 1
+  3:
     type: move
     x_cp: 7
     y_cp: 0
