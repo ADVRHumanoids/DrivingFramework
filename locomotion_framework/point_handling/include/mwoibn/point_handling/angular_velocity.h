@@ -48,16 +48,18 @@ public:
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+      _temp_world = CalcPointVelocity6D(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false).head<3>();
+      return _temp_world;
   }
 
   virtual Point::Current
   getWorld(bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+    Point::Current current;
+    current = CalcPointVelocity6D(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false).head<3>();
   }
   /** @brief set new tracked point giving data in a world frame*/
   virtual void getWorld(Point::Current& current, bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+    current = CalcPointVelocity6D(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false).head<3>();
   }
   /** @brief set new tracked point giving data in a world frame*/
 
