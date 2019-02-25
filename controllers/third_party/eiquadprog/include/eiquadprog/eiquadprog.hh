@@ -134,7 +134,9 @@ double solve_quadprog2(LLT<MatrixXd,Lower> &chol,  double c1, VectorXd & g0,
                       const MatrixXd & CE, const VectorXd & ce0,  
                       const MatrixXd & CI, const VectorXd & ci0, 
                       VectorXd& x);
-
+inline void print_vector(std::string name, const VectorXd& vector, int scalar){
+	std::cerr << name << "\t" << vector.transpose() << "\t" << scalar << std::endl;
+}
 /* solve_quadprog is used for on-demand QP solving */
 inline double solve_quadprog(MatrixXd & G,  VectorXd & g0,  
                       const MatrixXd & CE, const VectorXd & ce0,  
@@ -200,10 +202,10 @@ inline double solve_quadprog2(LLT<MatrixXd,Lower> &chol,  double c1, VectorXd & 
   J.setIdentity();
   J = chol.matrixU().solve(J);
 	c2 = J.trace();
-#ifdef TRACE_SOLVER
- print_matrix("J", J, n);
-#endif
-  
+// #ifdef TRACE_SOLVER
+//  print_matrix("J", J, n);
+// #endif
+
 	/* c1 * c2 is an estimate for cond(G) */
   
 	/* 
@@ -228,14 +230,14 @@ inline double solve_quadprog2(LLT<MatrixXd,Lower> &chol,  double c1, VectorXd & 
     compute_d(d, J, np);
 		update_z(z, J, d,  iq);
 		update_r(R, r, d,  iq);
-#ifdef TRACE_SOLVER
-		print_matrix("R", R, iq);
-		print_vector("z", z, n);
-		print_vector("r", r, iq);
-		print_vector("d", d, n);
-#endif
-    
-    /* compute full step length t2: i.e., the minimum step in primal space s.t. the contraint 
+// #ifdef TRACE_SOLVER
+// 		// print_matrix("R", R, iq);
+// 		print_vector("z", z, n);
+// 		print_vector("r", r, iq);
+// 		print_vector("d", d, n);
+// #endif
+
+    /* compute full step length t2: i.e., the minimum step in primal space s.t. the contraint
       becomes feasible */
     t2 = 0.0;
 	if (std::abs(z.dot(z)) > std::numeric_limits<double>::epsilon()) // i.e. z != 0
@@ -285,9 +287,9 @@ l1:	iter++;
 		s(i) = sum;
 		psi += std::min(0.0, sum);
 	}
-#ifdef TRACE_SOLVER
-  print_vector("s", s, mi);
-#endif
+// #ifdef TRACE_SOLVER
+//   print_vector("s", s, mi);
+// #endif
 
     
 	if (std::abs(psi) <= mi * std::numeric_limits<double>::epsilon() * c1 * c2* 100.0)
@@ -335,15 +337,15 @@ l2a:/* Step 2a: determine step direction */
   update_z(z, J, d, iq);
   /* compute N* np (if q > 0): the negative of the step direction in the dual space */
   update_r(R, r, d, iq);
-#ifdef TRACE_SOLVER
-  std::cerr << "Step direction z" << std::endl;
-		print_vector("z", z, n);
-		print_vector("r", r, iq + 1);
-    print_vector("u", u, iq + 1);
-    print_vector("d", d, n);
-    print_ivector("A", A, iq + 1);
-#endif
-    
+// #ifdef TRACE_SOLVER
+//   std::cerr << "Step direction z" << std::endl;
+// 		print_vector("z", z, n);
+// 		print_vector("r", r, iq + 1);
+//     print_vector("u", u, iq + 1);
+//     print_vector("d", d, n);
+//     // print_ivector("A", A, iq + 1);
+// #endif
+
   /* Step 2b: compute step length */
   l = 0;
   /* Compute t1: partial step length (maximum step in dual space without violating dual feasibility */
@@ -369,9 +371,9 @@ l2a:/* Step 2a: determine step direction */
 #ifdef TRACE_SOLVER
   std::cerr << "Step sizes: " << t << " (t1 = " << t1 << ", t2 = " << t2 << ") ";
 #endif
-  
+
   /* Step 2c: determine new S-pair and take step: */
-  
+
   /* case (i): no step in primal or dual space */
   if (t >= inf)
   {
@@ -392,8 +394,8 @@ l2a:/* Step 2a: determine step direction */
     std::cerr << " in dual space: " 
       << f_value << std::endl;
     print_vector("x", x, n);
-    print_vector("z", z, n);
-		print_ivector("A", A, iq + 1);
+    // print_vector("z", z, n);
+		// print_ivector("A", A, iq + 1);
 #endif
     goto l2a;
   }
@@ -410,9 +412,9 @@ l2a:/* Step 2a: determine step direction */
   std::cerr << " in both spaces: " 
     << f_value << std::endl;
 	print_vector("x", x, n);
-	print_vector("u", u, iq + 1);
-	print_vector("r", r, iq + 1);
-	print_ivector("A", A, iq + 1);
+	// print_vector("x", x, n);
+	// print_vector("u", u, iq + 1);
+	// print_vector("r", r, iq + 1);
 #endif
   
   if (t == t2)
@@ -427,10 +429,10 @@ l2a:/* Step 2a: determine step direction */
 		{
 			iaexcl(ip) = 0;
 			delete_constraint(R, J, A, u, p, iq, ip);
-#ifdef TRACE_SOLVER
-      print_matrix("R", R, n);
-      print_ivector("A", A, iq);
-#endif
+// #ifdef TRACE_SOLVER
+      // print_matrix("R", R, n);
+      // print_ivector("A", A, iq);
+// #endif
 			for (i = 0; i < m; i++)
 				iai(i) = i;
 			for (i = 0; i < iq; i++)
@@ -444,10 +446,10 @@ l2a:/* Step 2a: determine step direction */
 		}    
     else
       iai(ip) = -1;
-#ifdef TRACE_SOLVER
-    print_matrix("R", R, n);
-    print_ivector("A", A, iq);
-#endif
+// #ifdef TRACE_SOLVER
+//     print_matrix("R", R, n);
+//     print_ivector("A", A, iq);
+// #endif
     goto l1;
   }
   
@@ -459,16 +461,16 @@ l2a:/* Step 2a: determine step direction */
   /* drop constraint l */
 	iai(l) = l;
 	delete_constraint(R, J, A, u, p, iq, l);
-#ifdef TRACE_SOLVER
-  print_matrix("R", R, n);
-  print_ivector("A", A, iq);
-#endif
-  
-  s(ip) = CI.col(ip).dot(x) + ci0(ip);
+// #ifdef TRACE_SOLVER
+  // print_matrix("R", R, n);
+  // print_ivector("A", A, iq);
+// #endif
 
-#ifdef TRACE_SOLVER
-  print_vector("s", s, mi);
-#endif
+  s(ip) = CI.col(ip).dot(x) + ci0(ip);
+//
+// #ifdef TRACE_SOLVER
+//   print_vector("s", s, mi);
+// #endif
   goto l2a;
 }
 
@@ -620,4 +622,3 @@ inline void delete_constraint(MatrixXd& R, MatrixXd& J, VectorXi& A, VectorXd& u
 }
 
 #endif
-
