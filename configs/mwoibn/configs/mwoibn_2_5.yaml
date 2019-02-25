@@ -30,6 +30,14 @@ mwoibn:
                         contacts:
                                 read: true
                                 feedback: true
+                base_velocity:
+                        feedback:
+                                list: [link_side_online, simulation_base]
+                        actuators:
+                                read: true
+                        contacts:
+                                read: true
+                                feedback: true
                 force_test:
                         feedback:
                                 list: [torque_reference, link_side_online, odometry]
@@ -536,7 +544,7 @@ mwoibn:
                         mode: full
                 wheeled_motion:
                         layer: NRT
-                        robot: default
+                        robot: base_velocity
                         controller: direct
                         mode: full
                         chain: lower_body
@@ -670,6 +678,7 @@ mwoibn:
                                         CASTER: 30 # 14
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
+                                        COP: 0
                                 HW_str_1:
                                         ratio: 1.15
                                         damping: 0.0001
@@ -834,7 +843,7 @@ mwoibn:
                         chain: wheels
                 gravity_compensation:
                         layer: RT
-                        robot: default
+                        robot: base_velocity
                         controller: torque_reference
                         secondary_file:
                              path: *support
@@ -856,7 +865,7 @@ mwoibn:
                         compliance: True
                 ground_forces:
                         layer: NRT
-                        robot: default
+                        robot: base_velocity
                         controller: empty
                         mode: full
                         secondary_file:
