@@ -561,7 +561,7 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                         if (type.compare("wheel") == 0)
                         {
                                 _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
-                                                       new mwoibn::robot_points::WheelContactV2(
+                                                       new mwoibn::robot_points::WheelContactV3(
                                                                _model, state, contact)));
                                 loaded_contacts[_contacts->end()[-1]->getName()] = contact;
                                 continue;
