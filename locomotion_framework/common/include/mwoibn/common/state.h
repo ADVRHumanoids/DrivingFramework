@@ -49,6 +49,15 @@ State(State&& other): _interfaces(other._interfaces),
 {
 }
 
+State& operator=(const State& other){
+    if(&other == this) return *this;
+
+    for(auto& interface: other._interfaces)
+        _interfaces[interface.first] = interface.second;
+
+    return *this;
+}
+
 bool add(mwoibn::Interface interface){
   if(_interfaces.count(interface))
     return false;
