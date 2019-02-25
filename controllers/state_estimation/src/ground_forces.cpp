@@ -54,6 +54,7 @@ void mgnss::state_estimation::GroundForces::_allocate(){
 
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE});
+
   _robot.state.add("OVERALL_FORCE");
 
 
@@ -124,7 +125,7 @@ void mgnss::state_estimation::GroundForces::update()
 
       _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get();
       _force_2.noalias() = _contacts_inversed*_force_1;
-      _force_3 = _force_2  - _accelerations.getWorld();
+      _force_3 = _force_2  - _accelerations.getWorld(); // ???
 
       _world_contacts.noalias() = _contacts_inverse->get()*_force_3;
 
@@ -139,6 +140,8 @@ void mgnss::state_estimation::GroundForces::update()
 
       // check measured acceleration/forces at contact point
       _robot.state["OVERALL_FORCE"].set(_state);
+
+      _robot.state.acceleration.set(_gravity.getInertiaInverse()*_state);
       // _points_force.update(true);
       //
       // _linear_force.update(true);
