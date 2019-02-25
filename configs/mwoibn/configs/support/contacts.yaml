@@ -18,6 +18,12 @@ centauro:
          message: gazebo_msgs::ContactsState
          initialize: true
          interface: fixed
+         minor_axis: 0.068
+         major_axis: 0.01
+         reference_axis:
+             x: 0
+             y: 0
+             z: 1
       contact1:
          name: front_right_leg
          end_frame: wheel_2
@@ -36,6 +42,12 @@ centauro:
          message: gazebo_msgs::ContactsState
          initialize: true
          interface: fixed
+         minor_axis: 0.068
+         major_axis: 0.01
+         reference_axis:
+             x: 0
+             y: 0
+             z: -1
       contact2:
          name: rear_left_leg
          end_frame: wheel_3
@@ -54,6 +66,12 @@ centauro:
          message: gazebo_msgs::ContactsState
          initialize: true
          interface: fixed
+         minor_axis: 0.068
+         major_axis: 0.01
+         reference_axis:
+             x: 0
+             y: 0
+             z: 1
       contact3:
          name: rear_right_leg
          end_frame: wheel_4
@@ -72,3 +90,10 @@ centauro:
          message: gazebo_msgs::ContactsState
          initialize: true
          interface: fixed
+         minor_axis: 0.068
+         major_axis: 0.01
+         reference_axis:
+             x: 0
+             y: 0
+             z: -1
+

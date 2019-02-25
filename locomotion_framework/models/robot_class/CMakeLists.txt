@@ -82,6 +82,7 @@ target_link_libraries(communication
  add_library(robot_class
                  src/robot.cpp
                  src/robot_points/wheel_contact.cpp
+                 src/robot_points/wheel_contact_v3.cpp
                  src/robot_points/contact_v2.cpp
                  src/robot_points/contact.cpp
                  src/robot_points/handler.cpp
