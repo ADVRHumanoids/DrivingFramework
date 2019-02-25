@@ -8,18 +8,18 @@
     _point.setZero(3);
     _contact_j.setZero(3, _state.velocity.size());
     _contact_k.setZero(3, _state.velocity.size());
-
+    _wheel_jacobian.setZero(3,3);
   }
 
-  mwoibn::robot_points::TorusModel::TorusModel(mwoibn::robot_class::Robot& robot, mwoibn::point_handling::FramePlus centre,
-             mwoibn::Axis axis, double r, double R, const mwoibn::Vector3& ground_normal):
-                State(robot.getModel(), robot.state), _centre(centre), _axis(axis), _r(r), _R(R), _ground_normal(ground_normal), _v_centre(_centre){
-
-    _point.setZero(3);
-    _contact_j.setZero(3, _state.velocity.size());
-    _contact_k.setZero(3, _state.velocity.size());
-
-  }
+  // mwoibn::robot_points::TorusModel::TorusModel(mwoibn::robot_class::Robot& robot, mwoibn::point_handling::FramePlus centre,
+  //            mwoibn::Axis axis, double r, double R, const mwoibn::Vector3& ground_normal):
+  //               State(robot.getModel(), robot.state), _centre(centre), _axis(axis), _r(r), _R(R), _ground_normal(ground_normal), _v_centre(_centre){
+  //
+  //   _point.setZero(3);
+  //   _contact_j.setZero(3, _state.velocity.size());
+  //   _contact_k.setZero(3, _state.velocity.size());
+  //
+  // }
 
 
   mwoibn::robot_points::TorusModel::TorusModel(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::point_handling::FramePlus centre,
@@ -30,7 +30,7 @@
     _point.setZero(3);
     _contact_j.setZero(3, _state.velocity.size());
     _contact_k.setZero(3, _state.velocity.size());
-
+    _wheel_jacobian.setZero(3,3);
   }
 
   mwoibn::robot_points::TorusModel::TorusModel(TorusModel&& other) : State(other), _centre(other._centre), _v_centre(other._v_centre, _centre), _frame(other._frame),
@@ -50,16 +50,29 @@
   }
 
   void mwoibn::robot_points::TorusModel::computeJacobian() {
+
+
     _jacobian.noalias() =  _v_centre.linear().getJacobian();
     _jacobian.noalias() += _jacobianOffset();
+
+    _wheel_jacobian.setZero();
+    double norm = 1/(_ground_normal - _temp).norm();
+
+    mwoibn::eigen_utils::skew(_position_offset, _wheel_jacobian);
+
+    _wheel_jacobian += _contact_3*_R*norm;
+    // std::cout << "_wheel_jacobian\n" << _wheel_jacobian<< std::endl;
+    // std::cout << "_contact_3\n" << _contact_3*_R*norm << std::endl;
+
   }
 
   const mwoibn::Vector3& mwoibn::robot_points::TorusModel::_positionOffset(){
       double norm = 1/(_ground_normal - _axis_world*_ground_normal.transpose()*_axis_world).norm();
-      _temp = -(_ground_normal - _axis_world*_ground_normal.transpose()*_axis_world)*norm*_R;
-      _temp -= (_ground_normal)*_r;
-      return _temp;
+      _position_offset = -(_ground_normal - _axis_world*_ground_normal.transpose()*_axis_world)*norm*_R;
+      _position_offset -= (_ground_normal)*_r;
+      return _position_offset;
   }
+
 
   const mwoibn::Matrix& mwoibn::robot_points::TorusModel::_jacobianOffset(){
 
