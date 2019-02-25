@@ -29,12 +29,14 @@ public:
 
 
 virtual void init();
-
+virtual void resize(int vars, int slack);
+virtual void clear();
 virtual void update();
 
 virtual void solve();
 virtual void log(mwoibn::common::Logger& logger) = 0;
-virtual mwoibn::VectorN get(){return _return_state;}
+virtual const mwoibn::VectorN& get(){return _return_state;}
+virtual const mwoibn::VectorN& raw(){return _optimal_state;}
 
 double vars(){return _vars;}
 double slack(){return _slack;}
