@@ -45,6 +45,7 @@ add_library(ros_callbacks
    src/joint_states.cpp
    src/wheels_controller_extend.cpp
    src/wheels_controller_events.cpp
+   src/wheels_controller_second_order.cpp
 
    #src/wheels_zmp.cpp
 

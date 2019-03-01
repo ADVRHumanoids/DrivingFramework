@@ -3,6 +3,11 @@
 
 mgnss::higher_level::QrTask::QrTask(int vars, int slack): _vars(vars), _slack(slack), _llt(vars){
             resize(vars, slack);
+
+}
+
+mgnss::higher_level::QrTask::QrTask(): _vars(0), _slack(0), _llt(0){
+            resize(0, 0);
 }
 
 void mgnss::higher_level::QrTask::resize(int vars, int slack){
@@ -15,7 +20,7 @@ void mgnss::higher_level::QrTask::resize(int vars, int slack){
   _cost.quadratic.setIdentity(_cost.size,_cost.size); // this should work only with lower body - how?
   _cost.linear.setZero(_cost.size);
   _return_state.setZero(_vars);
-
+  _init(_vars , _vars);
 }
 
 
@@ -41,7 +46,7 @@ void mgnss::higher_level::QrTask::clear(){
     hard_inequality.clear();
 }
 
-void mgnss::higher_level::QrTask::update(){
+void mgnss::higher_level::QrTask::_update(){
 
   if(equality.size()){
     for(auto& constraint: equality) constraint->update();
@@ -76,7 +81,7 @@ void mgnss::higher_level::QrTask::update(){
 void mgnss::higher_level::QrTask::solve(){
 
 
-    update();
+    _update();
     //
      // std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
      // std::cout << "_cost.linear\n" << _cost.linear.transpose() << std::endl;
@@ -90,6 +95,8 @@ void mgnss::higher_level::QrTask::solve(){
      // std::cout << "state\t" << soft_inequality.getState().transpose() << std::endl;
      // std::cout << "_equality.transposed\n" << _equality.transposed << std::endl;
      // std::cout << "_equality.state\n" << _equality.state.transpose() << std::endl;
+
+
 
     _llt.compute(_cost.quadratic);
     _cost.trace = _cost.quadratic.trace();

@@ -41,7 +41,7 @@ public:
 // mwoibn::VectorN& margin(){return _margins;}
 
 void init();
-void update();
+void _update();
 
 void solve();
 void log(mwoibn::common::Logger& logger);
@@ -83,7 +83,7 @@ protected:
 
   // std::vector<mwoibn::hierarchical_control::tasks::BasicTask*> _other_tasks;
 
-  void _update();
+  // void _update();
 
   // I should check if it works before making the full optimization
   void _computeMargin(int i);

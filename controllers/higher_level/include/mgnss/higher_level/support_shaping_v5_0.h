@@ -38,7 +38,7 @@ public:
 
 
   // void init();
-  void update();
+  void _update();
 
   // void log(mwoibn::common::Logger& logger);
 

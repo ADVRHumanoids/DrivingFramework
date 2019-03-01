@@ -19,9 +19,9 @@ void mgnss::higher_level::SupportShapingV5::_allocate(){
     std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
 }
 
-void mgnss::higher_level::SupportShapingV5::update(){
+void mgnss::higher_level::SupportShapingV5::_update(){
 
-    SupportShapingV4::update();
+    SupportShapingV4::_update();
 
     _cost.linear.head<8>() = -2*_spv_desired;
     _cost.linear.segment<4>(8) = -2*_beta_desired;

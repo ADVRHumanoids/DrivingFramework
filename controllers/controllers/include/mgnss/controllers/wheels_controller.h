@@ -6,7 +6,7 @@
 #include <mwoibn/hierarchical_control/controllers/basic.h>
 #include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 
-#include <mwoibn/hierarchical_control/tasks/contact_point_tracking_task.h>
+#include <mwoibn/hierarchical_control/tasks/contact_point.h>
 #include "mgnss/higher_level/steering_reference.h"
 
 #include <mwoibn/hierarchical_control/tasks/cartesian_selective_task.h>
@@ -16,6 +16,8 @@
 #include <mwoibn/hierarchical_control/actions/task.h>
 #include <mwoibn/hierarchical_control/actions/compute.h>
 
+#include <mgnss/higher_level/qp_action.h>
+#include <mgnss/higher_level/qr_task_wrapper.h>
 
 namespace mgnss
 {
@@ -205,9 +207,10 @@ std::unique_ptr<mwoibn::hierarchical_control::tasks::Constraints> _constraints_p
 std::unique_ptr<mwoibn::hierarchical_control::tasks::CartesianSelective> _pelvis_position_ptr;
 std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelvis_orientation_ptr;
 
-std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointTracking> _steering_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPoint> _steering_ptr;
 
 std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
+std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
 
 std::unique_ptr<mwoibn::hierarchical_control::controllers::Actions> _ik_ptr;
 
@@ -232,7 +235,7 @@ virtual void _setInitialConditions();
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
 virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config);
-virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Compute> _taskAction(std::string task, YAML::Node config);
+virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type);
 virtual void _initIK(YAML::Node config);
 //virtual void _initSteering(YAML::Node config, std::function<>);
 

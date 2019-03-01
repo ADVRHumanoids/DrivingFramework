@@ -112,8 +112,13 @@ void mgnss::higher_level::SupportShaping::init(){
    }
 }
 
-void mgnss::higher_level::SupportShaping::update(){
-    _update();
+void mgnss::higher_level::SupportShaping::_update(){
+    _contact_points.update(true);
+    _points.update(false);
+    _base_points.update(false);
+    for(auto& wheel: _wheel_transforms)
+      wheel->compute();
+
      for(int i = 0; i < _contact_points.size(); i++)
        _computeMargin(i);
      _marginJacobians();
@@ -192,7 +197,7 @@ void mgnss::higher_level::SupportShaping::solve(mwoibn::common::Logger& logger){
   _llt.compute(_cost);
   _trace = _cost.trace();
 
-  update();
+  _update();
 
   mwoibn::VectorN g0 = mwoibn::VectorN::Zero(_optimal_state.size());
 
@@ -208,14 +213,6 @@ void mgnss::higher_level::SupportShaping::solve(mwoibn::common::Logger& logger){
      logger.add("check_cp_" + std::to_string(i), check__[i]);
 }
 
-
-void mgnss::higher_level::SupportShaping::_update(){
-    _contact_points.update(true);
-    _points.update(false);
-    _base_points.update(false);
-    for(auto& wheel: _wheel_transforms)
-      wheel->compute();
-    }
 
 // I should check if it works before making the full optimization
 void mgnss::higher_level::SupportShaping::_computeMargin(int i){

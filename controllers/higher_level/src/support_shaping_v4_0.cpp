@@ -36,7 +36,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 }
 
 
-void mgnss::higher_level::SupportShapingV4::update(){
+void mgnss::higher_level::SupportShapingV4::_update(){
 
      _optimal_state.setZero();
 
@@ -52,7 +52,7 @@ void mgnss::higher_level::SupportShapingV4::update(){
     if(_is_margin)
       soft_inequality[0].state = (_margin.state - _margin.limit)/_robot.rate();
 
-    QrTask::update();
+    QrTask::_update();
     // std::cout << "soft_inequality\n" << soft_inequality[0].jacobian << std::endl;
     // std::cout << "hard_inequality\n" << hard_inequality[0].jacobian << std::endl;
     // std::cout << "workspace.state\t" << soft_inequality[1].state.transpose() << std::endl;

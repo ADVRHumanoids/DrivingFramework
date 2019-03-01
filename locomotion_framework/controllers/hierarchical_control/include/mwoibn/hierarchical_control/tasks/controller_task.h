@@ -86,11 +86,11 @@ virtual void update(){
 }
 
 //! Returnes size of a defined task
-int getTaskSize(){
+int getTaskSize() const {
         return _jacobian.rows();
 }
 //! Returnes number of task dofs
-int getTaskDofs(){
+int getTaskDofs() const {
         return _jacobian.cols();
 }
 

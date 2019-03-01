@@ -13,6 +13,7 @@ namespace mwoibn
 
   namespace dynamic_points{
     class Torus;
+    class TorusVelocity;
   }
 
 namespace robot_points
@@ -39,6 +40,7 @@ public:
   TorusModel(const TorusModel& other);
 
   friend class dynamic_points::Torus;
+  friend class dynamic_points::TorusVelocity;
 
   virtual ~TorusModel() {}
 

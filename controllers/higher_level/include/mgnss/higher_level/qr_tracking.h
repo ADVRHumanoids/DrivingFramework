@@ -42,7 +42,7 @@ public:
 // mwoibn::VectorN& margin(){return _margins;}
 
 void init();
-void update();
+void _update();
 
 void solve();
 void log(mwoibn::common::Logger& logger);

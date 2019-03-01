@@ -81,8 +81,19 @@ void mgnss::higher_level::SupportShapingV2::init(){
 
 }
 
-void mgnss::higher_level::SupportShapingV2::update(){
-    _update();
+void mgnss::higher_level::SupportShapingV2::_update(){
+    _contact_points.update(true);
+        _points.update(false);
+        _base_points.update(false);
+
+        for(int i= 0; i < _points.size(); i++){
+          _points[i].rotateFrom(*_wheel_transforms[i]);
+          _base_points[i].rotateFrom(*_wheel_transforms[i]);
+        }
+
+        for(auto& wheel: _wheel_transforms)
+          wheel->compute();
+
     _wheels.update(false);
     _hips.update(false);
     _workspace_points.update(false);
@@ -133,7 +144,7 @@ void mgnss::higher_level::SupportShapingV2::solve(){
   _llt.compute(_cost);
   _trace = _cost.trace();
 
-  update();
+  _update();
 
   mwoibn::VectorN g0 = mwoibn::VectorN::Zero(_optimal_state.size());
 
@@ -149,21 +160,6 @@ void mgnss::higher_level::SupportShapingV2::solve(){
 
 }
 
-
-void mgnss::higher_level::SupportShapingV2::_update(){
-    _contact_points.update(true);
-    _points.update(false);
-    _base_points.update(false);
-
-    for(int i= 0; i < _points.size(); i++){
-      _points[i].rotateFrom(*_wheel_transforms[i]);
-      _base_points[i].rotateFrom(*_wheel_transforms[i]);
-    }
-
-    for(auto& wheel: _wheel_transforms)
-      wheel->compute();
-
-}
 
 // I should check if it works before making the full optimization
 void mgnss::higher_level::SupportShapingV2::_computeMargin(int i){

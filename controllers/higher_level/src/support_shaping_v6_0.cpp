@@ -30,9 +30,9 @@ void mgnss::higher_level::SupportShapingV6::_allocate(){
       // _cost.quadratic.block(_vars, _vars, _slack, _slack) = 100000*mwoibn::Matrix::Identity(_slack,_slack);
 }
 
-void mgnss::higher_level::SupportShapingV6::update(){
+void mgnss::higher_level::SupportShapingV6::_update(){
 
-    _original_task.update();
+    _original_task._update();
 
     for(int i = 0; i < 4; i++){
 

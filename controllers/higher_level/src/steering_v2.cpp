@@ -3,7 +3,7 @@
 
 mgnss::higher_level::Steering2::Steering2(
         mwoibn::robot_class::Robot& robot,
-        mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
+        mwoibn::hierarchical_control::tasks::ContactPoint& plane,
         double K_icm, double K_sp, double dt,
         double margin, double max)
         : SteeringReference(robot, plane, K_icm, K_sp, dt, margin, max), _margin(margin)

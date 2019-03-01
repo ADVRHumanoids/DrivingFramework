@@ -40,6 +40,7 @@ add_library(mwoibn_dynamic_points
                 src/force.cpp
                 src/linear_force.cpp
                 src/torus.cpp
+                src/torus_velocity.cpp
 )
 
 add_dependencies(mwoibn_dynamic_points ${catkin_EXPORTED_TARGETS})

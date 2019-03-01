@@ -2,7 +2,7 @@
 
 mgnss::higher_level::SteeringReactif::SteeringReactif(
         mwoibn::robot_class::Robot& robot,
-        mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
+        mwoibn::hierarchical_control::tasks::ContactPoint& plane,
         const mwoibn::VectorN& contact_vel,
         double K_icm, double K_sp, double K_v, double dt,
         double margin_icm, double margin_sp, double margin, double max)

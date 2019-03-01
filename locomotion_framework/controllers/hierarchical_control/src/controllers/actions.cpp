@@ -159,6 +159,7 @@ void mwoibn::hierarchical_control::controllers::Actions::compute()
         for (auto& action : _active_stack)
                 action->run();
 
+        
         for (auto& action : _active_stack) {
                 action = &action->next();
                 //if(action == next) continue;

@@ -59,7 +59,7 @@ class SteeringReference
 
 public:
 SteeringReference(mwoibn::robot_class::Robot& robot,
-                  mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
+                  mwoibn::hierarchical_control::tasks::ContactPoint& plane,
                   double K_icm, double K_sp, double dt, double margin = 0.04,
                   double max = 2.79252680) : _plane(plane), _K_icm(K_icm), _K_sp(K_sp), _dt(dt),
         _state(robot.state.position.get())
@@ -224,7 +224,7 @@ static void limitPI(double ref, double& st){
 }
 
 protected:
-mwoibn::hierarchical_control::tasks::ContactPointTracking& _plane;
+mwoibn::hierarchical_control::tasks::ContactPoint& _plane;
 double _dt, _max, _K_icm, _K_sp, _heading, _x, _y, _treshhold;
 mwoibn::VectorN _damp_icm, _v_icm, _b_icm, _v_sp, _b_sp, _b, _b_st, _plane_ref, _damp_sp, _v, _damp, _raw, _limited;
 const mwoibn::VectorN& _state;

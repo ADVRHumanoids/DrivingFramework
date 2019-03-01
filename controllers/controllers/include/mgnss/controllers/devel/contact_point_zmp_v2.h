@@ -45,8 +45,9 @@ protected:
 
 
   virtual void _updateError(){
-    if(_tracking) ContactPoint3DRbdl::_updateError();
-    else {  _error.setZero(); _full_error.setZero();}
+    // if(_tracking) 
+    ContactPoint3DRbdl::_updateError();
+    // else {  _error.setZero(); _full_error.setZero();}
 
 
     // std::cout << "_tracking\n" << _tracking << std::endl;

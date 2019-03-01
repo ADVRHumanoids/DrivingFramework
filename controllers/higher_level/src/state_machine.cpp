@@ -142,58 +142,27 @@ void mgnss::higher_level::StateMachine::update(const mwoibn::VectorN& last_state
      mwoibn::Matrix3 toN = _torus_acceleration[i].torus().groundNormal()*_torus_acceleration[i].torus().groundNormal().transpose();
      mwoibn::Matrix3 toPN = mwoibn::Matrix3::Identity() - toN;
 
-     // ACCELERATION
-    // _support_jacobian = _torus_acceleration[i].torus().getJacobianWheel()/_robot.rate();
-    //
-    // _support_offset =    (_torus_acceleration[i].getDependant()*toPN -_support_jacobian )*_torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
-    // _support_offset += _torus_acceleration[i].getIndependant();
-    // _support_offset += _torus_acceleration[i].torus().getJacobianWheel()*_robot.state.velocity.get();
-    // _support_jacobian += _torus_acceleration[i].getDependant()*toN;
-
     // VELOCITY
     _support_jacobian = _torus_acceleration[i].torus().getJacobianWheel()/_robot.rate();
 
     _support_offset =    (_torus_acceleration[i].getDependant()*toPN -_support_jacobian )*_torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
-    // std::cout << i << "\tgetJacobianWheel\n" << _torus_acceleration[i].torus().getJacobianWheel() << std::endl;
-    // std::cout << i << "\tgetJacobian\n" << _torus_acceleration[i].torus().getJacobian() << std::endl;
-
-    // std::cout << i << "\t_support_jacobian\n" << _support_jacobian << std::endl;
-    // std::cout << i << "\t_support_offset\n" << _support_offset.transpose() << std::endl;
-
     _support_offset += _torus_acceleration[i].getIndependant();
     _support_jacobian += _torus_acceleration[i].getDependant()*toN;
-
-    // std::cout << i << "\_torus_acceleration[i].getDependant()\n" << _torus_acceleration[i].getDependant() << std::endl;
-    // std::cout << i << "\_torus_acceleration[i].getIndependant()\n" << _torus_acceleration[i].getIndependant().transpose() << std::endl;
-
-    // std::cout << i << "\t_support_jacobian\n" << _support_jacobian << std::endl;
-    // std::cout << i << "\t_support_offset\n" << _support_offset.transpose() << std::endl;
-
     _support_jacobian = _support_jacobian*_robot.rate();
     _support_offset = _support_offset*_robot.rate();
 
-    // std::cout << i << "\t_support_jacobian\n" << _support_jacobian << std::endl;
-    // std::cout << i << "\t_support_offset\n" << _support_offset.transpose() << std::endl;
-
-
     _support_offset += _torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
 
-    // std::cout << i << "\t_support_jacobian\n" << _support_jacobian << std::endl;
-    // std::cout << i << "\t_support_offset\n" << _support_offset.transpose() << std::endl;
-
-
+    std::cout << "_state_machine\n" << _support_jacobian  << std::endl;
     _support_jacobian = _wheel_transforms[i]->rotation.transpose()*_support_jacobian;
     _support_offset = _wheel_transforms[i]->rotation.transpose()*_support_offset;
 
-    // std::cout << i << "\t_support_jacobian\n" << _support_jacobian << std::endl;
-    // std::cout << i << "\t_support_offset\n" << _support_/offset.transpose() << std::endl;
+
 
     _state_jacobian.block<2,3>(2*i, 3*i) = _support_jacobian.topRows<2>();
     _state_offset.segment<2>(2*i) = _support_offset.head<2>();
 
   }
-  // std::cout << "_state_jacobian\n" << _state_jacobian << std::endl;
-  // std::cout << "_state_offset\n" << _state_offset.transpose() << std::endl;
 
 
 for(int i = 0; i < _contact_points.size(); i++){

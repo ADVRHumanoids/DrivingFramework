@@ -23,12 +23,12 @@ class QRJointSpaceV2: public QrTask
 {
 
 public:
-  QRJointSpaceV2(QrTask& task, const mwoibn::Matrix& jacobian, const mwoibn::VectorN& offset, mwoibn::robot_class::Robot& robot);
+  QRJointSpaceV2(QrTask& task, const mwoibn::Matrix& jacobian, const mwoibn::VectorN& offset, mwoibn::robot_class::Robot& robot, double damping = 1e-8);
 
   ~QRJointSpaceV2(){}
 
 virtual void init(); // alocatte all the memory
-virtual void update(); // switch to joint space & solve
+virtual void _update(); // switch to joint space & solve
 
 // virtual void solve();
 virtual void log(mwoibn::common::Logger& logger);
@@ -38,7 +38,7 @@ protected:
   const mwoibn::Matrix& _jacobian;
   const mwoibn::VectorN& _offset;
   mwoibn::robot_class::Robot& _robot;
-
+  double _damping = 1e-8;
   virtual void _outputTransform();
 
 

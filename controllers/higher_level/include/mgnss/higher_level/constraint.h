@@ -17,7 +17,7 @@ namespace higher_level
 class Constraint{
 
   public:
-    Constraint(){    }
+    Constraint(){   resize(0,0); }
     Constraint(int size, int vars){
       resize(size, vars);
     }

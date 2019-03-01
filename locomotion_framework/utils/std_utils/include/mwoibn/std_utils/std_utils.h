@@ -15,6 +15,24 @@ public:
 };
 
 
+inline std::string separate(std::string full, std::string delimiter, std::string& back){
+
+  std::string front;
+
+  size_t pos = full.find(delimiter);
+  if ( pos == std::string::npos) {
+    front = "";
+    back = full;
+   }
+  else{
+    front = full.substr(0, pos);
+    back = full.substr(pos+2);
+  }
+
+  return front;
+}
+
+
 }
 }
 #endif

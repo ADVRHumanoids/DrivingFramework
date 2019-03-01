@@ -13,7 +13,7 @@ class Steering2 : public SteeringReference
 
 public:
 Steering2(mwoibn::robot_class::Robot& robot,
-          mwoibn::hierarchical_control::tasks::ContactPointTracking& plane,
+          mwoibn::hierarchical_control::tasks::ContactPoint& plane,
           double K_icm, double K_sp, double dt, double margin = 0.04,
           double max = 2.79252680);
 

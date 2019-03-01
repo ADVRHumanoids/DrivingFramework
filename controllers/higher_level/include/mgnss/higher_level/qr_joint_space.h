@@ -28,7 +28,7 @@ public:
   ~QRJointSpace(){}
 
 virtual void init(); // alocatte all the memory
-virtual void update(); // switch to joint space & solve
+virtual void _update(); // switch to joint space & solve
 
 // virtual void solve();
 virtual void log(mwoibn::common::Logger& logger);

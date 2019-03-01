@@ -2,8 +2,8 @@
 // #include <range/v3/view/zip.hpp>
 // #include <range/v3/view/concat.hpp>
 
-mgnss::higher_level::QRJointSpaceV2::QRJointSpaceV2(mgnss::higher_level::QrTask& task, const mwoibn::Matrix& jacobian, const mwoibn::VectorN& offset, mwoibn::robot_class::Robot& robot):
-    mgnss::higher_level::QrTask(jacobian.cols(), task.soft_inequality.rows()), _robot(robot), _task(task), _jacobian(jacobian), _offset(offset){
+mgnss::higher_level::QRJointSpaceV2::QRJointSpaceV2(mgnss::higher_level::QrTask& task, const mwoibn::Matrix& jacobian, const mwoibn::VectorN& offset, mwoibn::robot_class::Robot& robot, double damping):
+    mgnss::higher_level::QrTask(), _robot(robot), _task(task), _jacobian(jacobian), _offset(offset), _damping(damping){
 
 }
 
@@ -26,8 +26,8 @@ void mgnss::higher_level::QRJointSpaceV2::init(){
   _return_state.setZero(_jacobian.rows());
 }
 
-void mgnss::higher_level::QRJointSpaceV2::update(){
-      _task.update();
+void mgnss::higher_level::QRJointSpaceV2::_update(){
+      _task._update();
      // _marginJacobians();
      _optimal_state.setZero();// = _robot.command.velocity.get(); // init from last command?
 
@@ -92,7 +92,7 @@ void mgnss::higher_level::QRJointSpaceV2::update(){
 
 
   _cost.quadratic.block(0,0,_vars, _vars)  = _jacobian.transpose() * _task.cost().quadratic.block(0,0,_task.vars(), _task.vars()) * _jacobian;
-  _cost.quadratic.block(0,0,_vars, _vars) += mwoibn::VectorN::Constant(_vars, 1e-8).asDiagonal();
+  _cost.quadratic.block(0,0,_vars, _vars) += mwoibn::VectorN::Constant(_vars, _damping).asDiagonal();
   _cost.quadratic.block(_vars,_vars, _task.slack(), _task.slack())  = _task.cost().quadratic.block(_task.vars(), _task.vars(), _task.slack(), _task.slack());
   _cost.linear.head(_vars)  = _task.cost().linear.head(_task.vars()).transpose() * _jacobian;
   _cost.linear.head(_vars) += _offset.transpose()*_task.cost().quadratic.block(0,0,_task.vars(), _task.vars())*_jacobian;
@@ -105,32 +105,34 @@ void mgnss::higher_level::QRJointSpaceV2::update(){
 
   // std::cout << "_equality.jacobian\n" << _equality.jacobian << std::endl;
 
-  QrTask::update();
+  QrTask::_update();
   // std::cout << "equality.transposed\n" << _equality.transposed << std::endl;
   // std::cout << "equality.jacobian\n" << _equality.jacobian << std::endl;
   //
   // std::cout << "soft_inequality\n" << soft_inequality.getJacobian() << std::endl;
+
+
 }
 
 void mgnss::higher_level::QRJointSpaceV2::log(mwoibn::common::Logger& logger){
 
   //   std::cout << "QR JOINT SPACE STATE" << std::endl;
   if(_return_state.norm() > mwoibn::EPS){
-    // std::cout << "_offset\t" << _offset.transpose() << std::endl;
-    // std::cout << "_jacobian\t" << _jacobian << std::endl;
+    std::cout << "_offset\t" << _offset.transpose() << std::endl;
+    std::cout << "_jacobian\t" << _jacobian << std::endl;
     std::cout << "_optimal_state\t" << _optimal_state.transpose() << std::endl;
     std::cout << "_return_state\t" << _return_state.transpose() << std::endl;
-    // std::cout << "_cost.linear\t" << _cost.linear.transpose() << std::endl;
-    // std::cout << "_cost.quadratic\t" << _cost.quadratic.transpose() << std::endl;
+    std::cout << "_cost.linear\t" << _cost.linear.transpose() << std::endl;
+    std::cout << "_cost.quadratic\t" << _cost.quadratic.transpose() << std::endl;
 
-    // for(auto&& zip: ranges::view::zip(_task.equality, equality)){
-    //   std::cout << "equality\n" << std::get<0>(zip)->state.transpose() << "jacobian\n" << std::get<0>(zip)->jacobian << std::endl;
-    //   std::cout << "equality\n" << std::get<1>(zip)->state.transpose() << "jacobian\n" << std::get<1>(zip)->jacobian << std::endl;
-    // }
-    // for(auto&& zip: ranges::view::zip(_task.soft_inequality, soft_inequality)){
-    //   std::cout << "soft_inequality\n" << std::get<0>(zip)->state.transpose() << "soft_inequality\n" << std::get<0>(zip)->jacobian << std::endl;
-    //   std::cout << "soft_inequality\n" << std::get<1>(zip)->state.transpose() << "soft_inequality\n" << std::get<1>(zip)->jacobian << std::endl;
-    // }
+    for(auto&& zip: ranges::view::zip(_task.equality, equality)){
+      std::cout << "equality\n" << std::get<0>(zip)->state.transpose() << "jacobian\n" << std::get<0>(zip)->jacobian << std::endl;
+      std::cout << "equality\n" << std::get<1>(zip)->state.transpose() << "jacobian\n" << std::get<1>(zip)->jacobian << std::endl;
+    }
+    for(auto&& zip: ranges::view::zip(_task.soft_inequality, soft_inequality)){
+      std::cout << "soft_inequality\n" << std::get<0>(zip)->state.transpose() << "soft_inequality\n" << std::get<0>(zip)->jacobian << std::endl;
+      std::cout << "soft_inequality\n" << std::get<1>(zip)->state.transpose() << "soft_inequality\n" << std::get<1>(zip)->jacobian << std::endl;
+    }
     for(auto& constraint:  hard_inequality ){
       std::cout << "hard_inequality\n" << constraint->state.transpose()  << std::endl;
     }
@@ -151,4 +153,7 @@ void mgnss::higher_level::QRJointSpaceV2::_outputTransform(){
   // std::cout << "_optimal_state.transpose" << _optimal_state.head(_vars).transpose() << std::endl;
   // std::cout << "_offset.transpose" << _offset.transpose() << std::endl;
   _return_state = _jacobian*_optimal_state.head(_vars) + _offset;
+
+
+
 }

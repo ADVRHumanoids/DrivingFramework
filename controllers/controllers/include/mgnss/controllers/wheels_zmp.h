@@ -49,11 +49,10 @@ class WheelsZMP : public WheelsControllerExtend
 {
 
 public:
-WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), __dynamics(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
-        // shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -62,9 +61,8 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 
 
 
-WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), __dynamics(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
-        // shape__.reset(new mgnss::higher_level::SupportShapingV3(robot, config));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -171,17 +169,17 @@ virtual void nextStep(){
 
     // std::cout << "desired__\t" << desired__.transpose() << std::endl;
 
-    _tasks["BASE"]->update();
-    _tasks["CONSTRAINTS"]->update();
-    _tasks["CAMBER"]->update();
-    _tasks["STEERING"]->update();
+    // _tasks["BASE"]->update();
+    // _tasks["CONSTRAINTS"]->update();
+    // _tasks["CAMBER"]->update();
+    // _tasks["STEERING"]->update();
 
-    state_machine__->update(shape__->get());
+    // state_machine__->update(shape__->get());
     //
-    shape_joint__->equality[0].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
-    shape_joint__->equality[1].jacobian = _tasks["BASE"]->getJacobian(); // it is not updated yet?
+    // shape_joint__->equality[0].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
+    // shape_joint__->equality[1].jacobian = _tasks["BASE"]->getJacobian(); // it is not updated yet?
     // shape_joint__->equality[2].jacobian = _tasks["STEERING"]->getJacobian()-state_machine__->steerJacobian()*state_machine__->worldJacobian();
-    shape_joint__->equality[2].jacobian = _tasks["CAMBER"]->getJacobian();
+    // shape_joint__->equality[2].jacobian = _tasks["CAMBER"]->getJacobian();
     // // shape_joint__->equality[3].jacobian = _tasks["STEERING"]->getJacobian();
     // shape_joint__->equality[0].jacobian =  state_machine__->steerJacobian()*state_machine__->worldJacobian();
     //
@@ -208,11 +206,11 @@ virtual void nextStep(){
       // std::cout << "nextStep::shape" << std::endl;
       // shape__->solve();
       // std::cout << "steerJacobian\n" << state_machine__->steerJacobian() << std::endl;
-      shape__->solve();
+      // shape__->solve();
       // new_shape__->solve();
       // mwoibn::VectorN world__ = shape__->raw().head<8>();// this is in the world frame?
       // std::cout << "shape__->raw()\t" << shape__->raw().head<8>().transpose() << std::endl;
-      std::cout << "shape__->get()\t" << shape__->get().transpose() << std::endl;
+      // std::cout << "shape__->get()\t" << shape__->get().transpose() << std::endl;
       // std::cout << "new_shape__->get()\t" << new_shape__->get().transpose() << std::endl;
 
 
@@ -224,14 +222,14 @@ virtual void nextStep(){
         // _steer[i] = temp__;
       // }
 
-      shape_wheel__->solve();
-      shape_joint__->solve();
-      std::cout << "shape_wheel__->get()\t" << shape_wheel__->get().transpose() << std::endl;
+      // shape_wheel__->solve();
+      // shape_joint__->solve();
+      // std::cout << "shape_wheel__->get()\t" << shape_wheel__->get().transpose() << std::endl;
       // std::cout << "shape_wheel__->raw()\t" << shape_wheel__->raw().transpose() << std::endl; //?
-      std::cout << "shape_joint__->get()\t" << shape_joint__->get().transpose() << std::endl;
+      // std::cout << "shape_joint__->get()\t" << shape_joint__->get().transpose() << std::endl;
       // std::cout << "shape_joint__->raw()\t" << shape_joint__->raw().transpose() << std::endl;
-      std::cout << "shape_joint__->get():original\n" << (state_machine__->stateJacobian()*shape_joint__->get() + state_machine__->stateOffset()).transpose() << std::endl;
-      std::cout << "stateJacobian\n" << state_machine__->stateJacobian() << std::endl;
+      // std::cout << "shape_joint__->get():original\n" << (state_machine__->stateJacobian()*shape_joint__->get() + state_machine__->stateOffset()).transpose() << std::endl;
+      // std::cout << "stateJacobian\n" << state_machine__->stateJacobian() << std::endl;
 
     // }
 
@@ -291,19 +289,19 @@ virtual void nextStep(){
 protected:
 
   mwoibn::VectorN __last_steer;
-  mwoibn::dynamic_models::BasicModel __dynamics;
-  std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
+  // mwoibn::dynamic_models::BasicModel __dynamics;
+  // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
   // std::unique_ptr<mgnss::higher_level::SupportShapingV6> new_shape__;
 
   // std::unique_ptr<mgnss::higher_level::SupportShapingV5> shape_2__;
-  std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
+  // std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
   //std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
-  std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_joint__;
-  std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;
+  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_joint__;
+  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;
 
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
-  mwoibn::hierarchical_control::tasks::ContactPointZMPV2* _tracking_task;
+  // mwoibn::hierarchical_control::tasks::ContactPointZMPV2* _tracking_task;
 // virtual void _updateSupport()
 // {
 //   for(int i = 0, k = 0; i < _steering_select.size(); i++){

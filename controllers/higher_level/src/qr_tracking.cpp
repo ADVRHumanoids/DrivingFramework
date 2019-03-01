@@ -61,7 +61,7 @@ void mgnss::higher_level::QrTracking::init(){
     std::cout << "_offset_workspace\t" << _offset_workspace.transpose() << std::endl;
 }
 
-void mgnss::higher_level::QrTracking::update(){
+void mgnss::higher_level::QrTracking::_update(){
     // _update();
 
       // I have to consider a robot heading here?
@@ -133,7 +133,7 @@ void mgnss::higher_level::QrTracking::solve(){
   _llt.compute(_quadratic_cost);
   _trace = _quadratic_cost.trace();
 
-  update();
+  _update();
 
 
   cost__ = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);

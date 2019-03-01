@@ -1,13 +1,21 @@
-#ifndef __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_TRACKING_TASK_H
-#define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_TRACKING_TASK_H
+#ifndef __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_SECOND_ORDER_H
+#define __MWOIBN_HIERARCHICAL_CONTROL_TASKS_CONTACT_POINT_SECOND_ORDER_H
 
 #include "mwoibn/hierarchical_control/hierarchical_control.h"
 #include "mwoibn/hierarchical_control/tasks/contact_point.h"
 #include "mwoibn/robot_points/handler.h"
 #include "mwoibn/robot_points/point.h"
+#include "mwoibn/dynamic_points/dynamic_point.h"
 #include "mwoibn/robot_points/rotation.h"
 #include "mwoibn/robot_points/minus.h"
 #include "mwoibn/common/update_manager.h"
+
+#include "mwoibn/hierarchical_control/tasks/center_of_mass_task.h"
+
+#include "mwoibn/robot_points/ground_wheel.h"
+#include "mwoibn/robot_points/torus_model.h"
+#include "mwoibn/dynamic_points/torus_velocity.h"
+
 
 namespace mwoibn
 {
@@ -21,7 +29,7 @@ namespace tasks
  ********to control the position of a point defined in one of a robot reference frames
  *
  */
-class ContactPointTracking : public ContactPoint
+class ContactPointSecondOrder : public ContactPoint
 {
 
 public:
@@ -31,14 +39,44 @@ public:
  ********prevent outside user from modifying a controlled point
  *
  */
-ContactPointTracking(mwoibn::robot_class::Robot& robot, mwoibn::robot_points::Point& base_point, std::string base_link)
+ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Robot& robot, YAML::Node config,
+                        mwoibn::robot_points::Point& base_point, std::string base_link)
         : ContactPoint(base_point), _robot(robot), _contacts(_robot.getDofs()), _base_point(base_point),
          _base( base_link, robot.getModel(), robot.state), _base_ang_vel(_base),
          _minus(_robot.getDofs()), _ground_normal(_robot.contacts()[0].getGroundNormal())
 {
-      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateError, this)));
-      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateJacobian, this)));
-      _update.push_back(_manager.signIn(std::bind(&ContactPointTracking::_updateState, this)));
+      _update.push_back(_manager.signIn(std::bind(&ContactPointSecondOrder::_updateError, this)));
+      _update.push_back(_manager.signIn(std::bind(&ContactPointSecondOrder::_updateJacobian, this)));
+      _update.push_back(_manager.signIn(std::bind(&ContactPointSecondOrder::_updateState, this)));
+
+
+      for(auto& contact: _robot.contacts())
+      {
+          std::string name = _robot.getBodyName(contact->wrench().getBodyId());
+          if(!std::count(names.begin(), names.end(), name)){
+            std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+            names.erase(std::remove(names.begin(), names.end(), name), names.end());
+            continue;
+          }
+
+          std::unique_ptr<mwoibn::robot_points::TorusModel> torus_(new mwoibn::robot_points::TorusModel(
+                             _robot.getModel(), _robot.state, mwoibn::point_handling::FramePlus(name,
+                             _robot.getModel(), _robot.state),
+                             mwoibn::Axis(config["reference_axis"][name]["x"].as<double>(),
+                                          config["reference_axis"][name]["y"].as<double>(),
+                                          config["reference_axis"][name]["z"].as<double>()),
+                                          config["minor_axis"].as<double>(), config["major_axis"].as<double>(),
+                                          contact->getGroundNormal()));
+
+          _wheel_transforms.push_back(std::unique_ptr<mwoibn::robot_points::Rotation>(
+                    new mwoibn::robot_points::GroundWheel(torus_->axis(), torus_->groundNormal())));
+          _support.add(std::move(torus_));
+          _contacts.add(mwoibn::dynamic_points::TorusVelocity(_support.end(-1), _robot));
+
+      }
+
+          _allocate();
+          reset();
 }
 
 void subscribe(bool error, bool jacobian, bool state){
@@ -53,7 +91,6 @@ void unsubscribe(bool error, bool jacobian, bool state){
     if(state) _update[2]->unsubscribe();
 }
 
-virtual ~ContactPointTracking() { }
 
 virtual void start(){
   _manager.reset();
@@ -85,8 +122,6 @@ virtual void updateState() final {
   }
 
 
-  int getReferenceSize(){return _reference.size();}
-  
   virtual const mwoibn::VectorN& getReference() const {
           return _reference;
   }
@@ -159,15 +194,9 @@ virtual void releaseContact(int i) { _selector[i] = true; }
 virtual void claimContact(int i) { _selector[i] = false; }
 
 void setVelocity(mwoibn::VectorN& velocity){
-  // std::cout << __PRETTY_FUNCTION__ << "\n" << velocity.transpose() << std::endl;
   for (int i = 0; i < _contacts.size(); i++)
-    _velocity.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
-
-  // std::cout << "wheel 3\n" << _wheel_transforms[i]->rotation;
-  // std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
+    _velocity_ref.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
 }
-//virtual int getFullTaskSize() = 0;
-
 
 virtual double heading(){
       return _q_twist.angle();
@@ -184,7 +213,8 @@ virtual double baseY(){
 protected:
   mwoibn::robot_class::Robot& _robot;
 
-  mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _contacts;
+  mwoibn::robot_points::Handler<mwoibn::dynamic_points::DynamicPoint> _contacts;
+  mwoibn::robot_points::Handler<mwoibn::robot_points::TorusModel> _support;
   mwoibn::robot_points::Point& _base_point;
   mwoibn::point_handling::FramePlus _base;
   mwoibn::point_handling::AngularVelocity _base_ang_vel;
@@ -194,7 +224,7 @@ protected:
   mwoibn::VectorBool _selector;
 
   mwoibn::Vector3 _point;
-  mwoibn::VectorN _reference, _full_error, _force;
+  mwoibn::VectorN _reference, _full_error, _force, _velocity_ref;
   mwoibn::Quaternion _q_twist;
   const mwoibn::Vector3& _ground_normal;
   mwoibn::Matrix3 _rot, _projected, _rot_project;
@@ -207,10 +237,53 @@ protected:
 
   }
 
-  //! generic function to provide the same syntax for Jacobian update of all derived classes
-  virtual void _updateJacobian() = 0;
-  //! generic function to provide the same syntax for error update of all derived classes
-  virtual void _updateError() = 0;
+  virtual void _updateError()
+  {
+    // std::cout << "_updateError" << std::endl;
+    _last_error.noalias() = _error; // save previous state
+
+    for (int i = 0; i < _contacts.size(); i++)
+    {
+
+      _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
+      _error.segment<3>(3 * i).noalias() = _wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i); // 10 is for a task gain should be automatic
+
+      if (_selector[i])
+        _error[3*i+2] = 0;
+
+      _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
+
+      _velocity.segment<3>(3*i) = _velocity_ref.segment<3>(3*i) + _contacts[i].getConstant();
+    }
+
+    std::cout << "_error\t" << _error.transpose() << std::endl;
+    std::cout << "_velocity\t" << _velocity.transpose() << std::endl;
+
+  }
+
+
+  virtual void _updateJacobian()
+  {
+
+    _last_jacobian.noalias() = _jacobian;
+
+    for (int i = 0; i < _contacts.size(); i++)
+    {
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      _projected = _ground_normal*_ground_normal.transpose();
+      mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
+      _rot_project = _rot*_projected;
+      _rot = _wheel_transforms[i]->rotation.transpose()*_rot_project;
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
+      if (_selector[i])
+        _jacobian.row(3*i+2).setZero();
+    }
+
+    std::cout << "_jacobian\n" << _jacobian << std::endl;
+
+  }
+
+
 
   virtual mwoibn::Vector3 _worldToBase(mwoibn::Vector3 point)
   {
@@ -233,12 +306,12 @@ protected:
   }
 
   virtual void _allocate(){
-    // _init(_contacts.rows(), _contacts.cols());
-    _init(4, _contacts.cols());
+    _init(_contacts.rows(), _contacts.cols());
     _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
     _reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());
     _force.setZero(_robot.contacts().size()*3);
+    _velocity_ref.setZero(_contacts.rows());
 
     for(auto& contact: _contacts)
       _minus.add(mwoibn::robot_points::Minus(*contact, _base_point));
@@ -254,6 +327,7 @@ protected:
 
 
     virtual void _updateState(){
+      _support.update(true);
       _contacts.update(true);
       _q_twist = _base.orientation.getWorld().twistSwing(_ground_normal); // this has heading
       for(auto& wheel: _wheel_transforms)

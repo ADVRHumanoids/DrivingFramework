@@ -1,6 +1,9 @@
 #include "mgnss/controllers/wheels_controller.h"
 #include "mgnss/higher_level/steering_v4.h"
 #include <mwoibn/hierarchical_control/controllers/default.h>
+#include <mgnss/higher_level/previous_task.h>
+#include <mgnss/higher_level/joint_constraint.h>
+
 
 mgnss::controllers::WheelsController::WheelsController(mwoibn::robot_class::Robot& robot)
         : mgnss::modules::Base(robot)
@@ -92,7 +95,7 @@ void mgnss::controllers::WheelsController::_createTasks(YAML::Node config){
 
 }
 
-std::shared_ptr<mwoibn::hierarchical_control::actions::Compute> mgnss::controllers::WheelsController::_taskAction(std::string task, YAML::Node config){
+std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers::WheelsController::_taskAction(std::string task, YAML::Node config, std::string type){
 
 
     double ratio = config["ratio"].as<double>(); // 4
@@ -108,30 +111,50 @@ std::shared_ptr<mwoibn::hierarchical_control::actions::Compute> mgnss::controlle
 
     std::cout << "\t" << task << ": " << config[task] << "\t" << task_damp_ << std::endl;
 
+    mwoibn::VectorN gain;
     if(config[task].IsScalar())
-      return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], config[task].as<double>(),  task_damp_, _ik_ptr->state);
-
+          gain.setConstant(_tasks[task]->getTaskSize(), config[task].as<double>() );
     else if (!config[task].IsSequence())
-      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
+            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
+    else{
+      if(config[task].size() != _tasks[task]->getTaskSize())
+          throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
 
-    if(config[task].size() != _tasks[task]->getTaskSize())
-      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
+          gain.setZero(config[task].size());
 
-      mwoibn::VectorN gain(config[task].size());
-
-      for(int i = 0 ; i < config[task].size(); i++)
-        gain[i] = config[task][i].as<double>();
-
+          for(int i = 0 ; i < config[task].size(); i++)
+          gain[i] = config[task][i].as<double>();
+        }
+    if(type == "" || type == "ns")
       return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], gain,  task_damp_, _ik_ptr->state);
+
+    if(type != "qp")
+        throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task type '") + type  + std::string("'."));
+
+    _qr_wrappers.push_back(std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], gain, task_damp_, _robot)));
+
+    for(auto& action: _actions){
+        if(action.first == task) continue;
+        _qr_wrappers.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+    }
+
+    _qr_wrappers.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION", "VELOCITY"}));
+
+    _qr_wrappers.back()->init();
+    return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qr_wrappers.back(), _ik_ptr->state);
 
 }
 
 mwoibn::hierarchical_control::actions::Task& mgnss::controllers::WheelsController::_createAction(std::string task, YAML::Node config){
 
-  if(!_actions[task])
-      _actions[task] = _taskAction(task, config);
+  std::string name;
+  std::string type = mwoibn::std_utils::separate(task, "::", name);
 
-    return *_actions[task];
+
+  if(!_actions[name])
+      _actions[name] = _taskAction(name, config, type);
+
+    return *_actions[name];
 }
 
 void mgnss::controllers::WheelsController::_initIK(YAML::Node config){
@@ -188,8 +211,8 @@ void mgnss::controllers::WheelsController::_allocate(){
         _select_steer = _robot.getDof(_robot.getLinks("camber"));
         steerings.setZero(_select_steer.size());
 
-        _support.setZero(_tasks["CONTACT_POINTS"]->getTaskSize());
-        _support_vel.setZero(_tasks["CONTACT_POINTS"]->getTaskSize());
+        _support.setZero( _robot.getLinks("wheels").size()*3);
+        _support_vel.setZero( _robot.getLinks("wheels").size()*3);
 
         _l_limits.setZero(_select_steer.size());
         _u_limits.setZero(_select_steer.size());

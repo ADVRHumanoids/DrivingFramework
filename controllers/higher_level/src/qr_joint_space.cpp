@@ -23,8 +23,8 @@ void mgnss::higher_level::QRJointSpace::init(){
   QrTask::init();
 }
 
-void mgnss::higher_level::QRJointSpace::update(){
-      _task.update();
+void mgnss::higher_level::QRJointSpace::_update(){
+      _task._update();
      // _marginJacobians();
      _optimal_state.setZero();// = _robot.command.velocity.get(); // init from last command?
 
@@ -54,7 +54,7 @@ void mgnss::higher_level::QRJointSpace::update(){
 
   // std::cout << "_equality.jacobian\n" << _equality.jacobian << std::endl;
 
-  QrTask::update();
+  QrTask::_update();
   // std::cout << "equality.transposed\n" << _equality.transposed << std::endl;
   // std::cout << "equality.jacobian\n" << _equality.jacobian << std::endl;
   //

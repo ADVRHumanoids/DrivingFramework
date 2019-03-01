@@ -37,7 +37,7 @@ void mgnss::higher_level::SupportShapingV3::init(){
 
 }
 
-void mgnss::higher_level::SupportShapingV3::update(){
+void mgnss::higher_level::SupportShapingV3::_update(){
 
      _optimal_state.setZero();
      mwoibn::Matrix jac_ = mwoibn::Matrix::Zero(8,8);
@@ -87,7 +87,7 @@ void mgnss::higher_level::SupportShapingV3::solve(){
   _llt.compute(_quadratic_cost);
   _trace = _quadratic_cost.trace();
 
-  update();
+  _update();
 
   cost__ = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
 

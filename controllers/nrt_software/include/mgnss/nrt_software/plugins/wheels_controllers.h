@@ -7,6 +7,7 @@
 
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/controllers/wheels_zmp.h"
+#include "mgnss/controllers/wheels_second_order.h"
 
 #include "mgnss/controllers/wheels_reactif.h"
 #include "mgnss/controllers/wheeled_motion_world.h"
@@ -17,6 +18,7 @@
 
 //#include "mgnss/ros_callbacks/wheels_controller_extend.h"
 #include "mgnss/ros_callbacks/wheels_controller_events.h"
+#include "mgnss/ros_callbacks/wheels_controller_second_order.h"
 //#include "mgnss/ros_callbacks/wheels_controller_actions.h"
 //#include "mgnss/ros_callbacks/wheels_controller_merge_v1.h"
 
@@ -61,6 +63,43 @@ namespace plugins {
     }
 
     };
+
+
+
+    template<typename Subscriber, typename Service, typename Node>
+    class WheelsSecondOrder : public mgnss::plugins::Generator<Subscriber, Service, Node>
+    {
+      typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+
+      public:
+        WheelsSecondOrder() : Generator_("wheeled_motion"){}
+
+        mgnss::controllers::WheelsSecondOrder& get(){
+            return static_cast<mgnss::controllers::WheelsSecondOrder&>(*Generator_::controller_ptr);
+        }
+        mwoibn::robot_class::Robot& robot(){
+                return *Generator_::_robot_ptr.begin()->second;
+        }
+
+
+      protected:
+        virtual void _resetPrt(YAML::Node config){
+              Generator_::controller_ptr.reset(new mgnss::controllers::WheelsSecondOrder(*Generator_::_robot_ptr.begin()->second, config));
+            }
+
+        virtual void _initCallbacks(YAML::Node config){
+                Generator_::_srv.push_back(Generator_::n->template advertiseService<custom_services::updatePDGains::Request,
+                                                custom_services::updatePDGains::Response>("wheels_command", boost::bind(&mgnss::ros_callbacks::wheels_controller_second_order::eventsHandler,
+                                                    _1, _2, static_cast<mgnss::controllers::WheelsSecondOrder*>(Generator_::controller_ptr.get()))));
+
+                Generator_::_sub.push_back(Generator_::n->template subscribe<custom_messages::CustomCmnd>("wheels_support", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_second_order::supportHandler,
+                  _1, static_cast<mgnss::controllers::WheelsSecondOrder*>(Generator_::controller_ptr.get()))));
+
+                Generator_::_sub.push_back(Generator_::n->template subscribe<custom_messages::StateMsg>("wheels_state", 1, boost::bind(&mgnss::ros_callbacks::wheels_controller_second_order::stateHandler,
+                  _1, static_cast<mgnss::controllers::WheelsSecondOrder*>(Generator_::controller_ptr.get()))));
+                }
+    };
+
 
 template<typename Subscriber, typename Service, typename Node>
 class WheeledMotionEvent3 : public WheelsControllerExtend<Subscriber, Service, Node>

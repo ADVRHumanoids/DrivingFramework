@@ -306,8 +306,25 @@ LIST( APPEND INSTALL_TARGETS
 
   if ( Xenomai_FOUND )
     message(WARNING "set_xeno_flags")
-    set_xeno_flags(NwheelsZMP)
+    set_xeno_flags(NwheelsSecondOrder)
   endif()
+
+  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
+
+  add_library(NwheelsSecondOrder SHARED
+     src/plugins/wheels_second_order.cpp
+   )
+  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(NwheelsSecondOrder
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+)
+
+if ( Xenomai_FOUND )
+message(WARNING "set_xeno_flags")
+set_xeno_flags(NwheelsSecondOrder)
+endif()
+
 
      LIST( APPEND INSTALL_TARGETS ground_forces )
 

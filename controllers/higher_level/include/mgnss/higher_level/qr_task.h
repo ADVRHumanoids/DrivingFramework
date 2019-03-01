@@ -19,11 +19,12 @@ namespace higher_level
  *  Steering version with contact point open-loop reference
  *  For now, just hardcode everythong
  */
-class QrTask
+class QrTask: public mwoibn::hierarchical_control::tasks::BasicTask
 {
 
 public:
   QrTask(int vars, int slack);
+  QrTask();
 
   ~QrTask(){  }
 
@@ -31,10 +32,10 @@ public:
 virtual void init();
 virtual void resize(int vars, int slack);
 virtual void clear();
-virtual void update();
+virtual void _update();
 
 virtual void solve();
-virtual void log(mwoibn::common::Logger& logger) = 0;
+virtual void log(mwoibn::common::Logger& logger){}
 virtual const mwoibn::VectorN& get(){return _return_state;}
 virtual const mwoibn::VectorN& raw(){return _optimal_state;}
 
