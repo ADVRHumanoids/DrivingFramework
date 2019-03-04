@@ -592,7 +592,7 @@ mwoibn:
                                   x: 0
                                   y: -1
                                   z: 0
-                        IK: [CONSTRAINTS, STEERING, BASE, CONTACT_POINTS, CAMBER, CASTER]
+                        IK: [qp::CONSTRAINTS, qp::BASE, qp::CONTACT_POINTS]
                         steerings:
                                 test:
                                         icm: 1.00 # 0.95
@@ -616,17 +616,43 @@ mwoibn:
                                         damp: 0.0008
                                         tracking: 1.0
                         tunnings:
+                                reactif_8: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 30
+                                        BASE: [45, 45, 45, 20, 20, 30]
+                                        CONTACT_POINTS: [15, 5, 15, 5, 15, 5, 15, 5]
+                                        CONTACT_POINTS_DAMP: 0.0005
+                                        CAMBER: 40 # 100
+                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.0005
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
+                                reactif_7: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 30
+                                        BASE: [45, 45, 45, 20, 20, 30]
+                                        CONTACT_POINTS: [15, 5, 15, 5, 15, 5, 15, 5]
+                                        CONTACT_POINTS_DAMP: 0.0005
+                                        CAMBER: 10 # 100
+                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.006
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 reactif_6: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 30
                                         BASE: [45, 45, 45, 20, 20, 30]
-                                        CONTACT_POINTS: 10
-#                                        CONTACT_POINTS: 0.01
+                                        CONTACT_POINTS: [15, 8, 15, 8, 15, 8, 15, 8, 10, 10, 10, 10, 5, 5, 5, 5]
+                                        CONTACT_POINTS_DAMP: 0.000002
                                         CAMBER: 15 # 100
                                         CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.05
+                                        CAMBER_DAMP: 0.0001
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 ZMP_2: # circular - odom,
@@ -899,7 +925,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        plugins: [odometry, ground_forces, NwheelsSecondOrder::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry, ground_forces,
                         #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

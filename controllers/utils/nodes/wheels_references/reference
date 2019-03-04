@@ -38,7 +38,7 @@ class Reference:
             except yaml.YAMLError as exc:
                 print(exc)
         #yaml_file["dsfknl"]
-        self.check_keys(["x cp", "y cp", "z cp", "base now", "vel", "dt", "x cp ref", "y cp ref", "z cp ref", "base ref", "pattern", "base_const_vel"], yaml_file)
+        self.check_keys(["x cp", "y cp", "z cp", "base now", "vel", "dt", "x cp ref", "y cp ref", "z cp ref", "base ref", "pattern", "base_const_vel", "cs ref"], yaml_file)
 
         self.base_offset = np.array(yaml_file["base_const_vel"])
         # initial support velocity
@@ -60,6 +60,8 @@ class Reference:
         self.y_cp = np.array(yaml_file["y cp"])
         self.z_cp = np.array(yaml_file["z cp"])
 
+        self.cs_ref = np.array(yaml_file["cs ref"])
+        self.cs = np.array([0,0,0,0])
         # following predefined x references
         self.x_cp_ref = np.array(yaml_file["x cp ref"])
         # following predefined y references
@@ -92,8 +94,8 @@ class Reference:
 
 
     def readMove(self, pattern):
-        self.check_keys(["x_cp", "y_cp", "z_cp", "base"], pattern)
-        return (self.move, [pattern["x_cp"], pattern["y_cp"], pattern["z_cp"], pattern["base"]])
+        self.check_keys(["x_cp", "y_cp", "z_cp", "base", "cs"], pattern)
+        return (self.move, [pattern["x_cp"], pattern["y_cp"], pattern["z_cp"], pattern["base"], pattern["cs"]])
 
     def readSpeed(self, pattern):
         self.check_keys(["motions"], pattern)
@@ -131,7 +133,7 @@ class Reference:
 		self.dz_cp = self.vel[8:12]/self.dt*(self.getZ() - self.z_cp)
 		#self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
 		self.d_base = self.vel[12:16]*np.sign(self.getBase() - self.base_now)
-
+		self.cs = self.cs_ref[self.get(4)]
 		self.check()
 		self.d_base[np.abs(self.getBase() - self.base_now) < 1e-3] = (self.getBase() - self.base_now)[np.abs(self.getBase() - self.base_now) < 1e-3]/self.dt
 
@@ -275,7 +277,6 @@ class Reference:
 
     def send(self):
 		self.msg.velocity = list(sum(zip(self.dx_cp, self.dy_cp, self.dz_cp),())) + [2147483647]
-
 		#if self.timer%100 < 0.0001:
 		#	print(self.step, self.msg.velocity, self.dz_bs)
 
@@ -283,6 +284,7 @@ class Reference:
 
     def base(self):
         self.base_msg.x, self.base_msg.y, self.base_msg.z, self.base_msg.rz = self.d_base + self.base_offset
+        self.base_msg.cs = self.cs
         return self.base_msg
 
     def end(self):

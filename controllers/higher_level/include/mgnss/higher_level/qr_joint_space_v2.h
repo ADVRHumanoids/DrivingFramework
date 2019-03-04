@@ -32,6 +32,7 @@ virtual void _update(); // switch to joint space & solve
 
 // virtual void solve();
 virtual void log(mwoibn::common::Logger& logger);
+mwoibn::VectorN& damping(){return _damp_vec;}
 
 protected:
   QrTask& _task;
@@ -39,6 +40,7 @@ protected:
   const mwoibn::VectorN& _offset;
   mwoibn::robot_class::Robot& _robot;
   double _damping = 1e-8;
+  mwoibn::VectorN _damp_vec;
   virtual void _outputTransform();
 
 

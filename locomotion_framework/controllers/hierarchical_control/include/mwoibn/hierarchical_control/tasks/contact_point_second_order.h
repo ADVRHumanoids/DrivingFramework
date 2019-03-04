@@ -239,25 +239,23 @@ protected:
 
   virtual void _updateError()
   {
-    // std::cout << "_updateError" << std::endl;
     _last_error.noalias() = _error; // save previous state
 
     for (int i = 0; i < _contacts.size(); i++)
     {
 
       _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
-      _error.segment<3>(3 * i).noalias() = _wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i); // 10 is for a task gain should be automatic
+      _error.segment<2>(2 * i).noalias() = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)).head<2>(); // 10 is for a task gain should be automatic
 
-      if (_selector[i])
-        _error[3*i+2] = 0;
+      // if (_selector[i])
+      //   _error[3*i+2] = 0;
 
       _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
 
-      _velocity.segment<3>(3*i) = _velocity_ref.segment<3>(3*i) + _contacts[i].getConstant();
+      _velocity.segment<2>(2*i) = (_velocity_ref.segment<3>(3*i) + _contacts[i].getConstant()).head<2>();
     }
 
     std::cout << "_error\t" << _error.transpose() << std::endl;
-    std::cout << "_velocity\t" << _velocity.transpose() << std::endl;
 
   }
 
@@ -269,14 +267,16 @@ protected:
 
     for (int i = 0; i < _contacts.size(); i++)
     {
-      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      // _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      mwoibn::Matrix _temp_jacobian = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
       _projected = _ground_normal*_ground_normal.transpose();
       mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
       _rot_project = _rot*_projected;
       _rot = _wheel_transforms[i]->rotation.transpose()*_rot_project;
-      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
-      if (_selector[i])
-        _jacobian.row(3*i+2).setZero();
+      // _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
+      _jacobian.middleRows<2>(2*i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).topRows<2>();
+      // if (_selector[i])
+        // _jacobian.row(3*i+2).setZero();
     }
 
     std::cout << "_jacobian\n" << _jacobian << std::endl;
@@ -306,7 +306,7 @@ protected:
   }
 
   virtual void _allocate(){
-    _init(_contacts.rows(), _contacts.cols());
+    _init(8, _contacts.cols());
     _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
     _reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());
@@ -327,6 +327,7 @@ protected:
 
 
     virtual void _updateState(){
+      _base_point.update(true);
       _support.update(true);
       _contacts.update(true);
       _q_twist = _base.orientation.getWorld().twistSwing(_ground_normal); // this has heading

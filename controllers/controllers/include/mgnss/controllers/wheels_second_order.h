@@ -317,7 +317,7 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::tasks::CartesianSelective> _pelvis_position_ptr;
   std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelvis_orientation_ptr;
 
-  std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointZMPV2> _steering_ptr;
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointSecondOrder> _steering_ptr;
   std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
 
   // std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
@@ -367,6 +367,7 @@ mwoibn::VectorN estimated__, _modified_support, _zero;
 mwoibn::VectorN _com_ref;
 
 mwoibn::robot_points::Constant _world;
+std::unique_ptr<mwoibn::robot_points::LinearPoint> _pelvis;
 
 virtual void _setInitialConditions();
 virtual void _allocate();

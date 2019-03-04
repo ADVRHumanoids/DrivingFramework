@@ -34,15 +34,27 @@ void addTask(BasicTask& task, mwoibn::VectorBool selector, unsigned int i);
 
 int taskSize(const BasicTask& task){
   auto task_ptr_ =
-      std::find_if(_tasks_ptrs.begin(), _tasks_ptrs.end(), [&task](const std::pair<mwoibn::VectorBool, BasicTask&>& pair)
+      std::find_if(_tasks_ptrs.begin(), _tasks_ptrs.end(), [&task](const std::tuple<mwoibn::VectorBool, BasicTask&, mwoibn::VectorN>& pair)
                    {
-                     return &(pair.second) == &task;
+                     return &(std::get<1>(pair)) == &task;
                    });
   if (task_ptr_ == _tasks_ptrs.end())
     return 0;
 
-  return task_ptr_->first.count();
+  return std::get<0>(*task_ptr_).count();
 
+}
+
+BasicTask& getTask(int i ){
+  return std::get<1>(_tasks_ptrs[i]);
+}
+
+void setWeight(double w, int task_id){
+  std::get<2>(_tasks_ptrs[task_id]).setConstant(w);
+}
+
+double getWeight(int task_id){
+  return std::get<2>(_tasks_ptrs[task_id])[0];
 }
 
 virtual void updateJacobian();
@@ -55,7 +67,7 @@ virtual void updateError();
 virtual void update();
 
 protected:
-std::vector < std::pair<mwoibn::VectorBool, BasicTask&> > _tasks_ptrs;
+std::vector < std::tuple<mwoibn::VectorBool, BasicTask&, mwoibn::VectorN> > _tasks_ptrs;
 void _verify(BasicTask& task, mwoibn::VectorBool selector)
 {
         if (task.getTaskSize() != selector.size())

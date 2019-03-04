@@ -8,7 +8,9 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task){
         _verify(task, selector);
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
-        _tasks_ptrs.push_back(std::make_pair(selector, std::ref(task)));
+        mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
+        _tasks_ptrs.push_back(std::make_tuple(selector, std::ref(task), test__));
+
 }
 
 void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, mwoibn::VectorBool selector){
@@ -16,7 +18,8 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, m
         _verify(task, selector);
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
-        _tasks_ptrs.push_back(std::make_pair(selector, std::ref(task)));
+        mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
+        _tasks_ptrs.push_back(std::make_tuple(selector, std::ref(task), test__));
 }
 // add task at the end of the stack
 void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, unsigned int i){
@@ -28,7 +31,8 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, u
                 throw(std::invalid_argument("Couldn't add task to the aggravated task, requested number is too high."));
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
-        _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_pair(selector, std::ref(task)));
+        mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
+        _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_tuple(selector, std::ref(task), test__));
 
 }
 
@@ -40,17 +44,19 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, m
                 throw(std::invalid_argument("Couldn't add task to the aggravated task, requested number is too high."));
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
-        _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_pair(selector, std::ref(task)));
+        mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
+
+        _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_tuple(selector, std::ref(task), test__));
 }
 
 void mwoibn::hierarchical_control::tasks::Aggravated::updateJacobian(){
         _last_jacobian.noalias() = _jacobian;
         int row = 0;
         for(auto& task : _tasks_ptrs) {
-                task.second.updateJacobian();
-                for(int i = 0; i < task.first.size(); i++) {
-                        if(!task.first[i]) continue;
-                        _jacobian.row(row) = task.second.getJacobian().row(i);
+                std::get<1>(task).updateJacobian();
+                for(int i = 0; i < std::get<0>(task).size(); i++) {
+                        if(!std::get<0>(task)[i]) continue;
+                        _jacobian.row(row) = std::get<2>(task)[i]*std::get<1>(task).getJacobian().row(i);
                         row++;
                 }
         }
@@ -62,10 +68,10 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateError(){
         _last_error.noalias() = _error;
         int row = 0;
         for(auto& task : _tasks_ptrs) {
-                task.second.updateError();
-                for(int i = 0; i < task.first.size(); i++) {
-                        if(!task.first[i]) continue;
-                        _error[row] = task.second.getError()[i];
+                std::get<1>(task).updateError();
+                for(int i = 0; i < std::get<0>(task).size(); i++) {
+                        if(!std::get<0>(task)[i]) continue;
+                        _error[row] = std::get<2>(task)[i]*std::get<1>(task).getError()[i];
                         row++;
                 }
         }

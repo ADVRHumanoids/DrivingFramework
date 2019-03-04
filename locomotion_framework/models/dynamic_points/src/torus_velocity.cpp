@@ -23,7 +23,7 @@ namespace dynamic_points
      _jacobian = _support_jacobian * _torus._v_centre.angular().getJacobian(); // under the contact point assumption
      _constant += _torus.getJacobian()*_robot.state.velocity.get();
 
-     std::cout << "_support_jacobian\t" << _support_jacobian << std::endl;
+     // std::cout << "_support_jacobian\t" << _support_jacobian << std::endl;
      // std::cout << "angular\t" <<  _torus._v_centre.angular().getJacobian() << std::endl;
 
 

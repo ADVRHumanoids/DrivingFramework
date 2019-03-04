@@ -10,6 +10,7 @@ mgnss::higher_level::QRJointSpaceV2::QRJointSpaceV2(mgnss::higher_level::QrTask&
 void mgnss::higher_level::QRJointSpaceV2::init(){
 
   resize(_jacobian.cols(), _task.soft_inequality.rows());
+  _damp_vec.setConstant(_vars, _damping);
   _slack = _task.soft_inequality.rows();
 
   for (auto& constraint: _task.equality)
@@ -92,7 +93,7 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
 
 
   _cost.quadratic.block(0,0,_vars, _vars)  = _jacobian.transpose() * _task.cost().quadratic.block(0,0,_task.vars(), _task.vars()) * _jacobian;
-  _cost.quadratic.block(0,0,_vars, _vars) += mwoibn::VectorN::Constant(_vars, _damping).asDiagonal();
+  _cost.quadratic.block(0,0,_vars, _vars) += _damp_vec.asDiagonal();
   _cost.quadratic.block(_vars,_vars, _task.slack(), _task.slack())  = _task.cost().quadratic.block(_task.vars(), _task.vars(), _task.slack(), _task.slack());
   _cost.linear.head(_vars)  = _task.cost().linear.head(_task.vars()).transpose() * _jacobian;
   _cost.linear.head(_vars) += _offset.transpose()*_task.cost().quadratic.block(0,0,_task.vars(), _task.vars())*_jacobian;
@@ -111,6 +112,7 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
   //
   // std::cout << "soft_inequality\n" << soft_inequality.getJacobian() << std::endl;
 
+// std::cout << "_jacobian\n" << _jacobian << std::endl;
 
 }
 

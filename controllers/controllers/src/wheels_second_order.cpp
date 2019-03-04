@@ -8,9 +8,11 @@
 
 #include <mwoibn/robot_points/torus_model.h>
 #include <mgnss/higher_level/previous_task.h>
+#include <mgnss/higher_level/joint_constraint.h>
 
 #include <mwoibn/hierarchical_control/controllers/default.h>
 #include <mwoibn/robot_points/handler.h>
+#include <mwoibn/point_handling/spatial_velocity.h>
 #include <range/v3/range_for.hpp>
 
 void mgnss::controllers::WheelsSecondOrder::compute()
@@ -24,7 +26,22 @@ void mgnss::controllers::WheelsSecondOrder::compute()
         // without resttering
         _command.noalias() = _ik_ptr->update();
 
-        std::cout << _command.transpose() << std::endl;
+        for(int i = 0; i < 4; i++){
+          double weight = std::fabs( _leg_tasks["CAMBER"].first.getTask(i).getJacobian()(0, 6*(i+1)+3) / _leg_tasks["CAMBER"].first.getTask(i).getJacobian()(0, 6*(i+1)+4)  );
+          // double weight_2 = std::fabs( _tasks["CONTACT_POINTS_1"]->getJacobian()(2*i+1, 6*(i+1)+4) / _tasks["CONTACT_POINTS_1"]->getJacobian()(2*i+1, 6*(i+1)+0)  );
+
+          // _qr_wrappers.back()->damping()[6*(i+1)] = 0.000002+std::fabs(_tasks["CONTACT_POINTS_1"]->getJacobian()(2*i+1, 6*(i+1)+4))*std::tanh(0.1*weight_2);
+
+          _leg_tasks["CAMBER"].first.setWeight(3.0, i);
+          _leg_tasks["CASTER"].first.setWeight(0.05*(1-std::tanh( 0.2*std::pow(weight,3) ) ), i);
+
+          // std::cout << "weight\t" << weight_2 << std::endl;
+          std::cout << "weight\t" << _leg_tasks["CAMBER"].first.getWeight(i);
+          // std::cout << "\t" << _leg_tasks["CASTER"].first.getWeight(i) << std::endl;
+        }
+        // std::cout << "damping\t" << _qr_wrappers.back()->damping().transpose() << std::endl;
+
+        // std::cout << _command.transpose() << std::endl;
         _robot.command.velocity.set(_command, _select_ik);
 
 
@@ -257,19 +274,25 @@ void mgnss::controllers::WheelsSecondOrder::_createTasks(YAML::Node config){
 
             YAML::Node tunning = config["tunnings"][config["tunning"].as<std::string>()];
 
+
             std::cout << tunning << std::endl;
 
-            _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
-                                _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>() ));
+            _pelvis.reset(new mwoibn::robot_points::LinearPoint("pelvis", _robot));
+            _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointSecondOrder(
+                                _robot.getLinks("wheels"), _robot, config, *_pelvis, "pelvis" ));
 
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
 
 
             _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
+            _contact_point->addTask(*_tasks["CAMBER"]);
+            _contact_point->addTask(*_tasks["CASTER"]);
 
           _tasks["CONTACT_POINTS"] = _contact_point.get();
           _tasks["CONTACT_POINTS_1"] = _steering_ptr.get();
+          _tasks["CONTACT_POINTS_2"] = _tasks["CAMBER"];
+          _tasks["CONTACT_POINTS_3"] = _tasks["CASTER"];
 
 
 
@@ -302,34 +325,37 @@ std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers:
 
     std::cout << "\t" << task << ": " << config[task] << "\t" << task_damp_ << std::endl;
 
-    if(type == "" || type == "ns"){
 
+
+    mwoibn::VectorN gain;
     if(config[task].IsScalar())
-        return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], config[task].as<double>(),  task_damp_, _ik_ptr->state);
-
+            gain.setConstant(_tasks[task]->getTaskSize(), config[task].as<double>() );
     else if (!config[task].IsSequence())
-      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
+            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
+    else{
+            if(config[task].size() != _tasks[task]->getTaskSize())
+            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
 
-    if(config[task].size() != _tasks[task]->getTaskSize())
-      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
+            gain.setZero(config[task].size());
 
-      mwoibn::VectorN gain(config[task].size());
-
-      for(int i = 0 ; i < config[task].size(); i++)
-        gain[i] = config[task][i].as<double>();
-
-      return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], gain,  task_damp_, _ik_ptr->state);
-    }
+            for(int i = 0 ; i < config[task].size(); i++)
+              gain[i] = config[task][i].as<double>();
+        }
+    if(type == "" || type == "ns")
+        return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], gain,  task_damp_, _ik_ptr->state);
 
     if(type != "qp")
-      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task type '") + type  + std::string("'."));
+        throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task type '") + type  + std::string("'."));
 
-    _qr_wrappers.push_back(std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], config[task].as<double>(), task_damp_, _robot)));
+    _qr_wrappers.push_back(std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], gain, task_damp_, _robot)));
 
-    RANGES_FOR(auto& action, ranges::view::slice(_actions, 0, ranges::end-1) )
-      _qr_wrappers.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
-    //ptr->equality.add(mgnss::higher_level::PreviousTask(*_tasks["STEERING"], _ik_ptr->state.command));
-    // qr_tracking->equality.add(mgnss::higher_level::PreviousTask(*_tasks["BASE"], _ik_ptr->state.command));
+    for(auto& action: _actions){
+        if(action.first == task) continue;
+        _qr_wrappers.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+    }
+
+    _qr_wrappers.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+
     _qr_wrappers.back()->init();
     return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qr_wrappers.back(), _ik_ptr->state);
 }
@@ -403,8 +429,8 @@ void mgnss::controllers::WheelsSecondOrder::log(mwoibn::common::Logger& logger, 
    logger.add("th", _robot.state.position.get()[5]);
    logger.add("r_th", _heading);
    //
-       for(int i = 0; i < 3; i++){
 
+   for(int i = 0; i < 3; i++){
          logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
          logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
          logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
@@ -418,6 +444,17 @@ void mgnss::controllers::WheelsSecondOrder::log(mwoibn::common::Logger& logger, 
          }
        }
 
+       for(int i = 0; i < 4; i++){
+         logger.add("camber_"   + std::to_string(i) , _tasks["CAMBER"]->getJacobian()(i,6*(i+1)+3)/_tasks["CAMBER"]->getJacobian()(i,6*(i+1)+4));
+         logger.add("point_"   + std::to_string(i) , _tasks["CONTACT_POINTS"]->getJacobian()(2*i+1,6*(i+1)+3)/_tasks["CONTACT_POINTS"]->getJacobian()(2*i+1,6*(i+1)+4));
+         mwoibn::point_handling::FramePlus frame_temp__(_robot.getLinks("wheels")[i], _robot.getModel(), _robot.state);
+         mwoibn::point_handling::SpatialVelocity temp__(frame_temp__);
+         logger.add("wheels_x" + std::to_string(i), temp__.angular().getWorld()[0]);
+         logger.add("wheels_y" + std::to_string(i), temp__.angular().getWorld()[1]);
+         logger.add("wheels_z" + std::to_string(i), temp__.angular().getWorld()[2]);
+       }
+
+       std::cout << "final camber\t" << (_tasks["CAMBER"]->getJacobian()*_robot.command.velocity.get()).transpose() << std::endl;
         // qr_tracking->log(logger);
 //
 }
