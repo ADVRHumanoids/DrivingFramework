@@ -8,10 +8,14 @@ mgnss::higher_level::QRJointSpaceV2::QRJointSpaceV2(mgnss::higher_level::QrTask&
 }
 
 void mgnss::higher_level::QRJointSpaceV2::init(){
-
+  _task.init();
   resize(_jacobian.cols(), _task.soft_inequality.rows());
   _damp_vec.setConstant(_vars, _damping);
   _slack = _task.soft_inequality.rows();
+
+//  equality.clear();
+//  soft_inequality.clear();
+//  hard_inequality.clear();
 
   for (auto& constraint: _task.equality)
     equality.add(Constraint(constraint->size(), _vars));
