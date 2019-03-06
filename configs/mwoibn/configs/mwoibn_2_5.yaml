@@ -554,7 +554,7 @@ mwoibn:
 #                        tunning: ZMP_INDIRECT
                         steering: reactif
 #                        position_gain: 200
-                        tunning: reactif_6
+                        tunning: reactif_second_order
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
@@ -592,7 +592,10 @@ mwoibn:
                                   x: 0
                                   y: -1
                                   z: 0
-                        IK: [qp::CONSTRAINTS, qp::BASE, qp::CONTACT_POINTS]
+                        IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
+                        # IK: [CONSTRAINTS, STEERING, BASE, CONTACT_POINTS, CAMBER,  CASTER]
+                        SUPPORT: [CONTACT_POINTS, CAMBER, CASTER]
+                        SHAPE: [SHAPE_JOINT]
                         steerings:
                                 test:
                                         icm: 1.00 # 0.95
@@ -616,82 +619,32 @@ mwoibn:
                                         damp: 0.0008
                                         tracking: 1.0
                         tunnings:
-                                reactif_8: # drive without caster - this should work only for zero camber angle (at least for now)
+                                reactif_first_order: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 30
                                         BASE: [45, 45, 45, 20, 20, 30]
-                                        CONTACT_POINTS: [15, 5, 15, 5, 15, 5, 15, 5]
-                                        CONTACT_POINTS_DAMP: 0.0005
-                                        CAMBER: 40 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.0005
-                                        CASTER_DAMP: 0.12
-                                        COP: 0
-                                reactif_7: # drive without caster - this should work only for zero camber angle (at least for now)
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 30
-                                        BASE: [45, 45, 45, 20, 20, 30]
-                                        CONTACT_POINTS: [15, 5, 15, 5, 15, 5, 15, 5]
-                                        CONTACT_POINTS_DAMP: 0.0005
-                                        CAMBER: 10 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.006
-                                        CASTER_DAMP: 0.12
-                                        COP: 0
-                                reactif_6: # drive without caster - this should work only for zero camber angle (at least for now)
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 30
-                                        BASE: [45, 45, 45, 20, 20, 30]
-                                        CONTACT_POINTS: [15, 8, 15, 8, 15, 8, 15, 8, 10, 10, 10, 10, 5, 5, 5, 5]
-                                        CONTACT_POINTS_DAMP: 0.000002
+                                        CONTACT_POINTS: 10
+                                        CONTACT_POINTS: 0.0001
                                         CAMBER: 15 # 100
                                         CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.0001
-                                        CASTER_DAMP: 0.12
-                                        COP: 0
-                                ZMP_2: # circular - odom,
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 90
-                                        BASE: [45, 45, 45, 35, 35, 30]
-#                                        CONTACT_POINTS: 15
-                                        CONTACT_POINTS: 0.020
-                                        CAMBER: 15 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.08
-                                        CASTER_DAMP: 0.12
-                                ZMP_DIRECT: # circular - odom,
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 45
-                                        BASE: [45, 45, 45, 35, 35, 30]
-                                        CONTACT_POINTS: 6
-#                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 10 # 100
-#                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.030
-#                                        CASTER_DAMP: 0.12
-                                ZMP_INDIRECT: # circular - odom,
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 45
-                                        BASE: [45, 45, 45, 35, 35, 30]
-                                        CONTACT_POINTS: 5
-#                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 15 # 100
-#                                        CASTER: 30 # 14
                                         CAMBER_DAMP: 0.05
-                                        COP: 500 #
-#                                        CASTER_DAMP: 0.12
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
+                                reactif_second_order: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 30
+                                        BASE: [45, 45, 45, 20, 20, 30]
+                                        CONTACT_POINTS: [15, 12, 15, 12, 15, 12, 15, 12]
+                                        CONTACT_POINTS_DAMP: 0.000002
+                                        CAMBER: 10 # 100
+                                        CASTER: 5 # 14
+                                        CAMBER_DAMP: 0.00000
+                                        CASTER_DAMP: 0.00000
+                                        COP: 0
                                 odom_NRT_5: # circular - odom,
                                         ratio: 1.0
                                         damping: 0.0001
@@ -705,157 +658,6 @@ mwoibn:
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0
-                                HW_str_1:
-                                        ratio: 1.15
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 70 # 20
-                                        base_orinetation: 80
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 25
-                                        contact_point: 22.0
-                                        camber: 50
-                                        castor: 15
-                                        camber_damp: 0.04
-                                        castor_damp: 0.12
-                                HW_1:
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 90
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 10
-                                        contact_point: 18
-                                        camber: 15 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.08
-                                        castor_damp: 0.12
-                                switch_configuration:
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 60
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 18
-                                        camber: 10 # 100
-                                        castor: 5 # 14
-                                        camber_damp: 0.04
-                                        castor_damp: 0.0005
-                                        camber_tolerance: -0.008
-                                        camber_speed: 80
-                                odom_NRT_6: # drive without caster - this should work only for zero camber angle (at least for now)
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        CONSTRAINTS: 1
-                                        STEERING: 30
-                                        BASE: [45, 45, 45, 35, 35, 80]
-                                        CONTACT_POINTS: 15
-#                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 15 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.05
-                                        CASTER_DAMP: 0.12
-                                        COP: 0
-                                reactif_1: # fast
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 90
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 25
-                                        camber: 15 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.01
-                                        castor_damp: 0.012
-                                        camber_tolerance: 0.012
-                                        camber_speed: 50
-                                reactif_2: # smooth
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 45
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 25
-                                        camber: 50 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.03
-                                        castor_damp: 0.012
-                                        camber_tolerance: 0.05
-                                        camber_speed: 50
-                                reactif_3: # smooth
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 45
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 25
-                                        camber: 50 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.05
-                                        castor_damp: 0.012
-                                        camber_tolerance: 0.04
-                                        camber_speed: 50
-                                reactif_4: # slow
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 45
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 25
-                                        camber: 50 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.05
-                                        castor_damp: 0.012
-                                        camber_tolerance: 0.04
-                                        camber_speed: 1
-                                reactif_5: # camber
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 30
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 20
-                                        contact_point: 25
-                                        camber: 50 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.08
-                                        castor_damp: 0.012
-                                        camber_tolerance: 0.08
-                                        camber_speed: 1
-                                reactif_old: # circular - odom,
-                                        ratio: 1.0
-                                        damping: 0.0001
-                                        constraints: 1
-                                        leg_steer: 90
-                                        base_orinetation: 45
-                                        centre_of_mass_x: 35
-                                        centre_of_mass_y: 35
-                                        base_position: 30
-                                        contact_point: 15
-                                        camber: 15 # 100
-                                        castor: 30 # 14
-                                        camber_damp: 0.08
-                                        castor_damp: 0.12
                 odometry:
                         layer: NRT
                         robot: odometry
