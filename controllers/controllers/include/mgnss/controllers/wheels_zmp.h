@@ -163,83 +163,19 @@ virtual void nextStep(){
     _robot.centerOfMass().update();
 
     _support += _support_vel*_robot.rate();
-    // mwoibn::VectorN desired__ = state_machine__->worldJacobian()*shape_joint__->get();
-    // std::cout << "worldJacobian frame " << state_machine__->worldJacobian() << std::endl;
-    // std::cout << "shape_joint__ " << shape_joint__->get().transpose() << std::endl;
 
-    // std::cout << "desired__\t" << desired__.transpose() << std::endl;
-
-    // _tasks["BASE"]->update();
-    // _tasks["CONSTRAINTS"]->update();
-    // _tasks["CAMBER"]->update();
-    // _tasks["STEERING"]->update();
-
-    // state_machine__->update(shape__->get());
-    //
-    // shape_joint__->equality[0].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
-    // shape_joint__->equality[1].jacobian = _tasks["BASE"]->getJacobian(); // it is not updated yet?
-    // shape_joint__->equality[2].jacobian = _tasks["STEERING"]->getJacobian()-state_machine__->steerJacobian()*state_machine__->worldJacobian();
-    // shape_joint__->equality[2].jacobian = _tasks["CAMBER"]->getJacobian();
-    // // shape_joint__->equality[3].jacobian = _tasks["STEERING"]->getJacobian();
-    // shape_joint__->equality[0].jacobian =  state_machine__->steerJacobian()*state_machine__->worldJacobian();
-    //
-    // // shape_joint__->equality[3].state.setConstant(4);
-    // std::cout << shape_joint__->equality[2].state.transpose() << std::endl;
-    //
-
-    // std::cout << "steerEquality\n" << sha/pe_joint__->equality[2].jacobian << std::endl;
-    // std::cout << "_tasks[STEERING]->getJacobian()\n" << _tasks["STEERING"]->getJacobian() << std::endl;
-    // std::cout << "state_machine__->steerJacobian()*state_machine__->worldJacobian()\n" << state_machine__->steerJacobian()*state_machine__->worldJacobian() << std::endl;
-
-    // if(state_machine__->restart()){
-    // restore a desired postion from a current one
-      // std::cout << "restart" << std::endl;
-    // for(int i = 0; i < 4; i++)
-    //   _modified_support.segment<3>(3*i) = _steering_ptr->getPointStateReference(i);
-    // }
-    // if(state_machine__->state()){
-    //
-    //   // std::cout << "nextStep::restore" << std::endl;
-    //   restore__->solve();
-    // }
-    // else{
-      // std::cout << "nextStep::shape" << std::endl;
+      state_machine__->update();
+      _qr_wrappers["SHAPE"]->update();
       _qr_wrappers["SHAPE"]->solve();
-      std::cout << "SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
-      // shape__->solve();
-      // new_shape__->solve();
-      // mwoibn::VectorN world__ = shape__->raw().head<8>();// this is in the world frame?
-      // std::cout << "shape__->raw()\t" << shape__->raw().head<8>().transpose() << std::endl;
-      // std::cout << "shape__->get()\t" << shape__->get().transpose() << std::endl;
-      // std::cout << "new_shape__->get()\t" << new_shape__->get().transpose() << std::endl;
+      std::cout << "get SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
+      std::cout << "raw SHAPE\t" << _qr_wrappers["SHAPE"]->raw().transpose() << std::endl;
 
 
-      // _steer =  state_machine__->steerJacobian()*shape__->get().head<8>();
-      // for(int i = 0; i < 4; i++){
-        // double new__ = mwoibn::eigen_utils::unwap(_leg_tasks["STEERING"].second[i].getCurrent(), std::atan2(world__[2*i+1], world__[2*i]));
 
-        // std::cout << "steer\t" << i << "\t" <<  _steer[i]  << std::endl;
-        // _steer[i] = temp__;
-      // }
+      for(int i = 0; i < 4; i++)
+         _modified_support.segment<2>(3*i)  = _qr_wrappers["SHAPE"]->get().segment<2>(2*i);
 
-      // shape_wheel__->solve();
-      // shape_joint__->solve();
-      // std::cout << "shape_wheel__->get()\t" << shape_wheel__->get().transpose() << std::endl;
-      // std::cout << "shape_wheel__->raw()\t" << shape_wheel__->raw().transpose() << std::endl; //?
-      // std::cout << "shape_joint__->get()\t" << shape_joint__->get().transpose() << std::endl;
-      // std::cout << "shape_joint__->raw()\t" << shape_joint__->raw().transpose() << std::endl;
-      // std::cout << "shape_joint__->get():original\n" << (state_machine__->stateJacobian()*shape_joint__->get() + state_machine__->stateOffset()).transpose() << std::endl;
-      // std::cout << "stateJacobian\n" << state_machine__->stateJacobian() << std::endl;
-
-    // }
-
-    // for(int i = 0; i < 4; i++)
-    //    _support_vel.segment<2>(3*i) = restore__->get().segment<2>(2*i);
-
-    // std::cout << "restore\t" << restore__->get().transpose() << std::endl;
-    // std::cout << "_support\t" << _support.transpose() << std::endl;
-    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
-
+    _support += _modified_support*_robot.rate(); // for this mode integrate current command
     step();
 
     updateBase();
@@ -251,32 +187,6 @@ virtual void nextStep(){
 
     steering();
 
-//       for(int i = 0; i < 4; i++)
-//          _modified_support.segment<2>(3*i)  -= _qr_wrappers["SHAPE"]->get().segment<2>(2*i) * _robot.rate();
-
-   //
-   //  mwoibn::Vector3 temp_state__ = mwoibn::Vector3::Zero();
-   //  for(int i = 0; i < 4; i++){
-   //    temp_state__.setZero();
-   //    if (state_machine__->state())
-   //      temp_state__.head<2>() = restore__->get().segment<2>(2*i);
-   //    else
-   //      temp_state__.head<2>() = shape__->get().segment<2>(2*i);
-   //
-   //      mwoibn::Matrix3 rot;
-   //      rot << std::cos(steerings[i]), -std::sin(steerings[i]), 0, std::sin(steerings[i]), std::cos(steerings[i]), 0, 0, 0, 1;
-   //    temp_state__ = rot.transpose()*temp_state__; // this should be in a steering frames
-   //    temp_state__.tail<2>().setZero(); // remove other components
-
-   //    // Apply in a world frame - I am ignoring heading here!
-   //    _modified_support.segment<2>(3*i)  += (rot*temp_state__).head<2>() * _robot.rate();
-      // std::cout << "temp_state__\t" << temp_state__.transpose() << std::endl;
-      // std::cout << "modification\t" <<  ((rot*temp_state__).head<2>() * _robot.rate()).transpose() << std::endl;
-      // std::cout << "restore__ command\t" <<  (restore__->get().segment<2>(2*i) * _robot.rate()).transpose() << std::endl;
-      // std::cout << "shape__ command\t" <<  (shape__->get().segment<2>(2*i) * _robot.rate()).transpose() << std::endl;
-     // }
-
-    // _updateSupport();
 
 }
 

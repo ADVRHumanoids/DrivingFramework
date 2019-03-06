@@ -78,13 +78,13 @@ void mgnss::higher_level::Steering8::_merge(int i){
 
         _b_st[i] = _b[i] + _heading;
 
-        // std::cout << "Kicm\t" << _K_icm * _v_icm[i] << ", Ksp\t" << _v_sp[i]
-        //           << ", Ksp v_sp\t" << _K_sp * scale * _v_sp[i]
-        //           << ", scale\t" << scale
-        //           << ", damp\t" << _damp[i]
-        //           << ", Ksp\t" << _K_sp
-        //           << ", _b_st[i]\t" << _b_st[i]
-        //           << std::endl;
+          // std::cout << "Kicm\t" << _K_icm * _v_icm[i] << ", Ksp\t" << _v_sp[i]
+          //           << ", Ksp v_sp\t" << _K_sp * scale * _v_sp[i]
+          //           << ", scale\t" << scale
+          //           << ", damp\t" << _damp[i]
+          //           << ", Ksp\t" << _K_sp
+          //           << ", _b_st[i]\t" << _b_st[i]
+          //           << std::endl;
 }
 
 void mgnss::higher_level::Steering8::_steerICM(int i, const mwoibn::Vector3 next_step){

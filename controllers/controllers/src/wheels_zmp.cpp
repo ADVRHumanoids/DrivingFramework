@@ -15,7 +15,6 @@
 void mgnss::controllers::WheelsZMP::compute()
 {
         _com_ptr->update();
-        state_machine__->update();
         //_support = _support + _support_vel*_robot.rate();
         // without resttering
         WheelsController::compute();
@@ -101,27 +100,7 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
 }
 
 void mgnss::controllers::WheelsZMP::step(){
-    // if (state_machine__->state())
-    //     _tracking_task->tracking();
-    // else _tracking_task->balance();
-       // std::cout << "step::restore\t" << restore__->get().transpose() * _robot.rate() << std::endl;
-       // for(int i = 0; i < 4; i++)
-          // _modified_support.segment<2>(3*i)  += restore__->get().segment<2>(2*i) * _robot.rate();
-        // }
-   // else {
-       // std::cout << "step::shape" << shape__->get().transpose() * _robot.rate() << std::endl;
-       // for(int i = 0; i < 4; i++)
-          // _modified_support.segment<2>(3*i)  = shape__->get().segment<2>(2*i);
-       // mwoibn::VectorN command = state_machine__->worldJacobian()*shape_joint__->get();
-       // for(int i = 0; i < 4; i++)
-          // _modified_support.segment<2>(3*i)  = command.segment<2>(2*i);// + 20*_tasks["BASE"]->getError().segment<2>(3);
-
-
-        // std::cout << "shape__\t" <<  shape__->get().transpose() << std::endl;
-        // std::cout << "shape_joint__\t" <<  (state_machine__->worldJacobian()*shape_joint__->get()).transpose() << std::endl;
-        // std::cout << "state_joint__\t" <<  (state_machine__->stateJacobian()*shape_joint__->get()).transpose() << std::endl;
-
-        _steering_ptr->setVelocity(_modified_support);
+        // _steering_ptr->setVelocity(_modified_support);
 
         _position += _linear_vel  * _robot.rate();
         _heading  += _angular_vel[2] * _robot.rate();
@@ -223,7 +202,7 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             std::cout << tunning << std::endl;
 
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
-                                _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), "pelvis", tunning["COP"].as<double>()));
+                                _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
 
             _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShapingV4>(new mgnss::higher_level::SupportShapingV4(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));

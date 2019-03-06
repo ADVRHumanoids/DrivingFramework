@@ -90,7 +90,7 @@ void mgnss::higher_level::SupportShapingV4::_outputTransform(){
   // std::cout << "_steering_state\t" << _return_state.transpose() << std::endl;
 
   for(int i = 0; i < 4; i++){
-    temp__.head<2>() = _return_state.segment<2>(2*i);
+    temp__.head<2>() = _optimal_state.segment<2>(2*i);
     _return_state.segment<2>(2*i) = (_wheel_transforms[i]->rotation*temp__).head<2>();
   }
 

@@ -245,21 +245,21 @@ LIST( APPEND INSTALL_TARGETS
 #    set_xeno_flags(NwheelsWorld)
 #  endif()
 
-    LIST( APPEND INSTALL_TARGETS Nwheels3 )
+#    LIST( APPEND INSTALL_TARGETS Nwheels3 )
+#
+#    add_library(Nwheels3 SHARED
+#       src/plugins/wheels_3.cpp
+#     )
+#    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+#    target_link_libraries(Nwheels3
+#       ${catkin_LIBRARIES}
+#       ${XCM_LIBRARIES}
+#     )
 
-    add_library(Nwheels3 SHARED
-       src/plugins/wheels_3.cpp
-     )
-    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
-    target_link_libraries(Nwheels3
-       ${catkin_LIBRARIES}
-       ${XCM_LIBRARIES}
-     )
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(Nwheels3)
-  endif()
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(Nwheels3)
+#  endif()
 
 #     LIST( APPEND INSTALL_TARGETS NwheelsReactif )
 #
@@ -304,21 +304,21 @@ LIST( APPEND INSTALL_TARGETS
          ${XCM_LIBRARIES}
     )
 
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(NwheelsSecondOrder)
-  endif()
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(NwheelsSecondOrder)
+#  endif()
 
-  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
+#  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
 
-  add_library(NwheelsSecondOrder SHARED
-     src/plugins/wheels_second_order.cpp
-   )
-  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(NwheelsSecondOrder
-     ${catkin_LIBRARIES}
-     ${XCM_LIBRARIES}
-)
+#  add_library(NwheelsSecondOrder SHARED
+#     src/plugins/wheels_second_order.cpp
+#   )
+#  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
+#  target_link_libraries(NwheelsSecondOrder
+#     ${catkin_LIBRARIES}
+#     ${XCM_LIBRARIES}
+#)
 
 if ( Xenomai_FOUND )
 message(WARNING "set_xeno_flags")

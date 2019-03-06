@@ -64,7 +64,7 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
 
         _margins.limit.setZero(4);
         _workspace.limit.setZero(4);
-        _margins.limit << 0.18, 0.18, 0.18, 0.18;
+        _margins.limit << 0.30, 0.18, 0.18, 0.30;
         _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
         _margins.state.setZero(_size);
         _workspace.state.setZero(_size);

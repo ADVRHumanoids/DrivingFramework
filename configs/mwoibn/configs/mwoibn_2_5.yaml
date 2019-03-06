@@ -554,7 +554,7 @@ mwoibn:
 #                        tunning: ZMP_INDIRECT
                         steering: reactif
 #                        position_gain: 200
-                        tunning: reactif_second_order
+                        tunning: reactif_first_order
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
@@ -592,8 +592,8 @@ mwoibn:
                                   x: 0
                                   y: -1
                                   z: 0
-                        IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
-                        # IK: [CONSTRAINTS, STEERING, BASE, CONTACT_POINTS, CAMBER,  CASTER]
+                        # IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
+                        IK: [CONSTRAINTS, STEERING, BASE, CONTACT_POINTS, CAMBER,  CASTER]
                         SUPPORT: [CONTACT_POINTS, CAMBER, CASTER]
                         SHAPE: [SHAPE_JOINT]
                         steerings:
@@ -626,7 +626,7 @@ mwoibn:
                                         STEERING: 30
                                         BASE: [45, 45, 45, 20, 20, 30]
                                         CONTACT_POINTS: 10
-                                        CONTACT_POINTS: 0.0001
+                                        CONTACT_POINTS_DAMP: 0.0001
                                         CAMBER: 15 # 100
                                         CASTER: 30 # 14
                                         CAMBER_DAMP: 0.05
@@ -727,7 +727,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry, ground_forces, NwheelsSecondOrder::wheeled_motion]
+                        plugins: [odometry, ground_forces, NwheelsZMP::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry, ground_forces,
                         #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

@@ -160,7 +160,7 @@ virtual void releaseContact(int i) { _selector[i] = true; }
 virtual void claimContact(int i) { _selector[i] = false; }
 
 void setVelocity(mwoibn::VectorN& velocity){
-  // std::cout << __PRETTY_FUNCTION__ << "\n" << velocity.transpose() << std::endl;
+
   for (int i = 0; i < _contacts.size(); i++)
     _velocity.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
 
