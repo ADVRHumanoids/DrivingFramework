@@ -16,7 +16,7 @@ class JointConstraint: public Constraint{
   public:
     JointConstraint(mwoibn::robot_class::Robot& robot, const mwoibn::VectorInt& dofs, std::vector<mwoibn::Interface> interfaces): Constraint(2*dofs.size(), robot.getDofs()), _robot(robot){
 
-      std::cout << __PRETTY_FUNCTION__ << "\t" << dofs.transpose() << std::endl;
+      // std::cout << __PRETTY_FUNCTION__ << "\t" << dofs.transpose() << std::endl;
       if(!interfaces.size())
         throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Could not initalize joint space constraints. Received an empty interface vector. Please, specify a robot interface."));
 
