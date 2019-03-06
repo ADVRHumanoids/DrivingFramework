@@ -24,6 +24,8 @@ void mgnss::controllers::WheelsSecondOrder::compute()
         std::cout << __PRETTY_FUNCTION__ << std::endl;
         //_support = _support + _support_vel*_robot.rate();
         // without resttering
+        state_machine__->update();
+
         _command.noalias() = _ik_ptr->update();
 
         for(int i = 0; i < 4; i++){
@@ -59,8 +61,8 @@ double mgnss::controllers::WheelsSecondOrder::limit(const double th)
 
 void mgnss::controllers::WheelsSecondOrder::_create(YAML::Node config){
         _createTasks(config);
-        _initIK(config);
         _allocate();
+        _initIK(config);
 }
 
 // void mgnss::controllers::WheelsSecondOrder::resetSteering()
@@ -118,17 +120,17 @@ void mgnss::controllers::WheelsSecondOrder::_setInitialConditions(){
 
         _robot.centerOfMass().update(true);
 
+        state_machine__->update();
+        // restore__->update();
+        _qr_wrappers["SHAPE"]->update();
+
         _tasks["CONSTRAINTS"]->update();
         _tasks["BASE"]->update();
         _tasks["CAMBER"]->update();
-        // _tasks["STEERING"]->update();
 
+        _qr_wrappers["SHAPE_WHEEL"]->update();
+        _qr_wrappers["SHAPE_JOINT"]->update();
 
-        // shape_joint__->equality[0].jacobian = _tasks["CONSTRAINTS"]->getJacobian();
-        // shape_joint__->equality[1].jacobian = _tasks["BASE"]->getJacobian();
-        // shape_joint__->equality[2].jacobian = _tasks["CAMBER"]->getJacobian();
-
-        // qr_tracking->update();
 
 }
 
@@ -167,8 +169,15 @@ void mgnss::controllers::WheelsSecondOrder::_allocate(){
         __last_steer.setZero(4);
         _zero.setZero( _robot.getLinks("wheels").size()*3);
 
-        // qr_tracking->init();
-        state_machine__->init();
+
+        // _qr_wrappers["SHAPE_JOINT"]->init();
+        // _qr_wrappers["SHAPE"]->init();
+
+        // _qr_wrappers["SHAPE_JOINT"]->equality.add(mgnss::higher_level::PreviousTask(*_tasks["CONSTRAINTS"], _ik_ptr->state.command));
+        // _qr_wrappers["SHAPE_JOINT"]->equality.add(mgnss::higher_level::PreviousTask(*_tasks["BASE"], _ik_ptr->state.command));
+
+        // _qr_wrappers["SHAPE_WHEEL"]->init();
+        // _qr_wrappers["SHAPE_JOINT"]->init();
 
 
 }
@@ -191,15 +200,16 @@ void mgnss::controllers::WheelsSecondOrder::_initIK(YAML::Node config){
           std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
     std::cout << "Initializing Inverse Kinematics..." << std::endl;
-    for(auto entry : ik)   _ik_ptr->addAction(_createAction(entry.as<std::string>(), tunning));
+    for(auto entry : ik)   _ik_ptr->addAction(_createAction(entry.as<std::string>(), tunning, config));
 
-    _ik_ptr->update();
 
 
     // YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
     // _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
               // _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
+
+    _ik_ptr->update();
 
 }
 
@@ -281,18 +291,27 @@ void mgnss::controllers::WheelsSecondOrder::_createTasks(YAML::Node config){
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointSecondOrder(
                                 _robot.getLinks("wheels"), _robot, config, *_pelvis, "pelvis" ));
 
+            // _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointSecondOrder(
+            //                       _robot.getLinks("wheels"), _robot, config, _world, "ROOT" ));
+
             state_machine__.reset(new mgnss::higher_level::StateMachine(_robot, config ));
+
+            _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShapingV4>(new mgnss::higher_level::SupportShapingV4(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            _qr_wrappers["SHAPE_WHEEL"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->stateJacobian(), state_machine__->stateOffset(), _robot ));
+            _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE_WHEEL"], state_machine__->wheelOrientation().passJacobian(), _zero, _robot ));
+                        // shape_wheel__.reset(new mgnss::higher_level::QRJointSpaceV2(*shape__, state_machine__->stateJacobian(), state_machine__->stateOffset(), _robot ));
+            // shape_joint__.reset(new mgnss::higher_level::QRJointSpaceV2(*shape_wheel__, state_machine__->wheelOrientation().passJacobian(), _zero, _robot ));
 
 
             _steering_ptr->subscribe(true, true, false);
             _contact_point->addTask(*_steering_ptr);
-            _contact_point->addTask(*_tasks["CAMBER"]);
-            _contact_point->addTask(*_tasks["CASTER"]);
+            // _contact_point->addTask(*_tasks["CAMBER"]);
+            // _contact_point->addTask(*_tasks["CASTER"]);
 
           _tasks["CONTACT_POINTS"] = _contact_point.get();
           _tasks["CONTACT_POINTS_1"] = _steering_ptr.get();
-          _tasks["CONTACT_POINTS_2"] = _tasks["CAMBER"];
-          _tasks["CONTACT_POINTS_3"] = _tasks["CASTER"];
+          // _tasks["CONTACT_POINTS_2"] = _tasks["CAMBER"];
+          // _tasks["CONTACT_POINTS_3"] = _tasks["CASTER"];
 
 
 
@@ -307,67 +326,136 @@ void mgnss::controllers::WheelsSecondOrder::_createTasks(YAML::Node config){
         _tasks["BASE_GRAVITY"] = _pelvis_position_ptr.get();
         _tasks["BASE"] = _world_posture_ptr.get();
 
+
+        state_machine__->init();
+        state_machine__->update();
+
 }
 
 
-std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers::WheelsSecondOrder::_taskAction(std::string task, YAML::Node config, std::string type){
+std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers::WheelsSecondOrder::_taskAction(std::string task, YAML::Node config, std::string type, YAML::Node full_config){
 
-    double ratio = config["ratio"].as<double>(); // 4
-    double damp_ = config["damping"].as<double>();
-    double task_damp_;
+    // double ratio = config["ratio"].as<double>(); // 4
 
-    if(!_tasks[task])
-        throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task '") + task + std::string("'."));
-    if(!config[task])
-            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Please defined gain for task '") + task + std::string("'."));
+    std::cout << "\t" << task << std::endl;
 
-    task_damp_ = config[task+"_DAMP"] ? config[task+"_DAMP"].as<double>() : damp_;
+    if(type == "qA"){
+      // Check if task has been defined in th config file
+      if(!full_config[task])
+          throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task '") + task + std::string("'."));
 
-    std::cout << "\t" << task << ": " << config[task] << "\t" << task_damp_ << std::endl;
+      _qp_aggravated.push_back(std::unique_ptr<mgnss::higher_level::QpAggravated>(new mgnss::higher_level::QpAggravated(_robot.getDofs())));
+
+      // Initialize default constraints
+      int eq_count = 0;
+      for(auto& action: _actions){
+          if(action.first == task) continue;
+          ++eq_count;
+      }
 
 
+      // Add basic tasks
+      for(int i = 0; i < full_config[task].size(); i++){
+        std::string task_name_ = full_config[task][i].as<std::string>();
 
-    mwoibn::VectorN gain;
-    if(config[task].IsScalar())
-            gain.setConstant(_tasks[task]->getTaskSize(), config[task].as<double>() );
-    else if (!config[task].IsSequence())
-            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
-    else{
-            if(config[task].size() != _tasks[task]->getTaskSize())
-            throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
+        std::cout << "\t" << task_name_ << std::endl;
 
-            gain.setZero(config[task].size());
+        if(!_qr_wrappers[task_name_])
+        {
+          _taskAction(task_name_, config, "qp", full_config);
+          _qr_wrappers[task_name_]->hard_inequality.remove(-1);
 
-            for(int i = 0 ; i < config[task].size(); i++)
-              gain[i] = config[task][i].as<double>();
+          for(auto&& zip: ranges::view::ints(0,eq_count))
+            _qr_wrappers[task_name_]->equality.remove(-1);
         }
-    if(type == "" || type == "ns")
+
+        _qp_aggravated.back()->add(*_qr_wrappers[task_name_]);
+
+        _qr_wrappers[task_name_]->init();
+      }
+
+      for(auto& action: _actions){
+          if(action.first == task) continue;
+          _qp_aggravated.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+      }
+      _qp_aggravated.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+
+      _qp_aggravated.back()->init();
+      return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qp_aggravated.back(), _ik_ptr->state);
+    }
+
+    if(type == "" || type == "ns"){
+        mwoibn::VectorN gain;
+        double task_damp_ = _readTask(config, task, gain);
         return std::make_shared<mwoibn::hierarchical_control::actions::Compute>(*_tasks[task], gain,  task_damp_, _ik_ptr->state);
+    }
 
-    if(type != "qp")
-        throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task type '") + type  + std::string("'."));
+    if( type != "qp")
+      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task type '") + type  + std::string("'."));
 
-    _qr_wrappers.push_back(std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], gain, task_damp_, _robot)));
+
+    if(!_qr_wrappers[task]){
+        mwoibn::VectorN gain;
+        double task_damp_ = _readTask(config, task, gain);
+       _qr_wrappers[task] = std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], gain, task_damp_, _robot));
+    }
 
     for(auto& action: _actions){
         if(action.first == task) continue;
-        _qr_wrappers.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+        if(!_tasks[action.first]) continue;
+        _qr_wrappers[task]->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
     }
 
-    _qr_wrappers.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+    _qr_wrappers[task]->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
 
-    _qr_wrappers.back()->init();
-    return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qr_wrappers.back(), _ik_ptr->state);
+    _qr_wrappers[task]->init();
+    return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qr_wrappers[task], _ik_ptr->state);
+
+
+
 }
 
-mwoibn::hierarchical_control::actions::Task& mgnss::controllers::WheelsSecondOrder::_createAction(std::string task, YAML::Node config){
+double mgnss::controllers::WheelsSecondOrder::_readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain){
+
+  double damp_ = config["damping"].as<double>();
+  // double task_damp_;
+
+  if(!_tasks[task])
+      throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown task '") + task + std::string("'."));
+  if(!config[task])
+          throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Please defined gain for task '") + task + std::string("'."));
+
+  double task_damp_ = config[task+"_DAMP"] ? config[task+"_DAMP"].as<double>() : damp_;
+
+  std::cout << "\t" << task << ": " << config[task] << "\t" << task_damp_ << std::endl;
+
+
+  if(config[task].IsScalar())
+          gain.setConstant(_tasks[task]->getTaskSize(), config[task].as<double>() );
+  else if (!config[task].IsSequence())
+          throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Unknown gain type for  '") + task + std::string("'."));
+  else{
+          if(config[task].size() != _tasks[task]->getTaskSize())
+          throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": Incompatible gain size for task '") + task + std::string("' of size ") + std::to_string(_tasks[task]->getTaskSize()) + std::string("."));
+
+          gain.setZero(config[task].size());
+
+          for(int i = 0 ; i < config[task].size(); i++)
+            gain[i] = config[task][i].as<double>();
+      }
+
+  return task_damp_;
+
+}
+
+mwoibn::hierarchical_control::actions::Task& mgnss::controllers::WheelsSecondOrder::_createAction(std::string task, YAML::Node config, YAML::Node full_config){
 
   std::string name;
   std::string type = mwoibn::std_utils::separate(task, "::", name);
 
 
   if(!_actions[name])
-      _actions[name] = _taskAction(name, config, type);
+      _actions[name] = _taskAction(name, config, type, full_config);
 
     return *_actions[name];
 }

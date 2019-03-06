@@ -14,6 +14,9 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 
           // _vector_cost_.setZero(_vars+_slack);
 
+          soft_inequality.clear();
+          hard_inequality.clear();
+
             if(_is_margin)
               soft_inequality.add(Constraint(4,_vars)); // margin
               hard_inequality.add(Constraint(8,_vars)); //limit

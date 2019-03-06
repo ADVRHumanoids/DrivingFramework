@@ -47,6 +47,8 @@
 
 
 #include <mgnss/higher_level/qr_task_wrapper.h>
+#include <mgnss/higher_level/qp_aggravated.h>
+#include <mgnss/higher_level/support_shaping_v4_0.h>
 
 #include "mwoibn/robot_points/constant.h"
 
@@ -318,8 +320,10 @@ protected:
   std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelvis_orientation_ptr;
 
   std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointSecondOrder> _steering_ptr;
-  std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
+  // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
 
+  std::map<std::string, std::unique_ptr<mgnss::higher_level::QrTask> > _qr_wrappers;
+  std::vector<std::unique_ptr<mgnss::higher_level::QpAggravated> > _qp_aggravated;
   // std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
 
   std::unique_ptr<mwoibn::hierarchical_control::controllers::Actions> _ik_ptr;
@@ -327,6 +331,10 @@ protected:
 
   std::map<std::string, mwoibn::hierarchical_control::tasks::BasicTask*> _tasks;  // Adding that only helps with automatic IK generation
   std::map<std::string, std::shared_ptr<mwoibn::hierarchical_control::actions::Task> > _actions;  // Adding that only helps with automatic IK generation
+
+  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_joint__;
+  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;
+
 
 
   double rate = 200;
@@ -373,9 +381,9 @@ virtual void _setInitialConditions();
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
 virtual void _initIK(YAML::Node config);
-virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config);
-virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type);
-
+virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config, YAML::Node full_config);
+virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type, YAML::Node full_config);
+double _readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain );
 
 void _create(YAML::Node config);
 

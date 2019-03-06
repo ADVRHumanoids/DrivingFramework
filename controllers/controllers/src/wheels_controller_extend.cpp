@@ -8,8 +8,8 @@ mgnss::controllers::WheelsControllerExtend::WheelsControllerExtend(mwoibn::robot
 
 void mgnss::controllers::WheelsControllerExtend::_create(YAML::Node config){
         _createTasks(config);
-        _initIK(config);
         _allocate();
+        _initIK(config);
 }
 
 
@@ -177,7 +177,7 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
 
         if(_steering_ptr != nullptr)
           _steering_ptr->start();
-          
+
 
 }
 
@@ -213,6 +213,6 @@ void mgnss::controllers::WheelsControllerExtend::log(mwoibn::common::Logger& log
            logger.add("force_" + std::to_string(point+1) + "_" + char('x'+i), _steering_ptr->getForce()[3*point+i]);
        }
    }
-    * 
+    *
     */
 }

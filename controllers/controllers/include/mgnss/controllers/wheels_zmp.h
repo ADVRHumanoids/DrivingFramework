@@ -204,8 +204,8 @@ virtual void nextStep(){
     // }
     // else{
       // std::cout << "nextStep::shape" << std::endl;
-      // shape__->solve();
-      // std::cout << "steerJacobian\n" << state_machine__->steerJacobian() << std::endl;
+      _qr_wrappers["SHAPE"]->solve();
+      std::cout << "SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
       // shape__->solve();
       // new_shape__->solve();
       // mwoibn::VectorN world__ = shape__->raw().head<8>();// this is in the world frame?
@@ -251,14 +251,9 @@ virtual void nextStep(){
 
     steering();
 
-   //  if (state_machine__->state()){
-   //     for(int i = 0; i < 4; i++)
-   //        _modified_support.segment<2>(3*i)  -= restore__->get().segment<2>(2*i) * _robot.rate();
-   //      }
-   // else {
-   //     for(int i = 0; i < 4; i++)
-   //        _modified_support.segment<2>(3*i)  -= shape__->get().segment<2>(2*i) * _robot.rate();
-   //      }
+//       for(int i = 0; i < 4; i++)
+//          _modified_support.segment<2>(3*i)  -= _qr_wrappers["SHAPE"]->get().segment<2>(2*i) * _robot.rate();
+
    //
    //  mwoibn::Vector3 temp_state__ = mwoibn::Vector3::Zero();
    //  for(int i = 0; i < 4; i++){
@@ -294,7 +289,7 @@ protected:
   // std::unique_ptr<mgnss::higher_level::SupportShapingV6> new_shape__;
 
   // std::unique_ptr<mgnss::higher_level::SupportShapingV5> shape_2__;
-  // std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
+  std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
   //std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
   // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_joint__;
   // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;

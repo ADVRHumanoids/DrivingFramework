@@ -42,13 +42,12 @@ public:
   ~StateMachine(){}
 
   void init();
-  void update(const mwoibn::VectorN& last_state);
+  void update();
 
-  bool state(){ return _state; }
+  // bool state(){ return _state; }
 
-  double time(){return _time;}
 
-  bool restart() { return _restart;}
+  // bool restart() { return _restart;}
 
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steeringFrames(){return _wheel_transforms;}
   std::vector<mwoibn::Matrix3> desiredSteer;
@@ -64,13 +63,13 @@ public:
   const mwoibn::Matrix& stateJacobian(){return _state_jacobian;}
   const mwoibn::Matrix& worldJacobian(){return _world_jacobian;}
   // const mwoibn::Matrix& steerJacobian(){return _steer_jacobian;}
-  const mwoibn::Matrix& desiredJacobian(){return _desired_jacobian;}
+  // const mwoibn::Matrix& desiredJacobian(){return _desired_jacobian;}
   const mwoibn::VectorN& stateOffset(){return _state_offset;}
-  const mwoibn::VectorN& nextStateOffset(){return _next_state_offset;}
+  // const mwoibn::VectorN& nextStateOffset(){return _next_state_offset;}
 
   mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus>& accelerations(){return _torus_acceleration;}
   const mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& wheelOrientation(){return _wheel_orientation;}
-  
+
   void log(mwoibn::common::Logger& logger);
   // bool valid();
 
@@ -84,12 +83,11 @@ protected:
   mwoibn::robot_class::Robot& _robot;
   mwoibn::robot_points::Point& _base;
 
-  unsigned int _size, _counter;
+  unsigned int _size;
   // mgnss::higher_level::SupportShapingV3& _shape;
   // mgnss::higher_level::QrTracking& _restore;
 
-  bool _state, _restart;
-  double _time = 0;
+  // bool _state, _restart;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _wheel_orientation;
 
@@ -106,10 +104,10 @@ protected:
   std::vector<std::pair<int,int>> _margin_pairs;
 
   Limit _margins, _workspace;
-  // mwoibn::VectorN _safety_margins, _max_workspace, _margins, _workspace, _norms;
-  mwoibn::VectorN _norms, _state_offset, _next_state_offset;
-  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian, _desired_jacobian;
-  // mwoibn::Matrix _margins_jacobian, _workspace_jacobian;
+
+  mwoibn::VectorN _norms, _state_offset;//, _next_state_offset;
+  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian;//, _desired_jacobian;
+
   mwoibn::Matrix3 _support_jacobian;
   mwoibn::Vector3 _support_offset;
 

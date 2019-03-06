@@ -17,6 +17,8 @@
 #include <mwoibn/hierarchical_control/actions/compute.h>
 
 #include <mgnss/higher_level/qp_action.h>
+#include <mgnss/higher_level/qp_aggravated.h>
+
 #include <mgnss/higher_level/qr_task_wrapper.h>
 
 namespace mgnss
@@ -210,7 +212,10 @@ std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelv
 std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPoint> _steering_ptr;
 
 std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
-std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
+// std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
+std::map<std::string, std::unique_ptr<mgnss::higher_level::QrTask> > _qr_wrappers;
+std::vector<std::unique_ptr<mgnss::higher_level::QpAggravated> > _qp_aggravated;
+
 
 std::unique_ptr<mwoibn::hierarchical_control::controllers::Actions> _ik_ptr;
 
@@ -234,8 +239,11 @@ std::vector<std::string> _log_names;
 virtual void _setInitialConditions();
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
-virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config);
-virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type);
+virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config, YAML::Node full_config);
+
+virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type, YAML::Node full_config);
+virtual double _readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain);
+
 virtual void _initIK(YAML::Node config);
 //virtual void _initSteering(YAML::Node config, std::function<>);
 
