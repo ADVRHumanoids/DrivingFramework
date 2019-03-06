@@ -68,13 +68,6 @@ void mgnss::higher_level::Steering8::_merge(int i){
         // std::cout << std::fixed;
         // std::cout << i << "\t" << _v_icm[i] << std::endl;
 
-        // std::cout << "Kicm\t" << _K_icm * _v_icm[i] << ", Ksp\t" << _K_sp * _v_sp[i]
-        //           << ", Ksp v_sp\t" << _K_sp * scale * _v_sp[i]
-        //           << ", scale\t" << scale
-        //           << ", K ratio\t" << std::fabs(_K_icm*_v_icm[i])/std::fabs(_K_sp*_v_sp[i])
-        //           << std::endl;
-
-
 
         _raw[i] = _b[i];
         _limited[i] = _b[i];
@@ -84,6 +77,14 @@ void mgnss::higher_level::Steering8::_merge(int i){
         _b[i] = _pb[i] + _damp[i] * (_limited[i] - _pb[i]); // do give the result in the world frame
 
         _b_st[i] = _b[i] + _heading;
+
+        // std::cout << "Kicm\t" << _K_icm * _v_icm[i] << ", Ksp\t" << _v_sp[i]
+        //           << ", Ksp v_sp\t" << _K_sp * scale * _v_sp[i]
+        //           << ", scale\t" << scale
+        //           << ", damp\t" << _damp[i]
+        //           << ", Ksp\t" << _K_sp
+        //           << ", _b_st[i]\t" << _b_st[i]
+        //           << std::endl;
 }
 
 void mgnss::higher_level::Steering8::_steerICM(int i, const mwoibn::Vector3 next_step){

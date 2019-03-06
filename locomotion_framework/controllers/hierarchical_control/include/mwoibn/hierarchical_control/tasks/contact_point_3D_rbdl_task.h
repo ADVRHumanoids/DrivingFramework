@@ -81,14 +81,14 @@ protected:
     {
 
       _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
-      // _error.segment<3>(3*i) = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)); // 10 is for a task gain should be automatic
-      mwoibn::VectorN test__ = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i));
-      _error[i] = test__[0];
+      _error.segment<3>(3*i) = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)); // 10 is for a task gain should be automatic
+      // mwoibn::VectorN test__ = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i));
+      // _error[i] = test__[0];
 
       // std::cout << "_minus\t" << _minus[i].get().transpose() << std::endl;
 
-      // if (_selector[i])
-        // _error.segment<2>(3*i+1).setZero();
+      if (_selector[i])
+        _error.segment<2>(3*i+1).setZero();
         // std::cout << "test__\t" << test__.transpose() << std::endl;
 
       _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
@@ -106,16 +106,16 @@ protected:
 
     for (int i = 0; i < _contacts.size(); i++)
     {
-      // _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
-      mwoibn::Matrix _temp_jacobian = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
+      // mwoibn::Matrix _temp_jacobian = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
       _projected = _ground_normal*_ground_normal.transpose();
       mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
       _rot_project = _rot*_projected;
       _rot = _wheel_transforms[i]->rotation.transpose()*_rot_project;
-      // _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
-      _jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
-      // if (_selector[i])
-      //   _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();
+      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
+      // _jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
+      if (_selector[i])
+        _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();
     }
 
     // std::cout << "_jacobian\n" << _jacobian.transpose() << std::endl;

@@ -71,7 +71,7 @@ ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Rob
           _wheel_transforms.push_back(std::unique_ptr<mwoibn::robot_points::Rotation>(
                     new mwoibn::robot_points::GroundWheel(torus_->axis(), torus_->groundNormal())));
           _support.add(std::move(torus_));
-          _contacts.add(mwoibn::dynamic_points::TorusVelocity(_support.end(-1), _robot));
+          _contacts.add(mwoibn::dynamic_points::TorusVelocity(_support.end(0), _robot));
 
       }
 
@@ -167,7 +167,7 @@ virtual void updateState() final {
 
     virtual const mwoibn::Vector3& getVelocityReference(int i)
     {
-      _point.noalias() = _worldToBase(_wheel_transforms[i]->rotation*_velocity.segment<3>(3*i));
+      _point.noalias() = _q_twist.transposed().rotate(_wheel_transforms[i]->rotation*_velocity.segment<3>(3*i));
       return _point;
     }
     virtual const mwoibn::Vector3& getPointStateReference(int i)
@@ -195,7 +195,7 @@ virtual void claimContact(int i) { _selector[i] = false; }
 
 void setVelocity(mwoibn::VectorN& velocity){
   for (int i = 0; i < _contacts.size(); i++)
-    _velocity_ref.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
+    _velocity_ref.segment<3>(3*i) = velocity.segment<3>(3*i);
 }
 
 virtual double heading(){
@@ -252,7 +252,7 @@ protected:
 
       _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
 
-      _velocity.segment<2>(2*i) = (_velocity_ref.segment<3>(3*i) + _contacts[i].getConstant()).head<2>();
+      _velocity.segment<2>(2*i) = (_wheel_transforms[i]->rotation.transpose()*(_velocity_ref.segment<3>(3*i) + _contacts[i].getConstant())).head<2>();
     }
 
     std::cout << "_error\t" << _error.transpose() << std::endl;
