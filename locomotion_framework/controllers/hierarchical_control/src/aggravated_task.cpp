@@ -66,6 +66,7 @@ void mwoibn::hierarchical_control::AggravatedTask::updateError(){
                 for(int i = 0; i < task.first.size(); i++) {
                         if(!task.first[i]) continue;
                         _error[row] = task.second.getError()[i];
+                        _velocity[row] = task.second.getVelocity()[i];
                         row++;
                 }
         }

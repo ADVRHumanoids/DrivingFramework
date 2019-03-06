@@ -72,6 +72,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateError(){
                 for(int i = 0; i < std::get<0>(task).size(); i++) {
                         if(!std::get<0>(task)[i]) continue;
                         _error[row] = std::get<2>(task)[i]*std::get<1>(task).getError()[i];
+                        _velocity[row] = std::get<2>(task)[i]*std::get<1>(task).getVelocity()[i];
                         row++;
                 }
         }
