@@ -66,14 +66,15 @@ public:
     // }
 
     virtual void resize(){
-          	double size = 0, rows = 0;
+          	double size = 0, rows = 0, cols = 0;
           	for(auto& point: _points){
               		  size += point->size();
           		      rows += point->rows();
+                    cols = point->cols();
           	}
-          	_jacobian = mwoibn::Matrix::Zero(size, _points[0]->cols());
+          	_jacobian = mwoibn::Matrix::Zero(size, cols);
             _positions = mwoibn::VectorN::Zero(rows);
-            _dofs = _points[0]->cols();
+            _dofs = cols;
     }
 
 
@@ -92,12 +93,23 @@ public:
 
     bool remove(int i)
     {
-      if (i < 0 || i >= _points.size())
-        return false;
+      // std::cout << __PRETTY_FUNCTION__ << std::endl;
+      // std::cout << i << std::endl;
+      // std::cout << _points.size() << std::endl;
+      // std::cout << (std::abs(i) <= _points.size()) << std::endl;
+      if(i < 0 && std::abs(i) <= _points.size()){
+          _points.erase(_points.end() - i);
+          resize();
+          return true;
+      }
 
+      if(i >= 0 && i < _points.size()){
       _points.erase(_points.begin() + i);
       resize();
       return true;
+      }
+
+      return false;
     }
 
     void clear(){
@@ -187,8 +199,10 @@ public:
     typename std::vector<std::unique_ptr<Type>>::const_iterator begin() const {return _points.begin();}
     typename std::vector<std::unique_ptr<Type>>::const_iterator end() const {return _points.end();}
 
-    virtual Type& end(int i) {
-            return *(_points.end()[i]);
+    virtual Type& end(unsigned int i) {
+            int idx = -i - 1;
+            // std::cout << "idx\t" << idx << std::endl;
+            return *(_points.end()[idx]);
     }
 
     virtual Type& operator[](int i) {
