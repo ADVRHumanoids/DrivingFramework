@@ -6,8 +6,9 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
 set(INSTALL_TARGETS "")
@@ -46,8 +47,8 @@ add_library(mgnss_controllers_wheels
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp
-#   src/wheeled_motion_event_v3.cpp
-#   src/wheels_second_order.cpp
+   src/wheeled_motion_event_v3.cpp
+   src/wheels_second_order.cpp
 
 #   src/wheeled_motion_actions.cpp
 #   src/wheeled_motion_merge_v1.cpp

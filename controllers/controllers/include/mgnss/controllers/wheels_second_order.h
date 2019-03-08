@@ -39,16 +39,16 @@
 
 #include <mwoibn/hierarchical_control/tasks/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/tasks/orientation_selective_task.h>
-#include <mgnss/higher_level/qp_action.h>
+#include <mgnss/higher_level/qp/qp_action.h>
 
 #include <mwoibn/robot_points/linear_point.h>
 
 //TEMP
 
 
-#include <mgnss/higher_level/qr_task_wrapper.h>
-#include <mgnss/higher_level/qp_aggravated.h>
-#include <mgnss/higher_level/support_shaping_v4_0.h>
+#include <mgnss/higher_level/qp/tasks/qr_task_wrapper.h>
+#include <mgnss/higher_level/qp/tasks/qp_aggravated.h>
+#include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
 
 #include "mwoibn/robot_points/constant.h"
 

@@ -727,7 +727,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        plugins: [odometry, ground_forces, Nwheels3::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry, ground_forces,
                         #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

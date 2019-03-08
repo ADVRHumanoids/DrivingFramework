@@ -6,7 +6,7 @@
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/robot_points/handler.h"
 #include "mwoibn/common/logger.h"
-#include "mgnss/higher_level/constraint.h"
+#include "mgnss/higher_level/qp/constraints/constraint.h"
 
 
 namespace mgnss

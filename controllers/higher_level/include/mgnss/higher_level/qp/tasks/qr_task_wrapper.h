@@ -4,10 +4,10 @@
 // #include "eiquadprog/eiquadprog.hh" //?
 // #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
-#include "mgnss/higher_level/qr_joint_space_v2.h"
+#include "mgnss/higher_level/qp/tasks/qr_joint_space_v2.h"
 // #include "mwoibn/robot_points/handler.h"
 // #include "mwoibn/common/logger.h"
-// #include "mgnss/higher_level/constraint.h"
+// #include "mgnss/higher_level/qp/constraints/constraint.h"
 
 
 namespace mgnss
@@ -52,7 +52,7 @@ virtual void _update(){
 
       _task_state = _gain.cwiseProduct(_basic_task.getError()) + _basic_task.getVelocity();
       QRJointSpaceV2::_update();
-      
+
 
       // std::cout << "_task_state\t" << _task_state.transpose() << std::endl;
       // std::cout << "_equality\t" << _equality.state.size() << std::endl;

@@ -2,7 +2,7 @@
 #include "mgnss/higher_level/steering_v4.h"
 #include <mwoibn/hierarchical_control/controllers/default.h>
 #include <mgnss/higher_level/previous_task.h>
-#include <mgnss/higher_level/joint_constraint.h>
+#include <mgnss/higher_level/qp/constraints/joint_constraint.h>
 
 
 mgnss::controllers::WheelsController::WheelsController(mwoibn::robot_class::Robot& robot)

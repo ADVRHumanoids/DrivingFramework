@@ -62,18 +62,12 @@ add_library(steering
 
 
  add_library(support_shaping
-    src/support_shaping.cpp
-    src/support_shaping_v2_0.cpp
-    src/support_shaping_v3_0.cpp
-    src/support_shaping_v4_0.cpp
-    src/support_shaping_v5_0.cpp
-    src/support_shaping_v6_0.cpp
-    src/qr_tracking.cpp
-    src/qr_task.cpp
-    src/qr_joint_space.cpp
-    src/qr_joint_space_v2.cpp
-    src/qp_aggravated.cpp
-
+    src/qp/tasks/support_shaping_v4_0.cpp
+    src/qp/tasks/support_shaping_v6_0.cpp
+    src/qp/tasks/qr_tracking.cpp
+    src/qp/tasks/qr_task.cpp
+    src/qp/tasks/qr_joint_space_v2.cpp
+    src/qp/tasks/qp_aggravated.cpp
     src/state_machine.cpp
   )
   add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})

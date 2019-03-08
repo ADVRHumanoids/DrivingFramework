@@ -1,5 +1,5 @@
-#ifndef __MGNSS_HIGHER_LEVEL_SUPPORT_CONSTRAINT_H
-#define __MGNSS_HIGHER_LEVEL_SUPPORT_CONSTRAINT_H
+#ifndef __MGNSS__HIGHER_LEVEL__CONSTRAINT_H
+#define __MGNSS__HIGHER_LEVEL__CONSTRAINT_H
 
 #include "eiquadprog/eiquadprog.hh" //?
 #include "mwoibn/robot_class/robot.h"
@@ -14,6 +14,7 @@ namespace mgnss
 namespace higher_level
 {
 
+
 class Constraint{
 
   public:
@@ -21,6 +22,8 @@ class Constraint{
     Constraint(int size, int vars){
       resize(size, vars);
     }
+
+    auto clone() {return std::unique_ptr<Constraint>(clone_impl()); }
 
     void resize(int size, int vars){
       if(vars == 0) size = 0;
@@ -44,6 +47,9 @@ class Constraint{
     int size(){return state.size() ;}
 
     virtual void update(){}
+
+  protected:
+    virtual Constraint* clone_impl() const {return new Constraint(*this);}
 
 };
 

@@ -1,8 +1,7 @@
 #ifndef __MGNSS__HIGHER_LEVEL__STATE_MACHINE_H
 #define __MGNSS__HIGHER_LEVEL__STATE_MACHINE_H
 
-#include "mgnss/higher_level/support_shaping_v3_0.h"
-#include "mgnss/higher_level/constraint.h"
+#include "mgnss/higher_level/qp/constraints/constraint.h"
 
 #include "mwoibn/robot_class/robot.h"
 // #include "mwoibn/hierarchical_control/tasks/controller_task.h"

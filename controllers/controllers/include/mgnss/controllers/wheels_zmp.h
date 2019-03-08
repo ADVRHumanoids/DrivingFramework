@@ -31,12 +31,12 @@
 #include <mwoibn/dynamic_models/basic_model.h>
 
 #include <mgnss/higher_level/state_machine.h>
-#include <mgnss/higher_level/support_shaping_v4_0.h>
-#include <mgnss/higher_level/support_shaping_v6_0.h>
+#include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
+#include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
-#include <mgnss/higher_level/qr_tracking.h>
-#include <mgnss/higher_level/qr_joint_space_v2.h>
-#include <mgnss/higher_level/joint_constraint.h>
+#include <mgnss/higher_level/qp/tasks/qr_tracking.h>
+#include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
+#include <mgnss/higher_level/shape_action.h>
 
 #include "mwoibn/robot_points/constant.h"
 
@@ -167,15 +167,41 @@ virtual void nextStep(){
       state_machine__->update();
       _qr_wrappers["SHAPE"]->update();
       _qr_wrappers["SHAPE"]->solve();
-      std::cout << "get SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
-      std::cout << "raw SHAPE\t" << _qr_wrappers["SHAPE"]->raw().transpose() << std::endl;
+      // _qr_wrappers["SHAPE_JOINT"]->update();
+      // _qr_wrappers["SHAPE_JOINT"]->solve();
 
+      // std::cout << "get SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
+      // std::cout << "raw SHAPE\t" << _qr_wrappers["SHAPE"]->raw().transpose() << std::endl;
+      // std::cout << "get SHAPE_JOINT\t" << _qr_wrappers["SHAPE_JOINT"]->get().transpose() << std::endl;
+      // std::cout << "raw SHAPE_JOINT\t" << _qr_wrappers["SHAPE_JOINT"]->raw().transpose() << std::endl;
+      // std::cout << "fin SHAPE_JOINT\t" << (state_machine__->stateJacobian()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->stateOffset()).transpose() << std::endl;
+      // std::cout << "CAMBER error\t" << (_leg_tasks["CAMBER"].first.getError()).transpose() << std::endl;
+      // std::cout << "CAMBER solution\t" << (_leg_tasks["CAMBER"].first.getJacobian()*_robot.command.velocity.get()).transpose() << std::endl;
+      // std::cout << "CAMBER SHAPE_JOINT\t" << ( _leg_tasks["CAMBER"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
+      // std::cout << "STEERING SHAPE_JOINT\t" << ( _leg_tasks["STEERING"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
+      // std::cout << "CONTACT_POINTS SHAPE_JOINT\t" << ( _leg_tasks["CONTACT_POINTS"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
+      //
+      // std::cout << "CAMBER current";
+      // for(auto& task: _leg_tasks["CAMBER"].second)
+      //   std::cout << "CAMBER current\t" << task.getCurrent();
+      // std::cout << std::endl;
+      //
+      //
+      // for(int i = 0; i < 4; i++){
+      //   mwoibn::Vector3 temp__;
+      //   temp__.setZero();
+      //   temp__.head<2>() = (state_machine__->stateJacobian()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->stateOffset()).segment<2>(2*i);
+      //   std::cout << i << "\tste SHAPE_JOINT\t" << (state_machine__->steeringFrames()[i]->rotation*(temp__ )).transpose() << std::endl;
+      // }
 
-
-      for(int i = 0; i < 4; i++)
-         _modified_support.segment<2>(3*i)  = _qr_wrappers["SHAPE"]->get().segment<2>(2*i);
-
+      // for(int i = 0; i < 4; i++)
+         // _modified_support.segment<2>(3*i)  = _qr_wrappers["SHAPE"]->get().segment<2>(2*i);
+    _modified_support.setZero();
     _support += _modified_support*_robot.rate(); // for this mode integrate current command
+
+    std::cout << "_support\t" << _support.transpose() << std::endl;
+    std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
+
     step();
 
     updateBase();
@@ -194,32 +220,15 @@ virtual void nextStep(){
 protected:
 
   mwoibn::VectorN __last_steer;
-  // mwoibn::dynamic_models::BasicModel __dynamics;
   // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
-  // std::unique_ptr<mgnss::higher_level::SupportShapingV6> new_shape__;
 
-  // std::unique_ptr<mgnss::higher_level::SupportShapingV5> shape_2__;
   std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
-  //std::unique_ptr<mgnss::higher_level::QrTracking> restore__;
-  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_joint__;
-  // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;
-
+  std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeAction> shape_action__;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
-  // mwoibn::hierarchical_control::tasks::ContactPointZMPV2* _tracking_task;
-// virtual void _updateSupport()
-// {
-//   for(int i = 0, k = 0; i < _steering_select.size(); i++){
-//         _steering_select[i] ? _steering_ptr_2->setReference(k, _support.segment<3>(3*i)) : _steering_ptr->setReference(i-k, _support.segment<3>(3*i));
-//         k += _steering_select[i];
-//   }
-// }
+  std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
 
 
-// std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPointZMPV2> _steering_ptr_2;
-std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
-
-// mwoibn::VectorBool _steering_select;
 
 
 void _allocate(YAML::Node config);

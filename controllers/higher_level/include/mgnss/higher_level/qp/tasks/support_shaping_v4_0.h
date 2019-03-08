@@ -1,7 +1,7 @@
 #ifndef __MGNSS_HIGHER_LEVEL_SUPPORT_SHAPING_V4_0_H
 #define __MGNSS_HIGHER_LEVEL_SUPPORT_SHAPING_V4_0_H
 
-#include "mgnss/higher_level/qr_task.h"
+#include "mgnss/higher_level/qp/tasks/qr_task.h"
 #include "mwoibn/robot_class/robot.h"
 // #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 

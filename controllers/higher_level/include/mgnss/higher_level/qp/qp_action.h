@@ -4,7 +4,7 @@
 #include "mwoibn/hierarchical_control/actions/primary.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/hierarchical_control/state.h"
-#include "mgnss/higher_level/qr_task.h"
+#include "mgnss/higher_level/qp/tasks/qr_task.h"
 
 namespace mwoibn {
 namespace hierarchical_control {

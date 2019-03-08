@@ -86,7 +86,7 @@ virtual void run(){
         // std::cout << "J*P\n" << _task.getJacobian()*_P << std::endl;
 
         _command.noalias() += _inverser_ptr->getInverse() * _errors;
-        // std::cout << "command\t" << (_task.getJacobian()*_command).transpose() << std::endl;
+        std::cout << "command\t" << (_task.getJacobian()*_command).transpose() << std::endl;
 
 }
 

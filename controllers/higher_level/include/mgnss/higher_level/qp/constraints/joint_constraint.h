@@ -2,7 +2,7 @@
 #define __MGNSS_HIGHER_LEVEL_JOINT_CONSTRAINT_H
 
 #include "mwoibn/robot_class/robot.h"
-#include "mgnss/higher_level/constraint.h"
+#include "mgnss/higher_level/qp/constraints/constraint.h"
 
 
 namespace mgnss
@@ -119,7 +119,7 @@ class JointConstraint: public Constraint{
     std::vector<bool> _velocity_dofs, _position_dofs;
 
     bool _velocity = false, _position = false;
-
+    virtual JointConstraint* clone_impl() const override {return new JointConstraint(*this);}
 
 };
 

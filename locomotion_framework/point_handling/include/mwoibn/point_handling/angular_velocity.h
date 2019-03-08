@@ -54,8 +54,7 @@ public:
 
   virtual Point::Current
   getWorld(bool update = false) const {
-    Point::Current current;
-    current = CalcPointVelocity6D(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false).head<3>();
+    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
   /** @brief set new tracked point giving data in a world frame*/
   virtual void getWorld(Point::Current& current, bool update = false) const {

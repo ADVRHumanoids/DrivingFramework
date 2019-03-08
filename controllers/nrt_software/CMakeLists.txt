@@ -16,7 +16,10 @@ endif()
 
 find_package(XCM REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
 
 #include(MacroYCMInstallLibrary)
@@ -245,16 +248,16 @@ LIST( APPEND INSTALL_TARGETS
 #    set_xeno_flags(NwheelsWorld)
 #  endif()
 
-#    LIST( APPEND INSTALL_TARGETS Nwheels3 )
-#
-#    add_library(Nwheels3 SHARED
-#       src/plugins/wheels_3.cpp
-#     )
-#    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
-#    target_link_libraries(Nwheels3
-#       ${catkin_LIBRARIES}
-#       ${XCM_LIBRARIES}
-#     )
+    LIST( APPEND INSTALL_TARGETS Nwheels3 )
+
+    add_library(Nwheels3 SHARED
+       src/plugins/wheels_3.cpp
+     )
+    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(Nwheels3
+       ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
+     )
 
 #  if ( Xenomai_FOUND )
 #    message(WARNING "set_xeno_flags")
@@ -304,21 +307,21 @@ LIST( APPEND INSTALL_TARGETS
          ${XCM_LIBRARIES}
     )
 
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(NwheelsSecondOrder)
-#  endif()
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(NwheelsSecondOrder)
+  endif()
 
-#  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
+  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
 
-#  add_library(NwheelsSecondOrder SHARED
-#     src/plugins/wheels_second_order.cpp
-#   )
-#  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
-#  target_link_libraries(NwheelsSecondOrder
-#     ${catkin_LIBRARIES}
-#     ${XCM_LIBRARIES}
-#)
+  add_library(NwheelsSecondOrder SHARED
+     src/plugins/wheels_second_order.cpp
+   )
+  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(NwheelsSecondOrder
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+)
 
 if ( Xenomai_FOUND )
 message(WARNING "set_xeno_flags")

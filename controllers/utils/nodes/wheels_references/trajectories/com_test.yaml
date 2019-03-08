@@ -39,7 +39,7 @@ z cp ref:
 # predefined base references
 base ref:
   - [0.0, 0.0, 0.0, 0.0]
-  - [-0.0, -0.3, 0.0, 0.0]
+  - [0.0, 0.0, 0.0, 0.4]
 
 cs ref:
   - [0.0, 0.0, 0.0, 0.0]
@@ -58,7 +58,7 @@ pattern:
     y_cp: 0
     z_cp: 0
     base: 1
-    cs: 1
+    cs: 0
   4:
     type: move
     x_cp: 7

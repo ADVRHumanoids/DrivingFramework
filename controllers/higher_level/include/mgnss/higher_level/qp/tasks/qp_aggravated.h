@@ -2,7 +2,7 @@
 #define __MGNSS_HIGHER_LEVEL_QP_AGGRAVATED_H
 
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
-#include "mgnss/higher_level/qr_task.h"
+#include "mgnss/higher_level/qp/tasks/qr_task.h"
 
 
 namespace mgnss

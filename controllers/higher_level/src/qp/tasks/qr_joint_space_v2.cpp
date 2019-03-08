@@ -1,4 +1,4 @@
-#include "mgnss/higher_level/qr_joint_space_v2.h"
+#include "mgnss/higher_level/qp/tasks/qr_joint_space_v2.h"
 // #include <range/v3/view/zip.hpp>
 // #include <range/v3/view/concat.hpp>
 
@@ -21,6 +21,7 @@ void mgnss::higher_level::QRJointSpaceV2::init(){
     equality.add(Constraint(constraint->size(), _vars));
 
   for (auto& constraint: _task.soft_inequality)
+
     soft_inequality.add(Constraint(constraint->size(), _vars));
 
   for (auto& constraint: _task.hard_inequality)

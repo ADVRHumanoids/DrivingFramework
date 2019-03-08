@@ -17,7 +17,7 @@
 #include "mwoibn/common/logger.h"
 
 // #include "mgnss/higher_level/state_machine.h"
-#include "mgnss/higher_level/constraint.h"
+#include "mgnss/higher_level/qp/constraints/constraint.h"
 
 namespace mgnss
 {

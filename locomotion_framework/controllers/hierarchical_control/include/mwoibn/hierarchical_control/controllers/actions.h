@@ -83,6 +83,26 @@ virtual void addAction(actions::Task& task){
         std::cout << "hierarchical_control::addAction: added action at the end of the stack" << std::endl;
 }
 
+virtual void addAfter(actions::Task& new_task, actions::Task& old_task){
+        if(!_map.exist(old_task.baseAction().getTask()))
+          throw std::runtime_error(std::string("Could not add action to the stack , unknown reference task."));
+
+
+          // it should check if tasks has already been in the stack
+        _map[new_task.baseAction().getTask()] = &new_task;
+
+        auto i = ranges::find(_active_stack, &old_task);
+
+        if(i == ranges::end(_active_stack))
+          throw std::runtime_error(std::string("Could not add action to the stack , unknown reference task."));
+
+        i++;
+        _active_stack.insert( i, &new_task );
+
+        std::cout << "hierarchical_control::addAction: added action at given position " << std::endl;
+}
+
+
 maps::ActionsMap& map(){
         return _map;
 }

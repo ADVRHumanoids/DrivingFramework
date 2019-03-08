@@ -1,4 +1,4 @@
-#include "mgnss/higher_level/qr_task.h"
+#include "mgnss/higher_level/qp/tasks/qr_task.h"
 
 
 mgnss::higher_level::QrTask::QrTask(int vars, int slack): _vars(vars), _slack(slack), _llt(vars){

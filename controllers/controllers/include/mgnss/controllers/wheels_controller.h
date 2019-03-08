@@ -16,10 +16,10 @@
 #include <mwoibn/hierarchical_control/actions/task.h>
 #include <mwoibn/hierarchical_control/actions/compute.h>
 
-#include <mgnss/higher_level/qp_action.h>
-#include <mgnss/higher_level/qp_aggravated.h>
+#include <mgnss/higher_level/qp/qp_action.h>
+#include <mgnss/higher_level/qp/tasks/qp_aggravated.h>
 
-#include <mgnss/higher_level/qr_task_wrapper.h>
+#include <mgnss/higher_level/qp/tasks/qr_task_wrapper.h>
 
 namespace mgnss
 {
