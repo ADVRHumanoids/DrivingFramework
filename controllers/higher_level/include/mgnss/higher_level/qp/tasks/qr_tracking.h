@@ -56,7 +56,7 @@ protected:
   mwoibn::robot_class::Robot& _robot;
 
   int _size = 4;
-  double _trace, cost__, _slack, _vars, _gain;
+  double _trace, _optimal_cost, _slack, _vars, _gain;
   mwoibn::VectorN _safety, _linear_cost, _vector_cost_, _desired, _max_workspace;
   mwoibn::Matrix _quadratic_cost;
 

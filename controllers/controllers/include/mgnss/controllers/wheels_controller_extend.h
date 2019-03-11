@@ -79,52 +79,6 @@ const mwoibn::VectorN& errorSteer(){
         return _leg_tasks["STEERING"].first.getError();
 }
 
-// const mwoibn::VectorN& getSteerICM(){
-//         return _steering_ref_ptr->getICM();
-// }
-// const mwoibn::VectorN& getSteerSP(){
-//         return _steering_ref_ptr->getSP();
-// }
-// const mwoibn::VectorN& getVelICM(){
-//         return _steering_ref_ptr->vICM();
-// }
-// const mwoibn::VectorN& getVelSP(){
-//         return _steering_ref_ptr->vSP();
-// }
-// const mwoibn::VectorN& getDampingICM(){
-//         return _steering_ref_ptr->getDampingICM();
-// }
-// const mwoibn::VectorN& getDampingSP(){
-//         return _steering_ref_ptr->getDampingSP();
-// }
-
-// const mwoibn::VectorN& getVel(){
-//         return _steering_ref_ptr->v();
-// }
-// const mwoibn::VectorN& getDamp(){
-//         return _steering_ref_ptr->damp();
-// }
-// const mwoibn::VectorN& rawSteer(){
-//         return _steering_ref_ptr->getLimited();
-// }
-// const mwoibn::VectorN& pureSteer(){
-//         return _steering_ref_ptr->getRaw();
-// }
-
-//
-// virtual bool isDoneSteering(const double eps) const
-// {
-//         return _isDone(_leg_tasks["STEERING"].first, eps);
-// }
-// virtual bool isDonePlanar(const double eps) const
-// {
-//         return _isDone(*_steering_ptr, eps);
-// }
-// virtual bool isDoneWheels(const double eps) const
-// {
-//         return _isDone(_leg_tasks["CAMBER"].first, eps);
-// }
-
 const mwoibn::VectorInt& countResteer(){
         return _reset_count;
 }

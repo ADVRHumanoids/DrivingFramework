@@ -7,7 +7,7 @@
   <!-- which inertia parameters should be loaded -->
   <arg name="inertia_param" default="original"/>
   <arg name="kinematic_param" default="original"/>
-
+  <arg name="control_limits" default="control"/>
   <!-- centauro model configuration parameters -->
   <!-- centauro modules -->
   <arg name="arms" default="true"/>
@@ -101,8 +101,21 @@
                    ARM_SENSORS:=false             LEG_SENSORS:=true
                    FT_SENSORS:=true                BUMBERS:=true                         IMU:=true
                    VISUAL_MODEL:=$(arg visual_model)            COLLISION_MODEL:=$(arg collision_model)
-                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)
+                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)       LIMITS:=$(arg control_limits)
         "/>
+
+  <param name="robot_control"
+         command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
+                   GAZEBO:=false                        MIDDLEWARE:=none                   XBOT_CONFIG_FILE:=none
+                   STATIC:=false                        LEFT_END_EFFECTOR:=none     RIGHT_END_EFFECTOR:=none   MASS:=0
+                   ARMS:=false                            LEGS:=true                               TORSO:=false                             WHEELS:=true                           HEAD:=false
+                   ARM_ACTUATORS:=false          LEG_ACTUATORS:=true             TORSO_ACTUATORS:=true         WHEELS_ACTUATORS:=true       HEAD_ACTUATORS:=false
+                   ARM_SENSORS:=false             LEG_SENSORS:=true
+                   FT_SENSORS:=true                BUMBERS:=true                         IMU:=true
+                   VISUAL_MODEL:=$(arg visual_model)            COLLISION_MODEL:=$(arg collision_model)
+                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)         LIMITS:=$(arg control_limits)
+        "/>
+
 
   <param name="robot_lower_body"
          command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
@@ -113,7 +126,7 @@
                    ARM_SENSORS:=false             LEG_SENSORS:=true
                    FT_SENSORS:=true                BUMBERS:=true                         IMU:=true
                    VISUAL_MODEL:=$(arg visual_model)            COLLISION_MODEL:=$(arg collision_model)
-                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)
+                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)         LIMITS:=$(arg control_limits)
         "/>
   <param name="robot_upper_body"
          command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
@@ -124,7 +137,7 @@
                    ARM_SENSORS:=false             LEG_SENSORS:=true
                    FT_SENSORS:=true                BUMBERS:=true                         IMU:=true
                    VISUAL_MODEL:=$(arg visual_model)            COLLISION_MODEL:=$(arg collision_model)
-                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)
+                   INERTIA_PARAM:=$(arg inertia_param)          KINEMATIC_PARAM:=$(arg kinematic_param)      LIMITS:=$(arg control_limits)
         "/>
   <param name="robot_srdf" textfile="$(find configs)/mgnss/configs/mwoibn/srdf/centauro_full_wheels.srdf"/>
   <param name="mwoibn_config" value="$(find configs)/mgnss/configs/mwoibn/configs/mwoibn_2_5.yaml"/>

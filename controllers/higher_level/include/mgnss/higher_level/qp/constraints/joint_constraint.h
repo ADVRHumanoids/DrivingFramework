@@ -64,6 +64,12 @@ class JointConstraint: public Constraint{
 
     virtual void update(){
       // if(_velocity){
+
+      // std::cout << __PRETTY_FUNCTION__;
+      // for(auto& id: _dofs)
+      //   std::cout << "\t" << id;
+      // std::cout << std::endl;
+
       for(int i = 0; i < _dofs.size(); i++){
           bool velocity = _velocity && _velocity_dofs[i];
           bool position = _position && _position_dofs[i];
@@ -93,14 +99,14 @@ class JointConstraint: public Constraint{
       // auto select =  mwoibn::eigen_utils::toVector<mwoibn::Scalar>(state) | ranges::action::remove_if([](int i){return i > 0;}) ;
       auto select = mwoibn::eigen_utils::toVector<mwoibn::Scalar>(state);
       for(auto&& zip:  ranges::view::zip( _dofs, select )){
-        if(std::get<1>(zip) < 0)
-        std::cout << "joint_limits\t" << std::get<0>(zip) << ", " << _robot.getLinks(std::get<0>(zip)) << " " << std::get<1>(zip) << std::endl;
-
-        // std::cout <<  "\t _robot.lower_limits.velocity\t" << -_robot.lower_limits.velocity.get(std::get<0>(zip));
-        // std::cout << "\t _robot.upper_limits.velocity\t" << _robot.upper_limits.velocity.get(std::get<0>(zip));
-        // std::cout << "\t _robot.lower_limits.position\t" <<  (_robot.state.position.get()[std::get<0>(zip)]-_robot.lower_limits.position.get(std::get<0>(zip)))/_robot.rate();
-        // std::cout << "\t _robot.upper_limits.position\t" <<  (-_robot.state.position.get()[std::get<0>(zip)]+_robot.upper_limits.position.get(std::get<0>(zip)))/_robot.rate();
-        // std::cout << std::endl;
+        if(std::get<1>(zip) < 0){
+          std::cout << "joint_limits\t" << std::get<0>(zip) << ", " << _robot.getLinks(std::get<0>(zip)) << " " << std::get<1>(zip) << std::endl;
+          std::cout <<  "\t _robot.lower_limits.velocity\t" << -_robot.lower_limits.velocity.get(std::get<0>(zip));
+          std::cout << "\t _robot.upper_limits.velocity\t" << _robot.upper_limits.velocity.get(std::get<0>(zip));
+          std::cout << "\t _robot.lower_limits.position\t" <<  (_robot.state.position.get()[std::get<0>(zip)]-_robot.lower_limits.position.get(std::get<0>(zip)))/_robot.rate();
+          std::cout << "\t _robot.upper_limits.position\t" <<  (-_robot.state.position.get()[std::get<0>(zip)]+_robot.upper_limits.position.get(std::get<0>(zip)))/_robot.rate();
+          std::cout << std::endl;
+        }
       }
       //   jacobian.topRows(_velocity_dofs.size()) = -_robot.lower_limits.velocity.get(_velocity_dofs);
       // }

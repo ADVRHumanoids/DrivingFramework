@@ -43,6 +43,7 @@ double vars(){return _vars;}
 double slack(){return _slack;}
 
 const Cost& cost(){return _cost;}
+double optimalCost(){return _optimal_cost;}
 // const Constraint& inequality(){return _inequality;}
 
 mwoibn::robot_points::Handler<Constraint> equality, soft_inequality, hard_inequality;
@@ -54,7 +55,7 @@ mwoibn::robot_points::Handler<Constraint> equality, soft_inequality, hard_inequa
 
 protected:
   int _vars, _slack;
-  double _trace, cost__;
+  double _trace, _optimal_cost;
 
   Cost _cost;
 

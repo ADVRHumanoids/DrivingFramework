@@ -234,8 +234,8 @@ protected:
   }
 
   virtual void _allocate(){
-    _init(_contacts.rows(), _contacts.cols());
-    // _init(4, _contacts.cols());
+    // _init(_contacts.rows(), _contacts.cols());
+    _init(4, _contacts.cols());
     _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
     _reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());

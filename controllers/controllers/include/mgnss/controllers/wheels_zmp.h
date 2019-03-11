@@ -164,12 +164,12 @@ virtual void nextStep(){
 
     _support += _support_vel*_robot.rate();
 
-      state_machine__->update();
-      _qr_wrappers["SHAPE"]->update();
-      _qr_wrappers["SHAPE"]->solve();
+      // state_machine__->update();
+      // _qr_wrappers["SHAPE"]->update();
+      // _qr_wrappers["SHAPE"]->solve();
       // _qr_wrappers["SHAPE_JOINT"]->update();
       // _qr_wrappers["SHAPE_JOINT"]->solve();
-
+      //
       // std::cout << "get SHAPE\t" << _qr_wrappers["SHAPE"]->get().transpose() << std::endl;
       // std::cout << "raw SHAPE\t" << _qr_wrappers["SHAPE"]->raw().transpose() << std::endl;
       // std::cout << "get SHAPE_JOINT\t" << _qr_wrappers["SHAPE_JOINT"]->get().transpose() << std::endl;
@@ -181,6 +181,22 @@ virtual void nextStep(){
       // std::cout << "STEERING SHAPE_JOINT\t" << ( _leg_tasks["STEERING"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
       // std::cout << "CONTACT_POINTS SHAPE_JOINT\t" << ( _leg_tasks["CONTACT_POINTS"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
       //
+      // mwoibn::Vector3 pelvis;
+      // pelvis << 1, 1, 1;
+      auto vec_ = {_robot.getLinks("wheels"), _robot.getLinks("hips")};
+      // std::cout << "join\t" << _robot.getDof(ranges::action::join(vec_)) << std::endl;
+
+      mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
+                                                         ranges::action::join(vec_));
+
+      std::cout << "pelvis hight\t" << pelvis_ph.getFullStateWorld().transpose() << std::endl;
+
+      // std::cout << "get SHAPE_JOINT";
+      // auto dofs_ = _robot.getDof(_robot.getLinks("wheels"));
+      // for(int i = 0; i < dofs_.size(); i++){
+      //   std::cout << "\t" << dofs_[i] << "\t" << _qr_wrappers["SHAPE_JOINT"]->raw()[dofs_[i]];
+      // }
+      // std::cout << std::endl;
       // std::cout << "CAMBER current";
       // for(auto& task: _leg_tasks["CAMBER"].second)
       //   std::cout << "CAMBER current\t" << task.getCurrent();
@@ -191,27 +207,27 @@ virtual void nextStep(){
       //   mwoibn::Vector3 temp__;
       //   temp__.setZero();
       //   temp__.head<2>() = (state_machine__->stateJacobian()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->stateOffset()).segment<2>(2*i);
-      //   std::cout << i << "\tste SHAPE_JOINT\t" << (state_machine__->steeringFrames()[i]->rotation*(temp__ )).transpose() << std::endl;
+      //   // std::cout << i << "\tste SHAPE_JOINT\t" << (state_machine__->steeringFrames()[i]->rotation*(temp__ )).transpose() << std::endl;
       // }
 
-      // for(int i = 0; i < 4; i++)
-         // _modified_support.segment<2>(3*i)  = _qr_wrappers["SHAPE"]->get().segment<2>(2*i);
-    _modified_support.setZero();
-    _support += _modified_support*_robot.rate(); // for this mode integrate current command
-
-    std::cout << "_support\t" << _support.transpose() << std::endl;
-    std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
+    //   for(int i = 0; i < 4; i++)
+    //      _modified_support.segment<2>(3*i)  = _qr_wrappers["SHAPE"]->get().segment<2>(2*i);
+    // // _modified_support.setZero();
+    // _support += _modified_support*_robot.rate(); // for this mode integrate current command
+    //
+    // std::cout << "_support\t" << _steering_ptr->getReference().transpose() << std::endl;
+    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
     step();
 
     updateBase();
-    _updateSupport();
+    // _updateSupport();
 
     _next_step[0] = (_linear_vel[0]);
     _next_step[1] = (_linear_vel[1]);
     _next_step[2] = (_angular_vel[2]); // just limit the difference
 
-    steering();
+    // steering();
 
 
 }
@@ -221,6 +237,7 @@ protected:
 
   mwoibn::VectorN __last_steer;
   // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
+  std::unique_ptr<mgnss::higher_level::SteeringShape> _steering_shape_ptr;
 
   std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
   std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeAction> shape_action__;

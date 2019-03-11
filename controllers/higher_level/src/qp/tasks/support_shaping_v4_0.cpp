@@ -3,7 +3,7 @@
 
 
 mgnss::higher_level::SupportShapingV4::SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
-  QrTask(8, 4), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
+  QrTask(8, 12), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
     if(!_is_margin) resize(8,0);
 }
 
@@ -19,7 +19,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 
             if(_is_margin)
               soft_inequality.add(Constraint(4,_vars)); // margin
-              hard_inequality.add(Constraint(8,_vars)); //limit
+              soft_inequality.add(Constraint(8,_vars)); //limit
 
               QrTask::init();
 
@@ -34,7 +34,8 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
               // _vector_cost_[8+i] = 50;
 
               // _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
-              _cost.quadratic.block(_vars, _vars, _slack, _slack) = 100000*mwoibn::Matrix::Identity(_slack,_slack);
+              _cost.quadratic.block(_vars, _vars, 4, 4) = 1e5*mwoibn::Matrix::Identity(4,4);
+              _cost.quadratic.block(_vars+4, _vars+4, 8, 8) = 1e5*mwoibn::Matrix::Identity(_slack,_slack);
 
 }
 
@@ -46,19 +47,21 @@ void mgnss::higher_level::SupportShapingV4::_update(){
     for(int i = 0; i < _size; i++){
       if(_is_margin)
         soft_inequality[0].jacobian.block<4,2>(0,2*i) = _margin.jacobian.middleCols<2>(3*i);
-        hard_inequality[0].state[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.state[i])/_robot.rate();
-        hard_inequality[0].state[4+i] = _workspace.state[i]/_robot.rate();
+        soft_inequality[1].state[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.state[i])/_robot.rate();
+        // soft_inequality[1].state[4+i] = _workspace.state[i]/_robot.rate(); //? what is is
+        soft_inequality[1].state[4+i] = -(0.52*0.52 - _workspace.state[i])/_robot.rate(); //Avoid going under the robot?
     }
 
-    hard_inequality[0].jacobian.block<4,8>(0,0) = -_workspace.jacobian;
-    hard_inequality[0].jacobian.block<4,8>(4,0) = _workspace.jacobian;
+    soft_inequality[1].jacobian.block<4,8>(0,0) = -_workspace.jacobian;
+    soft_inequality[1].jacobian.block<4,8>(4,0) = _workspace.jacobian;
     if(_is_margin)
       soft_inequality[0].state = (_margin.state - _margin.limit)/_robot.rate();
 
     QrTask::_update();
     // std::cout << "soft_inequality\n" << soft_inequality[0].jacobian << std::endl;
     // std::cout << "hard_inequality\n" << hard_inequality[0].jacobian << std::endl;
-    // std::cout << "workspace.state\t" << soft_inequality[1].state.transpose() << std::endl;
+    std::cout << "margin.state\t" << soft_inequality[0].state.transpose() << std::endl;
+    std::cout << "workspace.state\t" << soft_inequality[1].state.transpose() << std::endl;
     // std::cout << "margin.limit\t" << _margin.limit.transpose() << std::endl;
     // std::cout << "workspace.limit\t" << hard_inequality.limit.transpose() << std::endl;
 
@@ -66,7 +69,7 @@ void mgnss::higher_level::SupportShapingV4::_update(){
 
 void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
 
-    logger.add("cost", cost__);
+    logger.add("cost", _optimal_cost);
 
     for (int i = 0; i < _vars; i++)
        logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
@@ -84,7 +87,7 @@ void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
 
 void mgnss::higher_level::SupportShapingV4::_outputTransform(){
 
-  // std::cout << "_cost\t" << cost__ << std::endl;
+  // std::cout << "_cost\t" << _optimal_cost << std::endl;
   mwoibn::Vector3 temp__;
   temp__.setZero();
   // std::cout << "_steering_state\t" << _return_state.transpose() << std::endl;

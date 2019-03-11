@@ -80,16 +80,18 @@ public:
   virtual const Type&
   getWorld(bool update = false) = 0;
 
+  /** @brief Remove - it is unsafe */
   virtual Type
   getWorld(bool update = false) const = 0;
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Type& current,
                         bool update = false) = 0;
 
-  /** @brief get Position in a user-defined reference frame */
+  /** @brief Remove - it is unsafe */
   virtual Type
   getReference(unsigned int refernce_id, bool update = false) const = 0;
 
+  /** @brief Remove - it is unsafe */
   Type
   getReference(std::string reference_name, bool update = false) const{
     return getReference(TempBase<Type>::_checkBody(reference_name), update);

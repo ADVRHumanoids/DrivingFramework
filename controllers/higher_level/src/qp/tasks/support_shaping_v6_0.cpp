@@ -71,7 +71,7 @@ void mgnss::higher_level::SupportShapingV6::_update(){
 //
 void mgnss::higher_level::SupportShapingV6::_outputTransform(){
 
-  // std::cout << "_cost\t" << cost__ << std::endl;
+  // std::cout << "_cost\t" << _optimal_cost << std::endl;
   mwoibn::Vector3 temp__;
   temp__.setZero();
   // std::cout << "_steering_state\t" << _return_state.transpose() << std::endl;

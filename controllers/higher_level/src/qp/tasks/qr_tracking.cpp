@@ -108,7 +108,7 @@ void mgnss::higher_level::QrTracking::_update(){
 
 void mgnss::higher_level::QrTracking::log(mwoibn::common::Logger& logger){
 
-    logger.add("cost", cost__);
+    logger.add("cost", _optimal_cost);
 
     for (int i = 0; i < _vars; i++){
        logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
@@ -136,16 +136,16 @@ void mgnss::higher_level::QrTracking::solve(){
   _update();
 
 
-  cost__ = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
+  _optimal_cost = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
 
   //
-  //std::cout << std::setprecision(16) << "cost__\t" << cost__ << std::endl;
+  //std::cout << std::setprecision(16) << "_optimal_cost\t" << _optimal_cost << std::endl;
 
   mwoibn::Vector3 temp__;
   temp__.setZero();
 
   std::cout << "_optimal_state\t" << _optimal_state.transpose() <<  std::endl;
-  std::cout << "cost__\t" << cost__ <<  std::endl;
+  std::cout << "_optimal_cost\t" << _optimal_cost <<  std::endl;
 
   _optimal_state.head(_vars) += _desired;
 

@@ -119,6 +119,6 @@ void mgnss::higher_level::QpAggravated::_update(){
 
 void mgnss::higher_level::QpAggravated::log(mwoibn::common::Logger& logger){
 
-    logger.add("cost", cost__);
+    logger.add("cost", _optimal_cost);
 
 }

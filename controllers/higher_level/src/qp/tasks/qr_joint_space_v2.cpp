@@ -144,7 +144,7 @@ void mgnss::higher_level::QRJointSpaceV2::log(mwoibn::common::Logger& logger){
       std::cout << "hard_inequality\n" << constraint->state.transpose()  << std::endl;
     }
   }
-    logger.add("cost", cost__);
+    logger.add("cost", _optimal_cost);
     //
     // for (int i = 0; i < _vars; i++){
     //    logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
