@@ -39,13 +39,10 @@ z cp ref:
 # predefined base references
 base ref:
   - [0.0, 0.0, 0.0, 0.0]
-  - [1.08, 0.0, 0.0, 0.0]
-  - [1.23, 0.0, 0.0, 0.0]
-  - [1.60, 0.0, 0.0, 0.0]
-  - [1.70, 0.0, 0.0, 0.0]
-  - [2.6, 0.0, 0.0, 0.0]
-  - [4.0, 0.0, 0.0, 0.0]
-  - [5.0, 0.0, 0.0, 0.0]
+  - [0.0, 0.0, 0.0, 0.87]
+  - [0.0, 0.0, 0.0, 1.0]
+  - [0.0, 0.0, 0.0, 6.28]
+
 
 cs ref:
   - [0.0, 0.0, 0.0, 0.0]
@@ -54,96 +51,47 @@ cs ref:
 # pattern
 pattern:
   1:
-    type: speed
-    motions:
-      - [0,0,0.01]
-      - [0,1,0.01]
-  2:
     type: move
     x_cp: 0
     y_cp: 0
     z_cp: 0
     base: 1
     cs: 0
-  3:
+  2:
     type: speed
     motions:
-      - [3,0,0.03]
-      - [3,1,0.03]
-      - [3,2,0.03]
-      - [3,3,0.03]
+      - [3,0,0.0]
+      - [3,1,0.0]
+      - [3,2,0.0]
+      - [3,3,0.0]
+  3:
+    type: wait
+    steps: 150
   4:
+    type: speed
+    motions:
+      - [3,0,0.1]
+      - [3,1,0.1]
+      - [3,2,0.1]
+      - [3,3,0.1]
+  5:
     type: move
     x_cp: 0
     y_cp: 0
     z_cp: 0
     base: 2
     cs: 0
-  5:
-    type: wait
-    steps: 100
   6:
     type: speed
     motions:
-      - [3,0,0.1]
-      - [3,1,0.1]
-      - [3,2,0.1]
-      - [3,3,0.1]
+      - [3,0,0.10]
+      - [3,1,0.10]
+      - [3,2,0.10]
+      - [3,3,0.10]
   7:
     type: move
     x_cp: 0
     y_cp: 0
     z_cp: 0
     base: 3
-    cs: 0
-  8:
-    type: wait
-    steps: 100
-  9:
-    type: speed
-    motions:
-      - [3,0,0.03]
-      - [3,1,0.03]
-      - [3,2,0.03]
-      - [3,3,0.03]
-  10:
-    type: move
-    x_cp: 0
-    y_cp: 0
-    z_cp: 0
-    base: 4
-    cs: 0
-  11:
-    type: speed
-    motions:
-      - [3,0,0.1]
-      - [3,1,0.1]
-      - [3,2,0.1]
-      - [3,3,0.1]
-  12:
-    type: move
-    x_cp: 0
-    y_cp: 0
-    z_cp: 0
-    base: 5
-    cs: 0
-  13:
-    type: wait
-    steps: 250
-  14:
-    type: move
-    x_cp: 0
-    y_cp: 0
-    z_cp: 0
-    base: 6
-    cs: 0
-  15:
-    type: wait
-    steps: 250
-  16:
-    type: move
-    x_cp: 0
-    y_cp: 0
-    z_cp: 0
-    base: 7
     cs: 0

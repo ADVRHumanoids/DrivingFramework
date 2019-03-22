@@ -22,6 +22,12 @@ public:
   using Point::operator=;
 
 
+  void update(bool jacobian) {
+      //compute();
+      if(jacobian)
+        computeJacobian();
+    }
+
   void compute(){ mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);}
 
   void computeJacobian() {_jacobian.noalias() = point.getOrientationJacobian();}

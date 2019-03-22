@@ -1,6 +1,9 @@
 #include "mgnss/higher_level/qp/tasks/qr_task.h"
 
 
+
+
+
 mgnss::higher_level::QrTask::QrTask(int vars, int slack): _vars(vars), _slack(slack), _llt(vars){
             resize(vars, slack);
 
@@ -16,6 +19,8 @@ void mgnss::higher_level::QrTask::resize(int vars, int slack){
   _cost.size = vars + slack;
 
   _optimal_state.setZero(_cost.size); // state + slack
+  _soft_gains.setZero(slack);
+  _updateGains();
 
   _cost.quadratic.setIdentity(_cost.size,_cost.size); // this should work only with lower body - how?
   _cost.linear.setZero(_cost.size);
@@ -31,13 +36,13 @@ void mgnss::higher_level::QrTask::init(){
     _equality.transpose();
 
     _inequality.resize( hard_inequality.rows()+2*soft_inequality.rows(), _optimal_state.size());
-    _inequality.state.tail(soft_inequality.rows()).setZero();
+    _inequality.setState().tail(soft_inequality.rows()).setZero();
 
-    _inequality.jacobian.block(hard_inequality.rows(),_vars, soft_inequality.rows(), _slack ) = -mwoibn::Matrix::Identity(soft_inequality.rows(), _slack);
-    _inequality.jacobian.block(hard_inequality.rows() + soft_inequality.rows(),_vars, soft_inequality.rows(), _slack ) = -mwoibn::Matrix::Identity(soft_inequality.rows(), _slack);
+    _inequality.setJacobian().block(hard_inequality.rows(),_vars, soft_inequality.rows(), _slack ) = -mwoibn::Matrix::Identity(soft_inequality.rows(), _slack);
+    _inequality.setJacobian().block(hard_inequality.rows() + soft_inequality.rows(),_vars, soft_inequality.rows(), _slack ) = -mwoibn::Matrix::Identity(soft_inequality.rows(), _slack);
 
-    // std::cout << "init\n" << _inequality.jacobian << std::endl;
     _inequality.transpose();
+
 }
 
 void mgnss::higher_level::QrTask::clear(){
@@ -49,10 +54,13 @@ void mgnss::higher_level::QrTask::clear(){
 void mgnss::higher_level::QrTask::_update(){
 
   if(equality.size()){
-    for(auto& constraint: equality) constraint->update();
-    _equality.state = equality.getState();
-    _equality.jacobian.leftCols(_vars) = equality.getJacobian();
+    for(auto& constraint: equality) {
+      constraint->update();
+    }
+    _equality.setState() = equality.getState();
+    _equality.setJacobian().leftCols(_vars) = equality.getJacobian();
 
+    // std::cout << _equality.getState().transpose() << std::endl;
     _equality.transpose();
 
 
@@ -60,22 +68,23 @@ void mgnss::higher_level::QrTask::_update(){
 
   if(hard_inequality.size()){
     for(auto& constraint: hard_inequality) constraint->update();
-    _inequality.state.head(hard_inequality.rows()) = hard_inequality.getState();
-    _inequality.jacobian.block(0,0, hard_inequality.rows(), _vars) = hard_inequality.getJacobian();
+    _inequality.setState().head(hard_inequality.rows()) = hard_inequality.getState();
+    _inequality.setJacobian().block(0,0, hard_inequality.rows(), _vars) = hard_inequality.getJacobian();
   }
 
-  // std::cout << __PRETTY_FUNCTION__  << "\t" << soft_inequality.size() << std::endl;
-  //
-  // std::cout << "2\t" <<  soft_inequality[0].get().transpose() << std::endl;
-  // std::cout << "1\t" << soft_inequality[1].get().transpose() << std::endl;
-  if(soft_inequality.size()){
-    for(auto& constraint: soft_inequality) constraint->update();
 
-    _inequality.state.segment(hard_inequality.rows(), soft_inequality.rows()) = soft_inequality.getState();
-    _inequality.jacobian.block(hard_inequality.rows(),0, soft_inequality.rows(), _vars) =  soft_inequality.getJacobian();
+  if(soft_inequality.size()){
+    for(auto& constraint: soft_inequality) {
+      constraint->update();
+    }
+
+    _inequality.setState().segment(hard_inequality.rows(), soft_inequality.rows()) = soft_inequality.getState();
+    _inequality.setJacobian().block(hard_inequality.rows(),0, soft_inequality.rows(), _vars) =  soft_inequality.getJacobian();
   }
     _inequality.transpose();
 
+    _updateGains();
+    _cost.quadratic.block(_vars, _vars, _slack, _slack) = _soft_gains.asDiagonal();
 }
 
 void mgnss::higher_level::QrTask::solve(){
@@ -85,7 +94,9 @@ void mgnss::higher_level::QrTask::solve(){
     //
      // std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
      // std::cout << "_cost.linear\n" << _cost.linear.transpose() << std::endl;
-     // std::cout << "inequality.state\t" << _inequality.state.transpose() << std::endl;
+     // std::cout << "soft_inequality.state\t" << soft_inequality.getState().transpose() << std::endl;
+     // std::cout << "hard_inequality.state\t" << hard_inequality.getState().transpose() << std::endl;
+     // std::cout << "inequality.state\t" << _inequality.getState().transpose() << std::endl;
      // std::cout << "inequality.jacobian\t" << _inequality.jacobian << std::endl;
      // std::cout << "inequality.jacobian\t" << _inequality.jacobian << std::endl;
      // std::cout << "initial conditions\t" << _optimal_state.transpose() << std::endl;
@@ -101,7 +112,7 @@ void mgnss::higher_level::QrTask::solve(){
     _llt.compute(_cost.quadratic);
     _cost.trace = _cost.quadratic.trace();
 
-    _optimal_cost = solve_quadprog2(_llt, _trace, _cost.linear, _equality.transposed, _equality.state, _inequality.transposed, _inequality.state, _optimal_state);
+    _optimal_cost = solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
     // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);
     _outputTransform();

@@ -21,8 +21,8 @@ class PreviousTask: public Constraint{
     }
 
     virtual void update(){
-      jacobian = _task.getJacobian();
-      state.noalias() = -jacobian*_previous_state;
+      _jacobian = _task.getJacobian();
+      _state.noalias() = -_jacobian*_previous_state;
     }
 
   protected:

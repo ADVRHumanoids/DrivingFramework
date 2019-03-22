@@ -4,7 +4,7 @@
 
 void mgnss::higher_level::QpAggravated::init(){
 
-  _slack = 0;
+  _slack = soft_inequality.rows();
   // for(auto& task: _tasks) task->init();
 
   for(auto& task: _tasks) _slack += task->soft_inequality.rows();
@@ -27,8 +27,8 @@ void mgnss::higher_level::QpAggravated::init(){
 
       if(task->soft_inequality.cols()!= _vars)
         throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile soft_inequality constraint sizes got ") + std::to_string(task->soft_inequality.cols()) + " , expected " + std::to_string(_vars));
-
-      soft_inequality.add(Constraint(task->soft_inequality.rows(), _vars));
+        _updateGains();
+      addSoft(Constraint(task->soft_inequality.rows(), _vars), task->getSoftGain());
     }
 
     if(task->hard_inequality.size()){
@@ -58,8 +58,8 @@ void mgnss::higher_level::QpAggravated::_update(){
     // auto task = std::get<1>(zip);
 
       if(task->equality.size()){
-       equality.end(counter).state = task->equality.getState();
-       equality.end(counter).jacobian = task->equality.getJacobian();
+       equality.end(counter).setState() = task->equality.getState();
+       equality.end(counter).setJacobian() = task->equality.getJacobian();
        ++counter;
        // std::cout << "equality " << idx << std::endl;
        // std::cout << "state\t" << equality[idx].state.transpose() << std::endl;
@@ -72,8 +72,10 @@ void mgnss::higher_level::QpAggravated::_update(){
   RANGES_FOR(auto&& task, ranges::view::reverse(_tasks) ){
 
      if(task->soft_inequality.size()){
-       soft_inequality.end(counter).state = task->soft_inequality.getState();
-       soft_inequality.end(counter).jacobian = task->soft_inequality.getJacobian();
+       soft_inequality.end(counter).setState() = task->soft_inequality.getState();
+       soft_inequality.end(counter).setJacobian() = task->soft_inequality.getJacobian();
+       soft_inequality.end(counter).setGain(task->getSoftGain());
+       _updateGains();
        ++counter;
        // std::cout << "soft_inequality " << idx << std::endl;
        // std::cout << "state\t" << soft_inequality[idx].state.transpose() << std::endl;
@@ -86,8 +88,8 @@ void mgnss::higher_level::QpAggravated::_update(){
    RANGES_FOR(auto&& task, ranges::view::reverse(_tasks) ){
 
      if(task->hard_inequality.size()){
-       hard_inequality.end(counter).state = task->hard_inequality.getState();
-       hard_inequality.end(counter).jacobian = task->hard_inequality.getJacobian();
+       hard_inequality.end(counter).setState() = task->hard_inequality.getState();
+       hard_inequality.end(counter).setJacobian() = task->hard_inequality.getJacobian();
        ++counter;
      }
    }
@@ -114,6 +116,7 @@ void mgnss::higher_level::QpAggravated::_update(){
 
 
   QrTask::_update();
+  // std::cout << "soft_gains\t" << _soft_gains.transpose() << std::endl;
 
 }
 

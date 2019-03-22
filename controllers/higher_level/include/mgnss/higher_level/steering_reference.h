@@ -90,7 +90,10 @@ const mwoibn::VectorN& get() {
         return _b_st;
 }
 void set(mwoibn::VectorN last) {
+        _b = last;
         _b_st = last;
+        _b_sp = last;
+        _b_icm = last;
 }
 
 virtual void setRate(double dt)

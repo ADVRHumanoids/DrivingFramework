@@ -18,8 +18,8 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
           hard_inequality.clear();
 
             if(_is_margin)
-              soft_inequality.add(Constraint(4,_vars)); // margin
-              soft_inequality.add(Constraint(8,_vars)); //limit
+              addSoft(Constraint(4,_vars), 1e2); // margin
+              addSoft(Constraint(8,_vars), 1e2); // wirkspace
 
               QrTask::init();
 
@@ -34,8 +34,8 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
               // _vector_cost_[8+i] = 50;
 
               // _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
-              _cost.quadratic.block(_vars, _vars, 4, 4) = 1e5*mwoibn::Matrix::Identity(4,4);
-              _cost.quadratic.block(_vars+4, _vars+4, 8, 8) = 1e5*mwoibn::Matrix::Identity(_slack,_slack);
+              _cost.quadratic.block(_vars, _vars, 4, 4) = soft_inequality[0].getGain().asDiagonal();
+              _cost.quadratic.block(_vars+4, _vars+4, 8, 8) = soft_inequality[1].getGain().asDiagonal();
 
 }
 
@@ -46,22 +46,22 @@ void mgnss::higher_level::SupportShapingV4::_update(){
 
     for(int i = 0; i < _size; i++){
       if(_is_margin)
-        soft_inequality[0].jacobian.block<4,2>(0,2*i) = _margin.jacobian.middleCols<2>(3*i);
-        soft_inequality[1].state[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.state[i])/_robot.rate();
-        // soft_inequality[1].state[4+i] = _workspace.state[i]/_robot.rate(); //? what is is
-        soft_inequality[1].state[4+i] = -(0.52*0.52 - _workspace.state[i])/_robot.rate(); //Avoid going under the robot?
+        soft_inequality[0].setJacobian().block<4,2>(0,2*i) = _margin.getJacobian().middleCols<2>(3*i);
+        soft_inequality[1].setState()[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.getState()[i])/_robot.rate();
+        // soft_inequality[1].state[4+i] = _workspace.getState()[i]/_robot.rate(); //? what is is
+        soft_inequality[1].setState()[4+i] = -(0.0*0.0 - _workspace.getState()[i])/_robot.rate(); //Avoid going under the robot?
     }
 
-    soft_inequality[1].jacobian.block<4,8>(0,0) = -_workspace.jacobian;
-    soft_inequality[1].jacobian.block<4,8>(4,0) = _workspace.jacobian;
+    soft_inequality[1].setJacobian().block<4,8>(0,0) = -_workspace.getJacobian();
+    soft_inequality[1].setJacobian().block<4,8>(4,0) = _workspace.getJacobian();
     if(_is_margin)
-      soft_inequality[0].state = (_margin.state - _margin.limit)/_robot.rate();
+      soft_inequality[0].setState() = (_margin.getState() - _margin.limit)/_robot.rate();
 
     QrTask::_update();
-    // std::cout << "soft_inequality\n" << soft_inequality[0].jacobian << std::endl;
-    // std::cout << "hard_inequality\n" << hard_inequality[0].jacobian << std::endl;
-    std::cout << "margin.state\t" << soft_inequality[0].state.transpose() << std::endl;
-    std::cout << "workspace.state\t" << soft_inequality[1].state.transpose() << std::endl;
+    // std::cout << "soft_inequality\n" << soft_inequality[0].getJacobian() << std::endl;
+    // std::cout << "hard_inequality\n" << hard_inequality[0].getJacobian() << std::endl;
+    // std::cout << "margin.getState()\t" << soft_inequality[0].getState().transpose() << std::endl;
+    // std::cout << "workspace.getState()\t" << soft_inequality[1].getState().transpose() << std::endl;
     // std::cout << "margin.limit\t" << _margin.limit.transpose() << std::endl;
     // std::cout << "workspace.limit\t" << hard_inequality.limit.transpose() << std::endl;
 
@@ -75,8 +75,8 @@ void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
        logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
 
     for (int i = 0; i < _size; i++){
-       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.state[i]));
-       logger.add(std::string("error_workspace_") + std::to_string(i), _inequality.state[4+i]);
+       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
+       logger.add(std::string("error_workspace_") + std::to_string(i), _inequality.getState()[4+i]);
      }
 
     for (int i = 0; i < _slack; i++)

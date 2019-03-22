@@ -26,8 +26,9 @@ public:
 
 virtual void add(QrTask& task){
   _tasks.push_back(&task);
-
 }
+
+QrTask& task(int i){return *_tasks[i];}
 
 virtual void init(); // alocatte all the memory
 virtual void _update(); // switch to joint space & solve

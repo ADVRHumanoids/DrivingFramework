@@ -40,10 +40,10 @@ public:
 protected:
   XBot::MatLogger::Ptr _logger;
 
-  virtual void _addField(std::string name, double init_value){
+  virtual void _addField(const std::string& name, double init_value){
     _logger->add(name, init_value);
   }
-  virtual void _addEntry(std::string name, double value){
+  virtual void _addEntry(const std::string& name, double value){
     _logger->add(name, value);
   }
 

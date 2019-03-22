@@ -18,12 +18,12 @@ class MinimumLimit: public mgnss::higher_level::Constraint{
 
   public:
     MinimumLimit(const mwoibn::Matrix& jacobian, double limit ): Constraint(jacobian.rows(), jacobian.cols()), _other_jacobian(jacobian){
-        state = -mwoibn::VectorN::Constant(size(), limit);
+        _state = -mwoibn::VectorN::Constant(size(), limit);
     }
 
 
     virtual void update(){
-        jacobian = _other_jacobian;
+        _jacobian = _other_jacobian;
     }
 
   protected:

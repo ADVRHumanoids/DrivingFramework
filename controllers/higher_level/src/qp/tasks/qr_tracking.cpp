@@ -81,14 +81,14 @@ void mgnss::higher_level::QrTracking::_update(){
 
    // this will be variable size set only inactive constraints - active is integrated in a cost function as a linear function add workspace limits
     for(int i = 0; i < _size; i++){
-        jac_.block<4,2>(0,2*i) = _margin.jacobian.middleCols<2>(3*i);
-        _inequality_vector[_size+i] = ((_workspace.limit[i]-_offset_workspace[i])*(_workspace.limit[i]-_offset_workspace[i]) - _workspace.state[i])/_robot.rate();
+        jac_.block<4,2>(0,2*i) = _margin.getJacobian().middleCols<2>(3*i);
+        _inequality_vector[_size+i] = ((_workspace.limit[i]-_offset_workspace[i])*(_workspace.limit[i]-_offset_workspace[i]) - _workspace.getState()[i])/_robot.rate();
    }
-   jac_.bottomRows<4>() = -_workspace.jacobian; // minus dissapears due to the contact form
+   jac_.bottomRows<4>() = -_workspace.getJacobian(); // minus dissapears due to the contact form
 
 
     _inequality_matrix.block(0,0,8,_vars) = jac_.transpose();
-    _inequality_vector.head<4>() = (_margin.state - (_margin.limit + _offset_margin))/_robot.rate();
+    _inequality_vector.head<4>() = (_margin.getState() - (_margin.limit + _offset_margin))/_robot.rate();
 
     // std::cout << "vector\t" << _inequality_vector.transpose() << std::endl;
 
@@ -116,7 +116,7 @@ void mgnss::higher_level::QrTracking::log(mwoibn::common::Logger& logger){
      }
 
     for (int i = 0; i < _size; i++){
-       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.state[i]));
+       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
        logger.add(std::string("error_workspace_") + std::to_string(i), _inequality_vector[4+i]);
      }
 
@@ -144,8 +144,8 @@ void mgnss::higher_level::QrTracking::solve(){
   mwoibn::Vector3 temp__;
   temp__.setZero();
 
-  std::cout << "_optimal_state\t" << _optimal_state.transpose() <<  std::endl;
-  std::cout << "_optimal_cost\t" << _optimal_cost <<  std::endl;
+  // std::cout << "_optimal_state\t" << _optimal_state.transpose() <<  std::endl;
+  // std::cout << "_optimal_cost\t" << _optimal_cost <<  std::endl;
 
   _optimal_state.head(_vars) += _desired;
 

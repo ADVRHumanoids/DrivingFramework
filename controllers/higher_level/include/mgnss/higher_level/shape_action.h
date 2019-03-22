@@ -1,3 +1,4 @@
+
 #ifndef __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_H
 #define __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_H
 
@@ -18,28 +19,37 @@ namespace actions {
 
 class ShapeAction : public Primary {
 public:
-ShapeAction(mgnss::higher_level::QrTask& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
+ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
             std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringShape& steering_reference,
-            mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mgnss::higher_level::StateMachine& state_machine,
+            mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
+            mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
+             mgnss::higher_level::StateMachine& state_machine, mgnss::higher_level::QrTask& unconstrainted,
             hierarchical_control::State& state, mwoibn::Vector3& next_step, double dt) :
             Primary(task, state.memory), _state(state), _qr_task(task), _contact_point(contact_point), _steering(steering),
-            _steering_reference(steering_reference), _aggravated(aggravated), _state_machine(state_machine), _dt(dt), _next_step(next_step){
-    }
+            _steering_reference(steering_reference), _aggravated(aggravated), _angles(angles), _caster(caster), _camber(camber),
+             _state_machine(state_machine), _unconstrainted(unconstrainted), _dt(dt), _next_step(next_step){
+}
 
 
 virtual void run(){
-
-
-
+    _angles.update();
     _state_machine.update();
     _qr_task._update();
     _qr_task.solve();
-
+    // _unconstrainted.solve();
     mwoibn::VectorN desired_steer(4);
     // std::cout << "previous\t" << _state.command.transpose() << std::endl;
 
     // std::cout << "_qr_task\t" << _qr_task.raw().transpose() << std::endl;
-    std::cout << "_cost\t" << _qr_task.optimalCost() << std::endl;
+    // std::cout << "_cost\t" << _qr_task.optimalCost() << std::endl;
+
+    if(std::isinf(_qr_task.optimalCost())){
+        ++infs;
+        // std::cerr << infs << "\t" << _qr_task.optimalCost() << std::endl;
+    }
+    // std::cout << "_quadratic\n" << _qr_task.cost().quadratic << std::endl;
+    // std::cout << "_linear\t" << _qr_task.cost().linear.transpose() << std::endl;
+
     // std::cout << "_steering\t" << _steering[0].getJacobian().transpose() << std::endl;
 
     for(int i =0; i < 4; i++)
@@ -48,15 +58,20 @@ virtual void run(){
 
     // mwoibn::VectorN _modified_support  =  _state_machine.stateJacobian()*_qr_task.raw().head(_contact_point.getJacobian().cols());
     mwoibn::VectorN _modified_support(8);
-    mwoibn::VectorN _support_world  =  (_state_machine.stateJacobian()*_qr_task.get() + _state_machine.stateOffset());
+    _qr_task.task(0).set(_qr_task.raw());
+    _qr_task.task(0).transform();
+    mwoibn::VectorN _support_world  =  (_state_machine.stateJacobian()*_qr_task.task(0).get() + _state_machine.stateOffset());
 
     for(int i =0; i < 4; i++){
       mwoibn::Vector3 test__ = mwoibn::Vector3::Zero();
       test__.head<2>() = _support_world.segment<2>(2*i);
       _modified_support.segment<2>(2*i) = (_state_machine.steeringFrames()[i]->rotation*test__).head<2>();
     }
-    std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
-    std::cout << "desired_steer\t" << desired_steer.transpose() << std::endl;
+    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
+    // std::cout << "unconstrained_support\t" << _unconstrainted.get().transpose() << std::endl;
+
+    // std::cout << "desired_steer\t" << desired_steer.transpose() << std::endl;
+    // std::cout << "_caster\t" << (_caster.getJacobian()*_qr_task.raw().head(_caster.getJacobian().cols())).transpose() << std::endl;
 
     if(std::isinf(_qr_task.optimalCost())){
       desired_steer.setZero();
@@ -88,8 +103,8 @@ virtual void run(){
     for(int i =0; i < 4; i++){
       support_i = _support.segment<3>(3*i);
       support_i.head<2>() -= _modified_support.segment<2>(2*i)*_dt;
-      std::cout << i << "\t_modified_support\t" << (_modified_support.segment<2>(2*i)*_dt).transpose() << std::endl;
-      std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
+      // std::cout << i << "\t_modified_support\t" << (_modified_support.segment<2>(2*i)*_dt).transpose() << std::endl;
+      // std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
       mwoibn::Vector3 vel__;
       vel__.setZero();
       vel__.head<2>() = _modified_support.segment<2>(2*i);
@@ -98,14 +113,43 @@ virtual void run(){
       test__[1] = 0;
       support_i += _state_machine.steeringFrames()[i]->rotation*test__;
       // std::cout << "test\t" << (_state_machine.steeringFrames()[i]->rotation*test__).transpose() << std::endl;
-      std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
+      // std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
       _contact_point.setReferenceWorld(i, support_i, false);
     }
 
-      std::cout << "_steering_reference.get()\t" << _steering_reference.get().transpose() << std::endl;
+      // std::cout << "_steering_reference.get()\t" << _steering_reference.get().transpose() << std::endl;
 
+
+      for(int i = 0; i < 4; i++){
+
+        _camber.setWeight(1, i);
+        _caster.setWeight(1, i);
+        // _leg_tasks["CASTER"].first.setWeight(0.5, i);
+      }
+
+      _caster.update();
+
+
+        // I need to change when the tasks are updated
+    for(int i = 0; i < 4; i++){
+      // _weight[i] = _camber.getWeight(i);
+      double weight = std::fabs( _camber.getTask(i).getJacobian()(0, 6*(i+1)+3) / _camber.getTask(i).getJacobian()(0, 6*(i+1)+4)  );
+      // double weight_2 = std::fabs( _tasks["CONTACT_POINTS_1"]->getJacobian()(2*i+1, 6*(i+1)+4) / _tasks["CONTACT_POINTS_1"]->getJacobian()(2*i+1, 6*(i+1)+0)  );
+      // std::cout << _camber.getTask(i).getJacobian()  <<"\t";
+
+      // std::cout << weight  <<"\t";
+      // std::cout << 0.6*(1-std::tanh( 0.2*std::pow(weight,3) ))  <<"\t";
+      // _camber.setWeight(std::tanh( 0.1*std::pow(weight,3)), i);
+      // _caster.setWeight(1-std::tanh( 0.1*std::pow(weight,3) ), i);
+      _camber.setWeight(1, i);
+      _caster.setWeight(0, i);
+      // _caster.setWeight(0.0, i);
+      // std::cout << "caster//camber/t" << _caster.getWeight(i) << "\t" << _camber.getWeight(i) << std::endl;
+
+      // _leg_tasks["CASTER"].first.setWeight(0.5, i);
+    }
     _contact_point.update();
-    _aggravated.update();
+    _aggravated.update(); // steering
 
 }
 
@@ -113,15 +157,18 @@ virtual void release(){ }
 
 protected:
   hierarchical_control::State& _state;
-  mgnss::higher_level::QrTask& _qr_task;
+  mgnss::higher_level::QpAggravated& _qr_task;
   mwoibn::hierarchical_control::tasks::ContactPoint &_contact_point;
   std::vector<mwoibn::hierarchical_control::tasks::Angle> &_steering;
   mgnss::higher_level::SteeringShape& _steering_reference;
-  mwoibn::hierarchical_control::tasks::Aggravated& _aggravated;
+  mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
+  mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;
+  mgnss::higher_level::QrTask& _unconstrainted;
   mgnss::higher_level::StateMachine& _state_machine;
-
+  mwoibn::VectorN _weight;
   double _dt;
   mwoibn::Vector3& _next_step;
+  int infs = 0;
 };
 
 }

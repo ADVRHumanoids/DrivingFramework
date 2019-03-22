@@ -23,13 +23,13 @@ class Intergate: public mgnss::higher_level::Constraint{
     template<typename ConstraintType>
     Intergate(ConstraintType&& constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(), _dt(dt), _robot_state(robot_state) {
       _constraint.reset(new ConstraintType(constraint));
-      resize(_constraint->jacobian.rows(), _constraint->jacobian.cols());
+      resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
     }
 
     template<typename ConstraintType>
     Intergate(std::unique_ptr<ConstraintType> constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(), _dt(dt), _robot_state(robot_state) {
       _constraint.reset(std::move(constraint));
-      resize(_constraint->jacobian.rows(), _constraint->jacobian.cols());
+      resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
     }
 
 
@@ -42,15 +42,15 @@ class Intergate: public mgnss::higher_level::Constraint{
 
     virtual void update(){
       _constraint->update();
-        jacobian = _constraint->jacobian*_dt;
-        state = _constraint->state;
-        state += _constraint->jacobian*_robot_state.get();
+        _jacobian = _constraint->getJacobian()*_dt;
+        _state = _constraint->getState();
+        _state += _constraint->getJacobian()*_robot_state.get();
 
-        std::cout << "Constraint\n" << std::endl;
-        std::cout << "_constraint->state\t" << _constraint->state.transpose() << std::endl;
-        std::cout << "_constraint->jacobian\n" << _constraint->jacobian << std::endl;
-        std::cout << "state\t" << state.transpose() << std::endl;
-        std::cout << "jacobian\n" << jacobian << std::endl;
+        // std::cout << "Constraint\n" << std::endl;
+        // std::cout << "_constraint->state\t" << _constraint->state.transpose() << std::endl;
+        // std::cout << "_constraint->jacobian\n" << _constraint->jacobian << std::endl;
+        // std::cout << "state\t" << state.transpose() << std::endl;
+        // std::cout << "jacobian\n" << jacobian << std::endl;
 
     }
 

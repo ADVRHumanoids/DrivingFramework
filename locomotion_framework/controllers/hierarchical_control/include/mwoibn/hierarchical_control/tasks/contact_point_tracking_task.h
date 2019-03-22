@@ -133,7 +133,7 @@ virtual void updateState() final {
     virtual const mwoibn::Vector3& getVelocityReference(int i)
     {
       // std::cout << "velocity\t" << _velocity.segment<3>(3*i).transpose() << std::endl;
-      _point.noalias() = _q_twist.transposed().rotate(_wheel_transforms[i]->rotation*_velocity.segment<3>(3*i));
+      _point.noalias() = _q_twist.transposed().rotate(_wheel_transforms[i]->rotation*_velocity_reference.segment<3>(3*i));
       return _point;
     }
     virtual const mwoibn::Vector3& getPointStateReference(int i)
@@ -162,8 +162,7 @@ virtual void claimContact(int i) { _selector[i] = false; }
 void setVelocity(mwoibn::VectorN& velocity){
 
   for (int i = 0; i < _contacts.size(); i++)
-    _velocity.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
-
+    _velocity_reference.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
   // std::cout << "wheel 3\n" << _wheel_transforms[i]->rotation;
   // std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
 }
@@ -195,7 +194,7 @@ protected:
   mwoibn::VectorBool _selector;
 
   mwoibn::Vector3 _point;
-  mwoibn::VectorN _reference, _full_error, _force;
+  mwoibn::VectorN _reference, _full_error, _force, _velocity_reference;
   mwoibn::Quaternion _q_twist;
   const mwoibn::Vector3& _ground_normal;
   mwoibn::Matrix3 _rot, _projected, _rot_project;
@@ -238,6 +237,7 @@ protected:
     _init(4, _contacts.cols());
     _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
     _reference.setZero(_contacts.rows());
+    _velocity_reference.setZero(_contacts.rows());
     _full_error.setZero(_contacts.rows());
     _force.setZero(_robot.contacts().size()*3);
 

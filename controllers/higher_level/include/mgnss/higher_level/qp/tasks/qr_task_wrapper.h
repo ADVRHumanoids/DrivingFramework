@@ -32,34 +32,22 @@ public:
 
   QrTaskWrapper(mwoibn::hierarchical_control::tasks::BasicTask& task, const mwoibn::VectorN& gain, double damping, mwoibn::robot_class::Robot& robot):
       QRJointSpaceV2(_qr_base, task.getJacobian(), _task_state, robot, damping), _qr_base(task.getTaskSize(),0), _basic_task(task), _gain(gain){
-    // _gain.setConstant(_task.getTaskSize(), gain);
     resize(_robot.getDofs(),0);
   }
 
   virtual void resize(int vars, int slack){
     _qr_base.resize(_basic_task.getTaskSize(),0);
-    // _gain.setConstant(_basic_task.getTaskSize(), _gain[0]);
     QRJointSpaceV2::resize(vars, slack);
-    // std::cout << "_damping\t" << _damping << std::endl;
 
   }
 
 
 virtual void _update(){
       _basic_task.update();
-      // std::cout << "_gain\t" << _gain.transpose() << std::endl;
-      // std::cout << "_basic_task\t" << _basic_task.getError().transpose() << std::endl;
 
       _task_state = _gain.cwiseProduct(_basic_task.getError()) + _basic_task.getVelocity();
       QRJointSpaceV2::_update();
 
-
-      // std::cout << "_task_state\t" << _task_state.transpose() << std::endl;
-      // std::cout << "_equality\t" << _equality.state.size() << std::endl;
-
-      // _cost.quadratic.setIdentity();
-      // std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
-      // std::cout << "_cost.linear\n" << _cost.linear.transpose() << std::endl;
 }
 
 protected:
@@ -70,31 +58,6 @@ protected:
 
   virtual void _outputTransform(){
 
-    // std::cout << "_optimal_state\t" << ( _optimal_state.head(_vars)).transpose()<< std::endl;
-
-    // std::cout << ( _jacobian*_optimal_state.head(_vars) + _offset ).transpose()<< std::endl;
-
-    // if(_return_state.norm() > mwoibn::EPS){
-    //   std::cout << "_offset\t" << _offset.transpose() << std::endl;
-    //   std::cout << "_jacobian\t" << _jacobian << std::endl;
-    //   std::cout << "_optimal_state\t" << _optimal_state.transpose() << std::endl;
-    //   std::cout << "_return_state\t" << _return_state.transpose() << std::endl;
-    //   // std::cout << "_cost.linear\t" << _cost.linear.transpose() << std::endl;
-    //   // std::cout << "_cost.quadratic\t" << _cost.quadratic.transpose() << std::endl;
-    //   std::cout << "_equality\t" << _equality.jacobian << std::endl;
-    //
-    //   for(auto&& zip: ranges::view::zip(_task.equality, equality)){
-    //     std::cout << "equality\n" << std::get<0>(zip)->state.transpose() << "jacobian\n" << std::get<0>(zip)->jacobian << std::endl;
-    //     std::cout << "equality\n" << std::get<1>(zip)->state.transpose() << "jacobian\n" << std::get<1>(zip)->jacobian << std::endl;
-    //   }
-    //   for(auto&& zip: ranges::view::zip(_task.soft_inequality, soft_inequality)){
-    //     std::cout << "soft_inequality\n" << std::get<0>(zip)->state.transpose() << "soft_inequality\n" << std::get<0>(zip)->jacobian << std::endl;
-    //     std::cout << "soft_inequality\n" << std::get<1>(zip)->state.transpose() << "soft_inequality\n" << std::get<1>(zip)->jacobian << std::endl;
-    //   }
-    //   for(auto& constraint:  hard_inequality ){
-    //     std::cout << "hard_inequality\n" << constraint->state.transpose()  << std::endl;
-    //   }
-    // }
 
   }
 

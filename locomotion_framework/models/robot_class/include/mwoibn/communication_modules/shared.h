@@ -20,7 +20,7 @@ Shared( Shared&& other): _shared(other._shared) { }
 
 virtual ~Shared() { }
 
-bool add(std::string name, ShareObj share)
+bool add(const std::string& name, ShareObj share)
 {
   _shared[name] = share;
   return true;
@@ -31,17 +31,17 @@ int size() const {
         return _shared.size();
 }                                               // RT?
 
-bool remove(std::string name)
+bool remove(const std::string& name)
 {
   _shared.erase(name);
   return true;
 }
 
-bool has(std::string name){
+bool has(const std::string& name){
   return _shared.count(name);
 }
 
-bool startsWith(std::string start){
+bool startsWith(const std::string& start){
   auto i = _shared.lower_bound(start);
   if (i != _shared.end())
          return (i->first.compare(0, start.size(), start) == 0); // Really a prefix?

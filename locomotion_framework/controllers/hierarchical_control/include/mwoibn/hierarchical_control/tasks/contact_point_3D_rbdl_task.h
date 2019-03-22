@@ -84,6 +84,7 @@ protected:
       // _error.segment<3>(3*i) = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)); // 10 is for a task gain should be automatic
       mwoibn::VectorN test__ = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i));
       _error[i] = test__[0];
+      _velocity[i] = (_wheel_transforms[i]->rotation.transpose()*_velocity_reference.segment<3>(3*i))[0];
 
       // std::cout << "_minus\t" << _minus[i].get().transpose() << std::endl;
 
@@ -112,7 +113,7 @@ protected:
       mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
       _rot_project = _rot*_projected;
       _rot = _wheel_transforms[i]->rotation.transpose()*_rot_project;
-      _jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
+      //_jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
       _jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
       // if (_selector[i])
         // _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();

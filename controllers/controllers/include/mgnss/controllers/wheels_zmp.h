@@ -180,16 +180,6 @@ virtual void nextStep(){
       // std::cout << "CAMBER SHAPE_JOINT\t" << ( _leg_tasks["CAMBER"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
       // std::cout << "STEERING SHAPE_JOINT\t" << ( _leg_tasks["STEERING"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
       // std::cout << "CONTACT_POINTS SHAPE_JOINT\t" << ( _leg_tasks["CONTACT_POINTS"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
-      //
-      // mwoibn::Vector3 pelvis;
-      // pelvis << 1, 1, 1;
-      auto vec_ = {_robot.getLinks("wheels"), _robot.getLinks("hips")};
-      // std::cout << "join\t" << _robot.getDof(ranges::action::join(vec_)) << std::endl;
-
-      mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
-                                                         ranges::action::join(vec_));
-
-      std::cout << "pelvis hight\t" << pelvis_ph.getFullStateWorld().transpose() << std::endl;
 
       // std::cout << "get SHAPE_JOINT";
       // auto dofs_ = _robot.getDof(_robot.getLinks("wheels"));
@@ -250,11 +240,13 @@ protected:
 
 void _allocate(YAML::Node config);
 
+std::unique_ptr<mgnss::higher_level::QpAggravated> _shape_extend_ptr;
+std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _angles_ptr;
 
 std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _contact_point;
 mwoibn::VectorN estimated__, _modified_support, _zero;
 mwoibn::VectorN _com_ref;
-
+std::vector<mwoibn::Matrix> _soft_hip;
 mwoibn::robot_points::Constant _world;
 
 virtual void _setInitialConditions();

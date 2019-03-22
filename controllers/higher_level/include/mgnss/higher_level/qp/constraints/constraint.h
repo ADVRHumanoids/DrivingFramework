@@ -23,33 +23,47 @@ class Constraint{
       resize(size, vars);
     }
 
+    Constraint(const Constraint& other): _jacobian(other._jacobian),
+          _transposed(other._transposed), _state(other._state){
+
+          }
+
     auto clone() {return std::unique_ptr<Constraint>(clone_impl()); }
 
     void resize(int size, int vars){
       if(vars == 0) size = 0;
 
-      jacobian.setZero(size, vars);
-      transposed.setZero(vars, size);
-      state.setZero(size);
+      _jacobian.setZero(size, vars);
+      _transposed.setZero(vars, size);
+      _state.setZero(size);
     }
 
-    const mwoibn::VectorN& get(){return state;}
-    const mwoibn::Matrix& getJacobian(){return jacobian;}
-    int rows(){return state.size();}
-    int cols(){return jacobian.cols();}
+    const mwoibn::VectorN& get(){return _state;}
+    int rows(){return _state.size();}
+    int cols(){return _jacobian.cols();}
 
 
-    void transpose(){ transposed = jacobian.transpose();}
+    void transpose(){ _transposed = _jacobian.transpose();}
 
-    mwoibn::Matrix jacobian, transposed;
-    mwoibn::VectorN state;
 
-    int size(){return state.size() ;}
+
+    int size(){return _state.size() ;}
 
     virtual void update(){}
 
+    virtual const mwoibn::Matrix& getJacobian() const {return _jacobian;}
+    virtual mwoibn::Matrix& setJacobian(){return _jacobian;}
+
+    virtual const mwoibn::Matrix& getTransposed() const {return _transposed;}
+    virtual mwoibn::Matrix& setTransposed(){return _transposed;}
+
+    virtual const mwoibn::VectorN& getState() const {return _state;}
+    virtual mwoibn::VectorN& setState(){return _state;}
+
   protected:
     virtual Constraint* clone_impl() const {return new Constraint(*this);}
+    mwoibn::Matrix _jacobian, _transposed;
+    mwoibn::VectorN _state;
 
 };
 

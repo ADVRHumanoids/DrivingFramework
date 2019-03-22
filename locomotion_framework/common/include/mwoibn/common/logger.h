@@ -27,12 +27,12 @@ void start(){
   add = std::bind(&Logger::_addEntry, this, std::placeholders::_1, std::placeholders::_2);
 }
 //std::function<void(Foo*)> f = &Foo::doSomething;
-std::function<void(std::string, double)> add = std::bind(&Logger::_addField, this, std::placeholders::_1, std::placeholders::_2);
+std::function<void(const std::string&, double)> add = std::bind(&Logger::_addField, this, std::placeholders::_1, std::placeholders::_2);
 
 protected:
 
-  virtual void _addField(std::string name, double init_value) = 0;
-  virtual void _addEntry(std::string name, double value) = 0;
+  virtual void _addField(const std::string& name, double init_value) = 0;
+  virtual void _addEntry(const std::string& name, double value) = 0;
   virtual void _start() = 0;
 };
 

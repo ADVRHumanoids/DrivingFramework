@@ -15,7 +15,7 @@ void mgnss::higher_level::SupportShapingV6::_allocate(){
   // _vector_cost_.setZero(_vars+_slack);
 
     // if(_is_margin)
-      soft_inequality.add(Constraint(4,_vars)); // margin
+      addSoft(Constraint(4,_vars), 1e5); // margin
       hard_inequality.add(Constraint(8,_vars)); //limit
 
       QrTask::init();

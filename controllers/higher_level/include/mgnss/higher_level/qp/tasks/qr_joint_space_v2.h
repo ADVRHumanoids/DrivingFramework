@@ -42,6 +42,7 @@ protected:
   double _damping = 1e-8;
   mwoibn::VectorN _damp_vec;
   virtual void _outputTransform();
+  mwoibn::Matrix _temp;
 
 
 

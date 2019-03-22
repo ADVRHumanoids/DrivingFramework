@@ -16,12 +16,14 @@ class MaximumLimit: public mgnss::higher_level::Constraint{
 
   public:
     MaximumLimit(const mwoibn::Matrix& jacobian, double limit ): mgnss::higher_level::Constraint(jacobian.rows(), jacobian.cols()), _other_jacobian(jacobian){
-        state = mwoibn::VectorN::Constant(size(), limit);
+        _state = mwoibn::VectorN::Constant(size(), limit);
     }
 
+    MaximumLimit(const MaximumLimit& other): mgnss::higher_level::Constraint(other), _other_jacobian(other._other_jacobian){
+    }
 
     virtual void update(){
-       jacobian = -_other_jacobian;
+       _jacobian = -_other_jacobian;
     }
 
   protected:

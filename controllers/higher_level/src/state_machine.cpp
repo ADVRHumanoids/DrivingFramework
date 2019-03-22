@@ -37,9 +37,9 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
             std::cout << "contacts: " << contact->getName() << "\t" << name << std::endl;
         }
 
-        _margins.state.setZero(_contact_points.size()); // How to define which margins should be computed here?
+        _margins.setState().setZero(_contact_points.size()); // How to define which margins should be computed here?
         _norms.setZero(_contact_points.size());
-        _margins.jacobian.setZero(_contact_points.size(), _contact_points.size()*3+2); // points x,y, base x,y
+        _margins.setJacobian().setZero(_contact_points.size(), _contact_points.size()*3+2); // points x,y, base x,y
         _margin_pairs = { {0,1}, {1,3}, {2,0}, {3,2}};
 
           for(auto& pair: _margin_pairs){
@@ -64,12 +64,12 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
 
         _margins.limit.setZero(4);
         _workspace.limit.setZero(4);
-        _margins.limit << 0.30, 0.18, 0.18, 0.30;
+        _margins.limit << 0.25, 0.18, 0.18, 0.25;
         _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
-        _margins.state.setZero(_size);
-        _workspace.state.setZero(_size);
-        _margins.jacobian.setZero(_size, _size*3+2); // cp + base
-        _workspace.jacobian.setZero(_size, _size*2);
+        _margins.setState().setZero(_size);
+        _workspace.setState().setZero(_size);
+        _margins.setJacobian().setZero(_size, _size*3+2); // cp + base
+        _workspace.setJacobian().setZero(_size, _size*2);
         _state_offset.setZero(_contact_points.size()*2);
         // _next_state_offset.setZero(_contact_points.size()*2);
 
@@ -89,16 +89,16 @@ void mgnss::higher_level::StateMachine::init(){ }
 
 // I should check if it works before making the full optimization
 void mgnss::higher_level::StateMachine::_computeMargin(int i){
-    _margins.state[i] = -_points[i].get()[0]*_base_points[i].get()[1]+_points[i].get()[1]*_base_points[i].get()[0];
+    _margins.setState()[i] = -_points[i].get()[0]*_base_points[i].get()[1]+_points[i].get()[1]*_base_points[i].get()[0];
     _norms[i] = std::sqrt( std::pow(_points[i].get()[0], 2) + std::pow(_points[i].get()[1], 2) );
-    _margins.state[i] = _margins.state[i]/_norms[i];
+    _margins.setState()[i] = _margins.getState()[i]/_norms[i];
 }
 
 // Do I have a way to validate it?
 // Try to integrate and compare with next values m + dt J \dot q = m_1+i
 void mgnss::higher_level::StateMachine::_marginJacobians(){
 
-    _margins.jacobian.setZero();
+    _margins.setJacobian().setZero();
 
     for(int i = 0; i < _contact_points.size(); i++){
 
@@ -107,21 +107,18 @@ void mgnss::higher_level::StateMachine::_marginJacobians(){
             mwoibn::Vector3 base_other = _wheel_transforms[i]->rotation.transpose()*_base_points[_margin_pairs[i].second].get();
 
       // point 1 x
-      _margins.jacobian.row(i)[_margin_pairs[i].first*3] = -point[0]*(_margins.state[i])/std::pow(_norms[i],2) - (base_other[1])/_norms[i];
+      _margins.setJacobian().row(i)[_margin_pairs[i].first*3] = -point[0]*(_margins.getState()[i])/std::pow(_norms[i],2) - (base_other[1])/_norms[i];
       // point 1 y
-      _margins.jacobian.row(i)[_margin_pairs[i].first*3+1] = -point[1]*(_margins.state[i])/std::pow(_norms[i],2) + (base_other[0])/_norms[i];
+      _margins.setJacobian().row(i)[_margin_pairs[i].first*3+1] = -point[1]*(_margins.getState()[i])/std::pow(_norms[i],2) + (base_other[0])/_norms[i];
       // point 2 x
-      _margins.jacobian.row(i)[_margin_pairs[i].second*3] = point[0]*(_margins.state[i])/std::pow(_norms[i],2) + (base_this[1])/_norms[i];
+      _margins.setJacobian().row(i)[_margin_pairs[i].second*3] = point[0]*(_margins.getState()[i])/std::pow(_norms[i],2) + (base_this[1])/_norms[i];
       // point 2 y
-      _margins.jacobian.row(i)[_margin_pairs[i].second*3+1] = point[1]*(_margins.state[i])/std::pow(_norms[i],2) - base_this[0]/_norms[i];
+      _margins.setJacobian().row(i)[_margin_pairs[i].second*3+1] = point[1]*(_margins.getState()[i])/std::pow(_norms[i],2) - base_this[0]/_norms[i];
       // base x
-      _margins.jacobian.row(i)[12] = -point[1]/_norms[i];
+      _margins.setJacobian().row(i)[12] = -point[1]/_norms[i];
       // base y
-      _margins.jacobian.row(i)[13] = point[0]/_norms[i];
+      _margins.setJacobian().row(i)[13] = point[0]/_norms[i];
     }
-
-    // for(int i = 0; i < _contact_points.size(); i++)
-    //   _margins.jacobian.block<12,3>(0,3*i) = _margins.jacobian.block<12,3>(0,3*i)*_contact_points[i].getJacobianWheel();
 
 
 }
@@ -170,19 +167,19 @@ void mgnss::higher_level::StateMachine::update(){
   _computeWorkspace();
   _workspaceJacobian();
 
-  _margins.error = (_margins.state - _margins.limit)/_robot.rate();
-  _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.state)/_robot.rate();
+  _margins.error = (_margins.getState() - _margins.limit)/_robot.rate();
+  _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.getState())/_robot.rate();
 
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){
   for(int i = 0; i < _contact_points.size(); i++)
-    _workspace.state[i] = _workspace_points[i].get().transpose()*_workspace_points[i].get();
+    _workspace.setState()[i] = _workspace_points[i].get().transpose()*_workspace_points[i].get();
 }
 
 void mgnss::higher_level::StateMachine::_workspaceJacobian(){
   for(int i = 0; i < _contact_points.size(); i++)
-    _workspace.jacobian.block<1,2>(i,2*i) =  -(2*_wheel_transforms[i]->rotation.transpose()*_workspace_points[i].get()).head<2>();
+    _workspace.setJacobian().block<1,2>(i,2*i) =  -(2*_wheel_transforms[i]->rotation.transpose()*_workspace_points[i].get()).head<2>();
   // for(int i = 0; i < _contact_points.size(); i++)
   //   _workspace.jacobian.block<8,2>(0, 2*i) = _workspace.jacobian.block<8,2>(0, 2*i)*_contact_points[i].getJacobianWheel().block<2,2>(0,0);
 }

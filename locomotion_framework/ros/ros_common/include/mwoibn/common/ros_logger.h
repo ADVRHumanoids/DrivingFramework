@@ -67,7 +67,7 @@ virtual void _start(){
 }
 
 
-virtual void _addField(std::string name, double init_value){
+virtual void _addField(const std::string& name, double init_value){
         if(!_print.size())
                 _file << name;
         else
@@ -77,7 +77,7 @@ virtual void _addField(std::string name, double init_value){
         _print.tail<1>()[0] = init_value;
 
 }  //allocates memory, slow
-virtual void _addEntry(std::string name, double value){
+virtual void _addEntry(const std::string& name, double value){
         _print[_map[name]] = value;
 }  // doesn't allocate memory
 

@@ -230,6 +230,11 @@ class Reference:
         return self.timer > self.get(0)
 
     def wait(self):
+        self.d_base = np.array([0.0,  0.0,  0.0, 0.0])
+
+        self.dx_cp = np.array([0.0,  0.0,  0.0, 0.0])
+        self.dy_cp = np.array([0.0,  0.0,  0.0, 0.0])
+        self.dz_cp = np.array([0.0,  0.0,  0.0, 0.0])
         #print("wait", self.timer)
         self.timer += 1
 
@@ -266,7 +271,7 @@ class Reference:
 
     def increment(self):
 		self.step += 1
-#		print(self.step)
+		print(self.step)
 		if not self.isRunning(): return
 		self.timer = 0
 		self.condFunc = self.conds[self.getType()]
