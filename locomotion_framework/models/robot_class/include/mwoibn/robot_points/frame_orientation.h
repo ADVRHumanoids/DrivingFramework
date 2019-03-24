@@ -1,3 +1,4 @@
+
 #ifndef __MWOIBN__ROBOT_CLASS__FRAME_ORIENTATION_H
 #define __MWOIBN__ROBOT_CLASS__FRAME_ORIENTATION_H
 
@@ -22,7 +23,7 @@ public:
   using Point::operator=;
 
 
-  void update(bool jacobian) {
+  virtual void update(bool jacobian) override{
       //compute();
       if(jacobian)
         computeJacobian();

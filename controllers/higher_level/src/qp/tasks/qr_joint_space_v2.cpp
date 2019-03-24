@@ -29,7 +29,7 @@ void mgnss::higher_level::QRJointSpaceV2::init(){
   QrTask::init();
 
   _return_state.setZero(_jacobian.rows());
-  _temp.setZero(_task.vars(), _jacobian.rows());
+  _temp.setZero(_task.vars(), _jacobian.cols());
   // _cost.quadratic.block(0,0,_vars, _vars).setIdentity();
 
 }
@@ -46,9 +46,10 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
        int new_ = std::get<1>(zip)->getJacobian().cols();
        int size_ = std::get<0>(zip)->getState().size();
 
-       std::get<1>(zip)->setState() = std::get<0>(zip)->getState() + std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
+       std::get<1>(zip)->setState() = std::get<0>(zip)->getState();
+       std::get<1>(zip)->setState().noalias() += std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
 
-       std::get<1>(zip)->setJacobian().block(0,0,size_, new_) = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
+       std::get<1>(zip)->setJacobian().block(0,0,size_, new_).noalias() = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
      }
 
      for(auto&& zip:  ranges::view::zip(_task.soft_inequality, ranges::view::slice(soft_inequality, ranges::end - _task.soft_inequality.size(), ranges::end)   )  ){
@@ -56,9 +57,10 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
        int new_ = std::get<1>(zip)->getJacobian().cols();
        int size_ = std::get<0>(zip)->getState().size();
 
-       std::get<1>(zip)->setState() = std::get<0>(zip)->getState() + std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
+       std::get<1>(zip)->setState() = std::get<0>(zip)->getState();
+       std::get<1>(zip)->setState().noalias() += std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
 
-       std::get<1>(zip)->setJacobian().block(0,0,size_, new_) = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
+       std::get<1>(zip)->setJacobian().block(0,0,size_, new_).noalias() = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
      }
 
      for(auto&& zip:  ranges::view::zip(_task.hard_inequality, ranges::view::slice(hard_inequality, ranges::end - _task.hard_inequality.size(), ranges::end)) ){
@@ -66,9 +68,10 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
        int new_ = std::get<1>(zip)->getJacobian().cols();
        int size_ = std::get<0>(zip)->getState().size();
 
-       std::get<1>(zip)->setState() = std::get<0>(zip)->getState() + std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
+       std::get<1>(zip)->setState() = std::get<0>(zip)->getState();
+       std::get<1>(zip)->setState().noalias() += std::get<0>(zip)->getJacobian().leftCols(old_)*_offset;
 
-       std::get<1>(zip)->setJacobian().block(0,0,size_, new_) = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
+       std::get<1>(zip)->setJacobian().block(0,0,size_, new_).noalias() = std::get<0>(zip)->getJacobian().leftCols(old_)*_jacobian.leftCols(new_);
 
      }
 
@@ -128,5 +131,6 @@ void mgnss::higher_level::QRJointSpaceV2::log(mwoibn::common::Logger& logger){
 void mgnss::higher_level::QRJointSpaceV2::_outputTransform(){
   // std::cout << "_optimal_state.transpose" << _optimal_state.head(_vars).transpose() << std::endl;
   // std::cout << "_offset.transpose" << _offset.transpose() << std::endl;
-  _return_state = _jacobian*_optimal_state.head(_vars) + _offset;
+  _return_state.noalias() = _jacobian*_optimal_state.head(_vars);
+  _return_state += _offset;
 }

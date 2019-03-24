@@ -107,8 +107,8 @@ protected:
   mwoibn::VectorN _norms, _state_offset;//, _next_state_offset;
   mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian;//, _desired_jacobian;
 
-  mwoibn::Matrix3 _support_jacobian;
-  mwoibn::Vector3 _support_offset;
+  mwoibn::Matrix3 _support_jacobian, mat_1;
+  mwoibn::Vector3 _support_offset, vec_1;
 
   void _computeMargin(int i);
   void _marginJacobians();

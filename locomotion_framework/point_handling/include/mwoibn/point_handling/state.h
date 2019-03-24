@@ -20,7 +20,7 @@ public:
   {
   }
 
-  State(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
+  State(const Point::Current& current, point_handling::FramePlus& frame, std::string name = "")
       : Point(current, frame, name), frame(frame)
   { }
 

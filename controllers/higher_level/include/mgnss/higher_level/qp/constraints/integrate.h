@@ -44,7 +44,7 @@ class Intergate: public mgnss::higher_level::Constraint{
       _constraint->update();
         _jacobian = _constraint->getJacobian()*_dt;
         _state = _constraint->getState();
-        _state += _constraint->getJacobian()*_robot_state.get();
+        _state.noalias() += _constraint->getJacobian()*_robot_state.get();
 
         // std::cout << "Constraint\n" << std::endl;
         // std::cout << "_constraint->state\t" << _constraint->state.transpose() << std::endl;

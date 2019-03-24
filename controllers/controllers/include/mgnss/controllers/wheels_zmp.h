@@ -34,7 +34,6 @@
 #include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
 #include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
-#include <mgnss/higher_level/qp/tasks/qr_tracking.h>
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
 #include <mgnss/higher_level/shape_action.h>
 
@@ -97,7 +96,7 @@ void updateBase(){
         WheelsController::updateBase();
 }
 
-mwoibn::VectorN getBaseReference(){
+const mwoibn::Vector3& getBaseReference(){
         return _pelvis_position_ptr->getReference(0);
 }
 

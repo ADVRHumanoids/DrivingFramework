@@ -1,7 +1,6 @@
 #ifndef __MGNSS_HIGHER_LEVEL_SUPPORT_QR_TASK_WRAPPER_H
 #define __MGNSS_HIGHER_LEVEL_SUPPORT_QR_TASK_WRAPPER_H
 
-// #include "eiquadprog/eiquadprog.hh" //?
 // #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mgnss/higher_level/qp/tasks/qr_joint_space_v2.h"

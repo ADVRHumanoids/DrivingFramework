@@ -1,7 +1,7 @@
 #ifndef __MGNSS__HIGHER_LEVEL__CONSTRAINT_H
 #define __MGNSS__HIGHER_LEVEL__CONSTRAINT_H
 
-#include "eiquadprog/eiquadprog.hh" //?
+//#include "eiquadprog/eiquadprog.hh" //?
 #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/robot_points/handler.h"

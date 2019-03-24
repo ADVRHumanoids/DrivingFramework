@@ -79,7 +79,7 @@ const mwoibn::VectorN& getBaseError(){
         return _pelvis_position_ptr->getError();
 }
 
-mwoibn::VectorN getBaseReference(){
+const mwoibn::Vector3& getBaseReference(){
         return _pelvis_position_ptr->getReference(0);
 }
 

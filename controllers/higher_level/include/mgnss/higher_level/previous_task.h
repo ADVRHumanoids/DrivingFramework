@@ -1,7 +1,6 @@
 #ifndef __MGNSS_HIGHER_LEVEL_PREVIOUS_TASK_H
 #define __MGNSS_HIGHER_LEVEL_PREVIOUS_TASK_H
 
-// #include "eiquadprog/eiquadprog.hh" //?
 #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/robot_points/handler.h"

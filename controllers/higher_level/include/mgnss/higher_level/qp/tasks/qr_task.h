@@ -1,7 +1,7 @@
 #ifndef __MGNSS_HIGHER_LEVEL_SUPPORT_QR_TASK_H
 #define __MGNSS_HIGHER_LEVEL_SUPPORT_QR_TASK_H
 
-#include "eiquadprog/eiquadprog.hh" //?
+#include "eiquadprog/eiquadprog_RT.hh" //?
 #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 #include "mwoibn/robot_points/handler.h"
@@ -88,6 +88,7 @@ protected:
 
   Eigen::LLT<Eigen::MatrixXd,Eigen::Lower> _llt;
 
+  Eigen::QuadProg _solver;
   virtual void _outputTransform(){}
 
   mwoibn::VectorN _soft_gains;

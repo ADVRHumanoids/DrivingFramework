@@ -21,7 +21,7 @@ public:
       : State(frame, 3, name)
   {  }
 
-  Force(Point::Current current,
+  Force(const Point::Current& current,
        point_handling::FramePlus& frame, std::string name = "")
       : State(current, frame, name)
   {

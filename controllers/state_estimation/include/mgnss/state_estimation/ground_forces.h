@@ -64,12 +64,13 @@ mwoibn::dynamic_models::BasicModel _gravity;
 // mwoibn::robot_points::Handler<mwoibn::dynamic_points::Force> _linear_force;
 
 std::unique_ptr<mwoibn::PseudoInverse> _inertia_inverse, _contacts_inverse;
-mwoibn::VectorN _world_contacts, _force_1, _force_2, _force_3, _state;
+mwoibn::VectorN _world_contacts, _force_1, _force_2, _force_3, _state, _state_2;
 
 std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_torque_ptr;
 
 mwoibn::Matrix _contacts_jacobian, _contacts_inversed, _contacts_temp, _contacts_transposed;
 mwoibn::Vector3 _des_com;
+mwoibn::VectorN _set_force;
 
 
 };

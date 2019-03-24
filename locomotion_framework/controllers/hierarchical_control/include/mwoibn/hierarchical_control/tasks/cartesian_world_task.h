@@ -66,9 +66,10 @@ const point_handling::PositionsHandler& points() {
         return _ik;
 }
 //! sets task reference
-virtual mwoibn::VectorN getReference(int i) const
+virtual const mwoibn::Vector3& getReference(int i)
 {
-        return _reference.segment<3>(i * 3);
+      temp_ = _reference.segment<3>(i * 3);
+        return temp_;
 }
 
 protected:
@@ -76,6 +77,7 @@ protected:
 point_handling::PositionsHandler _ik;
 //! task reference position of a controlled point expressed in a world frame
 mwoibn::VectorN _reference;
+mwoibn::Vector3 temp_;
 };
 }
 } // namespace package

@@ -128,25 +128,28 @@ void mgnss::higher_level::StateMachine::update(){
 
   // ACCELERATION BASED
   for(int i = 0; i < _contact_points.size(); i++){
-     mwoibn::Matrix3 toN = _torus_acceleration[i].torus().groundNormal()*_torus_acceleration[i].torus().groundNormal().transpose();
-     mwoibn::Matrix3 toPN = mwoibn::Matrix3::Identity() - toN;
+     mwoibn::Matrix3 toN, toPN;
+     toN.noalias() = _torus_acceleration[i].torus().groundNormal()*_torus_acceleration[i].torus().groundNormal().transpose();
+     toPN = mwoibn::Matrix3::Identity() - toN;
 
     // VELOCITY
     _support_jacobian = _torus_acceleration[i].torus().getJacobianWheel()/_robot.rate();
 
-    _support_offset =    (_torus_acceleration[i].getDependant()*toPN -_support_jacobian )*_torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
-    _support_offset += _torus_acceleration[i].getIndependant();
-    _support_jacobian += _torus_acceleration[i].getDependant()*toN;
-    _support_jacobian = _support_jacobian*_robot.rate();
-    _support_offset = _support_offset*_robot.rate();
+    mat_1.noalias() = _torus_acceleration[i].getDependant()*toPN;
+    mat_1 -= _support_jacobian;
+    _support_offset.noalias() =  mat_1*_torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
 
-    _support_offset += _torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
+    // _support_offset =    (_torus_acceleration[i].getDependant()*toPN -_support_jacobian )*_torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    _support_offset += _torus_acceleration[i].getIndependant();
+    _support_jacobian.noalias() += _torus_acceleration[i].getDependant()*toN;
+    mat_1 = _support_jacobian*_robot.rate();
+    vec_1 = _support_offset*_robot.rate();
+
+    vec_1.noalias() += _torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
 
     // std::cout << "_state_machine\n" << _support_jacobian  << std::endl;
-    _support_jacobian = _wheel_transforms[i]->rotation.transpose()*_support_jacobian;
-    _support_offset = _wheel_transforms[i]->rotation.transpose()*_support_offset;
-
-
+    _support_jacobian.noalias() = _wheel_transforms[i]->rotation.transpose()*mat_1;
+    _support_offset.noalias() = _wheel_transforms[i]->rotation.transpose()*vec_1;
 
     _state_jacobian.block<2,3>(2*i, 3*i) = _support_jacobian.topRows<2>();
     _state_offset.segment<2>(2*i) = _support_offset.head<2>();

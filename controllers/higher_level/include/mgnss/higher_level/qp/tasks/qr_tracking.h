@@ -1,7 +1,7 @@
 #ifndef __MGNSS_HIGHER_LEVEL_QR_TRACKING_H
 #define __MGNSS_HIGHER_LEVEL_QR_TRACKING_H
 
-#include "eiquadprog/eiquadprog.hh"
+#include "eiquadprog/eiquadprog_RT.hh"
 #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
 
@@ -60,6 +60,7 @@ protected:
   mwoibn::VectorN _safety, _linear_cost, _vector_cost_, _desired, _max_workspace;
   mwoibn::Matrix _quadratic_cost;
 
+  Eigen::QuadProg _solver;
 
   const mgnss::higher_level::Limit &_margin, &_workspace;
   // const mwoibn::VectorN &_margins, &_workspace;

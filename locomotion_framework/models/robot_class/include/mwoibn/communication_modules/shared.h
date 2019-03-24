@@ -55,7 +55,7 @@ typename std::map<std::string, ShareObj>::iterator end(){return _shared.end();}
 typename std::map<std::string, ShareObj>::const_iterator begin() const {return _shared.begin();}
 typename std::map<std::string, ShareObj>::const_iterator end() const {return _shared.end();}
 
-ShareObj& operator[](std::string name) {
+ShareObj& operator[](const std::string& name) {
         return _shared[name];
 }
 

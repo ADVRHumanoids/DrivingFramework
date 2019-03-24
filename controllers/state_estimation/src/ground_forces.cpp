@@ -71,7 +71,8 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _force_3.setZero(_robot.contacts().jacobianRows());
 
   _state.setZero(_robot.state.torque.size());
-
+  _state_2.setZero(_robot.state.torque.size());
+  _set_force.setZero(3);
 
   _filter_torque_ptr->reset(_robot.state.torque.get());
 
@@ -130,7 +131,8 @@ void mgnss::state_estimation::GroundForces::update()
       _world_contacts.noalias() = _contacts_inverse->get()*_force_3;
 
       for(int i = 0; i < _robot.contacts().size(); i++){
-            _robot.contacts()[i].wrench().force.setWorld(_world_contacts.segment<3>(3*i));
+            _set_force = _world_contacts.segment<3>(3*i);
+            _robot.contacts()[i].wrench().force.setWorld(_set_force);
             _robot.contacts()[i].wrench().synch();
       }
 
@@ -140,8 +142,8 @@ void mgnss::state_estimation::GroundForces::update()
 
       // check measured acceleration/forces at contact point
       _robot.state["OVERALL_FORCE"].set(_state);
-
-      _robot.state.acceleration.set(_gravity.getInertiaInverse()*_state);
+      _state_2.noalias() = _gravity.getInertiaInverse()*_state;
+      _robot.state.acceleration.set(_state_2);
       // _points_force.update(true);
       //
       // _linear_force.update(true);

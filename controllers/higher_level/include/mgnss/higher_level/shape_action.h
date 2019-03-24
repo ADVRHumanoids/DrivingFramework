@@ -28,6 +28,12 @@ ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_contro
             Primary(task, state.memory), _state(state), _qr_task(task), _contact_point(contact_point), _steering(steering),
             _steering_reference(steering_reference), _aggravated(aggravated), _angles(angles), _caster(caster), _camber(camber),
              _state_machine(state_machine), _unconstrainted(unconstrainted), _dt(dt), _next_step(next_step){
+
+               _desired_steer.setZero(4);
+               _modified_support.setZero(8);
+               _support_world.setZero(8);
+               _support.setZero(12);
+               _eigen_scalar.setZero(1);
 }
 
 
@@ -37,7 +43,6 @@ virtual void run(){
     _qr_task._update();
     _qr_task.solve();
     // _unconstrainted.solve();
-    mwoibn::VectorN desired_steer(4);
     // std::cout << "previous\t" << _state.command.transpose() << std::endl;
 
     // std::cout << "_qr_task\t" << _qr_task.raw().transpose() << std::endl;
@@ -52,37 +57,39 @@ virtual void run(){
 
     // std::cout << "_steering\t" << _steering[0].getJacobian().transpose() << std::endl;
 
-    for(int i =0; i < 4; i++)
-        desired_steer[i] = -(_steering[i].getJacobian()*_qr_task.raw().head(_steering[i].getJacobian().cols()))[0]*_dt;
-
+    for(int i =0; i < 4; i++){
+        _eigen_scalar.noalias() =  _steering[i].getJacobian()*_qr_task.raw().head(_steering[i].getJacobian().cols() ) ;
+        _desired_steer[i] = -_eigen_scalar[0]*_dt;
+    }
 
     // mwoibn::VectorN _modified_support  =  _state_machine.stateJacobian()*_qr_task.raw().head(_contact_point.getJacobian().cols());
-    mwoibn::VectorN _modified_support(8);
+    // mwoibn::VectorN _modified_support(8);
     _qr_task.task(0).set(_qr_task.raw());
     _qr_task.task(0).transform();
-    mwoibn::VectorN _support_world  =  (_state_machine.stateJacobian()*_qr_task.task(0).get() + _state_machine.stateOffset());
+    _support_world.noalias()  =  _state_machine.stateJacobian()*_qr_task.task(0).get();
+    _support_world +=  _state_machine.stateOffset();
 
     for(int i =0; i < 4; i++){
-      mwoibn::Vector3 test__ = mwoibn::Vector3::Zero();
+      test__ = mwoibn::Vector3::Zero();
       test__.head<2>() = _support_world.segment<2>(2*i);
       _modified_support.segment<2>(2*i) = (_state_machine.steeringFrames()[i]->rotation*test__).head<2>();
     }
     // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
     // std::cout << "unconstrained_support\t" << _unconstrainted.get().transpose() << std::endl;
 
-    // std::cout << "desired_steer\t" << desired_steer.transpose() << std::endl;
+    // std::cout << "_desired_steer\t" << _desired_steer.transpose() << std::endl;
     // std::cout << "_caster\t" << (_caster.getJacobian()*_qr_task.raw().head(_caster.getJacobian().cols())).transpose() << std::endl;
 
     if(std::isinf(_qr_task.optimalCost())){
-      desired_steer.setZero();
+      _desired_steer.setZero();
       _modified_support.setZero();
     }
 
-    mwoibn::VectorN _support(12);
+
     //
     for(int i =0; i < 4; i++){
       _support.segment<3>(3*i) = _contact_point.getReferenceWorld(i);
-      _support.segment<2>(3*i) += _modified_support.segment<2>(2*i)*_dt;
+      _support.segment<2>(3*i).noalias() += _modified_support.segment<2>(2*i)*_dt;
     //   // std::cout << i << "_modified_support\t" << (_modified_support.segment<2>(2*i)).transpose() << std::endl;
     //   // std::cout << i << "_modified_support\t" << (_modified_support.segment<2>(2*i)*_dt).transpose() << std::endl;
     //   // std::cout << i << "_support\t" << (_support.segment<3>(3*i)*_dt).transpose() << std::endl;
@@ -94,7 +101,7 @@ virtual void run(){
       _contact_point.setReferenceWorld(i, support_i, false);
     }
 
-    _steering_reference.compute(_next_step, desired_steer);
+    _steering_reference.compute(_next_step, _desired_steer);
     //
     for(int i =0; i < 4; i++)
       _steering[i].setReference(_steering_reference.get()[i]);
@@ -105,13 +112,14 @@ virtual void run(){
       support_i.head<2>() -= _modified_support.segment<2>(2*i)*_dt;
       // std::cout << i << "\t_modified_support\t" << (_modified_support.segment<2>(2*i)*_dt).transpose() << std::endl;
       // std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
-      mwoibn::Vector3 vel__;
+
       vel__.setZero();
       vel__.head<2>() = _modified_support.segment<2>(2*i);
-      mwoibn::Vector3 test__ = _state_machine.steeringFrames()[i]->rotation.transpose()*vel__*_dt;
+
+      test__.noalias() = _state_machine.steeringFrames()[i]->rotation.transpose()*vel__*_dt;
       // std::cout << "test\t" << test__.transpose() << std::endl;
       test__[1] = 0;
-      support_i += _state_machine.steeringFrames()[i]->rotation*test__;
+      support_i.noalias() += _state_machine.steeringFrames()[i]->rotation*test__;
       // std::cout << "test\t" << (_state_machine.steeringFrames()[i]->rotation*test__).transpose() << std::endl;
       // std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
       _contact_point.setReferenceWorld(i, support_i, false);
@@ -166,6 +174,9 @@ protected:
   mgnss::higher_level::QrTask& _unconstrainted;
   mgnss::higher_level::StateMachine& _state_machine;
   mwoibn::VectorN _weight;
+  mwoibn::VectorN _desired_steer, _modified_support, _support_world, _support;
+  mwoibn::Vector3 test__, vel__;
+  mwoibn::VectorN _eigen_scalar;
   double _dt;
   mwoibn::Vector3& _next_step;
   int infs = 0;

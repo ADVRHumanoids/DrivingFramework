@@ -59,6 +59,8 @@ void mgnss::higher_level::QrTracking::init(){
 
     std::cout << "_offset_margin\t" << _offset_margin.transpose() << std::endl;
     std::cout << "_offset_workspace\t" << _offset_workspace.transpose() << std::endl;
+
+    _solver.init(_vars, _equality_vector.size(), _inequality_vector.size());
 }
 
 void mgnss::higher_level::QrTracking::_update(){
@@ -136,7 +138,7 @@ void mgnss::higher_level::QrTracking::solve(){
   _update();
 
 
-  _optimal_cost = solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
+  _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _linear_cost, _equality_matrix, _equality_vector, _inequality_matrix, _inequality_vector, _optimal_state);
 
   //
   //std::cout << std::setprecision(16) << "_optimal_cost\t" << _optimal_cost << std::endl;

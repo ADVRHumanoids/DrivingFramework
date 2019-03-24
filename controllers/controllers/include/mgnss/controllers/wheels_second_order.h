@@ -184,7 +184,7 @@ void updateBase(){
         _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_z, _heading)*(_orientation));
 }
 
-mwoibn::VectorN getBaseReference(){
+const mwoibn::Vector3& getBaseReference(){
         return _pelvis_position_ptr->getReference(0);
 }
 
@@ -352,7 +352,7 @@ protected:
 
   mwoibn::VectorN __last_steer;
 
-  // std::unique_ptr<mgnss::higher_level::QrTaskWrapper> qr_tracking;
+  std::unique_ptr<mgnss::higher_level::QrTaskWrapper> qr_tracking;
   // std::unique_ptr<mwoibn::hierarchical_control::actions::QP> qp_action;
 
 

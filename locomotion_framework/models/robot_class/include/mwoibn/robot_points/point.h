@@ -33,7 +33,7 @@ public:
 
   virtual void computeJacobian() = 0;
 
-  void update(bool jacobian = true);
+  virtual void update(bool jacobian = true);
 
   const mwoibn::Matrix& getJacobian() const {return _jacobian;}
 
