@@ -84,11 +84,10 @@ catkin_package(
 	${DEPENDS_OPTIONAL}
 )
 add_library(BasePlugin SHARED
-    src/xbot_base.cpp
     src/xbot_base_v2.cpp
     src/ros_base.cpp
     src/ros_shared.cpp
-    #src/generator.cpp
+    src/xbot_shared.cpp
 )
 
 if ( Xenomai_FOUND )

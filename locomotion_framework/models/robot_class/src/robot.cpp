@@ -358,7 +358,7 @@ mwoibn::robot_class::Robot::getLinks(mwoibn::VectorInt dofs, bool unique)
         std::vector<std::string> links;
 
         for (int i = 0; i < dofs.size(); i++)
-            links.push_back(getLinks(dofs[i]));
+                links.push_back(getLinks(dofs[i]));
         // ensure uniquness
         if (unique) // return repetitions
                 links.erase(std::unique(links.begin(), links.end()), links.end());
@@ -375,35 +375,35 @@ mwoibn::robot_class::Robot::getLinks(unsigned int dof)
         for (int k = 0; k < _model.mJoints.size(); k++)
         {
                 if (dof >= _model.mJoints[k].q_index &&
-                            dof < (_model.mJoints[k].q_index + _model.mJoints[k].mDoFCount))
+                    dof < (_model.mJoints[k].q_index + _model.mJoints[k].mDoFCount))
+                {
+                        if (!_is_static && _model.mJoints[k].q_index < 6 &&
+                            _model.mJoints[k].q_index + _model.mJoints[k].mDoFCount != 6)
                         {
-                                if (!_is_static && _model.mJoints[k].q_index < 6 &&
-                                    _model.mJoints[k].q_index + _model.mJoints[k].mDoFCount != 6)
+                                for (int l = k; l < _model.mJoints.size(); l++)
                                 {
-                                        for (int l = k; l < _model.mJoints.size(); l++)
-                                        {
-                                                if (_model.mJoints[l].q_index < 6 &&
-                                                    _model.mJoints[l].q_index + _model.mJoints[l].mDoFCount == 6)
- //                                               {
-                                                        return _model.GetBodyName(l);
+                                        if (_model.mJoints[l].q_index < 6 &&
+                                            _model.mJoints[l].q_index + _model.mJoints[l].mDoFCount == 6)
+                                                //                                               {
+                                                return _model.GetBodyName(l);
 //                                                        found = true;
 //                                                        break;
 //                                                }
-                                        }
                                 }
+                        }
 //                                else
 //                                {
-                                        return _model.GetBodyName(k);
+                        return _model.GetBodyName(k);
 //                                        found = true;
 //                                        break;
 //                                }
-                        }
+                }
         }
 
- //           if (!found)
-                    throw std::invalid_argument(
-                              std::string("No link is associated with dof ") +
-                          std::to_string(dof));
+        //           if (!found)
+        throw std::invalid_argument(
+                      std::string("No link is associated with dof ") +
+                      std::to_string(dof));
 
 //        return links;
 }
@@ -885,8 +885,8 @@ mwoibn::robot_class::Robot::_readRobotConfig(YAML::Node full_config,
 
 
         if(!full_config["controllers"][controller_source])
-          throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string("\nconfig_name: ") + config_name + "\n" +
-                                    "\tcontroller source " + controller_source + " undefined in a config file.\n"));
+                throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string("\nconfig_name: ") + config_name + "\n" +
+                                            "\tcontroller source " + controller_source + " undefined in a config file.\n"));
 
         // extend config_robot by robot name
         config["name"] = (full_config["robot"]["name"])
@@ -1025,7 +1025,8 @@ bool mwoibn::robot_class::Robot::_loadFeedback(YAML::Node entry,
 
         entry["name"] = name;
 
-        return true;
+        return (feedbacks.startsWith(name)) ? false : true;
+        // return true;
 }
 
 void mwoibn::robot_class::Robot::_loadMappings(YAML::Node config)
@@ -1183,15 +1184,16 @@ void mwoibn::robot_class::Robot::_initContactsCallbacks(YAML::Node config, mwoib
         }
 }
 
-std::unique_ptr<mwoibn::communication_modules::CommunicationBase> mwoibn::robot_class::Robot::_generateContactCallback(mwoibn::robot_points::Contact& contact, YAML::Node config, mwoibn::communication_modules::Shared& shared){
-    if (!config["name"])
-      throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
+std::unique_ptr<mwoibn::communication_modules::CommunicationBase> mwoibn::robot_class::Robot::_generateContactCallback(
+        mwoibn::robot_points::Contact& contact, YAML::Node config, mwoibn::communication_modules::Shared& shared){
+        if (!config["name"])
+                throw std::invalid_argument(std::string("Contact shared feedback: missing 'name' argument."));
 
-    if (shared.startsWith(config["name"].as<std::string>()))
-    return  std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
-                                   new mwoibn::communication_modules::SharedPointGet(config, shared, contact.wrench()));
+        if (shared.startsWith(config["name"].as<std::string>()))
+                return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                               new mwoibn::communication_modules::SharedPointGet(config, shared, contact.wrench()));
 
-    return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
+        return std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(nullptr);
 
 }
 
@@ -1219,6 +1221,7 @@ void mwoibn::robot_class::Robot::_shareFeedbacks(YAML::Node config, mwoibn::comm
                 entry.second["rate"] = rate();
                 mwoibn::robot_class::State& state_ref = (entry.second["function"] && entry.second["function"].as<std::string>() == "reference") ? command : state;
                 if(share.startsWith(entry.second["name"].as<std::string>())) {
+                        std::cout << "share feedback\t" << entry.second["name"].as<std::string>() << std::endl;
                         feedbacks.add(mwoibn::communication_modules::SharedFeedback(state_ref, map, entry.second, share),  entry.second["name"].as<std::string>());
 
                         continue;
@@ -1232,22 +1235,27 @@ void mwoibn::robot_class::Robot::_shareControllers(YAML::Node config, mwoibn::co
         for (auto entry : config)
         {
                 if (entry.first.as<std::string>() == "mode") continue;
+                if (entry.first.as<std::string>() == "source") continue;
 
 
                 if (!entry.second["type"])
                         throw(std::invalid_argument(std::string("Unknown controller type for " +
                                                                 entry.first.as<std::string>())));
 
-              try{
-                if (entry.second["type"].as<std::string>() == "reference")
-                        controllers.add(std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
-                                                new mwoibn::communication_modules::SharedController(
-                                                        static_cast<mwoibn::communication_modules::BasicController&>(controllers[entry.first.as<std::string>()]),
-                                                        shared, entry.first.as<std::string>())), entry.first.as<std::string>());  // thats unsafe
+                try{
+                        if (entry.second["type"].as<std::string>() == "reference"){
+
+                                std::cout << "share controller\t" << entry.second["name"].as<std::string>() << std::endl;
+
+                                controllers.add(std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
+                                                        new mwoibn::communication_modules::SharedController(
+                                                                static_cast<mwoibn::communication_modules::BasicController&>(controllers[entry.first.as<std::string>()]),
+                                                                shared, entry.first.as<std::string>())), entry.first.as<std::string>());  // thats unsafe
+                        }
                 }
-              catch (const std::invalid_argument& e)
+                catch (const std::invalid_argument& e)
                 {
-                  std::cout << "WARNING: " <<  e.what() << std::endl;
+                        std::cout << "WARNING: " <<  e.what() << std::endl;
                 }
         }
 }

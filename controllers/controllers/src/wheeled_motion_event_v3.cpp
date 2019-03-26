@@ -1,5 +1,6 @@
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/higher_level/steering_v8.h"
+#include "mgnss/higher_level/steering_reactif.h"
 #include <mwoibn/hierarchical_control/tasks/contact_point_3D_rbdl_task.h>
 
 
@@ -17,7 +18,7 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
 
         YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
+        _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
                                 _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
 
@@ -40,6 +41,8 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         _com_ptr.reset(new mwoibn::hierarchical_control::tasks::CenterOfMass(_robot));
 
         _com_ptr->setDofs(_robot.selectors().get("lower_body").getBool());
+
+        _pelvis.reset(new mwoibn::robot_points::LinearPoint("pelvis", _robot));
 
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(

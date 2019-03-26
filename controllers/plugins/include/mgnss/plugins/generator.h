@@ -79,6 +79,7 @@ virtual void stop(){
 
 virtual void control_loop(double time)
 {
+
   int i = 0;
   _valid = true;
 

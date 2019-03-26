@@ -73,6 +73,7 @@ public:
 protected:
   virtual void _updateError()
   {
+    _base_point.update(true);
     // std::cout << "_updateError" << std::endl;
     _last_error.noalias() = _error; // save previous state
 
@@ -98,8 +99,7 @@ protected:
       _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
     }
 
-    // std::cout << "_error\t" << _error.transpose() << std::endl;
-    // std::cout << "_full_error\t" << _full_error.transpose() << std::endl;
+    //std::cout << "get\n" << _base_point.get() << std::endl;
   }
 
 

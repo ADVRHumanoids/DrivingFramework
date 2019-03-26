@@ -248,16 +248,16 @@ LIST( APPEND INSTALL_TARGETS
 #    set_xeno_flags(NwheelsWorld)
 #  endif()
 
-#    LIST( APPEND INSTALL_TARGETS Nwheels3 )
-#
-#    add_library(Nwheels3 SHARED
-#       src/plugins/wheels_3.cpp
-#     )
-#    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
-#    target_link_libraries(Nwheels3
-#       ${catkin_LIBRARIES}
-#       ${XCM_LIBRARIES}
-#     )
+    LIST( APPEND INSTALL_TARGETS Nwheels3 )
+
+    add_library(Nwheels3 SHARED
+       src/plugins/wheels_3.cpp
+     )
+    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(Nwheels3
+       ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
+     )
 
 #  if ( Xenomai_FOUND )
 #    message(WARNING "set_xeno_flags")

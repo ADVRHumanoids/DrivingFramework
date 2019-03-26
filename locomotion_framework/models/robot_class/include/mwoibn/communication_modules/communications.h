@@ -48,9 +48,10 @@ public:
    {
 
      bool success = true;
-     for (auto& module : _modules)
+     for (auto& module : _modules){
+       // std::cout << "success\t" << module.first << "\t" << module.second->run() << std::endl;
        success = module.second->run() && success;
-
+     }
      return success;
    }
 

@@ -126,15 +126,17 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
 {
 
   std::cout << "load controllers" << std::endl;
+
   for (auto entry : config)
   {
+
     if (entry.first.as<std::string>() == "mode") continue;
     std::cout << entry.first << std::endl;
     if (entry.first.as<std::string>() == "gains") continue;
     if (entry.first.as<std::string>() == "source") continue;
 
     if (!entry.second["layer"])
-      throw(std::invalid_argument("Please define controller type" +
+      throw(std::invalid_argument("Please define controller type " +
                                   entry.first.as<std::string>()));
 
     if (entry.second["layer"].as<std::string>() != "lower_level")

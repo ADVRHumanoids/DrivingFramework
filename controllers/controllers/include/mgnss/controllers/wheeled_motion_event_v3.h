@@ -87,6 +87,8 @@ const mwoibn::Vector3& getBaseReference(){
 protected:
   WheeledMotionEvent3(mwoibn::robot_class::Robot& robot) : WheelsControllerExtend(robot){ }
 
+  std::unique_ptr<mwoibn::robot_points::LinearPoint> _pelvis;
+
   void _allocate(YAML::Node config);
 
   std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;

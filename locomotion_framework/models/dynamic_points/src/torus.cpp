@@ -91,7 +91,7 @@ namespace dynamic_points
       vec_1.noalias() = _torus._v_centre.angular().getJacobian()*_state.acceleration.get();
       est_.noalias() = j_test__*vec_1;
       est_ += _constant;
-      est_ = est_*0.005;
+      est_ = est_*0.002; // I need robot rate here
       est_ += last_;
       // est_ = last_ + (_constant + j_test__*_torus._v_centre.angular().getJacobian()*_state.acceleration.get())*0.005;
 

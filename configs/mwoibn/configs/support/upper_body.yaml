@@ -1,3 +1,4 @@
+
 mwoibn:
         # controller:
         #         position_controller:
@@ -6,8 +7,14 @@ mwoibn:
         ros:
                 source:
                        urdf: "/robot_upper_body"
+        xbot:
+                source:
+                       urdf:
+                              file: mwoibn/urdf/centauro_upper_body.urdf
+
         controllers:
-                higher_level: [upper_body]
+                position_reference:
+                        list: [upper_body]
         feedbacks:
                 online: [link_side_online]
 

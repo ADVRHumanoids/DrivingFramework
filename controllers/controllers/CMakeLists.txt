@@ -47,7 +47,7 @@ add_library(mgnss_controllers_wheels
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp
-#   src/wheeled_motion_event_v3.cpp
+   src/wheeled_motion_event_v3.cpp
 #   src/wheels_second_order.cpp
 
 #   src/wheeled_motion_actions.cpp

@@ -4,7 +4,7 @@ config_path: &config /home/malgorzata/catkin_ws/src/DrivingFramework/configs/
 support_path: &support /home/malgorzata/catkin_ws/src/DrivingFramework/configs/mwoibn/configs/support/
 
 mwoibn:
-        middleware: ROS
+        middleware: XBOT
         system: SM # SM
         layers:
             RT:
@@ -492,7 +492,7 @@ mwoibn:
                                 layer: NRT
                                 source: desired_state
                         upper_body:
-                                layer: NRT
+                                layer: RT
                                 source: upper_body
                         torque_reference:
                                 layer: NRT
@@ -504,7 +504,7 @@ mwoibn:
                                 layer: NRT
                                 source: desired_state
                         odometry:
-                                layer: NRT
+                                layer: RT
                                 source: base_odometry
                 controller:
                         position_controller:
@@ -519,7 +519,7 @@ mwoibn:
                                 layer: NRT
                                 sink: desired_state
                         upper_body:
-                                layer: NRT
+                                layer: RT
                                 sink: upper_body
                         torque_reference:
                                 layer: NRT
@@ -528,16 +528,16 @@ mwoibn:
                                 layer: NRT
                                 sink: desired_state
                         odometry:
-                                layer: NRT
+                                layer: RT
                                 sink: base_odometry
         modules:
                 joint_states:
-                        layer: NRT
+                        layer: RT
                         robot: joint_space
                         controller: direct
                         mode: full
                 joint_reference:
-                        layer: NRT
+                        layer: RT
                         robot: default
                         controller: position_reference
                         secondary_file:
@@ -545,7 +545,7 @@ mwoibn:
                             file: upper_body.yaml
                         mode: full
                 wheeled_motion:
-                        layer: NRT
+                        layer: RT
                         robot: default
                         controller: direct
                         mode: full
@@ -687,7 +687,7 @@ mwoibn:
                                         CASTER_DAMP: 0.12
                                         COP: 0
                 odometry:
-                        layer: NRT
+                        layer: RT
                         robot: odometry
                         controller: odometry
                         secondary_file:
@@ -753,7 +753,7 @@ mwoibn:
                         controller: direct
                         mode: full
                 shared:
-                        layer: NRT
+                        layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
                         plugins: [odometry, joint_states::joint_reference, Nwheels3::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]

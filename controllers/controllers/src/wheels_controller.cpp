@@ -35,15 +35,23 @@ double mgnss::controllers::WheelsController::limit(const double th)
 
 void mgnss::controllers::WheelsController::compute()
 {
+        // std::cout << "compute\t" << _robot.command.position.get().transpose() << std::endl;
+
         _command.noalias() = _ik_ptr->update();
 
+        // std::cout << "IK\t" << _command.transpose() << std::endl;
         _robot.command.velocity.set(_command, _select_ik);
 
         _command.noalias() = _command * _robot.rate();
-        _command.noalias() +=
-                _robot.state.position.get();
+        mwoibn::VectorN position = _command;
+        // std::cout << "position\t" << _robot.command.position.get().transpose() << std::endl;
+
+        _robot.state.position.get(position, _select_ik);
+        _command.noalias() += position;
 
         _robot.command.position.set(_command, _select_ik);
+        // std::cout << "after position\t" << _robot.command.position.get().transpose() << std::endl;
+
 
 }
 

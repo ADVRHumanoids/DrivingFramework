@@ -27,6 +27,7 @@ mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot)
 }
 
 void mgnss::controllers::JointStates::init(){
+
         _position.noalias() = _robot.state.position.get();
 
         _robot.state.position.get(_des_ankle, _ankle_map);
@@ -201,9 +202,10 @@ void mgnss::controllers::JointStates::update()
 void mgnss::controllers::JointStates::send()
 {
         _robot.command.position.set(_position);
-
+        // std::cout << "joint_states\t" << _robot.command.position.get().transpose() << std::endl;
         _robot.command.velocity.set(_velocity, _vel_map);
         _robot.send();
+
         // _robot.update();
 }
 

@@ -43,7 +43,7 @@ YAML::Node mwoibn::robot_class::RobotXBot::_init(YAML::Node config,
 
   _readActuators(config_robot);
   _readContacts(config_robot);
-  _readController(config_robot);
+  // _readController(config_robot);
         //
         //
         // std::cout << __PRETTY_FUNCTION__ << std::endl;
