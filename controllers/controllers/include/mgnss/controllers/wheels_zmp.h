@@ -35,6 +35,7 @@
 #include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
+#include <mgnss/higher_level/qp/tasks/qr_joint_space_v3.h>
 #include <mgnss/higher_level/shape_action.h>
 
 #include "mwoibn/robot_points/constant.h"

@@ -20,8 +20,18 @@ class QpAggravated: public QrTask
 
 public:
   QpAggravated(int vars): QrTask(vars, 0){
+    _chain = mwoibn::eigen_utils::iota(vars);
+    _max = _chain.maxCoeff();
+    _equality.active_dofs = _chain;
+    _inequality.active_dofs = _chain;
   }
 
+  QpAggravated(const mwoibn::VectorInt& chain): QrTask(chain.size(), 0), _chain(chain){
+    _max = chain.maxCoeff();
+    _equality.active_dofs = _chain;
+    _inequality.active_dofs = _chain;
+  }
+  
   ~QpAggravated(){}
 
 virtual void add(QrTask& task){
@@ -38,6 +48,8 @@ virtual void log(mwoibn::common::Logger& logger);
 protected:
   std::vector<QrTask*> _tasks;
   int _size;
+  mwoibn::VectorInt _chain;
+  int _max;
 
 
 };

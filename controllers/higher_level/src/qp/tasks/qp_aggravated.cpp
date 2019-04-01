@@ -18,25 +18,25 @@ void mgnss::higher_level::QpAggravated::init(){
   for(auto& task: _tasks) {
     if(task->equality.size()){
 
-      if(task->equality.cols()!= _vars)
-        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile equality constraint sizes got ") + std::to_string(task->equality.cols()) + " , expected " + std::to_string(_vars));
-      equality.add(Constraint(task->equality.rows(), _vars));
+      if(task->equality.cols() < _max )
+        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile equality constraint sizes got ") + std::to_string(task->equality.cols()) + " , expected at least " + std::to_string(_max));
+      equality.add(Constraint(task->equality.rows(), task->equality.cols()));
     }
 
     if(task->soft_inequality.size()){
 
-      if(task->soft_inequality.cols()!= _vars)
-        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile soft_inequality constraint sizes got ") + std::to_string(task->soft_inequality.cols()) + " , expected " + std::to_string(_vars));
+      if(task->soft_inequality.cols()  < _max )
+        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile soft_inequality constraint sizes got ") + std::to_string(task->soft_inequality.cols()) + " , expected at least " + std::to_string(_max));
         _updateGains();
-      addSoft(Constraint(task->soft_inequality.rows(), _vars), task->getSoftGain());
+      addSoft(Constraint(task->soft_inequality.rows(), task->soft_inequality.cols()), task->getSoftGain());
     }
 
     if(task->hard_inequality.size()){
 
-      if(task->hard_inequality.cols()!= _vars)
-        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile hard_inequality constraint sizes got ") + std::to_string(task->hard_inequality.cols()) + " , expected " + std::to_string(_vars));
+      if(task->hard_inequality.cols()  < _max )
+        throw std::runtime_error(__PRETTY_FUNCTION__ + std::string(": incompatibile hard_inequality constraint sizes got ") + std::to_string(task->hard_inequality.cols()) + " , expected at least " + std::to_string(_max));
 
-        hard_inequality.add(Constraint(task->hard_inequality.rows(), _vars));
+        hard_inequality.add(Constraint(task->hard_inequality.rows(), task->hard_inequality.cols()));
       }
     }
 
@@ -59,7 +59,8 @@ void mgnss::higher_level::QpAggravated::_update(){
 
       if(task->equality.size()){
        equality.end(counter).setState() = task->equality.getState();
-       equality.end(counter).setJacobian() = task->equality.getJacobian();
+       for(int i = 0; i < _vars; i++)
+          equality.end(counter).setJacobian().col(i) = task->equality.getJacobian().col(_chain[i]);
        ++counter;
        // std::cout << "equality " << idx << std::endl;
        // std::cout << "state\t" << equality[idx].state.transpose() << std::endl;
@@ -73,7 +74,8 @@ void mgnss::higher_level::QpAggravated::_update(){
 
      if(task->soft_inequality.size()){
        soft_inequality.end(counter).setState() = task->soft_inequality.getState();
-       soft_inequality.end(counter).setJacobian() = task->soft_inequality.getJacobian();
+       for(int i = 0; i < _vars; i++)
+          soft_inequality.end(counter).setJacobian().col(i) = task->soft_inequality.getJacobian().col(_chain[i]);
        soft_inequality.end(counter).setGain(task->getSoftGain());
        _updateGains();
        ++counter;
@@ -89,7 +91,8 @@ void mgnss::higher_level::QpAggravated::_update(){
 
      if(task->hard_inequality.size()){
        hard_inequality.end(counter).setState() = task->hard_inequality.getState();
-       hard_inequality.end(counter).setJacobian() = task->hard_inequality.getJacobian();
+       for(int i = 0; i < _vars; i++)
+          hard_inequality.end(counter).setJacobian().col(i) = task->hard_inequality.getJacobian().col(_chain[i]);
        ++counter;
      }
    }
@@ -99,10 +102,17 @@ void mgnss::higher_level::QpAggravated::_update(){
    int slack = 0;
    for(auto& task: _tasks){
 
-     _cost.quadratic.block(0,0,_vars, _vars)  += task->cost().quadratic.block(0,0,_vars, _vars);
+
+      for(int i = 0; i < _vars; i++){
+        _cost.linear[i] += task->cost().linear[_chain[i]];
+         for(int j = 0; j < _vars; j++)
+            _cost.quadratic(i,j)  += task->cost().quadratic(_chain[i],_chain[j]);
+      }
+
      _cost.quadratic.block(_vars+slack,_vars+slack, task->slack(), task->slack())  = task->cost().quadratic.block(task->vars(), task->vars(), task->slack(), task->slack());
 
-     _cost.linear.head(_vars) += task->cost().linear.head(task->vars());
+
+
      _cost.linear.segment(_vars+slack, task->slack())  = task->cost().linear.tail(task->slack());
 
      // std::cout << "task cost\n" << task->cost().linear.transpose() << std::endl;

@@ -68,6 +68,7 @@ add_library(steering
     #src/qp/tasks/qr_tracking.cpp
     src/qp/tasks/qr_task.cpp
     src/qp/tasks/qr_joint_space_v2.cpp
+    src/qp/tasks/qr_joint_space_v3.cpp
     src/qp/tasks/qp_aggravated.cpp
     src/state_machine.cpp
   )

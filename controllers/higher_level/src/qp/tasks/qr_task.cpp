@@ -59,7 +59,9 @@ void mgnss::higher_level::QrTask::_update(){
       constraint->update();
     }
     _equality.setState() = equality.getState();
-    _equality.setJacobian().leftCols(_vars) = equality.getJacobian();
+
+    for(int i = 0; i < _equality.active_dofs.size(); i++ )
+      _equality.setJacobian().col(i) = equality.getJacobian().col(_equality.active_dofs[i]);
 
     // std::cout << _equality.getState().transpose() << std::endl;
     _equality.transpose();
@@ -70,7 +72,11 @@ void mgnss::higher_level::QrTask::_update(){
   if(hard_inequality.size()){
     for(auto& constraint: hard_inequality) constraint->update();
     _inequality.setState().head(hard_inequality.rows()) = hard_inequality.getState();
-    _inequality.setJacobian().block(0,0, hard_inequality.rows(), _vars) = hard_inequality.getJacobian();
+
+    for(int i = 0; i < _inequality.active_dofs.size(); i++)
+      _inequality.setJacobian().block(0, i, hard_inequality.rows(), 1) = hard_inequality.getJacobian().col(_inequality.active_dofs[i]);
+
+    // _inequality.setJacobian().block(0,0, hard_inequality.rows(), _vars) = hard_inequality.getJacobian();
   }
 
 
@@ -80,7 +86,10 @@ void mgnss::higher_level::QrTask::_update(){
     }
 
     _inequality.setState().segment(hard_inequality.rows(), soft_inequality.rows()) = soft_inequality.getState();
-    _inequality.setJacobian().block(hard_inequality.rows(),0, soft_inequality.rows(), _vars) =  soft_inequality.getJacobian();
+    for(int i = 0; i < _inequality.active_dofs.size(); i++)
+        _inequality.setJacobian().block(hard_inequality.rows(),i, soft_inequality.rows(), 1) =  soft_inequality.getJacobian().col(_inequality.active_dofs[i]);
+
+    // _inequality.setJacobian().block(hard_inequality.rows(),0, soft_inequality.rows(), _vars) =  soft_inequality.getJacobian();
   }
     _inequality.transpose();
 
@@ -114,7 +123,7 @@ void mgnss::higher_level::QrTask::solve(){
     _cost.trace = _cost.quadratic.trace();
 
     _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
-    // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
+    std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);
     _outputTransform();
     // if(_return_state.norm()) std::cout << "_optimal_state\t" << _return_state.transpose() << std::endl;

@@ -3,7 +3,9 @@
 
 // #include "mwoibn/robot_class/robot.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
+//#include "mgnss/higher_level/qp/tasks/qr_joint_space_v3.h"
 #include "mgnss/higher_level/qp/tasks/qr_joint_space_v2.h"
+
 // #include "mwoibn/robot_points/handler.h"
 // #include "mwoibn/common/logger.h"
 // #include "mgnss/higher_level/qp/constraints/constraint.h"
