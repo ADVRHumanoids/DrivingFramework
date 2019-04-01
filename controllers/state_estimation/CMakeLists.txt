@@ -39,8 +39,10 @@ include_directories(
 )
 
 add_library(mgnss_state_estimation
-   src/odometry.cpp
+   #src/odometry.cpp
    src/odometry_v2.cpp
+   src/odometry_v3.cpp
+
    src/ground_forces.cpp
    src/acceleration_test.cpp
 )

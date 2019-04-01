@@ -93,6 +93,7 @@ public:
       _orientation.z() = msg->pose[_ref].orientation.z;
       _orientation.w() = msg->pose[_ref].orientation.w;
 
+      std::cout << "orientation\t" << _orientation << std::endl;
       if (_is_position)
         _linear_state << msg->pose[_ref].position.x, msg->pose[_ref].position.y,
             msg->pose[_ref].position.z;
@@ -102,9 +103,31 @@ public:
 
     if (_velocity)
     {
-      _full << msg->twist[_ref].linear.x, msg->twist[_ref].linear.y,
-          msg->twist[_ref].linear.z, msg->twist[_ref].angular.x,
-          msg->twist[_ref].angular.y, msg->twist[_ref].angular.z;
+
+      // this is the angular velocity not euler angles
+
+
+
+      mwoibn::Matrix3 to_euler;
+      double x = _command.position.get()[_map_dofs[3]];
+      double y = _command.position.get()[_map_dofs[4]];
+      double z = _command.position.get()[_map_dofs[5]];
+
+      to_euler << 1, std::sin(x)*std::sin(y)/std::cos(y), -std::cos(x)*std::sin(y)/std::cos(y),
+                   0, std::cos(x), std::sin(x),
+                   0, -std::sin(x)/std::cos(y), std::cos(x)/std::cos(y);
+
+     mwoibn::Vector3 angular;
+     angular << msg->twist[_ref].angular.x, msg->twist[_ref].angular.y,
+              msg->twist[_ref].angular.z;
+
+    // std::cout << "angular velocity\t" << angular.transpose() << std::endl;
+    _full.tail<3>().noalias() = to_euler*angular;
+      _full[0] = msg->twist[_ref].linear.x;
+      _full[1] = msg->twist[_ref].linear.y;
+      _full[2] = msg->twist[_ref].linear.z;
+
+      // std::cout << "euler vel\t" << _full.tail<3>().transpose() << std::endl;
       getVelocity(_full);
     }
   }

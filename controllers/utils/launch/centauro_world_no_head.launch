@@ -108,7 +108,7 @@
          command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
                    GAZEBO:=false                        MIDDLEWARE:=none                   XBOT_CONFIG_FILE:=none
                    STATIC:=false                        LEFT_END_EFFECTOR:=none     RIGHT_END_EFFECTOR:=none   MASS:=0
-                   ARMS:=true                            LEGS:=true                               TORSO:=true                             WHEELS:=true                           HEAD:=false
+                   ARMS:=true                            LEGS:=true                 TORSO:=false                             WHEELS:=true                           HEAD:=false
                    ARM_ACTUATORS:=true          LEG_ACTUATORS:=true             TORSO_ACTUATORS:=true         WHEELS_ACTUATORS:=true       HEAD_ACTUATORS:=false
                    ARM_SENSORS:=false             LEG_SENSORS:=true
                    FT_SENSORS:=true                BUMBERS:=true                         IMU:=true

@@ -129,13 +129,21 @@ void mgnss::plugins::RosShared::control_loop(double time)
   if (!_initialized)
   {
           if(_valid){
-              for(auto& controller: _controller_ptrs) controller->init();
+
+              for(auto& controller: _controller_ptrs) {controller->init();
+                controller->send();
+                for(auto& robot: _robot_ptr)
+                    robot.second->get();
+              }
           }
 
           if(_rate && _valid)  _initialized = true;
   }
 
   for(auto& controller: _controller_ptrs){
+    for(auto& robot: _robot_ptr)
+        robot.second->get(); // this will cause unecessary update on external feedbacks (think how to separate both), but it should not be expensive
+
         controller->update();
         controller->send();
         controller->log(*_logger_ptr.get(), time-_start);

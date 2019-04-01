@@ -46,7 +46,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
 
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
-                             _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
+                             _robot.getLinks("wheels"), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
 
         _steering_ptr->subscribe(true, true, false);
 
@@ -106,5 +106,12 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
          }
        }
 
+
+              std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
+
+             std::cout << "wheels velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
+
+
+  // std::cout << _robot.state.velocity.get().head<6>().transpose() << std::endl;
 
 }

@@ -255,6 +255,22 @@ Eigen::Vector3d rotate (const Eigen::Vector3d &vec) const {
 
         return res_quat.axis();
 }
+
+Quaternion log()
+{
+        Quaternion quat;
+        Eigen::Vector3d axis;
+
+        quat.w() = std::log(this->norm());
+        axis = std::atan2(this->axis().norm(), this->w())*this->axis();
+        axis = axis/this->axis().norm();
+        quat.x() = axis[0];
+        quat.y() = axis[1];
+        quat.z() = axis[2];
+
+        return quat;
+}
+
 };
 } // namespace
 

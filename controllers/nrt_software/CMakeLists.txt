@@ -227,6 +227,17 @@ LIST( APPEND INSTALL_TARGETS
       ${XCM_LIBRARIES}
     )
 
+    LIST( APPEND INSTALL_TARGETS odometry2 )
+
+    add_library(odometry2 SHARED
+       src/plugins/odometry_3.cpp
+     )
+    add_dependencies(odometry2 ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(odometry2
+       ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
+     )
+
   if ( Xenomai_FOUND )
     message(WARNING "set_xeno_flags")
     set_xeno_flags(odometry)

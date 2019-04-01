@@ -57,6 +57,7 @@ mwoibn:
                 odometry:
                         feedback:
                                 list: [link_side_online, imu_base]
+#                                list: [link_side_online, simulation_base]
                         actuators:
                                 read: true
                         contacts:
@@ -263,7 +264,7 @@ mwoibn:
                                 mapping: RBDL_LOWER #this has to be to indiacate the RBDL model that it is working with is only lower body
                         interface:
                                 position: true
-                                velocity: false
+                                velocity: true
                                 effort: false
                         function: state
                 velocity_reference:
@@ -347,7 +348,7 @@ mwoibn:
                                 mapping: RBDL_LOWER #this he RBDL model that it is working with is only lower body
                         interface:
                                 position: true
-                                velocity: false
+                                velocity: true
                                 effort: false
                         filter:
                                 run: false
@@ -639,7 +640,7 @@ mwoibn:
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 90
-                                        BASE: [100, 100, 100, 50, 50, 150]
+                                        BASE: [45, 45, 45, 20, 20, 80]
                                         CONTACT_POINTS: 30
 #                                        CONTACT_POINTS: 0.01
                                         CAMBER: 15 # 100
@@ -755,7 +756,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry, joint_states::joint_reference, Nwheels3::wheeled_motion]
+                        plugins: [odometry2::odometry, NwheelsZMP::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry, ground_forces,
                         #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

@@ -394,6 +394,10 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
          }
        }
 
+       std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
+
+      std::cout << "wheels velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
+
 //      for(auto& state_: {"MINUS_TORQUE","CONTACT_TORQUE","COM_TORQUE"}){
 //        for(int i = 0; i < _robot.state[state_].size(); i++)
 //          logger.add(state_ + std::string("_") + _robot.getLinks(i), _robot.state[state_][i]);

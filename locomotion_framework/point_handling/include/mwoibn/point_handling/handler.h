@@ -142,6 +142,12 @@ typename std::vector<std::unique_ptr<Type>>::iterator end(){return _points.end()
 typename std::vector<std::unique_ptr<Type>>::const_iterator begin() const {return _points.begin();}
 typename std::vector<std::unique_ptr<Type>>::const_iterator end() const {return _points.end();}
 
+virtual Type& end(unsigned int i) {
+        int idx = -i - 1;
+        // std::cout << "idx\t" << idx << std::endl;
+        return *(_points.end()[idx]);
+}
+
 virtual Type& operator[](int i) {
         return *_points[i];
 }

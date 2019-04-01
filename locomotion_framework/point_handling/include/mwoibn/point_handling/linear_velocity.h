@@ -45,7 +45,9 @@ public:
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+    _temp_world = CalcPointVelocity(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false);
+    return _temp_world;
+    // throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
 
   virtual Point::Current
