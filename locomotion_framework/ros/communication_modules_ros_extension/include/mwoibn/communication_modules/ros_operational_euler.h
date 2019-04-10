@@ -93,7 +93,7 @@ public:
       _orientation.z() = msg->pose[_ref].orientation.z;
       _orientation.w() = msg->pose[_ref].orientation.w;
 
-      std::cout << "orientation\t" << _orientation << std::endl;
+      // std::cout << "orientation\t" << _orientation << std::endl;
       if (_is_position)
         _linear_state << msg->pose[_ref].position.x, msg->pose[_ref].position.y,
             msg->pose[_ref].position.z;

@@ -3,67 +3,74 @@
 
 #include "mgnss/higher_level/qp/constraints/constraint.h"
 
-namespace mgnss
-{
-
-namespace higher_level
-{
-
-  namespace constraints
+namespace mgnss::higher_level::constraints
   {
 
-class Intergate: public mgnss::higher_level::Constraint{
+class Integrate: public mgnss::higher_level::Constraint{
 
   public:
     // template<typename ConstraintType>
-    // Intergate(ConstraintType constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(constraint), _constraint(constraint), _dt(dt), _robot_state(robot_state) {
+    // Integrate(ConstraintType constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(constraint), _constraint(constraint), _dt(dt), _robot_state(robot_state) {
     //   _constraint.reset(new ConstraintType(constraint));
     // }
 
-    template<typename ConstraintType>
-    Intergate(ConstraintType&& constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(), _dt(dt), _robot_state(robot_state) {
-      _constraint.reset(new ConstraintType(constraint));
+    //template<typename ConstraintType>
+    Integrate(Constraint&& constraint, double dt, const mwoibn::VectorN& current ): Constraint(), _dt(dt), _current(current), _constraint(constraint.clone())
+    {
       resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
+      active.setConstant(_constraint->getJacobian().rows(), true);
     }
 
     template<typename ConstraintType>
-    Intergate(std::unique_ptr<ConstraintType> constraint, double dt, const mwoibn::robot_class::Pipe& robot_state ): Constraint(), _dt(dt), _robot_state(robot_state) {
+    Integrate(std::unique_ptr<ConstraintType> constraint, double dt, const mwoibn::VectorN& current ): Constraint(), _dt(dt), _current(current) {
       _constraint.reset(std::move(constraint));
       resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
+      active.setConstant(_constraint->getJacobian().rows(), true);
     }
 
 
-    Intergate(Intergate&& other): Constraint(other), _dt(other._dt), _robot_state(other._robot_state){
+    Integrate(Integrate&& other): Constraint(other), _dt(other._dt), _current(other._current){
       _constraint = std::move(other._constraint);
     }
 
-    Intergate(const Intergate& other): Constraint(other), _constraint(other._constraint->clone()), _dt(other._dt), _robot_state(other._robot_state){ }
+    Integrate(const Integrate& other): Constraint(other), _constraint(other._constraint->clone()), _dt(other._dt), _current(other._current){ }
 
+
+    virtual void init() override {
+            resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
+    }
 
     virtual void update(){
-      _constraint->update();
-        _jacobian = _constraint->getJacobian()*_dt;
+      // std::cout << "Constraint" << std::endl;
+        _constraint->update();
+        _jacobian = _constraint->getJacobian();
         _state = _constraint->getState();
-        _state.noalias() += _constraint->getJacobian()*_robot_state.get();
+        _state.noalias() += _current;
 
-        // std::cout << "Constraint\n" << std::endl;
-        // std::cout << "_constraint->state\t" << _constraint->state.transpose() << std::endl;
-        // std::cout << "_constraint->jacobian\n" << _constraint->jacobian << std::endl;
-        // std::cout << "state\t" << state.transpose() << std::endl;
+
+
+        _state = _state/_dt;
+
+//        std::cout << "_constraint->state\t_state\t_current\n";
+//        for(int i = 0; i < active.size(); i++)
+//          std::cout << _constraint->getState()[i] << "\t" << _state[i] << "\t" << _current[i] << "\n";
+
+        //std::cout << "current\t" << _current.transpose() << std::endl;
         // std::cout << "jacobian\n" << jacobian << std::endl;
 
     }
 
+    mgnss::higher_level::Constraint& constraint(){return *_constraint;}
+
   protected:
     std::unique_ptr<mgnss::higher_level::Constraint> _constraint;
     double _dt;
-    const mwoibn::robot_class::Pipe& _robot_state;
-    virtual Intergate* clone_impl() const override {return new Intergate(*this);}
+    const mwoibn::VectorN& _current;
+    //const mwoibn::robot_class::Pipe& _robot_state;
+    virtual Integrate* clone_impl() const override {return new Integrate(*this);}
 
 
 };
 
-}
-}
 }
 #endif

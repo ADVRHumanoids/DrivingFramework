@@ -20,6 +20,7 @@ public:
       : BasicPoint(point, config)
   {
 
+          _state.setZero(6);
           if(!config["topic"]) return;
           if(!config["message"]) return;
 
@@ -61,7 +62,6 @@ public:
     other._subscribe.shutdown();
     _subscribe = _node.subscribe<gazebo_msgs::ContactsState>(
     topic, 1, &mwoibn::communication_modules::RosContactSimulation::get, this);
-
   }
 
   RosContactSimulation(RosContactSimulation&& other)
@@ -72,6 +72,7 @@ public:
     _subscribe = _node.subscribe<gazebo_msgs::ContactsState>(
     topic, 1, &mwoibn::communication_modules::RosContactSimulation::get, this);
    }
+
   virtual ~RosContactSimulation() {}
   virtual bool initialized() { return _initialized; }
   virtual bool run() { return true; }
@@ -92,7 +93,7 @@ protected:
   ros::NodeHandle _node;
   ros::Subscriber _subscribe;
 
-  mwoibn::Vector6 _state;
+  mwoibn::VectorN _state;
 
 };
 }

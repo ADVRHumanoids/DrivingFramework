@@ -43,11 +43,13 @@ void mgnss::controllers::WheelsController::compute()
         _robot.command.velocity.set(_command, _select_ik);
 
         _command.noalias() = _command * _robot.rate();
-        mwoibn::VectorN position = _command;
+        //_active_state = _command;
         // std::cout << "position\t" << _robot.command.position.get().transpose() << std::endl;
 
-        _robot.state.position.get(position, _select_ik);
-        _command.noalias() += position;
+        _robot.state.position.get(_active_state, _select_ik);
+
+        for(int i = 0; i < _select_ik.size(); i++)
+        _command[_select_ik[i]] += _active_state[i];
 
         _robot.command.position.set(_command, _select_ik);
         // std::cout << "after position\t" << _robot.command.position.get().transpose() << std::endl;
@@ -300,5 +302,5 @@ void mgnss::controllers::WheelsController::_allocate(){
 
         _previous_command = mwoibn::VectorN::Zero(3);
         _command.setZero(_robot.getDofs());
-
+        _active_state.setZero(_select_ik.size());
 }

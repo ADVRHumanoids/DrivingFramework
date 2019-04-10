@@ -136,7 +136,14 @@ public:
     _measures.assign(mwoibn::std_utils::factorial(size)/mwoibn::std_utils::factorial(2)/mwoibn::std_utils::factorial(size-2), mwoibn::MAX_DOUBLE);
     _selector.setZero(mwoibn::std_utils::factorial(size)/mwoibn::std_utils::factorial(2)/mwoibn::std_utils::factorial(size-2));
     _inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix(6,4 )));
+
     _estimate.setZero(4);
+    _base_jacobian.setZero(6, 4);
+    _temp_jacobian.setZero(3, _wheels_velocity[0].dofs());
+    _x.setZero(6);
+    _y.setZero(6);
+
+    _inverse->compute(_base_jacobian);
   }
 
   void update();
@@ -149,7 +156,8 @@ protected:;
   const mwoibn::VectorInt& _ids;
   mwoibn::Quaternion& _twist_es;
   double _r;
-
+  mwoibn::Matrix _base_jacobian, _temp_jacobian;
+  mwoibn::VectorN _x, _y;
   virtual void _average();
 
   virtual void _measure();
@@ -216,6 +224,7 @@ mwoibn::point_handling::Handler<mwoibn::point_handling::FramePlus> _wheels_frame
 
 std::vector<mwoibn::point_handling::Point::Current> _estimated, _pelvis, _contact_points, _step;     // _estimated - wheel center position
 std::vector<mwoibn::Axis> _directions, _axes;     // directions
+std::vector<int> _translation_dofs;
 double _r;
 mwoibn::VectorInt _ids, _base_ids;
 mwoibn::Vector6 _base;

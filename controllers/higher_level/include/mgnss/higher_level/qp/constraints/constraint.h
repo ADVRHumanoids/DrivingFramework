@@ -22,17 +22,19 @@ class Constraint{
     Constraint(int size, int vars){
       resize(size, vars);
       active_dofs = mwoibn::eigen_utils::iota(vars);
+      active.setConstant(size, true);
     }
 
     Constraint(int size, int vars, mwoibn::VectorInt& dofs): active_dofs(dofs){
       resize(size, vars);
-      active_dofs = mwoibn::eigen_utils::iota(vars);
+      active.setConstant(size, true);
     }
 
     Constraint(const Constraint& other): _jacobian(other._jacobian),
-          _transposed(other._transposed), _state(other._state), active_dofs(other.active_dofs){
-
+          _transposed(other._transposed), _state(other._state), active_dofs(other.active_dofs), active(other.active){
           }
+
+    virtual void init(){}
 
     auto clone() {return std::unique_ptr<Constraint>(clone_impl()); }
 
@@ -67,6 +69,8 @@ class Constraint{
     virtual mwoibn::VectorN& setState(){return _state;}
 
     mwoibn::VectorInt active_dofs;
+    mwoibn::VectorBool active;
+
   protected:
     virtual Constraint* clone_impl() const {return new Constraint(*this);}
     mwoibn::Matrix _jacobian, _transposed;

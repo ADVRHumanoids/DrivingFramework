@@ -31,7 +31,7 @@ public:
     _equality.active_dofs = _chain;
     _inequality.active_dofs = _chain;
   }
-  
+
   ~QpAggravated(){}
 
 virtual void add(QrTask& task){
@@ -44,6 +44,8 @@ virtual void init(); // alocatte all the memory
 virtual void _update(); // switch to joint space & solve
 
 virtual void log(mwoibn::common::Logger& logger);
+
+const mwoibn::VectorInt& activeDofs(){ return _chain;}
 
 protected:
   std::vector<QrTask*> _tasks;

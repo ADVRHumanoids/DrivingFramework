@@ -89,7 +89,7 @@ virtual ~SteeringReference() {
 const mwoibn::VectorN& get() {
         return _b_st;
 }
-void set(mwoibn::VectorN last) {
+void set(mwoibn::VectorN& last) {
         _b = last;
         _b_st = last;
         _b_sp = last;

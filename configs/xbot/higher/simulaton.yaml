@@ -24,7 +24,7 @@ XBotRTPlugins:
 #  plugins: ["JointStates", "Odometry", "WheelsV2"]
 #  plugins: ["JointStates", "Odometry", "WheelsEvents3"]
   io_plugins: []
-  plugins: [joint_states, BasePlugin]
+  plugins: [joint_states]
 
 NRTPlugins:
 #  plugins: ["HomingExample"]

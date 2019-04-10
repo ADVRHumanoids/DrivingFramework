@@ -82,7 +82,7 @@ void mgnss::state_estimation::OdometryV3::_allocate(std::vector<std::string> nam
         _previous_state.setZero(names.size());
         _ang_vel.setZero();
         _selector_th.setConstant(mwoibn::std_utils::factorial(names.size()-1), true);
-
+        _translation_dofs = std::vector<int>{0,1,2};
         _base_ids.setZero(3);
         _base_map.setZero(6);
         _base_map << 0, 1, 2, 3, 4, 5;
@@ -167,9 +167,9 @@ void mgnss::state_estimation::OdometryV3::update()
         // std::cout << "state velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
 
         // _robot.command.velocity.set(_robot.state.velocity.get().head<6>(), _base_map);
-        _robot.state.velocity.set(mwoibn::VectorN::Zero(6), _base_map);
+        for(int i = 0; i < _base_map.size(); i++) _robot.state.velocity.set(0.0, _base_map[i]);
 
-       _robot.state.position.set(mwoibn::Vector3::Zero(), std::vector<int>{0,1,2});
+        for(auto& i: _translation_dofs) _robot.state.position.set(0.0 , i);
         //Get wheels position
         _robot.state.position.get(_state, _ids);
 
@@ -202,14 +202,14 @@ void mgnss::state_estimation::OdometryV3::update()
         //here I should estimate velocity
 
 
-        _robot.command.velocity.set(_velocity_ptr->get().head<3>(), std::vector<int>{0,1,2});
+        _robot.command.velocity.set(_velocity_ptr->get().head<3>(), _translation_dofs);
         _robot.command.velocity.set(_velocity_ptr->get()[3], _base_map[5] );
 
         _previous_state.noalias() = _state;
 
         // std::cout << "odometry position\t" << _robot.command.position.get().head<6>().transpose() << std::endl;
        // std::cout << "odometry velocity\t" << _robot.command.velocity.get().head<6>().transpose() << std::endl;
-       std::cout << _velocity_ptr->get().transpose() << std::endl;
+       // std::cout << _velocity_ptr->get().transpose() << std::endl;
 
         //_end = std::chrono::high_resolution_clock::now();
         //  return _base;
@@ -699,33 +699,35 @@ void mgnss::state_estimation::Velocity::_update(int n)
     j = i - sum + m;
 
 
-    mwoibn::Matrix _base_jacobian(6, 4);
-    mwoibn::Matrix jacobian = _wheels_velocity[i].linear().getJacobian();
+    // mwoibn::Matrix _base_jacobian(6, 4);
+    // mwoibn::Matrix jacobian = _wheels_velocity[i].linear().getJacobian();
+    _temp_jacobian = _wheels_velocity[i].linear().getJacobian();
 
-    _base_jacobian.block<3,3>(0,0) = jacobian.leftCols<3>();
-    _base_jacobian.block<3,1>(0,3) = _twist_es.toMatrix()*jacobian.col(5);
+    _base_jacobian.block<3,3>(0,0) = _temp_jacobian.leftCols<3>();
+    _base_jacobian.block<3,1>(0,3).noalias() = _twist_es.toMatrix()*_temp_jacobian.col(5);
 
     _base_jacobian.block<3,3>(3,0) = _wheels_velocity[j].linear().getJacobian().leftCols<3>();
-    _base_jacobian.block<3,1>(3,3) = _twist_es.toMatrix()*_wheels_velocity[j].linear().getJacobian().col(5);
+    _base_jacobian.block<3,1>(3,3).noalias() = _twist_es.toMatrix()*_wheels_velocity[j].linear().getJacobian().col(5);
 
-    mwoibn::VectorN x(6), y(6);
+    // mwoibn::VectorN x(6), y(6);
     mwoibn::Vector3 temp;
 
-    x.setZero();
-    y.setZero();
-    x.head<3>() = _twist_es.rotate( _wheels_velocity[i].linear().getWorld()); // wheel velocity assuming unknown values are 0
+    _x.setZero();
+    _y.setZero();
+    _x.head<3>() = _twist_es.rotate( _wheels_velocity[i].linear().getWorld()); // wheel velocity assuming unknown values are 0
 
-    x.tail<3>() = _twist_es.rotate(_wheels_velocity[j].linear().getWorld()); // wheel velocity assuming unknown values are 0
+    _x.tail<3>() = _twist_es.rotate(_wheels_velocity[j].linear().getWorld()); // wheel velocity assuming unknown values are 0
 
     temp =  _twist_es.rotate(_wheels_velocity[i].angular().getWorld());
-    y.head<3>() = temp.cross(_ground_normal*_r);
+    _y.head<3>() = temp.cross(_ground_normal*_r);
 
     temp =  _twist_es.rotate(_wheels_velocity[j].angular().getWorld());
-    y.tail<3>() = temp.cross(_ground_normal*_r);
+    _y.tail<3>() = temp.cross(_ground_normal*_r);
 
     _inverse->compute(_base_jacobian);
 
-    _estimates[m-1] = _inverse->get()*(y-x);
+    _y -= _x;
+    _estimates[m-1].noalias() = _inverse->get()*_y;
 
     // std::cout << "m\t" << m << "\tindices\t" << i << ", " << j << "\t" <<  _estimates[m-1].transpose() << std::endl;
 }

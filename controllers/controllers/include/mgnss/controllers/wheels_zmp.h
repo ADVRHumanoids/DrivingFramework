@@ -54,6 +54,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
 
+        _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
@@ -64,6 +65,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
 
+        _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
@@ -162,6 +164,12 @@ virtual void nextStep(){
 
     _robot.centerOfMass().update();
 
+    _dynamic_ptr->update();
+    for(auto& hip: _soft_hip){
+      std::get<2>(hip)[0] = _robot.state.position.get()[std::get<0>(hip)];
+      std::get<3>(hip)[0] = -_robot.state.position.get()[std::get<0>(hip)];
+    }
+
     _support += _support_vel*_robot.rate();
 
       // state_machine__->update();
@@ -245,9 +253,13 @@ std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _angles_ptr;
 
 std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _contact_point;
 mwoibn::VectorN estimated__, _modified_support, _zero;
-mwoibn::VectorN _com_ref;
-std::vector<mwoibn::Matrix> _soft_hip;
+mwoibn::VectorN _com_ref, _temp_state, _temp_4;
+std::vector<std::tuple<int, mwoibn::Matrix, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN> > _soft_hip;
+mwoibn::VectorN _min_camber_limit, _max_camber_limit;
 mwoibn::robot_points::Constant _world;
+mwoibn::VectorN _eigen_scalar;
+
+std::unique_ptr<mwoibn::dynamic_models::BasicModel> _dynamic_ptr;
 
 virtual void _setInitialConditions();
 virtual void _allocate();
@@ -258,6 +270,17 @@ virtual void _updateSupport()
 {
         _steering_ptr->setReference(_support);
 }
+
+private:
+  std::vector<std::string> _names;
+  const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
+  const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
+  const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
+  const std::string QR_TASK_TORQUE = "QR_TASK_TORQUE";
+  const std::string ESTIMATED_TORQUES = "ESTIMATED_TORQUES";
+  mwoibn::VectorN _forces;
+
+
 
 };
 }

@@ -107,9 +107,9 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
        }
 
 
-              std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
+              // std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
 
-             std::cout << "wheels velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
+             // std::cout << "wheels velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
 
 
   // std::cout << _robot.state.velocity.get().head<6>().transpose() << std::endl;

@@ -63,6 +63,9 @@ add_library(steering
 
 
  add_library(support_shaping
+    src/qp/constraints/joint_constraint_v2.cpp
+    src/qp/constraints/merge.cpp
+
     src/qp/tasks/support_shaping_v4_0.cpp
     src/qp/tasks/support_shaping_v6_0.cpp
     #src/qp/tasks/qr_tracking.cpp

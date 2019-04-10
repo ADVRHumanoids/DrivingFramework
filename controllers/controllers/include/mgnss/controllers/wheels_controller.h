@@ -233,6 +233,7 @@ mwoibn::Quaternion _orientation;
 bool _reference = false;
 mwoibn::VectorInt _select_steer, _select_ik;
 mwoibn::VectorN _l_limits, _u_limits;
+mwoibn::VectorN _active_state;
 int count = 0;
 std::vector<std::string> _log_names;
 

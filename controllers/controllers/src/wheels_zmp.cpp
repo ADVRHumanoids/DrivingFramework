@@ -13,6 +13,8 @@
 #include <mwoibn/hierarchical_control/controllers/default.h>
 #include <mgnss/higher_level/previous_task.h>
 #include <mgnss/higher_level/qp/constraints/joint_constraint.h>
+#include <mgnss/higher_level/qp/constraints/joint_constraint_v2.h>
+
 #include <mgnss/higher_level/qp/constraints/minimum_limit.h>
 #include <mgnss/higher_level/qp/constraints/maximum_limit.h>
 #include <mgnss/higher_level/qp/constraints/integrate.h>
@@ -22,6 +24,14 @@
 void mgnss::controllers::WheelsZMP::compute()
 {
         _com_ptr->update();
+
+        _leg_tasks["CAMBER"].first.updateError();
+
+        for(int i = 0; i < 4; i++){
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get();
+          _min_camber_limit[i] =  _eigen_scalar[0]-1e-5;
+          _max_camber_limit[i] =  _min_camber_limit[i]+2*1e-5;
+        }
         //_support = _support + _support_vel*_robot.rate();
         // without resttering
         WheelsController::compute();
@@ -39,6 +49,31 @@ void mgnss::controllers::WheelsZMP::compute()
           // std::cout << "weight\t" << _leg_tasks["CASTER"].first.getWeight(i);
           // std::cout << "\t" << _leg_tasks["CASTER"].first.getWeight(i) << std::endl;
         // }
+        _temp_state = _robot.command.velocity.get() - _robot.state.velocity.get();
+        _temp_state = _temp_state/_robot.rate();
+        _robot.command.acceleration.set(_temp_state );
+        _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.command.acceleration.get();
+        _temp_state -= - _robot.state["BIAS_FORCE"].get();
+        _robot.command.torque.set(_temp_state);
+
+        _temp_state = _robot.command[QR_TASK_VELOCITY].get()*_robot.rate();
+        _temp_state += _robot.state.position.get();
+        _robot.command[QR_TASK_POSITION].set(_temp_state);
+
+        _temp_state = _robot.command[QR_TASK_VELOCITY].get() - _robot.state.velocity.get();
+        _temp_state = _temp_state/_robot.rate();
+        _robot.command[QR_TASK_ACCELERATION].set(_temp_state);
+
+        _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.command[QR_TASK_ACCELERATION].get();
+        _temp_state -=  _robot.state["BIAS_FORCE"].get();
+        _robot.command[QR_TASK_TORQUE].set( _temp_state );
+
+        _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.state.acceleration.get();
+        _temp_state -= _robot.state["BIAS_FORCE"].get();
+        _robot.state[ESTIMATED_TORQUES].set(_temp_state);
+        // _robot.command.torque.set( ( _robot.command.velocity.get() - _robot.state.velocity.get() )/_robot.rate() );
+        // _robot.command[QR_TASK_TORQUE].set( ( _robot.command[QR_TASK_VELOCITY].get() - _robot.state.velocity.get() )/_robot.rate() );
+
 }
 
 void mgnss::controllers::WheelsZMP::steering()
@@ -104,9 +139,9 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         // if(_steering_select.any())
         //       _steering_ptr_2->start();
         _robot.centerOfMass().update(true);
-        mwoibn::VectorN beta(4);
-        for(int i = 0; i <  _leg_tasks["STEERING"].second.size(); i++)
-          beta[i] = _leg_tasks["STEERING"].second[i].getCurrent();
+        //mwoibn::VectorN beta(4);
+        //for(int i = 0; i <  _leg_tasks["STEERING"].second.size(); i++)
+        //  beta[i] = _leg_tasks["STEERING"].second[i].getCurrent();
 
         state_machine__->update();
 
@@ -115,12 +150,12 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         // _tasks["CONSTRAINTS"]->update();
         // _tasks["BASE"]->update();
         // _tasks["CAMBER"]->update();
-        mwoibn::VectorN init_steer(4);
+        // mwoibn::VectorN init_steer(4);
         for(int i = 0; i < 4; i++)
-          init_steer[i] = _leg_tasks["STEERING"].second[i].getCurrent();
-        std::cout << "init steer\t" << init_steer.transpose() << std::endl;
+          _temp_4[i] = _leg_tasks["STEERING"].second[i].getCurrent();
+        // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
 
-        _steering_shape_ptr->set(init_steer);
+        _steering_shape_ptr->set(_temp_4);
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
 
@@ -135,12 +170,16 @@ void mgnss::controllers::WheelsZMP::step(){
 }
 
 void mgnss::controllers::WheelsZMP::_allocate(){
-          WheelsControllerExtend::_allocate();
+        WheelsControllerExtend::_allocate();
+        _temp_4.setZero(4);
+        _eigen_scalar.setZero(1);
         _com_ref.setZero(2);
         __last_steer.setZero(4);
         _modified_support.setZero( _robot.getLinks("wheels").size()*3);
-        _zero.setZero( _robot.getLinks("wheels").size()*3);
 
+        _forces.setZero(_modified_support.size());
+        _zero.setZero( _modified_support.size());
+        _temp_state.setZero(_robot.getDofs());
 
         _shape_extend_ptr->equality.add(mgnss::higher_level::PreviousTask(*_tasks["CONSTRAINTS"], _ik_ptr->state.command));
         _shape_extend_ptr->equality.add(mgnss::higher_level::PreviousTask(*_tasks["BASE"], _ik_ptr->state.command));
@@ -149,31 +188,42 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_tasks["CAMBER"]->getJacobian(),  0.0001));
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MinimumLimit(_tasks["CASTER"]->getJacobian(), -0.1));
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_tasks["CASTER"]->getJacobian(),  0.1));
-        _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
-
+        // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+        //_shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY", "TORQUE"}));
+        _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, _robot.getDof(_robot.getLinks("lower_body" ) ), {"POSITION","VELOCITY", "TORQUE"}, *_dynamic_ptr));
         for(auto& link: _robot.getLinks("hips")){
-          _soft_hip.push_back(mwoibn::Matrix(1, _robot.getDofs()));
-          _soft_hip.back().setZero();
-          _soft_hip.back()(0,_robot.getDof(link)[0]) = 1;
+          _soft_hip.push_back(std::tuple<int, mwoibn::Matrix, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN>(_robot.getDof(link)[0], mwoibn::Matrix(1, _robot.getDofs()), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1)));
+          std::get<1>(_soft_hip.back()).setZero();
+          std::get<1>(_soft_hip.back())(0,_robot.getDof(link)[0]) = 1;
+          std::get<2>(_soft_hip.back())[0] = _robot.state.position.get()[std::get<0>(_soft_hip.back())];
+          std::get<2>(_soft_hip.back())[0] = -_robot.state.position.get()[std::get<0>(_soft_hip.back())];
         }
-        //
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MaximumLimit(_soft_hip[0],  1.0), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MinimumLimit(_soft_hip[1], -1.0), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MinimumLimit(_soft_hip[2], -1.0), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MaximumLimit(_soft_hip[3],  1.0), _robot.rate(), _robot.state.position), 1e3);
+        std::get<4>(_soft_hip[0])[0] =  1.0;
+        std::get<5>(_soft_hip[1])[0] = -1.0;
+        std::get<5>(_soft_hip[2])[0] = -1.0;
+        std::get<4>(_soft_hip[3])[0] =  1.0;
+        std::get<5>(_soft_hip[0])[0] = -1.9;
+        std::get<4>(_soft_hip[1])[0] =  1.9;
+        std::get<4>(_soft_hip[2])[0] =  1.9;
+        std::get<5>(_soft_hip[3])[0] = -1.9;
+                //
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[0]), std::get<4>(_soft_hip[0])), _robot.rate(), std::get<2>(_soft_hip[0])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[1]), std::get<5>(_soft_hip[1])), _robot.rate(), std::get<2>(_soft_hip[1])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[2]), std::get<5>(_soft_hip[2])), _robot.rate(), std::get<2>(_soft_hip[2])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[3]), std::get<4>(_soft_hip[3])), _robot.rate(), std::get<2>(_soft_hip[3])), 1e3);
 
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MinimumLimit(_soft_hip[0], -1.9), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MaximumLimit(_soft_hip[1],  1.9), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MaximumLimit(_soft_hip[2],  1.9), _robot.rate(), _robot.state.position), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Intergate(
-                                   mgnss::higher_level::constraints::MinimumLimit(_soft_hip[3], -1.9), _robot.rate(), _robot.state.position), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[0]), std::get<5>(_soft_hip[0])), _robot.rate(), std::get<3>(_soft_hip[0])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[1]), std::get<4>(_soft_hip[1])), _robot.rate(), std::get<3>(_soft_hip[1])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[2]), std::get<4>(_soft_hip[2])), _robot.rate(), std::get<3>(_soft_hip[2])), 1e3);
+        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[3]), std::get<5>(_soft_hip[3])), _robot.rate(), std::get<3>(_soft_hip[3])), 1e3);
 
         // _qr_wrappers["SHAPE"]->init();
         // _qr_wrappers["SHAPE_WHEEL"]->init();
@@ -188,6 +238,8 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         //
         // for(int i =0; i < dofs__.size(); i++)
         //     _qr_wrappers["SHAPE_JOINT"]->cost().quadratic(dofs__[i], dofs__[i]) = 1e-4;
+        _robot.state.add(ESTIMATED_TORQUES);
+
 }
 
 void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
@@ -211,7 +263,8 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
 
     shape_action__.reset(new mwoibn::hierarchical_control::actions::ShapeAction(*_shape_extend_ptr, *_steering_ptr,
      _leg_tasks["STEERING"].second, *_steering_shape_ptr, _leg_tasks["STEERING"].first, *_angles_ptr, _leg_tasks["CASTER"].first,
-     _leg_tasks["CAMBER"].first, *state_machine__, *_qr_wrappers["SHAPE"], _ik_ptr->state, _next_step, _robot.rate()));
+     _leg_tasks["CAMBER"].first, *state_machine__, *_qr_wrappers["SHAPE"], _ik_ptr->state, _next_step, _robot.rate(), _robot));
+
     _ik_ptr->addAfter(*shape_action__, *_actions["BASE"]);
 
     YAML::Node tunning = config["tunnings"][config["tunning"].as<std::string>()];
@@ -228,10 +281,67 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     _angles_ptr->addTask(*_tasks["CAMBER"]);
     // _angles_ptr->init();
     // _shape_extend_ptr->add(*_qr_wrappers["CASTER"]);
-    _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MinimumLimit(_angles_ptr->getJacobian(), -1e-6)); // 1e-6
-    _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_angles_ptr->getJacobian(),  1e-6));
+    _min_camber_limit.setConstant(4, -1e-5); // 1e-6
+    _max_camber_limit.setConstant(4,  1e-5); // 1e-6
+
+    _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MinimumLimit(_angles_ptr->getJacobian(), _min_camber_limit)); // 1e-6
+    _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_angles_ptr->getJacobian(), _max_camber_limit));
 
     _shape_extend_ptr->init();
+
+
+    _names.push_back("time");
+    _names.push_back("th");
+    _names.push_back("r_th");
+
+    for(int i = 0; i < 3; i++){
+            _names.push_back(std::string("com_") + char('x'+i));
+            _names.push_back(std::string("r_base_") + char('x'+i));
+            _names.push_back(std::string("base_") + char('x'+i));
+
+           for(int k = 0; k < 4; k++){
+             _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
+             _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
+             _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
+           }
+         }
+
+        for(int i = 0; i < _robot.getDofs(); i++){
+            _names.push_back("pos_des_" + std::to_string(i));
+            _names.push_back("vel_des_" + std::to_string(i));
+            _names.push_back("acc_des_" + std::to_string(i));
+
+            _names.push_back("tau_des_" + std::to_string(i));
+            _names.push_back("pos_" + std::to_string(i));
+            _names.push_back("vel_" + std::to_string(i));
+            _names.push_back("acc_" + std::to_string(i));
+            _names.push_back("tau_" + std::to_string(i));
+            _names.push_back("pos_ll_" + std::to_string(i));
+            _names.push_back("vel_ll_" + std::to_string(i));
+            _names.push_back("tau_ll_" + std::to_string(i));
+            _names.push_back("pos_ul_" + std::to_string(i));
+            _names.push_back("vel_ul_" + std::to_string(i));
+            _names.push_back("tau_ul_" + std::to_string(i));
+            _names.push_back("bias_" + std::to_string(i));
+            _names.push_back("tau_est_" + std::to_string(i));
+
+        }
+
+        for(int i = 0; i < _robot.command[QR_TASK_VELOCITY].size(); i++){
+            _names.push_back("pos_qr_" + std::to_string(i));
+            _names.push_back("vel_qr_" + std::to_string(i));
+            _names.push_back("tau_qr_" + std::to_string(i));
+            _names.push_back("acc_qr_" + std::to_string(i));
+
+        }
+
+        for(int i = 0; i < 4; i++){
+            _names.push_back("camber_" + std::to_string(i));
+            _names.push_back("camber_qr_" + std::to_string(i));
+            _names.push_back("camber_des_" + std::to_string(i));
+            _names.push_back("camber_err_" + std::to_string(i));
+          }
+
 
 }
 
@@ -306,7 +416,7 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
             // mwoibn::VectorInt dofs__ = ;
             _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShapingV4>(new mgnss::higher_level::SupportShapingV4(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
             _qr_wrappers["SHAPE_WHEEL"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->stateJacobian(), state_machine__->stateOffset(), _robot, 0 ));
-            _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE_WHEEL"], state_machine__->wheelOrientation().passJacobian(), _zero, _robot, 1e-6 ));
+            _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE_WHEEL"], state_machine__->wheelOrientation().passJacobian(), _zero, _robot, 1e-7 ));
             // _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->stateJacobian(), state_machine__->stateOffset(), _robot ));
 
 
@@ -355,158 +465,67 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
 
 void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double time){
-  // logger.add("com_x", getComFull()[0]);
-  // logger.add("com_y", getComFull()[1]);
+  int counter = 0;
+  logger.add(_names[counter], time); ++counter;
 
-  // logger.add("r_com_x", refCom()[0]);
-  // logger.add("r_com_y", refCom()[1]);
-  //mgnss::controllers::WheelsControllerExtend::log(logger ,time);
-  logger.add("time", time);
-
-   logger.add("th", _robot.state.position.get()[5]);
-   logger.add("r_th", _heading);
+   logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
+   logger.add(_names[counter], _heading); ++counter;
    //
-       for(int i = 0; i < 3; i++){
+   _forces = _robot.contacts().getReactionForce();
+        for(int i = 0; i < 3; i++){
 
          // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-         logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
-         logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
-         logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
+         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
+         logger.add(_names[counter], getBaseReference()[i]); ++counter;
+         logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
 
          for(int k = 0; k < 4; k++){
-
-           logger.add("cp_"   + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getPointStateReference(k)[i]);
-
-           logger.add("r_cp_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getReference()[k*3+i]);
-
-           // logger.add("position_error_" + std::to_string(point+1) + "_" + char('x'+i),
-           //                 _steering_select[point] ? _steering_ptr_2->getPositionError()[k*3+i] : 0);
-
-           // logger.add("full_error_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getFullError()[k*3+i]);
-           //
-           // logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
-
-           // logger.add("com_error_" + std::to_string(point+1) + "_" + char('x'+i),
-           //                _steering_select[point] ? _steering_ptr_2->getTestError()[k*3+i] : 0);
-
-           // k += _steering_select[point];
-
+           logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
+           logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
+           logger.add(_names[counter], _forces[k*3+i]); ++counter;
          }
        }
 
-       std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
+      for(int i = 0; i < _robot.getDofs(); i++){
+          logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command.acceleration.get()[i]); ++counter;
 
-      std::cout << "wheels velocity\t" << _robot.state.velocity.get().head<6>().transpose() << std::endl;
+          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.acceleration.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.torque.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.lower_limits.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.lower_limits.velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.lower_limits.torque.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.upper_limits.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.upper_limits.velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.upper_limits.torque.get()[i]); ++counter;
+          logger.add(_names[counter],  _robot.state["BIAS_FORCE"][i]); ++counter;
+          logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
 
-//      for(auto& state_: {"MINUS_TORQUE","CONTACT_TORQUE","COM_TORQUE"}){
-//        for(int i = 0; i < _robot.state[state_].size(); i++)
-//          logger.add(state_ + std::string("_") + _robot.getLinks(i), _robot.state[state_][i]);
-//      }
-//      for(auto& state_: {"CONTACT_FORCE","COM_FORCE", "COM_CONTACT_FORCE"}){
-//          for(int i = 0; i < _robot.state[state_].size(); i++)
-//            logger.add(state_ + std::string("_") + std::to_string(i/3+1) + std::string("_") + char('x'+(i%3)), _robot.state[state_][i]);
-//      }
+      }
 
-// sprawdzić siłę, a potem spróbować drugą metodę
-// jeśli zadziała to ruszyć z support polygon i ewentualnie jak bede miec czas to pomyslec z admitance na contact point
+      for(int i = 0; i < _robot.command[QR_TASK_VELOCITY].size(); i++){
+          logger.add(_names[counter], _robot.command[QR_TASK_POSITION].get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command[QR_TASK_VELOCITY].get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command[QR_TASK_TORQUE].get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command[QR_TASK_ACCELERATION].get()[i]); ++counter;
 
+      }
 
-        // CHECK FORCE ESTIMATION
-        // __dynamics.update();
-        // _robot.centerOfMass().accelerationComponent();
-        //
-        //
-        // mwoibn::Vector3 F_m__ = _robot.centerOfMass().mass()*_robot.centerOfMass().getJacobian()*__dynamics.getInertiaInverse()*(-_robot.state["OVERALL_FORCE"].get());
-        // F_m__ +=  _robot.centerOfMass().mass()*_robot.centerOfMass().acceleration();
-        //
-        // mwoibn::Vector3 F_des__ = F_m__;
-
-        // this does not use a CoM.mass because it is already included in the gain in this implementation
-        //F_des__.head<2>() += _tasks["BASE"]->getError().segment<2>(3).cwiseProduct(std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain().segment<2>(3));
-        // F_des__ += (_robot.centerOfMass().getJacobian()*_robot.command.velocity.get())*_robot.centerOfMass().mass()/_robot.rate(); // \d_q_des*CoM.m/robot.rate
-        //
-        //
-        // for(int i = 0; i < 3; i++){
-        //   logger.add(std::string("comForce_") + char('x'+i), F_m__[i]);
-        //   logger.add(std::string("comDes_") + char('x'+i), F_des__[i]);
-        //   logger.add(std::string("comDiff_") + char('x'+i), F_des__[i] - F_m__[i]);
-        // }
-        //
-        // logger.add(std::string("comFactor"), dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get())->comFactor() );
-        // logger.add(std::string("forceFactor"), dynamic_cast<mwoibn::hierarchical_control::tasks::ContactPointZMPV2*>(_steering_ptr.get())->forceFactor() );
-
-        // i need a snap in solver
-        // shape__->solve(logger);
-        // shape__->log(logger);
-
-        // mwoibn::Vector3 temp__ = mwoibn::Vector3::Zero();
-        // mwoibn::VectorN desired__ = state_machine__->desiredJacobian()*shape_joint__->get();
-        // mwoibn::VectorN world__ = state_machine__->worldJacobian()*shape_joint__->get();
-        // mwoibn::VectorN workspace__ = state_machine__->workspace().jacobian*desired__;
-        // std::cout << "workspace velocity" << (workspace__).transpose() << std::endl;
-        // std::cout << "workspace limit";
-        // for (int i =0; i < workspace__.size(); i++)
-        //  std::cout << "\t" << state_machine__->workspace().limit[i]*state_machine__->workspace().limit[i] << std::endl;
-        // std::cout << std::endl;
-        //
-        //
-        // std::cout << "workspace state\t";
-        // for (int i =0; i < workspace__.size(); i++)
-        //  std::cout << "\t" << state_machine__->workspace().state[i] << std::endl;
-        // std::cout << std::endl;
-        //
-        // std::cout << "workspace est\t";
-        // for (int i =0; i < workspace__.size(); i++)
-        //  std::cout << "\t" << state_machine__->workspace().state[i] +  workspace__[i]*_robot.rate() << std::endl;
-        // std::cout << std::endl;
-
-        // std::cout << "steering\n" << state_machine__->stateJacobian()*shape_joint__->get() << std::endl;
-        // std::cout << "desired steering\n" << _steer << std::endl;
-
-        // std::cout << "joint space solution\n" << state_machine__->stateJacobian()*shape_joint__->get() << std::endl;
-        // std::cout << "workspace " << (state_machine__->workspace().state + workspace__*_robot.rate()).transpose() << std::endl;
+      for(int i = 0; i < 4; i++){
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); ++counter;
+          logger.add(_names[counter], _eigen_scalar[0]);
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command[QR_TASK_VELOCITY].get(); ++counter;
+          logger.add(_names[counter], _eigen_scalar[0]);
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); ++counter;
+          logger.add(_names[counter], _eigen_scalar[0]);
+          logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
+        }
 
 
-        // std::cout << "desired frame " << desired__.transpose() << std::endl;
-        // std::cout << "world frame " << world__.transpose() << std::endl;
-        // std::cout << "worldJacobian frame " << state_machine__->worldJacobian() << std::endl;
-        // std::cout << "shape_joint__ " << shape_joint__->get().transpose() << std::endl;
-
-
-        // std::cout << "desired__\t" << desired__.transpose() << std::endl;
-        // std::cout << "b_des";
-        // for(int i = 0; i < 4; i++){
-        //    __last_steer[i] =  std::atan2(world__[2*i+1], world__[2*i]);
-        //    // mwoibn::eigen_utils::wrapToPi(__last_steer[i]);
-        //   logger.add("beta_des"+std::to_string(i), __last_steer[i]);
-        //   // std::cout << "\t" << __last_steer[i];
-        //  }
-         // std::cout << std::endl;
-
-        // shape_wheel__->log(logger);
-        // shape_joint__->log(logger);
-        // state_machine__->log(logger);
-        // restore__->log(logger);
-
-        // estimated__ =  shape__->margin();
-        //
-        // estimated__ =  shape__->marginJ().leftCols<12>()*shape__->points().getJacobian()*_robot.command.velocity.get() *_robot.rate();
-        // estimated__ +=  shape__->marginJ().rightCols<2>()*_robot.centerOfMass().getJacobian().topRows<2>()*_robot.command.velocity.get()*_robot.rate();
-        //
-        // for(int i = 0; i < estimated__.size(); i++){
-        // //   logger.add(std::string("margin_est")+std::to_string(i), estimated__[i]);
-        //   logger.add(std::string("margin")+std::to_string(i), shape__->margin()[i]);
-        // }
-
-        // for(int i = 0; i < _tasks["BASE"]->getTaskSize(); i++){
-        //   logger.add(std::string("base_error_") + std::to_string(i), _tasks["BASE"]->getError()[i]);
-        //   logger.add(std::string("gain_") + std::to_string(i), std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain()[i]);
-        // }
-
-        //std::cout << std::dynamic_pointer_cast<mwoibn::hierarchical_control::actions::Compute>(_actions["BASE"])->gain().transpose() << std::endl;
-
-        // F =  \tau - (JH^{-1}J^T)^{-1}JH^{-1} ( "OVERALL_FORCE"- state.torque - dJdq)
-        // F_des = M (\ddot m + K_p * (m_des - m)) - I save it an recompute after log? 0 to see how well it is tracked?
-        // \ddot m = JH^{-1} ("OVERALL_FORCE" - dJdq)
+        shape_action__->log(logger);
 
 }

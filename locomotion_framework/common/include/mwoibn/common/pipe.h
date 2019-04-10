@@ -58,7 +58,7 @@ const mwoibn::VectorN& get() const
 
 template <typename Vector>
 void
-get(Vector& state, const std::vector<int> selector)
+get(Vector& state, const std::vector<int>& selector)
 {
         for (int i = 0; i < selector.size(); i++)
                 if (selector[i] != NON_EXISTING)
@@ -107,7 +107,7 @@ set(const Vector& state, const Selector& selector)
 
 template <typename Vector>
 void
-set(const Vector& state, std::vector<int> selector)
+set(const Vector& state, std::vector<int>& selector)
 {
         for (int i = 0; i < selector.size(); i++)
                 if (selector[i] != NON_EXISTING)
@@ -147,7 +147,7 @@ protected:
 mwoibn::VectorN _state;
 
 template<typename Vector1, typename Vector2>
-void _select(const Vector1& new_state, Vector2& state, mwoibn::VectorBool selector)
+void _select(const Vector1& new_state, Vector2& state, mwoibn::VectorBool& selector)
 {
         for (int i = 0; i < selector.size(); i++)
                 if (selector[i])

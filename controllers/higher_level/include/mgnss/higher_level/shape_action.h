@@ -24,16 +24,24 @@ ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_contro
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
              mgnss::higher_level::StateMachine& state_machine, mgnss::higher_level::QrTask& unconstrainted,
-            hierarchical_control::State& state, mwoibn::Vector3& next_step, double dt) :
+            hierarchical_control::State& state, mwoibn::Vector3& next_step, double dt, mwoibn::robot_class::Robot& robot) :
             Primary(task, state.memory), _state(state), _qr_task(task), _contact_point(contact_point), _steering(steering),
             _steering_reference(steering_reference), _aggravated(aggravated), _angles(angles), _caster(caster), _camber(camber),
-             _state_machine(state_machine), _unconstrainted(unconstrainted), _dt(dt), _next_step(next_step){
+             _state_machine(state_machine), _unconstrainted(unconstrainted), _dt(dt), _next_step(next_step), _robot(robot){
 
                _desired_steer.setZero(4);
                _modified_support.setZero(8);
                _support_world.setZero(8);
                _support.setZero(12);
                _eigen_scalar.setZero(1);
+
+               _robot.command.add(QR_TASK_VELOCITY, _robot.getDofs());
+               _robot.command.add("QR_TASK_POSITION", _robot.getDofs());
+               _robot.command.add("QR_TASK_TORQUE", _robot.getDofs());
+               _robot.command.add("QR_TASK_ACCELERATION", _robot.getDofs());
+
+               temp_des.setZero(12);
+               temp_qr.setZero(12);
 }
 
 
@@ -48,9 +56,12 @@ virtual void run(){
     // std::cout << "_qr_task\t" << _qr_task.raw().transpose() << std::endl;
     // std::cout << "_cost\t" << _qr_task.optimalCost() << std::endl;
 
+    _robot.command[QR_TASK_VELOCITY].set(_qr_task.raw().head(_qr_task.activeDofs().size()), _qr_task.activeDofs());
+
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
-        // std::cerr << infs << "\t" << _qr_task.optimalCost() << std::endl;
+        _robot.command[QR_TASK_VELOCITY].set(mwoibn::VectorN::Zero(_robot.command[QR_TASK_VELOCITY].size()));
+        std::cerr << infs << "\t" << _qr_task.optimalCost() << std::endl;
     }
     // std::cout << "_quadratic\n" << _qr_task.cost().quadratic << std::endl;
     // std::cout << "_linear\t" << _qr_task.cost().linear.transpose() << std::endl;
@@ -94,6 +105,8 @@ virtual void run(){
     //   // std::cout << i << "_modified_support\t" << (_modified_support.segment<2>(2*i)*_dt).transpose() << std::endl;
     //   // std::cout << i << "_support\t" << (_support.segment<3>(3*i)*_dt).transpose() << std::endl;
     }
+
+    temp_qr = _support;
     //
     mwoibn::Vector3 support_i;
     for(int i =0; i < 4; i++){
@@ -106,7 +119,7 @@ virtual void run(){
     for(int i =0; i < 4; i++)
       _steering[i].setReference(_steering_reference.get()[i]);
 
-
+    temp_des.setZero(12);
     for(int i =0; i < 4; i++){
       support_i = _support.segment<3>(3*i);
       support_i.head<2>() -= _modified_support.segment<2>(2*i)*_dt;
@@ -122,6 +135,8 @@ virtual void run(){
       support_i.noalias() += _state_machine.steeringFrames()[i]->rotation*test__;
       // std::cout << "test\t" << (_state_machine.steeringFrames()[i]->rotation*test__).transpose() << std::endl;
       // std::cout << i << "\tsupport_i\t" << support_i.transpose() << std::endl;
+      temp_des.segment<3>(3*i) = support_i;
+
       _contact_point.setReferenceWorld(i, support_i, false);
     }
 
@@ -159,9 +174,20 @@ virtual void run(){
     _contact_point.update();
     _aggravated.update(); // steering
 
+
+
 }
 
 virtual void release(){ }
+
+void log(  mwoibn::common::Logger& logger){
+  for(int i =0 ; i < 4; i++){
+  logger.add("cp_des_"   + std::to_string(i) + "_x", temp_des[3*i] );
+  logger.add("cp_des_"   + std::to_string(i) + "_y", temp_des[3*i+1] );
+  logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
+  logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
+  }
+}
 
 protected:
   hierarchical_control::State& _state;
@@ -179,7 +205,10 @@ protected:
   mwoibn::VectorN _eigen_scalar;
   double _dt;
   mwoibn::Vector3& _next_step;
+  mwoibn::robot_class::Robot& _robot;
   int infs = 0;
+  mwoibn::VectorN temp_qr, temp_des;
+  const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
 };
 
 }

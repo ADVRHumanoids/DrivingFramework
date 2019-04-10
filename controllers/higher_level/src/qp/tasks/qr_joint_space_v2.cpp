@@ -31,7 +31,6 @@ void mgnss::higher_level::QRJointSpaceV2::init(){
   _return_state.setZero(_jacobian.rows());
   _temp.setZero(_task.vars(), _jacobian.cols());
   // _cost.quadratic.block(0,0,_vars, _vars).setIdentity();
-
 }
 
 void mgnss::higher_level::QRJointSpaceV2::_update(){

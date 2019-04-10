@@ -111,10 +111,10 @@ void init(int dofs){
       interface.second.init(dofs);
 }
 
-const mwoibn::robot_class::Pipe& operator[] (mwoibn::Interface interface) const {
+const mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) const {
       return _interfaces.at(interface);
 }
-mwoibn::robot_class::Pipe& operator[] (mwoibn::Interface interface) {
+mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) {
       return _interfaces.at(interface);
 }
 

@@ -21,6 +21,7 @@ public:
     Handler(int dofs) : _dofs(dofs) {}
     Handler() : _dofs(0) {}
 
+
     template<typename Other>
     Handler(Other&& other)
           : _positions(other.getState()), _jacobian(other.getJacobian()), _dofs(other._dofs)
@@ -53,7 +54,7 @@ public:
     template<typename Other>
     int add(Other point)
     {
-           _points.push_back(std::unique_ptr<Type>(new Other(point)));
+           _points.push_back(std::unique_ptr<Type>(new Other(std::move(point))));
            resize();
            return _points.size()-1;
     }

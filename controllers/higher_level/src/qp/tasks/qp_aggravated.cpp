@@ -41,7 +41,6 @@ void mgnss::higher_level::QpAggravated::init(){
     }
 
   QrTask::init();
-
   // _return_state.setZero(_jacobian.rows());
 }
 

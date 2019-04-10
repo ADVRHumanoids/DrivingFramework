@@ -56,6 +56,8 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE});
 
   _robot.state.add("OVERALL_FORCE");
+  _robot.state.add("BIAS_FORCE");
+  _robot.state.add(_unfiltered_torque, _robot.getDofs());
 
 
   //_inertia_inverse.reset(new mwoibn::PseudoInverse(_gravity.getInertia()));
@@ -67,10 +69,11 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _contacts_transposed = _contacts_jacobian.transpose();
 
   _force_1.setZero(_robot.state.torque.size());
-  _force_2.setZero(_robot.state.velocity.size());
+  _force_2.setZero(_robot.contacts().jacobianRows());
   _force_3.setZero(_robot.contacts().jacobianRows());
 
   _state.setZero(_robot.state.torque.size());
+  _state_no_torque.setZero(_robot.state.torque.size());
   _state_2.setZero(_robot.state.torque.size());
   _set_force.setZero(3);
 
@@ -109,6 +112,7 @@ void mgnss::state_estimation::GroundForces::init(){
 
 void mgnss::state_estimation::GroundForces::update()
 {
+      _robot.state[_unfiltered_torque].set(_robot.state.torque);
 
       _filter_torque_ptr->update(_robot.state.torque);
       //_robot.updateKinematics();
@@ -134,16 +138,33 @@ void mgnss::state_estimation::GroundForces::update()
             _set_force = _world_contacts.segment<3>(3*i);
             _robot.contacts()[i].wrench().force.setWorld(_set_force);
             _robot.contacts()[i].wrench().synch();
+            // std::cout << "i\t" << _robot.contacts()[i].wrench().force.getFixed().transpose() << std::endl;
       }
 
-      _state.noalias() = _contacts_transposed*_robot.contacts().getReactionForce();
-      _state -= _gravity.getNonlinearEffects();
-      _state += _robot.state.torque.get();
+      _state_no_torque.noalias() = _contacts_transposed*_robot.contacts().getReactionForce();
+      // std::cout << "RF\t" << _state_no_torque.transpose() << std::endl;
 
-      // check measured acceleration/forces at contact point
+      _state_no_torque -= _gravity.getNonlinearEffects();
+
+      // std::cout << "nonlinear\t" << _gravity.getNonlinearEffects().transpose() << std::endl;
+
+      _state = _state_no_torque + _robot.state.torque.get();
       _robot.state["OVERALL_FORCE"].set(_state);
+      _robot.state["BIAS_FORCE"].set(_state_no_torque);
+      // std::cout << __PRETTY_FUNCTION__ << std::string(":\t") << _robot.state["BIAS_FORCE"].get().transpose() << std::endl;
+      // std::cout << _robot.state.torque.get().transpose() << std::endl;
+      // std::cout << "_world_contacts\t" << _world_contacts.transpose() << std::endl;
+
       _state_2.noalias() = _gravity.getInertiaInverse()*_state;
       _robot.state.acceleration.set(_state_2);
+
+      // _state = _state_no_torque + _robot.lower_limits.torque.get();
+      // _state_2.noalias() = _gravity.getInertiaInverse()*_state;
+      // _robot.lower_limits["ACCELERATION"].set(_state_2); // should it be send as state?
+      //
+      // _state = _state_no_torque + _robot.upper_limits.torque.get();
+      // _state_2.noalias() = _gravity.getInertiaInverse()*_state;
+      // _robot.upper_limits["ACCELERATION"].set(_state_2);
       // _points_force.update(true);
       //
       // _linear_force.update(true);

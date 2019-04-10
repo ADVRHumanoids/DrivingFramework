@@ -73,6 +73,7 @@ void mgnss::higher_level::QrTask::_update(){
     for(auto& constraint: hard_inequality) constraint->update();
     _inequality.setState().head(hard_inequality.rows()) = hard_inequality.getState();
 
+    // this is very inefficient!
     for(int i = 0; i < _inequality.active_dofs.size(); i++)
       _inequality.setJacobian().block(0, i, hard_inequality.rows(), 1) = hard_inequality.getJacobian().col(_inequality.active_dofs[i]);
 
@@ -123,15 +124,16 @@ void mgnss::higher_level::QrTask::solve(){
     _cost.trace = _cost.quadratic.trace();
 
     _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
-    std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
+    // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);
     _outputTransform();
     // if(_return_state.norm()) std::cout << "_optimal_state\t" << _return_state.transpose() << std::endl;
     // std::cout << "return state\t" << _return_state.transpose() << std::endl;
 
 
- //    std::cout << "soft_inequality.state\n" << soft_inequality.getState().transpose() << std::endl;
+    // std::cout << "soft_inequality.state\n" << soft_inequality.getState().transpose() << std::endl;
  //    std::cout << "_inequality.transposed\n" << _inequality.transposed << std::endl;
- //    std::cout << "_inequality.state\n" << _inequality.state.transpose() << std::endl;
+ if(std::isinf(optimalCost()))
+    std::cout << "_inequality.state\n" << _inequality.getState().transpose() << std::endl;
  // std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
 }

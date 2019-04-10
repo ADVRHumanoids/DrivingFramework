@@ -288,7 +288,7 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: true
+                                effort: false #true
                         initialize: link_side_online
                 velocity_controller:
                         type: ""
@@ -555,9 +555,9 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
 #                        tunning: ZMP_INDIRECT
-                        steering: reactif
+                        steering: whole_body
 #                        position_gain: 200
-                        tunning: reactif_first_order
+                        tunning: whole_body
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
@@ -614,6 +614,13 @@ mwoibn:
                                         damp_sp: 0.0015
                                         damp: 0.001
                                         tracking: 1.0
+                                whole_body:
+                                        icm: 1.00 # 0.95
+                                        sp: 0.05 # 0.05
+                                        damp_icm: 0.0001 # 0.0002
+                                        damp_sp: 0.0008
+                                        damp: 0.0004
+                                        tracking: 1.0
                                 reactif:
                                         icm: 1.00 # 0.95
                                         sp: 0.05 # 0.05
@@ -622,6 +629,19 @@ mwoibn:
                                         damp: 0.0004
                                         tracking: 1.0
                         tunnings:
+                                whole_body: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 90
+                                        BASE: [70, 70, 60, 60, 60, 100]
+                                        CONTACT_POINTS: 35
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 20 # 100
+                                        CASTER: 30 # 14
+                                        CAMBER_DAMP: 0.06
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 RT: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
@@ -722,7 +742,7 @@ mwoibn:
                         compliance: True
                 ground_forces:
                         layer: NRT
-                        robot: base_velocity
+                        robot: default
                         controller: empty
                         mode: full
                         secondary_file:
@@ -756,7 +776,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry2::odometry, NwheelsZMP::wheeled_motion]
+                        plugins: [odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
                         # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry, ground_forces,
                         #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]

@@ -534,6 +534,17 @@ std::vector<_Scalar> toVector(const _Matrix& m){
       return std::vector<_Scalar>(&m[0], m.data()+m.cols()*m.rows());
 }
 
+template <typename _Vector> inline
+void boolAnd(const _Vector& v1, const _Vector& v2, _Vector& result){
+  for(int i = 0; i < v1.size(); i++)
+      result[i] = v1[i] && v2[i];
+}
+
+template <typename _Vector> inline
+void boolOr(const _Vector& v1, const _Vector& v2, _Vector& result){
+  for(int i = 0; i < v1.size(); i++)
+      result[i] = v1[i] || v2[i];
+}
 
 
 // }

@@ -18,8 +18,8 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
           hard_inequality.clear();
 
             if(_is_margin)
-              addSoft(Constraint(4,_vars), 1e2); // margin
-              addSoft(Constraint(8,_vars), 1e2); // wirkspace
+              addSoft(Constraint(4,_vars), 5e1); // margin
+              addSoft(Constraint(8,_vars), 5e1); // wirkspace
 
               QrTask::init();
 
