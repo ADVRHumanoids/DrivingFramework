@@ -14,14 +14,14 @@ mgnss::controllers::ComplianceCompensation::ComplianceCompensation(mwoibn::robot
 
 void mgnss::controllers::ComplianceCompensation::_construct(YAML::Node config){
 
-        if(!config["type"])
-                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'type'."));
-
-        if(!config["reference"])
-                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'reference'."));
-
-        if(!config["compliance"])
-                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'compliance'."));
+        // if(!config["type"])
+        //         throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'type'."));
+        //
+        // if(!config["reference"])
+        //         throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'reference'."));
+        //
+        // if(!config["compliance"])
+        //         throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": configuration doesn't containt required filed 'compliance'."));
 
         config["name"].as<std::string>();
         _actuation_model_ptr.reset(new mwoibn::motor_side_reference::SeaCompensation(_robot));
@@ -43,6 +43,8 @@ void mgnss::controllers::ComplianceCompensation::update(){
         //_robot.command.velocity.set(_reference.state.velocity.get());
         //_gravity_compensation_ptr->update();
         //if(_motor_side)
+        // std::cout << "original\t" << _robot.command.torque.get().transpose() << std::endl;
+
         _actuation_model_ptr->update();
 
 }

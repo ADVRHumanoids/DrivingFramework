@@ -55,8 +55,8 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE});
 
-  _robot.state.add("OVERALL_FORCE");
-  _robot.state.add("BIAS_FORCE");
+  _robot.state.add("OVERALL_FORCE", _robot.getDofs());
+  _robot.state.add("BIAS_FORCE", _robot.getDofs());
   _robot.state.add(_unfiltered_torque, _robot.getDofs());
 
 

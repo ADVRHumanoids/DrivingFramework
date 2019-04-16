@@ -20,7 +20,7 @@ namespace actions {
 class ShapeAction : public Primary {
 public:
 ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
-            std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringShape& steering_reference,
+            std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
              mgnss::higher_level::StateMachine& state_machine, mgnss::higher_level::QrTask& unconstrainted,
@@ -30,15 +30,17 @@ ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_contro
              _state_machine(state_machine), _unconstrainted(unconstrainted), _dt(dt), _next_step(next_step), _robot(robot){
 
                _desired_steer.setZero(4);
+               _current_steer.setZero(4);
                _modified_support.setZero(8);
                _support_world.setZero(8);
                _support.setZero(12);
                _eigen_scalar.setZero(1);
 
-               _robot.command.add(QR_TASK_VELOCITY, _robot.getDofs());
-               _robot.command.add("QR_TASK_POSITION", _robot.getDofs());
-               _robot.command.add("QR_TASK_TORQUE", _robot.getDofs());
-               _robot.command.add("QR_TASK_ACCELERATION", _robot.getDofs());
+               _robot.states.add(QR, _robot.getDofs());
+               // _robot.command.add(QR_TASK_VELOCITY, _robot.getDofs());
+               // _robot.command.add("QR_TASK_POSITION", _robot.getDofs());
+               // _robot.command.add("QR_TASK_TORQUE", _robot.getDofs());
+               // _robot.command.add("QR_TASK_ACCELERATION", _robot.getDofs());
 
                temp_des.setZero(12);
                temp_qr.setZero(12);
@@ -56,11 +58,11 @@ virtual void run(){
     // std::cout << "_qr_task\t" << _qr_task.raw().transpose() << std::endl;
     // std::cout << "_cost\t" << _qr_task.optimalCost() << std::endl;
 
-    _robot.command[QR_TASK_VELOCITY].set(_qr_task.raw().head(_qr_task.activeDofs().size()), _qr_task.activeDofs());
+    _robot.states[QR].velocity.set(_qr_task.raw().head(_qr_task.activeDofs().size()), _qr_task.activeDofs());
 
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
-        _robot.command[QR_TASK_VELOCITY].set(mwoibn::VectorN::Zero(_robot.command[QR_TASK_VELOCITY].size()));
+        _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
         std::cerr << infs << "\t" << _qr_task.optimalCost() << std::endl;
     }
     // std::cout << "_quadratic\n" << _qr_task.cost().quadratic << std::endl;
@@ -70,8 +72,12 @@ virtual void run(){
 
     for(int i =0; i < 4; i++){
         _eigen_scalar.noalias() =  _steering[i].getJacobian()*_qr_task.raw().head(_steering[i].getJacobian().cols() ) ;
-        _desired_steer[i] = -_eigen_scalar[0]*_dt;
+        _desired_steer[i] = -2*_eigen_scalar[0]*_dt;
+        _current_steer[i] = _steering[i].getCurrent();
+        // _current_steer[i] = _steering[i].getReference();
+
     }
+
 
     // mwoibn::VectorN _modified_support  =  _state_machine.stateJacobian()*_qr_task.raw().head(_contact_point.getJacobian().cols());
     // mwoibn::VectorN _modified_support(8);
@@ -84,8 +90,12 @@ virtual void run(){
       test__ = mwoibn::Vector3::Zero();
       test__.head<2>() = _support_world.segment<2>(2*i);
       _modified_support.segment<2>(2*i) = (_state_machine.steeringFrames()[i]->rotation*test__).head<2>();
+      // std::cout << i << "\trotation\t" << mwoibn::Quaternion::fromMatrix(_state_machine.steeringFrames()[i]->rotation).angle()*180/mwoibn::PI << std::endl;
+      // std::cout << "rotation\t" << mwoibn::Quaternion::fromMatrix(_state_machine.steeringFrames()[i]->rotation).axis().transpose() << std::endl;
     }
-    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
+    // std::cout << "world\t" << _modified_support.transpose() << std::endl;
+    // std::cout << "_support_reference\t" << _support_world.transpose() << std::endl;
+
     // std::cout << "unconstrained_support\t" << _unconstrainted.get().transpose() << std::endl;
 
     // std::cout << "_desired_steer\t" << _desired_steer.transpose() << std::endl;
@@ -94,6 +104,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
       _desired_steer.setZero();
       _modified_support.setZero();
+      _support_world.setZero();
     }
 
 
@@ -114,7 +125,8 @@ virtual void run(){
       _contact_point.setReferenceWorld(i, support_i, false);
     }
 
-    _steering_reference.compute(_next_step, _desired_steer);
+
+    _steering_reference.compute(_next_step, _desired_steer, _current_steer);
     //
     for(int i =0; i < 4; i++)
       _steering[i].setReference(_steering_reference.get()[i]);
@@ -186,6 +198,9 @@ void log(  mwoibn::common::Logger& logger){
   logger.add("cp_des_"   + std::to_string(i) + "_y", temp_des[3*i+1] );
   logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
   logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
+  logger.add("v_steer_"   + std::to_string(i), _desired_steer[i]/_dt );
+  logger.add("current_"   + std::to_string(i), _current_steer[i]*180/mwoibn::PI );
+
   }
 }
 
@@ -194,13 +209,13 @@ protected:
   mgnss::higher_level::QpAggravated& _qr_task;
   mwoibn::hierarchical_control::tasks::ContactPoint &_contact_point;
   std::vector<mwoibn::hierarchical_control::tasks::Angle> &_steering;
-  mgnss::higher_level::SteeringShape& _steering_reference;
+  mgnss::higher_level::SteeringReference& _steering_reference;
   mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
   mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;
   mgnss::higher_level::QrTask& _unconstrainted;
   mgnss::higher_level::StateMachine& _state_machine;
   mwoibn::VectorN _weight;
-  mwoibn::VectorN _desired_steer, _modified_support, _support_world, _support;
+  mwoibn::VectorN _desired_steer, _modified_support, _support_world, _support, _current_steer;
   mwoibn::Vector3 test__, vel__;
   mwoibn::VectorN _eigen_scalar;
   double _dt;
@@ -208,7 +223,7 @@ protected:
   mwoibn::robot_class::Robot& _robot;
   int infs = 0;
   mwoibn::VectorN temp_qr, temp_des;
-  const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
+  const std::string QR = "QR";
 };
 
 }

@@ -548,6 +548,7 @@ mwoibn:
                 wheeled_motion:
                         layer: NRT
                         robot: default
+                        # controller: position_reference
                         controller: direct
                         mode: full
                         chain: lower_body
@@ -617,9 +618,9 @@ mwoibn:
                                 whole_body:
                                         icm: 1.00 # 0.95
                                         sp: 0.05 # 0.05
-                                        damp_icm: 0.0001 # 0.0002
+                                        damp_icm: 0.000000001 # 0.00001
                                         damp_sp: 0.0008
-                                        damp: 0.0004
+                                        damp: 0.00001
                                         tracking: 1.0
                                 reactif:
                                         icm: 1.00 # 0.95
@@ -639,7 +640,7 @@ mwoibn:
 #                                        CONTACT_POINTS: 0.01
                                         CAMBER: 20 # 100
                                         CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.06
+                                        CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 RT: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -720,7 +721,7 @@ mwoibn:
                         chain: wheels
                 gravity_compensation:
                         layer: NRT
-                        robot: base_velocity
+                        robot: default
                         controller: torque_reference
                         secondary_file:
                              path: *support
@@ -729,17 +730,17 @@ mwoibn:
                         # type: online
                         # reference: reference
                         # compliance: True
-                centralized:
+                compliance_compensation:
                         layer: NRT
                         robot: default
-                        controller: torque_reference
+                        controller: direct
                         secondary_file:
                             path: *support
                             file: lower_body.yaml
                         mode: full
-                        type: online
-                        reference: reference
-                        compliance: True
+#                        type: online
+#                        reference: reference
+#                        compliance: True
                 ground_forces:
                         layer: NRT
                         robot: default
@@ -776,7 +777,6 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        # plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation]
-                        # plugins: [joint_states::joint_reference, odometry, ground_forces,
-                        #           Nwheels3::wheeled_motion, centralized, ground_forces::gravity_forces]
+                        # plugins: [odometry2::odometry]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

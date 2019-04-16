@@ -4,6 +4,7 @@
 #include "mwoibn/common/types.h"
 #include "mwoibn/common/interfaces.h"
 #include "mwoibn/common/pipe.h"
+#include "mwoibn/common/stack.h"
 
 //#include <rbdl/rbdl.h>
 
@@ -12,72 +13,70 @@ namespace mwoibn
 namespace robot_class
 {
 
-class State
+class State: public mwoibn::common::Stack<mwoibn::Interface, mwoibn::robot_class::Pipe>
 {
+  typedef mwoibn::common::Stack<mwoibn::Interface, mwoibn::robot_class::Pipe> Precedesor_;
 
 public:
-State(int dofs = 0): _interfaces({{"POSITION", mwoibn::robot_class::Pipe()},
-                                 {"VELOCITY", mwoibn::robot_class::Pipe()},
-                                 {"TORQUE", mwoibn::robot_class::Pipe()},
-                                 {"ACCELERATION", mwoibn::robot_class::Pipe()},
-                                 {"ZERO", mwoibn::robot_class::Pipe()},}),
-                      position(_interfaces["POSITION"]),
-                      velocity(_interfaces["VELOCITY"]),
-                      torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"]),
-                      zero(_interfaces["ZERO"])
+State(int dofs = 0): Precedesor_({"POSITION", "VELOCITY", "TORQUE",
+                                  "ACCELERATION", "ZERO"}),
+                      position(Precedesor_::_interfaces["POSITION"]),
+                      velocity(Precedesor_::_interfaces["VELOCITY"]),
+                      torque(Precedesor_::_interfaces["TORQUE"]),
+                      acceleration(Precedesor_::_interfaces["ACCELERATION"]),
+                      zero(Precedesor_::_interfaces["ZERO"])
 {
         init(dofs);
 }
 
-State(State& other): _interfaces(other._interfaces),
-                      position(_interfaces["POSITION"]),
-                      velocity(_interfaces["VELOCITY"]),
-                      torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"]),
-                      zero(_interfaces["ZERO"])
+State(const State& other): Precedesor_(other),
+                      position(Precedesor_::_interfaces["POSITION"]),
+                      velocity(Precedesor_::_interfaces["VELOCITY"]),
+                      torque(Precedesor_::_interfaces["TORQUE"]),
+                      acceleration(Precedesor_::_interfaces["ACCELERATION"]),
+                      zero(Precedesor_::_interfaces["ZERO"])
 {
 }
 
 
-State(State&& other): _interfaces(other._interfaces),
-                      position(_interfaces["POSITION"]),
-                      velocity(_interfaces["VELOCITY"]),
-                      torque(_interfaces["TORQUE"]),
-                      acceleration(_interfaces["ACCELERATION"]),
-                      zero(_interfaces["ZERO"])
+State(State&& other): Precedesor_(other),
+                      position(Precedesor_::_interfaces["POSITION"]),
+                      velocity(Precedesor_::_interfaces["VELOCITY"]),
+                      torque(Precedesor_::_interfaces["TORQUE"]),
+                      acceleration(Precedesor_::_interfaces["ACCELERATION"]),
+                      zero(Precedesor_::_interfaces["ZERO"])
 {
 }
 
 State& operator=(const State& other){
     if(&other == this) return *this;
 
-    for(auto& interface: other._interfaces)
-        _interfaces[interface.first] = interface.second;
+    for(auto& interface: other.Precedesor_::_interfaces)
+        Precedesor_::_interfaces[interface.first] = interface.second;
 
     return *this;
 }
+//
+// bool add(mwoibn::Interface interface){
+//   if(_interfaces.count(interface))
+//     return false;
+//
+//   _interfaces[interface] = mwoibn::robot_class::Pipe(position.size());
+//   return true;
+// }
+//
+// bool add(mwoibn::Interface interface, int size){
+//   if(_interfaces.count(interface))
+//     return false;
+//
+//   _interfaces[interface] = mwoibn::robot_class::Pipe(size);
+//   return true;
+// }
 
-bool add(mwoibn::Interface interface){
-  if(_interfaces.count(interface))
-    return false;
 
-  _interfaces[interface] = mwoibn::robot_class::Pipe(position.size());
-  return true;
-}
-
-bool add(mwoibn::Interface interface, int size){
-  if(_interfaces.count(interface))
-    return false;
-
-  _interfaces[interface] = mwoibn::robot_class::Pipe(size);
-  return true;
-}
-
-
-bool has(mwoibn::Interface interface){
-  return _interfaces.count(interface);
-}
+// bool has(mwoibn::Interface interface){
+//   return _interfaces.count(interface);
+// }
 
 /** @resizes the states, it will reset to zero all values stored in an object */
 void restart(int dofs){
@@ -95,33 +94,33 @@ bool synch(State& other, std::initializer_list<mwoibn::Interface> interfaces){
 }
 
 void synch(State& other){
-      for(auto& interface: _interfaces )
+      for(auto& interface: Precedesor_::_interfaces )
         synch(other, interface.first);
 }
 
 bool synch(State& other, mwoibn::Interface interface){
       if(!other.has(interface) ||  !has(interface)) return false;
-      _interfaces[interface] = other[interface];
+      Precedesor_::_interfaces[interface] = other[interface];
 
       return true;
 }
+//
+// void init(int dofs){
+//     for(auto& interface: _interfaces)
+//       interface.second.init(dofs);
+// }
 
-void init(int dofs){
-    for(auto& interface: _interfaces)
-      interface.second.init(dofs);
-}
+// const mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) const {
+//       return _interfaces.at(interface);
+// }
+// mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) {
+//       return _interfaces.at(interface);
+// }
+//
 
-const mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) const {
-      return _interfaces.at(interface);
-}
-mwoibn::robot_class::Pipe& operator[] (const mwoibn::Interface& interface) {
-      return _interfaces.at(interface);
-}
-
-
-
-private:
-  std::map<mwoibn::Interface, mwoibn::robot_class::Pipe> _interfaces;
+//
+// private:
+//   std::map<mwoibn::Interface, mwoibn::robot_class::Pipe> _interfaces;
 
 
 public:

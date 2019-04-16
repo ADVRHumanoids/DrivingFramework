@@ -89,7 +89,7 @@ virtual ~SteeringReference() {
 const mwoibn::VectorN& get() {
         return _b_st;
 }
-void set(mwoibn::VectorN& last) {
+virtual void set(mwoibn::VectorN& last) {
         _b = last;
         _b_st = last;
         _b_sp = last;
@@ -146,6 +146,11 @@ void resteer(const mwoibn::VectorBool& steer)
         }
 //    _steer.noalias() = steer;
 }
+
+virtual void compute(const mwoibn::Vector3 next_step, const mwoibn::VectorN& db_des,  const mwoibn::VectorN& current){
+    compute(next_step);
+}
+
 
 virtual void compute(const mwoibn::Vector3 next_step){
 

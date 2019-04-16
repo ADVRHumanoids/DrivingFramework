@@ -356,22 +356,40 @@ LIST( APPEND INSTALL_TARGETS
     set_xeno_flags(ground_forces)
   endif()
 
-#      LIST( APPEND INSTALL_TARGETS gravity_compensation )
-#
-#      add_library(gravity_compensation SHARED
-#         src/plugins/gravity_compensation.cpp
-#       )
-#      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
-#      target_link_libraries(gravity_compensation
-#         ${catkin_LIBRARIES}
-#         ${XCM_LIBRARIES}
-#     )
-#
-#
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(gravity_compensation)
-#  endif()
+      LIST( APPEND INSTALL_TARGETS gravity_compensation )
+
+      add_library(gravity_compensation SHARED
+         src/plugins/gravity_compensation.cpp
+       )
+      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
+      target_link_libraries(gravity_compensation
+         ${catkin_LIBRARIES}
+         ${XCM_LIBRARIES}
+     )
+
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(gravity_compensation)
+  endif()
+
+
+  LIST( APPEND INSTALL_TARGETS compliance_compensation )
+
+  add_library(compliance_compensation SHARED
+     src/plugins/compliance_compensation.cpp
+   )
+  add_dependencies(compliance_compensation ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(compliance_compensation
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+ )
+
+
+if ( Xenomai_FOUND )
+message(WARNING "set_xeno_flags")
+set_xeno_flags(compliance_compensation)
+endif()
 
 #      LIST( APPEND INSTALL_TARGETS acceleration )
 #

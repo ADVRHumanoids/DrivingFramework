@@ -687,6 +687,10 @@
       <joint name="ankle_yaw_4" value="0.3"/>
    </group_state>
 
+   <group_state name="ankles" group="chains">
+      <joint name="ankle_yaw_1" value="-0.6"/>
+      <joint name="ankle_yaw_2" value=" 0.6"/>
+   </group_state>
 
       <group_state name="mammal_wide_high" group="chains">
 

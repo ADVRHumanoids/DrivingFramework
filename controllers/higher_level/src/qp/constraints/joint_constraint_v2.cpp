@@ -102,36 +102,45 @@ void mgnss::higher_level::constraints::JointConstraintV2::update(){
 
 
         _test_inactive.setZero();
-        for (int i = 0; i < _inactive_dofs.size(); i++){
-            _test_inactive += _gravity.getInertia().col(_inactive_dofs[i])*_robot.state.velocity.get()[_inactive_dofs[i]];
-        }
+        // for (int i = 0; i < _inactive_dofs.size(); i++){
+        //     _test_inactive += _gravity.getInertia().col(_inactive_dofs[i])*_robot.state.acceleration.get()[_inactive_dofs[i]]/_robot.rate();
+        // }
+        // for (int i = 0; i < _inactive_dofs.size(); i++){
+        //     _test_inactive += _gravity.getInertia().col(_inactive_dofs[i])*_robot.state.acceleration.get()[_inactive_dofs[i]]/_robot.rate();
+        // }
+
 
         _robot.lower_limits["BIAS_FORCE"].set(_robot.state["BIAS_FORCE"].get() + _robot.lower_limits.torque.get() + _test_inactive);
         _robot.upper_limits["BIAS_FORCE"].set(_robot.state["BIAS_FORCE"].get() + _robot.upper_limits.torque.get() + _test_inactive);
+
+        // std::cout << _test_inactive.transpose() << std::endl;
+        // std::cout << _robot.state["BIAS_FORCE"].get().transpose() << std::endl;
 
 
         // std::cout << ""
         _torque_max->update();
         _torque_min->update();
 
-        // int k = _min.active.count()+_max.active.count();
-        // for(int i = 0; i < _torque_min->active.size(); i++){
-        //   if(_torque_min->active[i]){
-        //       _jacobian.row(k) = _torque_min->getJacobian().row(i);
-        //       _state[k] = _torque_min->getState()[i];
-        //       // std::cout << "min k: " << k << ", i: " << i << "\t" << _state[k] << std::endl;
-        //       ++k;
-        //   }
-        // }
-        //
-        // for(int i = 0; i < _torque_max->active.size(); i++){
-        //   if(_torque_max->active[i]){
-        //       _jacobian.row(k) = _torque_max->getJacobian().row(i);
-        //       _state[k] = _torque_max->getState()[i];
-        //       // std::cout << "max k: " << k << ", i: " << i << "\t" << _state[k] << std::endl;
-        //       ++k;
-        //   }
-        // }
+        int k = _min.active.count()+_max.active.count();
+        for(int i = 0; i < _torque_min->active.size(); i++){
+          if(_torque_min->active[i]){
+              _jacobian.row(k) = _torque_min->getJacobian().row(i);
+              _state[k] = _torque_min->getState()[i];
+              if (_torque_min->getState()[i] < 0)
+                std::cout << "min k: " << k << ", i: " << i << "\t" << _torque_min->getState()[i]  << "\t" << _robot.state["BIAS_FORCE"].get()[i]*_robot.rate() << "\t" <<  _robot.lower_limits["BIAS_FORCE"][i]*_robot.rate() << "\t" << (_torque_min->getJacobian()*_min_torque)[i] << std::endl;
+              ++k;
+          }
+        }
+
+        for(int i = 0; i < _torque_max->active.size(); i++){
+          if(_torque_max->active[i]){
+              _jacobian.row(k) = _torque_max->getJacobian().row(i);
+              _state[k] = _torque_max->getState()[i];
+              if (_torque_max->getState()[i] < 0)
+                std::cout << "max k: " << k << ", i: " << i << "\t" << _torque_max->getState()[i] << "\t" << _robot.state["BIAS_FORCE"].get()[i]*_robot.rate() << "\t" <<  _robot.upper_limits["BIAS_FORCE"][i]*_robot.rate() << "\t" << (_torque_max->getJacobian()*_max_torque)[i]<< std::endl;
+              ++k;
+          }
+        }
 
         // std::cout << "state\n" << _state.transpose() << std::endl;
 

@@ -54,25 +54,34 @@ void mgnss::controllers::WheelsZMP::compute()
         _robot.command.acceleration.set(_temp_state );
         _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.command.acceleration.get();
         _temp_state -= - _robot.state["BIAS_FORCE"].get();
-        _robot.command.torque.set(_temp_state);
+        // _robot.command.torque.set(_temp_state);
 
-        _temp_state = _robot.command[QR_TASK_VELOCITY].get()*_robot.rate();
+        _temp_state = _robot.states[QR].velocity.get()*_robot.rate();
         _temp_state += _robot.state.position.get();
-        _robot.command[QR_TASK_POSITION].set(_temp_state);
+        _robot.states[QR].position.set(_temp_state);
 
-        _temp_state = _robot.command[QR_TASK_VELOCITY].get() - _robot.state.velocity.get();
+        _temp_state = _robot.states[QR].velocity.get() - _robot.state.velocity.get();
         _temp_state = _temp_state/_robot.rate();
-        _robot.command[QR_TASK_ACCELERATION].set(_temp_state);
+        _robot.states[QR].acceleration.set(_temp_state);
 
-        _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.command[QR_TASK_ACCELERATION].get();
+        _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.states[QR].acceleration.get();
         _temp_state -=  _robot.state["BIAS_FORCE"].get();
-        _robot.command[QR_TASK_TORQUE].set( _temp_state );
+        _robot.states[QR].torque.set( _temp_state );
 
         _temp_state.noalias() = _dynamic_ptr->getInertia()*_robot.state.acceleration.get();
         _temp_state -= _robot.state["BIAS_FORCE"].get();
         _robot.state[ESTIMATED_TORQUES].set(_temp_state);
+
+        // _temp_state.noalias() = _robot.command.torque.get();
+        // _temp_state.noalias() += _robot.states[GAINS].position.get().cwiseProduct(_robot.state.position.get()-_robot.command.position.get());
+        // _temp_state.noalias() -= _robot.states[GAINS].velocity.get().cwiseProduct(_robot.state.velocity.get());
+        //
+        // _robot.state[CONTROLLER_TORQUES].set(_temp_state);
+
+
+        // std::cout << "wheels\t" << _robot.command.position.get().transpose() << std::endl;
         // _robot.command.torque.set( ( _robot.command.velocity.get() - _robot.state.velocity.get() )/_robot.rate() );
-        // _robot.command[QR_TASK_TORQUE].set( ( _robot.command[QR_TASK_VELOCITY].get() - _robot.state.velocity.get() )/_robot.rate() );
+        // .states[QR].torque.set( ( _robot.states[QR].velocity.get() - _robot.state.velocity.get() )/_robot.rate() );
 
 }
 
@@ -155,9 +164,13 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
           _temp_4[i] = _leg_tasks["STEERING"].second[i].getCurrent();
         // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
 
-        _steering_shape_ptr->set(_temp_4);
+        _steering_ref_ptr->set(_temp_4);
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
+
+        // std::cout << "LINKS" << std::endl;
+        // for(auto& name: _robot.getLinks(mwoibn::eigen_utils::iota(_robot.getDofs()), false))
+        //   std::cout << name << std::endl;
 
 }
 
@@ -238,8 +251,17 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         //
         // for(int i =0; i < dofs__.size(); i++)
         //     _qr_wrappers["SHAPE_JOINT"]->cost().quadratic(dofs__[i], dofs__[i]) = 1e-4;
-        _robot.state.add(ESTIMATED_TORQUES);
+        _robot.state.add(ESTIMATED_TORQUES, _robot.getDofs());
+        // _robot.state.add(CONTROLLER_TORQUES, _robot.getDofs());
 
+//        _robot.states.add(GAINS, _robot.getDofs());
+//        mwoibn::VectorN temp_(_robot.getDofs());
+//        temp_ << 0,0,0,0,0,0, 5000, 5000, 5000, 3000, 3000, 0, 5000, 5000, 5000, 3000, 3000, 0, 5000, 5000, 5000, 3000, 3000, 0,
+//                 5000, 5000, 5000, 3000, 3000, 0, 2000, 500, 400, 400, 400, 300, 300, 200, 500, 400, 400, 400, 300, 300, 200;
+
+//        _robot.states[GAINS].position.set(temp_);
+//        temp_ << 0,0,0,0,0,0, 20, 20, 20, 20, 20, 30, 20, 20, 20, 20, 20, 30, 20, 20, 20, 20, 20, 30, 20, 20, 20, 20, 20, 30, 20, 5, 4, 4, 4, 3, 3, 2, 5, 4, 4, 4, 3, 3, 2;
+//        _robot.states[GAINS].velocity.set(temp_);
 }
 
 void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
@@ -252,17 +274,17 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     for(auto entry : steering)
           std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
-    _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
-              _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
+    // _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
+    //           _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
-    _steering_shape_ptr.reset(new mgnss::higher_level::SteeringShape(
+    _steering_ref_ptr.reset(new mgnss::higher_level::SteeringShape(
                         _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
     // _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
     //                       _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
     shape_action__.reset(new mwoibn::hierarchical_control::actions::ShapeAction(*_shape_extend_ptr, *_steering_ptr,
-     _leg_tasks["STEERING"].second, *_steering_shape_ptr, _leg_tasks["STEERING"].first, *_angles_ptr, _leg_tasks["CASTER"].first,
+     _leg_tasks["STEERING"].second, *_steering_ref_ptr, _leg_tasks["STEERING"].first, *_angles_ptr, _leg_tasks["CASTER"].first,
      _leg_tasks["CAMBER"].first, *state_machine__, *_qr_wrappers["SHAPE"], _ik_ptr->state, _next_step, _robot.rate(), _robot));
 
     _ik_ptr->addAfter(*shape_action__, *_actions["BASE"]);
@@ -302,11 +324,11 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
            for(int k = 0; k < 4; k++){
              _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
              _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
-             _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
+           //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
            }
          }
 
-        for(int i = 0; i < _robot.getDofs(); i++){
+        for(int i = 0; i < 30; i++){
             _names.push_back("pos_des_" + std::to_string(i));
             _names.push_back("vel_des_" + std::to_string(i));
             _names.push_back("acc_des_" + std::to_string(i));
@@ -323,11 +345,12 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
             _names.push_back("vel_ul_" + std::to_string(i));
             _names.push_back("tau_ul_" + std::to_string(i));
             _names.push_back("bias_" + std::to_string(i));
-            _names.push_back("tau_est_" + std::to_string(i));
+            // _names.push_back("tau_est_" + std::to_string(i));
+            // _names.push_back("tau_con_" + std::to_string(i));
 
         }
 
-        for(int i = 0; i < _robot.command[QR_TASK_VELOCITY].size(); i++){
+        for(int i = 0; i < 30; i++){
             _names.push_back("pos_qr_" + std::to_string(i));
             _names.push_back("vel_qr_" + std::to_string(i));
             _names.push_back("tau_qr_" + std::to_string(i));
@@ -342,6 +365,17 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
             _names.push_back("camber_err_" + std::to_string(i));
           }
 
+        // for(int i = 1; i < 5; i++){
+        //   _names.push_back("st_icm_" + std::to_string(i));
+        //   _names.push_back("st_sp_" + std::to_string(i));
+        //   _names.push_back("r_st_" + std::to_string(i));
+        //   _names.push_back("v_icm_" + std::to_string(i));
+        //   _names.push_back("v_sp_" + std::to_string(i));
+        //   _names.push_back("v_" + std::to_string(i));
+        //   _names.push_back("tan_sp_" + std::to_string(i));
+        //   _names.push_back("tan_icm_" + std::to_string(i));
+        //   _names.push_back("tan_" + std::to_string(i));
+        // }
 
 }
 
@@ -482,11 +516,11 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
          for(int k = 0; k < 4; k++){
            logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
            logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
-           logger.add(_names[counter], _forces[k*3+i]); ++counter;
+         //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
          }
        }
 
-      for(int i = 0; i < _robot.getDofs(); i++){
+      for(int i = 0; i < 30; i++){
           logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
           logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
           logger.add(_names[counter], _robot.command.acceleration.get()[i]); ++counter;
@@ -503,28 +537,39 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
           logger.add(_names[counter], _robot.upper_limits.velocity.get()[i]); ++counter;
           logger.add(_names[counter], _robot.upper_limits.torque.get()[i]); ++counter;
           logger.add(_names[counter],  _robot.state["BIAS_FORCE"][i]); ++counter;
-          logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
-
+          // logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
+          // logger.add(_names[counter],  _robot.state[CONTROLLER_TORQUES][i]); ++counter;
       }
 
-      for(int i = 0; i < _robot.command[QR_TASK_VELOCITY].size(); i++){
-          logger.add(_names[counter], _robot.command[QR_TASK_POSITION].get()[i]); ++counter;
-          logger.add(_names[counter], _robot.command[QR_TASK_VELOCITY].get()[i]); ++counter;
-          logger.add(_names[counter], _robot.command[QR_TASK_TORQUE].get()[i]); ++counter;
-          logger.add(_names[counter], _robot.command[QR_TASK_ACCELERATION].get()[i]); ++counter;
+      for(int i = 0; i < 30; i++){
+          logger.add(_names[counter], _robot.states[QR].position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.states[QR].velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.states[QR].torque.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.states[QR].acceleration.get()[i]); ++counter;
 
       }
 
       for(int i = 0; i < 4; i++){
           _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); ++counter;
           logger.add(_names[counter], _eigen_scalar[0]);
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command[QR_TASK_VELOCITY].get(); ++counter;
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get(); ++counter;
           logger.add(_names[counter], _eigen_scalar[0]);
           _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); ++counter;
           logger.add(_names[counter], _eigen_scalar[0]);
           logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
         }
 
+        // for(int i = 0; i < 4 ; i++){
+        //     logger.add(_names[counter], _steering_ref_ptr->getICM()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->getSP()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->get()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->vICM()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->vSP()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->v()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->getDampingSP()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->getDampingICM()[i]); ++counter;
+        //     logger.add(_names[counter], _steering_ref_ptr->damp()[i]); ++counter;
+        // }
 
         shape_action__->log(logger);
 

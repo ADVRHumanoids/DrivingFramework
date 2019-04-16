@@ -56,8 +56,8 @@ class JointConstraintV2: public Constraint{
     }
 
     void _initTorques(){
-      _robot.lower_limits.add("BIAS_FORCE");
-      _robot.upper_limits.add("BIAS_FORCE");
+      _robot.lower_limits.add("BIAS_FORCE", _robot.getDofs());
+      _robot.upper_limits.add("BIAS_FORCE", _robot.getDofs());
       _torque_min.reset(new mgnss::higher_level::constraints::Diff(mgnss::higher_level::constraints::MinimumLimit(_gravity.getInertia(), _robot.lower_limits["BIAS_FORCE"].get()), _robot.rate(), _min_torque));
       _torque_max.reset(new mgnss::higher_level::constraints::Diff(mgnss::higher_level::constraints::MaximumLimit(_gravity.getInertia(), _robot.upper_limits["BIAS_FORCE"].get()), _robot.rate(), _max_torque));
 

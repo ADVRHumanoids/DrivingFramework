@@ -19,7 +19,7 @@
 
 #include "mwoibn/communication_modules/shared.h"
 #include "mwoibn/communication_modules/shared_all.h"
-
+#include "mwoibn/common/stack.h"
 
 #include "mwoibn/common/all.h"
 #include "mwoibn/robot_class/mappings.h"
@@ -159,7 +159,7 @@ robot_class::State command;
 //! keep state limits
 robot_class::State lower_limits;   // read from urdf?
 robot_class::State upper_limits;
-
+common::Stack<std::string, robot_class::State> states;
 /** @brief Keeps pointers for all external controllers */
 communication_modules::Communications controllers;
 communication_modules::Communications feedbacks;

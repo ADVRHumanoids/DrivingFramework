@@ -63,7 +63,6 @@ void mgnss::higher_level::SupportShapingV4::_update(){
     // std::cout << "margin.getState()\t" << soft_inequality[0].getState().transpose() << std::endl;
     // std::cout << "workspace.getState()\t" << soft_inequality[1].getState().transpose() << std::endl;
     // std::cout << "margin.limit\t" << _margin.limit.transpose() << std::endl;
-    // std::cout << "workspace.limit\t" << hard_inequality.limit.transpose() << std::endl;
 
 }
 

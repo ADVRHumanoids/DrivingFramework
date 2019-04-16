@@ -235,7 +235,7 @@ protected:
 
   mwoibn::VectorN __last_steer;
   // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
-  std::unique_ptr<mgnss::higher_level::SteeringShape> _steering_shape_ptr;
+  // std::unique_ptr<mgnss::higher_level::SteeringShape> _steering_shape_ptr;
 
   std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
   std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeAction> shape_action__;
@@ -273,11 +273,17 @@ virtual void _updateSupport()
 
 private:
   std::vector<std::string> _names;
-  const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
-  const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
-  const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
-  const std::string QR_TASK_TORQUE = "QR_TASK_TORQUE";
+  // const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
+  // const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
+  // const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
+  // const std::string QR_TASK_TORQUE = "QR_TASK_TORQUE";
+  const std::string QR = "QR";
+  // const std::string GAINS = "GAINS";
+
   const std::string ESTIMATED_TORQUES = "ESTIMATED_TORQUES";
+  const std::string CONTROLLER_TORQUES = "CONTROLLER_TORQUES";
+
+
   mwoibn::VectorN _forces;
 
 

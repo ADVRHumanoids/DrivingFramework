@@ -244,6 +244,7 @@ void mgnss::controllers::WheelsController::_initIK(YAML::Node config){
   if(!config["chain"])
         throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
   _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+  _active_state.setZero(_select_ik.size());
 
   YAML::Node ik =  config["IK"];
 
@@ -302,5 +303,4 @@ void mgnss::controllers::WheelsController::_allocate(){
 
         _previous_command = mwoibn::VectorN::Zero(3);
         _command.setZero(_robot.getDofs());
-        _active_state.setZero(_select_ik.size());
 }

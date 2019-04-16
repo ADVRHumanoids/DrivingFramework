@@ -16,7 +16,7 @@ mgnss::higher_level::SteeringShape::SteeringShape(
         _damp_icm.setZero(_size);
 
         _reactif_gain.setZero(_size);
-
+        _current.setZero(_size);
         _treshhold_icm = margin_icm/dt;
         _treshhold_sp = margin_sp/dt;
 
@@ -50,6 +50,7 @@ void mgnss::higher_level::SteeringShape::_merge(int i){
         } // change velocity sign
 
         _pb[i] = _b[i];
+        _pb[i] = _current[i];
 
         _v[i] = _computeVelocity(i);
         _reactifGain(i);
@@ -171,22 +172,12 @@ void mgnss::higher_level::SteeringShape::_steerICM(int i, const mwoibn::Vector3 
 
         // SteeringReference::_steerICM(i, next_step);
         _plane_ref.noalias() = _plane.getPointStateReference(i).head(2);
+        _b_st[i] = _current[i]; // set desired to current
+        _b_sp[i] = _current[i]; // set desired to current
 
-        // _x = std::cos(_heading) * next_step[0];
-        // _x += std::sin(_heading) * next_step[1];
-        // _x -= _plane_ref[1] * next_step[2];
-        // _y = -std::sin(_heading) * next_step[0];
-        // _y += std::cos(_heading) * next_step[1];
-        // _y += _plane_ref[0] * next_step[2];
-        //
-        // _x += _contact_vel[3*i];
-        // _y += _contact_vel[3*i+1];
-        // _b_icm[i] = std::atan2(_y, _x); // this uses atan2 to avoid
-        //                                 // singularities in a atan
-        //                                 // implementation
-        // std::cout << "_heading\t" << _heading << std::endl;
-        _b_icm[i] += db_des[i]; // this is switched to take only a desired steering, use the same way of computing velocity
-        // _x = _plane.get
+        // _b_icm[i] += db_des[i]; // this is switched to take only a desired steering, use the same way of computing velocity
+        _b_icm[i] = _b_st[i] + db_des[i]; // this is switched to take only a desired steering, use the same way of computing velocity
+
 }
 
 void mgnss::higher_level::SteeringShape::_reactifGain(int i){
@@ -220,7 +211,7 @@ void mgnss::higher_level::SteeringShape::_ICM(mwoibn::Vector3 next_step, const m
 {
 
         _pb_icm.noalias() = _b_icm;
-
+        _pb_icm = _current;
         for (int i = 0; i < _size; i++)
         {
                 double v_last = _v_icm[i];
@@ -254,7 +245,7 @@ void mgnss::higher_level::SteeringShape::_velICM(int i){
 }
 
 void mgnss::higher_level::SteeringShape::_velSP(int i){
-        _v_sp[i] = _K_v*_plane_ref.norm();
+        _v_sp[i] = _K_v*_plane_ref.norm(); // this one assumes the _b_sp is in the +/- pi range
 }
 
 void mgnss::higher_level::SteeringShape::_PT(int i)
@@ -262,6 +253,8 @@ void mgnss::higher_level::SteeringShape::_PT(int i)
         // Desired state
 
         _pb_sp[i] = _b_sp[i];
+        _pb_sp[i] = _current[i];
+
         double v_last = _v_sp[i];
 
         _plane_ref.noalias() = _plane.getReferenceError(i).head<2>();

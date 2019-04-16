@@ -25,13 +25,17 @@ void SeaCompensation::updateStiffnessMatrix()
 void SeaCompensation::compute()
 {
         // use robot state as a feedback? or command -- I don't have to pass it
-        _command = _stiffness_matrix * _robot.state.torque.get() + _robot.command.position.get();
+        // std::cout << "command.torque\t" << _robot.command.torque.get().transpose() << std::endl;
+        // std::cout << "received\t" << _robot.command.position.get().transpose() << std::endl;
+        _command = _stiffness_matrix * _robot.command.torque.get() + _robot.command.position.get();
+        // std::cout << "send\t" << (_stiffness_matrix * _robot.command.torque.get()).transpose() << std::endl;
 }
 
 const mwoibn::VectorN& SeaCompensation::update()
 {
 
         //_gravity_compensation.update();
+
         compute();
         setCommand();
 

@@ -133,7 +133,11 @@ void mgnss::higher_level::QrTask::solve(){
 
     // std::cout << "soft_inequality.state\n" << soft_inequality.getState().transpose() << std::endl;
  //    std::cout << "_inequality.transposed\n" << _inequality.transposed << std::endl;
- if(std::isinf(optimalCost()))
-    std::cout << "_inequality.state\n" << _inequality.getState().transpose() << std::endl;
+ // if(std::isinf(optimalCost()))
+ // for(auto& constraint: soft_inequality)
+ //    std::cout << "soft\t" << constraint->getState().transpose() << std::endl;
+ // for(auto& constraint: hard_inequality)
+ //       std::cout << "hard\t" << constraint->getState().transpose() << std::endl;
+
  // std::cout << "_cost.quadratic\n" << _cost.quadratic << std::endl;
 }

@@ -24,12 +24,13 @@ SteeringShape(mwoibn::robot_class::Robot& robot,
 
 virtual ~SteeringShape() {
 }
-virtual void compute(const mwoibn::Vector3 next_step, const mwoibn::VectorN& db_des){
+virtual void compute(const mwoibn::Vector3 next_step, const mwoibn::VectorN& db_des,  const mwoibn::VectorN& current){
 
 
         _plane.updateError();
         _heading = _plane.heading();
 
+        _current = current;
         _ICM(next_step, db_des); // returns a velue in a robot space
 
         _SPT(); // returns a velue in a robot space
@@ -43,6 +44,12 @@ virtual void compute(const mwoibn::Vector3 next_step, const mwoibn::VectorN& db_
         _last_state[2] = _plane.heading(); // will it initialize correctly?
 }
 
+virtual void set(mwoibn::VectorN& last) {
+  _current = last;
+
+  SteeringReference::set(_current);
+}
+
 protected:
 
 virtual void _merge(int i);
@@ -53,6 +60,7 @@ virtual void _ICM(mwoibn::Vector3 next_step, const mwoibn::VectorN& db_des);
 virtual void _ICM(mwoibn::Vector3 next_step){}
 
 const mwoibn::VectorN& _contact_vel;
+mwoibn::VectorN _current;
 //mwoibn::robot_class::Robot& _robot;
 
 virtual void _PT(int i);
