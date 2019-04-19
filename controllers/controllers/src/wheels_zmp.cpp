@@ -220,23 +220,23 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         std::get<4>(_soft_hip[2])[0] =  1.9;
         std::get<5>(_soft_hip[3])[0] = -1.9;
                 //
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[0]), std::get<4>(_soft_hip[0])), _robot.rate(), std::get<2>(_soft_hip[0])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[1]), std::get<5>(_soft_hip[1])), _robot.rate(), std::get<2>(_soft_hip[1])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[2]), std::get<5>(_soft_hip[2])), _robot.rate(), std::get<2>(_soft_hip[2])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[3]), std::get<4>(_soft_hip[3])), _robot.rate(), std::get<2>(_soft_hip[3])), 1e3);
-
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[0]), std::get<5>(_soft_hip[0])), _robot.rate(), std::get<3>(_soft_hip[0])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[1]), std::get<4>(_soft_hip[1])), _robot.rate(), std::get<3>(_soft_hip[1])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[2]), std::get<4>(_soft_hip[2])), _robot.rate(), std::get<3>(_soft_hip[2])), 1e3);
-        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
-                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[3]), std::get<5>(_soft_hip[3])), _robot.rate(), std::get<3>(_soft_hip[3])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[0]), std::get<4>(_soft_hip[0])), _robot.rate(), std::get<2>(_soft_hip[0])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[1]), std::get<5>(_soft_hip[1])), _robot.rate(), std::get<2>(_soft_hip[1])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[2]), std::get<5>(_soft_hip[2])), _robot.rate(), std::get<2>(_soft_hip[2])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[3]), std::get<4>(_soft_hip[3])), _robot.rate(), std::get<2>(_soft_hip[3])), 1e3);
+//
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[0]), std::get<5>(_soft_hip[0])), _robot.rate(), std::get<3>(_soft_hip[0])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[1]), std::get<4>(_soft_hip[1])), _robot.rate(), std::get<3>(_soft_hip[1])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MaximumLimit(std::get<1>(_soft_hip[2]), std::get<4>(_soft_hip[2])), _robot.rate(), std::get<3>(_soft_hip[2])), 1e3);
+//        _shape_extend_ptr->addSoft(mgnss::higher_level::constraints::Integrate(
+//                                   mgnss::higher_level::constraints::MinimumLimit(std::get<1>(_soft_hip[3]), std::get<5>(_soft_hip[3])), _robot.rate(), std::get<3>(_soft_hip[3])), 1e3);
 
         // _qr_wrappers["SHAPE"]->init();
         // _qr_wrappers["SHAPE_WHEEL"]->init();
@@ -252,6 +252,9 @@ void mgnss::controllers::WheelsZMP::_allocate(){
         // for(int i =0; i < dofs__.size(); i++)
         //     _qr_wrappers["SHAPE_JOINT"]->cost().quadratic(dofs__[i], dofs__[i]) = 1e-4;
         _robot.state.add(ESTIMATED_TORQUES, _robot.getDofs());
+        _dynamic_ptr->subscribe({   mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA, 
+                                    mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA, 
+                                    mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA});
         // _robot.state.add(CONTROLLER_TORQUES, _robot.getDofs());
 
 //        _robot.states.add(GAINS, _robot.getDofs());
@@ -310,7 +313,7 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_angles_ptr->getJacobian(), _max_camber_limit));
 
     _shape_extend_ptr->init();
-
+    shape_action__->init();
 
     _names.push_back("time");
     _names.push_back("th");
@@ -499,78 +502,79 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
 
 void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double time){
-  int counter = 0;
-  logger.add(_names[counter], time); ++counter;
-
-   logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
-   logger.add(_names[counter], _heading); ++counter;
-   //
-   _forces = _robot.contacts().getReactionForce();
-        for(int i = 0; i < 3; i++){
-
-         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
-         logger.add(_names[counter], getBaseReference()[i]); ++counter;
-         logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
-
-         for(int k = 0; k < 4; k++){
-           logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
-           logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
-         //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
-         }
-       }
-
-      for(int i = 0; i < 30; i++){
-          logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.command.acceleration.get()[i]); ++counter;
-
-          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.state.velocity.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.state.acceleration.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.state.torque.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.lower_limits.position.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.lower_limits.velocity.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.lower_limits.torque.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.upper_limits.position.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.upper_limits.velocity.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.upper_limits.torque.get()[i]); ++counter;
-          logger.add(_names[counter],  _robot.state["BIAS_FORCE"][i]); ++counter;
-          // logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
-          // logger.add(_names[counter],  _robot.state[CONTROLLER_TORQUES][i]); ++counter;
-      }
-
-      for(int i = 0; i < 30; i++){
-          logger.add(_names[counter], _robot.states[QR].position.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.states[QR].velocity.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.states[QR].torque.get()[i]); ++counter;
-          logger.add(_names[counter], _robot.states[QR].acceleration.get()[i]); ++counter;
-
-      }
-
-      for(int i = 0; i < 4; i++){
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); ++counter;
-          logger.add(_names[counter], _eigen_scalar[0]);
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get(); ++counter;
-          logger.add(_names[counter], _eigen_scalar[0]);
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); ++counter;
-          logger.add(_names[counter], _eigen_scalar[0]);
-          logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
-        }
-
-        // for(int i = 0; i < 4 ; i++){
-        //     logger.add(_names[counter], _steering_ref_ptr->getICM()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->getSP()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->get()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->vICM()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->vSP()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->v()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->getDampingSP()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->getDampingICM()[i]); ++counter;
-        //     logger.add(_names[counter], _steering_ref_ptr->damp()[i]); ++counter;
-        // }
-
+//  int counter = 0;
+//  logger.add(_names[counter], time); ++counter;
+//
+//   logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
+//   logger.add(_names[counter], _heading); ++counter;
+//   //
+//   _forces = _robot.contacts().getReactionForce();
+//        for(int i = 0; i < 3; i++){
+//
+//         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
+//         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
+//         logger.add(_names[counter], getBaseReference()[i]); ++counter;
+//         logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
+//
+//         for(int k = 0; k < 4; k++){
+//           logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
+//           logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
+//         //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
+//         }
+//       }
+//
+//      for(int i = 0; i < 30; i++){
+//          logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.command.acceleration.get()[i]); ++counter;
+//
+//          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.state.velocity.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.state.acceleration.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.state.torque.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.lower_limits.position.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.lower_limits.velocity.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.lower_limits.torque.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.upper_limits.position.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.upper_limits.velocity.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.upper_limits.torque.get()[i]); ++counter;
+//          logger.add(_names[counter],  _robot.state["BIAS_FORCE"][i]); ++counter;
+//          // logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
+//          // logger.add(_names[counter],  _robot.state[CONTROLLER_TORQUES][i]); ++counter;
+//      }
+//
+//      for(int i = 0; i < 30; i++){
+//          logger.add(_names[counter], _robot.states[QR].position.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.states[QR].velocity.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.states[QR].torque.get()[i]); ++counter;
+//          logger.add(_names[counter], _robot.states[QR].acceleration.get()[i]); ++counter;
+//
+//      }
+//
+//      for(int i = 0; i < 4; i++){
+//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); ++counter;
+//          logger.add(_names[counter], _eigen_scalar[0]);
+//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get(); ++counter;
+//          logger.add(_names[counter], _eigen_scalar[0]);
+//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); ++counter;
+//          logger.add(_names[counter], _eigen_scalar[0]);
+//          logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
+//        }
+//
+//        // for(int i = 0; i < 4 ; i++){
+//        //     logger.add(_names[counter], _steering_ref_ptr->getICM()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->getSP()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->get()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->vICM()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->vSP()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->v()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->getDampingSP()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->getDampingICM()[i]); ++counter;
+//        //     logger.add(_names[counter], _steering_ref_ptr->damp()[i]); ++counter;
+//        // }
+//
         shape_action__->log(logger);
 
+   
 }

@@ -196,7 +196,6 @@ void mgnss::state_estimation::Odometry::update()
         _robot.command.position.set(_base, {0, 1, 2, 3, 4, 5});
 
         _previous_state.noalias() = _state;
-        //_end = std::chrono::high_resolution_clock::now();
         //  return _base;
 }
 

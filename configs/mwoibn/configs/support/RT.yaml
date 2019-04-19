@@ -6,6 +6,10 @@ mwoibn:
                         filter:
                                 damping: 1
                                 cut_off_frequency: 500
+                        velocity:
+                                damping: 4
+                                cut_off_frequency: 500
+                                
                 ground_forces:
                         filter:
                             torque:

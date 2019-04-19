@@ -102,7 +102,6 @@ int _min(mwoibn::VectorBool& selector, const mwoibn::VectorN& distance);
 mwoibn::Vector6 _base_raw, _base_filtered;
 //    mwoibn::point_handling::FullStatesHandler _wheels_ph;
 //    mwoibn::point_handling::OrientationsHandler _directions_ph;
-std::chrono::high_resolution_clock::time_point _begin, _end;
 
 
 

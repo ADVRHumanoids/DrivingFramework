@@ -263,7 +263,10 @@ Quaternion log()
 
         quat.w() = std::log(this->norm());
         axis = std::atan2(this->axis().norm(), this->w())*this->axis();
-        axis = axis/this->axis().norm();
+        if(this->axis().norm() < std::numeric_limits<double>::epsilon())
+            axis.setZero();
+        else
+            axis = axis/this->axis().norm();
         quat.x() = axis[0];
         quat.y() = axis[1];
         quat.z() = axis[2];

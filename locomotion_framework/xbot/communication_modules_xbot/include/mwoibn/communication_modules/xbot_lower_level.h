@@ -91,7 +91,8 @@ protected:
     {
       if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
       if (_lower_limits[interface].get(i) == mwoibn::NON_EXISTING)
-        continue;
+          //std::cout << interface << "\t" << i << std::endl;
+          continue;
       if (_command[interface].get(i) < _lower_limits[interface].get(i)){
           _command[interface].set(_lower_limits[interface].get(i), i);
       }

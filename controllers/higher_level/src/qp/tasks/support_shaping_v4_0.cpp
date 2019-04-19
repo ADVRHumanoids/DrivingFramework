@@ -19,7 +19,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 
             if(_is_margin)
               addSoft(Constraint(4,_vars), 5e1); // margin
-              addSoft(Constraint(8,_vars), 5e1); // wirkspace
+              addSoft(Constraint(4,_vars), 5e1); // wirkspace
 
               QrTask::init();
 
@@ -35,7 +35,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 
               // _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
               _cost.quadratic.block(_vars, _vars, 4, 4) = soft_inequality[0].getGain().asDiagonal();
-              _cost.quadratic.block(_vars+4, _vars+4, 8, 8) = soft_inequality[1].getGain().asDiagonal();
+              _cost.quadratic.block(_vars+4, _vars+4, 4, 4) = soft_inequality[1].getGain().asDiagonal();
 
 }
 
@@ -49,11 +49,11 @@ void mgnss::higher_level::SupportShapingV4::_update(){
         soft_inequality[0].setJacobian().block<4,2>(0,2*i) = _margin.getJacobian().middleCols<2>(3*i);
         soft_inequality[1].setState()[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.getState()[i])/_robot.rate();
         // soft_inequality[1].state[4+i] = _workspace.getState()[i]/_robot.rate(); //? what is is
-        soft_inequality[1].setState()[4+i] = -(0.0*0.0 - _workspace.getState()[i])/_robot.rate(); //Avoid going under the robot?
+    //    soft_inequality[1].setState()[4+i] = -(0.0*0.0 - _workspace.getState()[i])/_robot.rate(); //Avoid going under the robot?
     }
 
     soft_inequality[1].setJacobian().block<4,8>(0,0) = -_workspace.getJacobian();
-    soft_inequality[1].setJacobian().block<4,8>(4,0) = _workspace.getJacobian();
+    //soft_inequality[1].setJacobian().block<4,8>(4,0) = _workspace.getJacobian();
     if(_is_margin)
       soft_inequality[0].setState() = (_margin.getState() - _margin.limit)/_robot.rate();
 

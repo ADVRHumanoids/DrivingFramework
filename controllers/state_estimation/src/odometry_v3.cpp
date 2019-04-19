@@ -45,6 +45,7 @@ void mgnss::state_estimation::OdometryV3::_initConfig(YAML::Node config){
         _allocate(names);
         _filter_ptr.reset(new mwoibn::filters::IirSecondOrder(3, config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
         _vel_ptr.reset(new mwoibn::filters::IirSecondOrder(3, config["filter"]["cut_off_frequency"].as<double>(), config["filter"]["damping"].as<double>()));
+        _estimation_ptr.reset(new mwoibn::filters::IirSecondOrder(4, config["velocity"]["cut_off_frequency"].as<double>(), config["velocity"]["damping"].as<double>()));
 
 }
 void mgnss::state_estimation::OdometryV3::_checkConfig(YAML::Node config){
@@ -86,6 +87,7 @@ void mgnss::state_estimation::OdometryV3::_allocate(std::vector<std::string> nam
         _base_ids.setZero(3);
         _base_map.setZero(6);
         _base_map << 0, 1, 2, 3, 4, 5;
+        _raw.setZero(4);
 
         _ground_normal = _z;
         _projection.noalias() = _ground_normal*_ground_normal.transpose();
@@ -136,6 +138,7 @@ void mgnss::state_estimation::OdometryV3::init(){
 
         _filter_ptr->computeCoeffs(_robot.rate());
         _vel_ptr->computeCoeffs(_robot.rate());
+        _estimation_ptr->computeCoeffs(_robot.rate());
         _robot.get();
 
         _robot.updateKinematics();
@@ -144,6 +147,7 @@ void mgnss::state_estimation::OdometryV3::init(){
 
         _filter_ptr->reset(_base_pos);
         _vel_ptr->reset(_ang_vel);
+        _estimation_ptr->reset(mwoibn::VectorN::Zero(4));
         //std::cout << "OdometryV3 filter: initial state: " << _base_pos.transpose() << std::endl;
 
         for(int i = 0; i < _estimated.size(); i++) {
@@ -198,21 +202,22 @@ void mgnss::state_estimation::OdometryV3::update()
         // std::cout << "base" << _base.transpose() << std::endl;
         _robot.command.position.set(_base, _base_map);
         _robot.state.position.set(_base, _base_map);
+
+
         _velocity_ptr->update();
-        //here I should estimate velocity
+//        //here I should estimate velocity
+        _raw = _velocity_ptr->get();
+        _estimation_ptr->update(_velocity_ptr->get());
 
-
+//
         _robot.command.velocity.set(_velocity_ptr->get().head<3>(), _translation_dofs);
         _robot.command.velocity.set(_velocity_ptr->get()[3], _base_map[5] );
-
+//
         _previous_state.noalias() = _state;
 
-        // std::cout << "odometry position\t" << _robot.command.position.get().head<6>().transpose() << std::endl;
-       // std::cout << "odometry velocity\t" << _robot.command.velocity.get().head<6>().transpose() << std::endl;
-       // std::cout << _velocity_ptr->get().transpose() << std::endl;
-
-        //_end = std::chrono::high_resolution_clock::now();
-        //  return _base;
+//       // std::cout << _velocity_ptr->get().transpose() << std::endl;
+//
+//        //  return _base;
 }
 
 void mgnss::state_estimation::OdometryV3::_removeTwist(){
@@ -226,6 +231,7 @@ void mgnss::state_estimation::OdometryV3::_removeTwist(){
         if (_robot.state.position.get().segment<3>(3).norm() < mwoibn::EPS)
           std::cout << "norm!\t" << _imu << std::endl;
 
+
         _last_imu.ensureHemisphere(_imu);
         mwoibn::Position _euler;
         // get robot base eueler angles
@@ -236,20 +242,18 @@ void mgnss::state_estimation::OdometryV3::_removeTwist(){
                      0, -std::sin(_euler[0])/std::cos(_euler[1]), std::cos(_euler[0])/std::cos(_euler[1]);
         // std::cout << "_last_imu\t" << _last_imu << std::endl;
 
-        // std::cout << "_imu\t" << _imu << std::endl;
         // angular velocity estimation
         mwoibn::Quaternion temp = _imu*_last_imu.inversed();
 
         _ang_vel = temp.log().axis();
 
+
         _temp_est = _ang_vel;
+
         _vel_ptr->update(_ang_vel);
         _temp_fil = _ang_vel;
 
         _ang_vel = 2*_ang_vel/_robot.rate();
-
-        // std::cout <<"2 angualr\t" <<  _ang_vel.transpose() << std::endl;
-        // std::cout <<"3 euler\t" <<  (_to_euler*_ang_vel).transpose() << std::endl;
 
         _ang_vel = _projection*_ang_vel; // RT!
 
@@ -500,21 +504,32 @@ void mgnss::state_estimation::OdometryV3::_distances()
 void mgnss::state_estimation::OdometryV3::log(mwoibn::common::Logger& logger, double time){
 
         logger.add("time", time);
-        logger.add("heading", _twist_es.angle());
-        logger.add("raw", _twist_raw.angle());
-        logger.add("base", _robot.state.position.get()[3]);
-        logger.add("imu_e3", _temp_est[2]);
-        logger.add("imu_f3", _temp_fil[2]);
-        logger.add("base_v", _robot.command.velocity.get()[5]);
-        logger.add("_est_vel", _velocity_ptr->get()[3]);
-        logger.add("imu_x", _imu.x());
-        logger.add("imu_y", _imu.y());
-        logger.add("imu_z", _imu.z());
-        logger.add("imu_w", _imu.w());
-        logger.add("l_imu_x", _last_imu.x());
-        logger.add("l_imu_y", _last_imu.y());
-        logger.add("l_imu_z", _last_imu.z());
-        logger.add("l_imu_w", _last_imu.w());
+//        
+//        logger.add("heading", _twist_es.angle());
+//        logger.add("raw", _twist_raw.angle());
+//        logger.add("base", _robot.state.position.get()[3]);
+//        logger.add("imu_e3", _temp_est[2]);
+//        logger.add("imu_f3", _temp_fil[2]);
+        logger.add("vx", _robot.command.velocity.get()[0]);
+        logger.add("vy", _robot.command.velocity.get()[1]);
+        logger.add("vz", _robot.command.velocity.get()[2]);
+        logger.add("wx", _robot.command.velocity.get()[3]);
+        logger.add("wy", _robot.command.velocity.get()[4]);
+        logger.add("wz", _robot.command.velocity.get()[5]);
+        
+        logger.add("rvx", _raw[0]);
+        logger.add("rvy", _raw[1]);
+        logger.add("rvz", _raw[2]);
+        logger.add("rwx", _raw[3]);
+   
+//        logger.add("imu_x", _imu.x());
+//        logger.add("imu_y", _imu.y());
+//        logger.add("imu_z", _imu.z());
+//        logger.add("imu_w", _imu.w());
+//        logger.add("l_imu_x", _last_imu.x());
+//        logger.add("l_imu_y", _last_imu.y());
+//        logger.add("l_imu_z", _last_imu.z());
+//        logger.add("l_imu_w", _last_imu.w());
 
 }
 
@@ -678,7 +693,7 @@ void mgnss::state_estimation::Velocity::update()
   _measure();
   _compute();
 
-  // std::cout << "vel_est\t" << _estimate.transpose() << std::endl;
+//  // std::cout << "vel_est\t" << _estimate.transpose() << std::endl;
 }
 
 
@@ -727,7 +742,15 @@ void mgnss::state_estimation::Velocity::_update(int n)
     _inverse->compute(_base_jacobian);
 
     _y -= _x;
+    
+//    std::cout << _estimates[m-1].size() << "\t" << m << "\n" << std::endl;
+//    std::cout << _inverse->get()*_y << std::endl;
+//
     _estimates[m-1].noalias() = _inverse->get()*_y;
 
-    // std::cout << "m\t" << m << "\tindices\t" << i << ", " << j << "\t" <<  _estimates[m-1].transpose() << std::endl;
+//    if(std::isnan(_estimates[m-1][0])){
+//        std::cout << "v\t " <<  << std::endl;
+//        std::cout << "w\t " << _wheels_velocity[i].angular().getWorld() << std::endl;
+//    }
+//    // std::cout << "m\t" << m << "\tindices\t" << i << ", " << j << "\t" <<  _estimates[m-1].transpose() << std::endl;
 }

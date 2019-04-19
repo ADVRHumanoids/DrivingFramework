@@ -44,7 +44,9 @@ public:
                        mwoibn::communication_modules::Shared& shared,  std::string controller_source, XBot::SharedMemory::Ptr shared_memory);
 
 
-  virtual void wait(bool spin = true){}
+//  virtual void wait(bool spin = true){}
+  virtual void wait(bool spin = true){ _sense = spin;}
+
 
 protected:
 

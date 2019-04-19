@@ -33,7 +33,7 @@ namespace update
 
     bool done(){return _current < 1;} // it will return true also if overcalled
     void call(){
-        _function();
+        if(_subscribed) _function();
         _current = _subscribed;
       }
 

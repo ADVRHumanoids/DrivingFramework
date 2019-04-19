@@ -21,7 +21,8 @@ class Estimaton{
 public:
 
   virtual void update() = 0;
-  const Type & get() {return _estimate;}
+  Type & get() {return _estimate;}
+  const std::vector<Type> & estimates() {return _estimates;}
 
 protected:
   std::vector<Type> _estimates;
@@ -216,8 +217,7 @@ void _initConfig(YAML::Node config);
 mwoibn::VectorN _state, _previous_state, _error, _distance;     // _state - current wheel position
 
 
-std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr;
-std::unique_ptr<mwoibn::filters::IirSecondOrder> _vel_ptr;
+std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_ptr, _vel_ptr, _estimation_ptr;
 
 mwoibn::point_handling::Handler<mwoibn::point_handling::SpatialVelocity> _wheels_velocity;
 mwoibn::point_handling::Handler<mwoibn::point_handling::FramePlus> _wheels_frames;
@@ -269,8 +269,7 @@ void _poseEstimation();
 void _filter();
 
 mwoibn::Vector6 _base_raw, _base_filtered;
-
-std::chrono::high_resolution_clock::time_point _begin, _end;
+mwoibn::VectorN _raw;
 
 
 

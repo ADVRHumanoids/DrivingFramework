@@ -52,6 +52,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${XBotCore-interfaces_INCLUDE_DIRS}
   ${XBotInterface_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
 )
 
 
