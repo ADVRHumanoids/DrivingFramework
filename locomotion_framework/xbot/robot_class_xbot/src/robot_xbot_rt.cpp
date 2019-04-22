@@ -203,7 +203,7 @@ void mwoibn::robot_class::RobotXBotRT::loadControllers(YAML::Node full_config, s
 
       robot = _readRobotConfig(full_config, config_name, controller_source);
       // read ROS specific configuration
-      config = config["ros"];
+      config = config["xbot"];
       _loadConfig(config["controller"], robot["controller"]);
 
       _loadControllers(robot["controller"], shared_memory);

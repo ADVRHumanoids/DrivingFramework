@@ -131,9 +131,10 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
   {
 
     if (entry.first.as<std::string>() == "mode") continue;
-    std::cout << entry.first << std::endl;
     if (entry.first.as<std::string>() == "gains") continue;
     if (entry.first.as<std::string>() == "source") continue;
+    
+    std::cout << "XBOT feedback controllers\t" << entry.first << std::endl;
 
     if (!entry.second["layer"])
       throw(std::invalid_argument("Please define controller type " +

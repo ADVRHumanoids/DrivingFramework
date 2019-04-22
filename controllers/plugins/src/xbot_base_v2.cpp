@@ -54,13 +54,18 @@ bool mgnss::plugins::XbotBaseUnify::init_control_plugin(XBot::Handle::Ptr handle
         std::string robot_id = _plugin_ptr->readRobot(config_file, secondary_file, config, plugin_config);
 
         if (share_robots.count(robot_id)){
-            _plugin_ptr->shareRobots()[robot_id] = share_robots[robot_id];
-            _plugin_ptr->shareRobots()[robot_id]->loadControllers(config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>());
+          std::cout << "share robot" << std::endl;
+          share_robots[robot_id]->loadControllers(config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>(), handle->getSharedMemory());
+            // _plugin_ptr->shareRobots()[robot_id] = share_robots[robot_id];
+            // _plugin_ptr->shareRobots()[robot_id]->loadControllers(config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>(), handle->getSharedMemory());
         }
         else{
-          _plugin_ptr->shareRobots()[robot_id] = std::make_shared<mwoibn::robot_class::RobotXBotRT>(handle->getRobotInterface(), config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>(), handle->getSharedMemory());
-          share_robots[robot_id] = _plugin_ptr->shareRobots()[robot_id];
+          std::cout << "create robot" << std::endl;
+          share_robots[robot_id] = std::make_shared<mwoibn::robot_class::RobotXBotRT>(handle->getRobotInterface(), config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>(), handle->getSharedMemory());
+          // _plugin_ptr->shareRobots()[robot_id] = std::make_shared<mwoibn::robot_class::RobotXBotRT>(handle->getRobotInterface(), config, plugin_config["robot"].as<std::string>(), share, plugin_config["controller"].as<std::string>(), handle->getSharedMemory());
+          // share_robots[robot_id] = _plugin_ptr->shareRobots()[robot_id];
         }
+        _plugin_ptr->shareRobots()[robot_id] = share_robots[robot_id];
 
         _plugin_ptr->logger_ptr = logger_ptr;
         _plugin_ptr->initModule(config, plugin_config, share);

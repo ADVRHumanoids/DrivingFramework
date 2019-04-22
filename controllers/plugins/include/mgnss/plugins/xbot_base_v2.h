@@ -20,7 +20,7 @@ class XbotBaseUnify : public XBot::XBotControlPlugin
 {
 
   typedef  mgnss::plugins::Generator<XBot::RosUtils::SubscriberWrapper::Ptr, XBot::RosUtils::ServiceServerWrapper::Ptr, XBot::RosUtils::RosHandle> XbotGenerator_;
-  typedef  std::map<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> robot_map;
+  typedef  std::map<std::string, std::shared_ptr<mwoibn::robot_class::RobotXBotRT>> robot_map;
 
 
 public:

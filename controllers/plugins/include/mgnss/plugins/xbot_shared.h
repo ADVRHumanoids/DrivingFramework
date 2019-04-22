@@ -49,7 +49,8 @@ virtual void control_loop(double time, double period){
     control_loop(time);}
 
 std::vector<std::unique_ptr<mgnss::modules::Base>> _controller_ptrs;
-std::map<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> _robot_ptr;
+
+std::map<std::string, std::shared_ptr<mwoibn::robot_class::RobotXBotRT>> _robot_ptr;
 std::shared_ptr<mwoibn::common::Logger> _logger_ptr;
 mwoibn::communication_modules::Shared _shared;
 

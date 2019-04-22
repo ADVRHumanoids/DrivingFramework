@@ -6,6 +6,9 @@ mwoibn:
                         filter:
                                 damping: 1
                                 cut_off_frequency: 200
+                        velocity:
+                                damping: 4
+                                cut_off_frequency: 200                                
                 acceleration_test:
                         filter:
                                 damping: 2.0

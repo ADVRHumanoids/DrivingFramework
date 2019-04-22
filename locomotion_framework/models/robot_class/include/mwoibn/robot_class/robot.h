@@ -253,11 +253,15 @@ static YAML::Node readFullConfig(YAML::Node full_config, std::string config_name
 
 virtual void loadControllers(std::string config_file, std::string config_name,
                      mwoibn::communication_modules::Shared& shared,
-                     std::string controller_source, std::string secondary_file){}
+                     std::string controller_source, std::string secondary_file){
+                       std::cout << "base loads controllers" << std::endl;
+                     }
 
 
 virtual void loadControllers(YAML::Node full_config, std::string config_name,
-                     mwoibn::communication_modules::Shared& shared,  std::string controller_source){}
+                     mwoibn::communication_modules::Shared& shared,  std::string controller_source){
+                       std::cout << "base loads controllers" << std::endl;
+                     }
 
 
 std::string name(){return _name;}

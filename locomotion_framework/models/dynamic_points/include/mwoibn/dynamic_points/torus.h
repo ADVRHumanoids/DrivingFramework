@@ -21,26 +21,26 @@ class Torus: public DynamicPoint
 public:
 
 
-  Torus(robot_points::TorusModel& torus):
-    DynamicPoint(torus._model, torus._state), _torus(torus){
+  Torus(robot_points::TorusModel& torus, robot_class::Robot& robot):
+    DynamicPoint(torus._model, torus._state), _torus(torus), _robot(robot){
           _init();
   }
 
 
-    Torus(robot_points::TorusModel& torus, const mwoibn::robot_class::State& state):
-      DynamicPoint(torus._model, torus._state), _torus(torus){
+    Torus(robot_points::TorusModel& torus, const mwoibn::robot_class::State& state, robot_class::Robot& robot):
+      DynamicPoint(torus._model, torus._state), _torus(torus), _robot(robot){
             _init();
     }
 
 
   Torus( Torus&& other)
-      : DynamicPoint(other), _torus(other._torus)
+      : DynamicPoint(other), _torus(other._torus), _robot(other._robot)
   {
     _init();
   }
 
   Torus(const Torus& other)
-      : DynamicPoint(other), _torus(other._torus)
+      : DynamicPoint(other), _torus(other._torus), _robot(other._robot)
   {
     _init();
   }
@@ -62,6 +62,7 @@ public:
 
 protected:
   robot_points::TorusModel& _torus;
+  robot_class::Robot& _robot;
   mwoibn::Matrix _dependend;
   mwoibn::VectorN _independend;
   mwoibn::Vector3 est_, last_;

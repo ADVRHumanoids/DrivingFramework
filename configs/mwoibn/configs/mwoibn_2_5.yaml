@@ -779,4 +779,5 @@ mwoibn:
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
                         # plugins: [odometry2::odometry]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
                         plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
