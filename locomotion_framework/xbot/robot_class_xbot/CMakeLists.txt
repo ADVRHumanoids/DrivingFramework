@@ -72,6 +72,7 @@ catkin_package(
         	${catkin_INCLUDE_DIRS}
         	${ROBOT_XBOT_INCLUDE_DIRS}
         	${LOGGER_INCLUDE_DIRS}
+            ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
         LIBRARIES
         	${PROJECT_NAME}
         	${ROBOT_XBOT_LIBRARIES}
@@ -91,6 +92,7 @@ include_directories(include
         ${catkin_INCLUDE_DIRS}
         ${ROBOT_XBOT_INCLUDE_DIRS}
         ${LOGGER_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

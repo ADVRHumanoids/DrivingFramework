@@ -17,7 +17,7 @@ endif()
 find_package(XCM REQUIRED)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined ${CMAKE_SHARED_LINKER_FLAGS}")
@@ -35,7 +35,10 @@ option(GRAVITY_TEST ON)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(
+  ${CMAKE_BINARY_DIR}
+  ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
+)
 configure_file(
     ${CMAKE_SOURCE_DIR}/config.h.in
     ${CMAKE_BINARY_DIR}/config.h
@@ -320,7 +323,7 @@ LIST( APPEND INSTALL_TARGETS
 
   if ( Xenomai_FOUND )
     message(WARNING "set_xeno_flags")
-    set_xeno_flags(NwheelsSecondOrder)
+    set_xeno_flags(NwheelsZMP)
   endif()
 
 #  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )

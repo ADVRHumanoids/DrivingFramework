@@ -45,14 +45,15 @@ catkin_package(
 		${catkin_INCLUDE_DIRS}
 		${RBDL_INCLUDE_DIR}
 		${LOGGER_INCLUDE_DIRS}
-    ${RBDL_URDFReader_INCLUDE_DIR}
-    ${Eigen3_INCLUDE_DIRS}
+        ${RBDL_URDFReader_INCLUDE_DIR}
+        ${Eigen3_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/../third_party/range-v3/include
   LIBRARIES
 		mwoibn_common
 		${catkin_LIBRARIES}
 		${RBDL_LIBRARY}
 		${LOGGER_LIBRARIES}
-    ${RBDL_URDFReader_LIBRARY}
+        ${RBDL_URDFReader_LIBRARY}
   DEPENDS
 		Eigen3
 	CATKIN_DEPENDS
@@ -63,14 +64,14 @@ catkin_package(
 
 
 include_directories(
-include
-${RBDL_INCLUDE_DIR}
-${catkin_INCLUDE_DIRS}
-${RBDL_URDFReader_INCLUDE_DIR}
-${Eigen3_INCLUDE_DIRS}
-${LOGGER_INCLUDE_DIRS}
+        include
+        ${PROJECT_SOURCE_DIR}/../third_party/range-v3/include
+        ${RBDL_INCLUDE_DIR}
+        ${catkin_INCLUDE_DIRS}
+        ${RBDL_URDFReader_INCLUDE_DIR}
+        ${Eigen3_INCLUDE_DIRS}
+        ${LOGGER_INCLUDE_DIRS}
 )
-
 
 add_library(mwoibn_common
 	src/state.cpp

@@ -24,7 +24,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  INCLUDE_DIRS 
+        include 
+        ${catkin_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         mgnss_state_estimation
   CATKIN_DEPENDS
@@ -36,6 +39,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
 )
 
 add_library(mgnss_state_estimation

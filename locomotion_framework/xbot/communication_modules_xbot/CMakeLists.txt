@@ -43,6 +43,7 @@ catkin_package(
         ${catkin_INCLUDE_DIRS}
         ${XBotInterface_INCLUDE_DIRS}
         ${XBotCore-interfaces_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
   LIBRARIES
         communication_modules_xbot
         ${catkin_LIBRARIES}
@@ -65,6 +66,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${XBotInterface_INCLUDE_DIRS}
   ${XBotCore-interfaces_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 )
 
 add_library(communication_modules_xbot ${SOURCE_FILES})

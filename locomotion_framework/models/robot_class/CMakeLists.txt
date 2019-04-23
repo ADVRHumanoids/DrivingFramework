@@ -33,7 +33,6 @@ LIST(APPEND LOGGER_EXPORTED_TARGETS
 )
 endif(LOGGER)
 
-
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 find_package(YamlCpp REQUIRED)
 
@@ -41,6 +40,7 @@ catkin_package(
   INCLUDE_DIRS
 			include
 			${LOGGER_INCLUDE_DIRS}
+            ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
   LIBRARIES
 			robot_class
 			communication
@@ -56,14 +56,22 @@ catkin_package(
 ## Build ##
 ###########
 
+MESSAGE(WARNING "source path ${PROJECT_SOURCE_DIR}/../third_party/range-v3/include")
+
 include_directories(
 include
+${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
+
 ${catkin_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "dir='${dir}'")
+endforeach()
 
 
 ## Declare a C++ library

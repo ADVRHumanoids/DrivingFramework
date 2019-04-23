@@ -111,6 +111,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS
 	include
+    ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 	${catkin_INCLUDE_DIRS}
 	${ROBOT_ROS_INCLUDE_DIRS}
 	${ROBOT_ROS_NRT_INCLUDE_DIRS}
@@ -127,6 +128,7 @@ catkin_package(
 
 include_directories(
 include
+${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 ${catkin_INCLUDE_DIRS}
 ${ROBOT_ROS_INCLUDE_DIRS}
 ${ROBOT_ROS_NRT_INCLUDE_DIRS}

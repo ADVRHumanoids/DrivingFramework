@@ -65,6 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
 # include_directories(include)
 include_directories(
   include
+  ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   ${catkin_INCLUDE_DIRS}
   ${XCM_INCLUDE_DIRS}
   ${Eigen3_INCLUDE_DIRS}
@@ -75,6 +76,7 @@ catkin_package(
         include
         ${catkin_INCLUDE_DIRS}
         ${XCM_INCLUDE_DIRS}
+        ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         BasePlugin
         ${XCM_LIBRARIES}

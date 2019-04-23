@@ -7,7 +7,7 @@ set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
@@ -27,10 +27,11 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+          ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         mgnss_controllers_wheels
         mgnss_controllers_centralized
-        mgnss_controllers_joint_space
+        mgnss_controllers_joint_space        
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -40,6 +41,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
 )
 
 

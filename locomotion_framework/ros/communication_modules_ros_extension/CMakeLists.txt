@@ -63,7 +63,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-        ${catkin_INCLUDE_DIRS}
+        ${catkin_INCLUDE_DIRS}                
+        ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
   LIBRARIES
         ${LIBRARIES}
   CATKIN_DEPENDS
@@ -82,6 +83,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include  
 )
 
 add_library(communication_modules_ros ${SOURCE_FILES})
