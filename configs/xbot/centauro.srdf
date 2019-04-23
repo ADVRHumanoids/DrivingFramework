@@ -42,11 +42,15 @@
         <group name="right_arm"/> 
     </group>
 	
-   <!-- <group name="HeriHand">
-        <joint name="110"/>
-        <joint name="111"/>
+    <group name="HeriHand">
+      <!--<joint name="110"/>-->
+      <!--<joint name="111"/>-->
     </group>
--->
+    
+    <group name="hands">
+      <!--<joint name="j_arm1_8"/>-->
+      <!--<joint name="j_arm2_8"/>-->
+    </group>
 
 
    <group name="legs">

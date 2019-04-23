@@ -22,7 +22,7 @@ MasterCommunicationInterface:
 XBotRTPlugins:
 #  plugins: ["Odometry", "JointStates", "WheelsV2"]
 #  plugins: ["JointStates", "Odometry", "WheelsV2"]
-  plugins: ["JointStates", "Odometry", "WheelsEvents3"]
+  plugins: ["joint_states", "BasePlugin"]
 #  plugins: ["HomingExample"]
   io_plugins: []
   
@@ -82,4 +82,4 @@ GazeboXBotPlugin:
     j_wheel_4: *wheel
 
 mwoibn:
-   config_file: /home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/mwoibn_2_5.yaml
+   config_file: /home/embedded/malgorzata_exp/ws/src/DrivingFramework/configs/mwoibn/configs/mwoibn_xbot_new.yaml
