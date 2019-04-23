@@ -21,6 +21,7 @@
 
 #include <mgnss/higher_level/qp/tasks/qr_task_wrapper.h>
 
+#include <chrono>
 namespace mgnss
 {
 
