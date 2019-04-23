@@ -224,7 +224,7 @@ std::map<std::string, mwoibn::hierarchical_control::tasks::BasicTask*> _tasks;  
 std::map<std::string, std::shared_ptr<mwoibn::hierarchical_control::actions::Task> > _actions;  // Adding that only helps with automatic IK generation
 
 
-double rate = 200;
+//double rate = 200;
 double _dt, orientation = 0, _heading;
 mwoibn::VectorN steerings, _command, _previous_command, _support, _support_vel;
 mwoibn::Vector3 _position, _next_step, _angular_vel, _linear_vel;

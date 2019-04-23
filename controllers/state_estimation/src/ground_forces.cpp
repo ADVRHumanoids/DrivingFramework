@@ -83,10 +83,10 @@ void mgnss::state_estimation::GroundForces::_allocate(){
       _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame));
     }
 
-   for(int i = 0; i < 3; i++){
-       _log_names.push_back(std::string("__com_")+char('x'+i));
-       _log_names.push_back(std::string("__cop_")+char('x'+i));
-   }
+//   for(int i = 0; i < 3; i++){
+//       _log_names.push_back(std::string("__com_")+char('x'+i));
+//       _log_names.push_back(std::string("__cop_")+char('x'+i));
+//   }
 
    for(int contact = 0; contact < _robot.contacts().size(); contact++){
        for(int i = 0; i < 3; i++)
@@ -180,11 +180,11 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
         _robot.centerOfPressure().compute();
 
         int id = 0;
-        for(int i = 0; i < 3; i++){
-           logger.add(_log_names[id], _robot.centerOfMass().get()[i]);
-           logger.add(_log_names[id+1], _robot.centerOfPressure().get()[i]);
-            id += 2;
-        }
+//        for(int i = 0; i < 3; i++){
+//           logger.add(_log_names[id], _robot.centerOfMass().get()[i]);
+//           logger.add(_log_names[id+1], _robot.centerOfPressure().get()[i]);
+//            id += 2;
+//        }
 
         for(int contact = 0; contact < _robot.contacts().size(); contact++){
             for(int i = 0; i < 3; i++){

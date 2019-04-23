@@ -316,38 +316,41 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     shape_action__->init();
 
     _names.push_back("time");
-    _names.push_back("th");
-    _names.push_back("r_th");
-
-    for(int i = 0; i < 3; i++){
-            _names.push_back(std::string("com_") + char('x'+i));
-            _names.push_back(std::string("r_base_") + char('x'+i));
-            _names.push_back(std::string("base_") + char('x'+i));
-
-           for(int k = 0; k < 4; k++){
-             _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
-             _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
-           //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
-           }
-         }
+//    _names.push_back("th");
+//    _names.push_back("r_th");
+//
+//    for(int i = 0; i < 3; i++){
+//            _names.push_back(std::string("com_") + char('x'+i));
+//            _names.push_back(std::string("r_base_") + char('x'+i));
+//            _names.push_back(std::string("base_") + char('x'+i));
+//
+//           for(int k = 0; k < 4; k++){
+//             _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
+//             _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
+//           //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
+//           }
+//         }
 
         for(int i = 0; i < 30; i++){
             _names.push_back("pos_des_" + std::to_string(i));
             _names.push_back("vel_des_" + std::to_string(i));
-            _names.push_back("acc_des_" + std::to_string(i));
+//            _names.push_back("acc_des_" + std::to_string(i));
 
-            _names.push_back("tau_des_" + std::to_string(i));
+//            _names.push_back("tau_des_" + std::to_string(i));
             _names.push_back("pos_" + std::to_string(i));
-            _names.push_back("vel_" + std::to_string(i));
-            _names.push_back("acc_" + std::to_string(i));
+//            _names.push_back("vel_" + std::to_string(i));
+
+            _names.push_back("m_pos_" + std::to_string(i));
+            _names.push_back("m_vel_" + std::to_string(i));
+//            _names.push_back("acc_" + std::to_string(i));
             _names.push_back("tau_" + std::to_string(i));
-            _names.push_back("pos_ll_" + std::to_string(i));
-            _names.push_back("vel_ll_" + std::to_string(i));
-            _names.push_back("tau_ll_" + std::to_string(i));
-            _names.push_back("pos_ul_" + std::to_string(i));
-            _names.push_back("vel_ul_" + std::to_string(i));
-            _names.push_back("tau_ul_" + std::to_string(i));
-            _names.push_back("bias_" + std::to_string(i));
+//            _names.push_back("pos_ll_" + std::to_string(i));
+//            _names.push_back("vel_ll_" + std::to_string(i));
+//            _names.push_back("tau_ll_" + std::to_string(i));
+//            _names.push_back("pos_ul_" + std::to_string(i));
+//            _names.push_back("vel_ul_" + std::to_string(i));
+//            _names.push_back("tau_ul_" + std::to_string(i));
+//            _names.push_back("bias_" + std::to_string(i));
             // _names.push_back("tau_est_" + std::to_string(i));
             // _names.push_back("tau_con_" + std::to_string(i));
 
@@ -357,7 +360,7 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
             _names.push_back("pos_qr_" + std::to_string(i));
             _names.push_back("vel_qr_" + std::to_string(i));
             _names.push_back("tau_qr_" + std::to_string(i));
-            _names.push_back("acc_qr_" + std::to_string(i));
+//            _names.push_back("acc_qr_" + std::to_string(i));
 
         }
 
@@ -502,8 +505,8 @@ void mgnss::controllers::WheelsZMP::_createTasks(YAML::Node config){
 
 
 void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double time){
-//  int counter = 0;
-//  logger.add(_names[counter], time); ++counter;
+  int counter = 0;
+  logger.add(_names[counter], time); ++counter;
 //
 //   logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
 //   logger.add(_names[counter], _heading); ++counter;
@@ -523,16 +526,18 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //         }
 //       }
 //
-//      for(int i = 0; i < 30; i++){
-//          logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
-//          logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
+      for(int i = 0; i < 30; i++){
+          logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
+
 //          logger.add(_names[counter], _robot.command.acceleration.get()[i]); ++counter;
-//
 //          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
-//          logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.state.velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.motor.position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.motor.velocity.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.state.acceleration.get()[i]); ++counter;
-//          logger.add(_names[counter], _robot.state.torque.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.state.torque.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.lower_limits.position.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.lower_limits.velocity.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.lower_limits.torque.get()[i]); ++counter;
@@ -540,27 +545,27 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //          logger.add(_names[counter], _robot.upper_limits.velocity.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.upper_limits.torque.get()[i]); ++counter;
 //          logger.add(_names[counter],  _robot.state["BIAS_FORCE"][i]); ++counter;
-//          // logger.add(_names[counter],  _robot.state[ESTIMATED_TORQUES][i]); ++counter;
-//          // logger.add(_names[counter],  _robot.state[CONTROLLER_TORQUES][i]); ++counter;
-//      }
+      }
+      
 //
-//      for(int i = 0; i < 30; i++){
-//          logger.add(_names[counter], _robot.states[QR].position.get()[i]); ++counter;
-//          logger.add(_names[counter], _robot.states[QR].velocity.get()[i]); ++counter;
-//          logger.add(_names[counter], _robot.states[QR].torque.get()[i]); ++counter;
+      for(int i = 0; i < 30; i++){
+          logger.add(_names[counter], _robot.states[QR].position.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.states[QR].velocity.get()[i]); ++counter;
+          logger.add(_names[counter], _robot.states[QR].torque.get()[i]); ++counter;
 //          logger.add(_names[counter], _robot.states[QR].acceleration.get()[i]); ++counter;
 //
-//      }
+      }
 //
-//      for(int i = 0; i < 4; i++){
-//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); ++counter;
-//          logger.add(_names[counter], _eigen_scalar[0]);
-//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get(); ++counter;
-//          logger.add(_names[counter], _eigen_scalar[0]);
-//          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); ++counter;
-//          logger.add(_names[counter], _eigen_scalar[0]);
-//          logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
-//        }
+      for(int i = 0; i < 4; i++){
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get(); 
+          logger.add(_names[counter], _eigen_scalar[0]); ++counter;
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get(); 
+          logger.add(_names[counter], _eigen_scalar[0]); ++counter;
+          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get(); 
+          logger.add(_names[counter], _eigen_scalar[0]); ++counter;
+          logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
+        }
+        
 //
 //        // for(int i = 0; i < 4 ; i++){
 //        //     logger.add(_names[counter], _steering_ref_ptr->getICM()[i]); ++counter;

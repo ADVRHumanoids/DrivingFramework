@@ -6,16 +6,24 @@ bool mwoibn::communication_modules::XBotFeedbackOnline::run()
   if (!_initialized) initialize();
 
   if (_position){
-    _robot.getMotorPosition(_pub);
+    _robot.getJointPosition(_pub);
     _command.position.set(_pub, _map.reversed());
+    _robot.getMotorPosition(_pub);    
+    _motor_side.position.set(_pub, _map.reversed());
   }
+  
   if (_velocity){
-    _robot.getJointVelocity(_pub);
+    _robot.getMotorVelocity(_pub);
     _command.velocity.set(_pub, _map.reversed());
+//    _robot.getMotorVelocity(_pub);
+    _motor_side.velocity.set(_pub, _map.reversed());
   }
+  
   if (_torque){
     _robot.getJointEffort(_pub);
     _command.torque.set(_pub, _map.reversed());
+//    _robot.getMotorEffort(_pub);
+//    _motor_side.torque.set(_pub, _map.reversed());
   }
 
   return _initialized;

@@ -153,6 +153,8 @@ Contacts& contacts() {
 }
 //! Keeps robot states
 robot_class::State state;
+robot_class::State motor;
+
 //! Keeps current commands to be send to the robot
 robot_class::State command;
 

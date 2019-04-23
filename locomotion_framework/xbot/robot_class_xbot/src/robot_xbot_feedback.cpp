@@ -99,7 +99,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
       feedbacks.add(
           std::unique_ptr<mwoibn::communication_modules::BasicFeedback>(
               new mwoibn::communication_modules::XBotFeedbackOnline(
-                  state, lower_limits, upper_limits, map, entry.second, *_robot)), entry.first.as<std::string>());
+                  state, motor, lower_limits, upper_limits, map, entry.second, *_robot)), entry.first.as<std::string>());
       _sense = true;
       std::cout << "Loaded feedback " << entry.second["name"] << std::endl;
       continue;

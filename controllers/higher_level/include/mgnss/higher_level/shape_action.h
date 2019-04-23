@@ -176,14 +176,14 @@ virtual void run(){
 virtual void release(){ }
 
 void log(  mwoibn::common::Logger& logger){
-  for(int i =0 ; i < 4; i++){
-    logger.add("cp_des_"   + std::to_string(i) + "_x", temp_des[3*i] );
-    logger.add("cp_des_"   + std::to_string(i) + "_y", temp_des[3*i+1] );
-    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
-    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
-    logger.add("v_steer_"   + std::to_string(i), _desired_steer[i]/_dt );
-    logger.add("current_"   + std::to_string(i), _current_steer[i]*180/mwoibn::PI );
-  }
+//  for(int i =0 ; i < 4; i++){
+//    logger.add("cp_des_"   + std::to_string(i) + "_x", temp_des[3*i] );
+//    logger.add("cp_des_"   + std::to_string(i) + "_y", temp_des[3*i+1] );
+//    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
+//    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
+//    logger.add("v_steer_"   + std::to_string(i), _desired_steer[i]/_dt );
+//    logger.add("current_"   + std::to_string(i), _current_steer[i]*180/mwoibn::PI );
+//  }
     if(std::isinf(_qr_task.optimalCost()))
         logger.add("cost_", -mwoibn::NON_EXISTING );
     else

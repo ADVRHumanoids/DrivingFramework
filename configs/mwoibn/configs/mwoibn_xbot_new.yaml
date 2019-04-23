@@ -481,7 +481,7 @@ mwoibn:
                                 layer: online
                                 space: SKIP
                         floating_base:
-                                layer: NRT
+                                layer: RT
                                 sensor: imu_link
                                 source: floating_base
                         imu_base:
@@ -489,19 +489,19 @@ mwoibn:
                                 sensor: imu_link
                                 source: floating_base
                         whole_body:
-                                layer: NRT
+                                layer: RT
                                 source: desired_state
                         upper_body:
                                 layer: RT
                                 source: upper_body
                         torque_reference:
-                                layer: NRT
+                                layer: RT
                                 source: desired_state
                         velocity_reference:
-                                layer: NRT
+                                layer: RT
                                 source: desired_state
                         lower_body:
-                                layer: NRT
+                                layer: RT
                                 source: desired_state
                         odometry:
                                 layer: RT
@@ -516,16 +516,16 @@ mwoibn:
                                 dofs:
                                         mapping: XBOT
                         whole_body:
-                                layer: NRT
+                                layer: RT
                                 sink: desired_state
                         upper_body:
                                 layer: RT
                                 sink: upper_body
                         torque_reference:
-                                layer: NRT
+                                layer: RT
                                 sink: desired_state
                         lower_body:
-                                layer: NRT
+                                layer: RT
                                 sink: desired_state
                         odometry:
                                 layer: RT
@@ -634,7 +634,7 @@ mwoibn:
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 90
-                                        BASE: [70, 70, 60, 60, 60, 100]
+                                        BASE: [70, 70, 60, 60, 60, 120]
                                         CONTACT_POINTS: 35
 #                                        CONTACT_POINTS: 0.01
                                         CAMBER: 20 # 100
@@ -719,18 +719,15 @@ mwoibn:
                         wheel_radius: 0.078
                         chain: wheels
                 gravity_compensation:
-                        layer: NRT
+                        layer: RT
                         robot: default
                         controller: torque_reference
                         secondary_file:
                              path: *support
                              file: lower_body.yaml
-                        mode: full
-                        # type: online
-                        # reference: reference
-                        # compliance: True
+                        mode: idle
                 compliance_compensation:
-                        layer: NRT
+                        layer: RT
                         robot: default
                         controller: direct
                         secondary_file:
@@ -741,7 +738,7 @@ mwoibn:
 #                        reference: reference
 #                        compliance: True
                 ground_forces:
-                        layer: NRT
+                        layer: RT
                         robot: default
                         controller: empty
                         mode: full
@@ -752,7 +749,7 @@ mwoibn:
                                 path: *config
                                 file: mwoibn/configs/support/contacts.yaml
                 gravity_forces:
-                        layer: NRT
+                        layer: RT
                         robot: force_test
                         controller: empty
                         mode: full
@@ -769,13 +766,14 @@ mwoibn:
                                 cut_off_frequency: 200
 
                 acceleration_test:
-                        layer: NRT
+                        layer: RT
                         robot: joint_space
                         controller: direct
                         mode: full
                 shared:
                         layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

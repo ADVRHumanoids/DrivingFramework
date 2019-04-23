@@ -33,6 +33,10 @@ virtual void close(){
 
 virtual void log(mwoibn::common::Logger& logger, double time){
         logger.add("time", time);
+        int counter = 0;
+        for(int i = 0; i < 30; i++){
+          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
+        }
 }
 
 protected:
@@ -45,6 +49,7 @@ std::unique_ptr<mwoibn::gravity_compensation::SimpleQRGravityCompensation> _grav
 // std::unique_ptr<mwoibn::motor_side_reference::SeaReference> _actuation_model_ptr;
 
 bool _motor_side = true;
+std::vector<std::string> _names;
 //  bool _valid = false;
 
 };

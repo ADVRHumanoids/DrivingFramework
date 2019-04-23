@@ -14,11 +14,12 @@ class XBotFeedbackOnline : public BasicFeedback
 {
 public:
   XBotFeedbackOnline(mwoibn::robot_class::State& command,
+                     mwoibn::robot_class::State& motor_side,
                      mwoibn::robot_class::State& lower_limits,
                      mwoibn::robot_class::State& upper_limits,
                  mwoibn::robot_class::BiMap map, YAML::Node config,
                  XBot::RobotInterface& robot)
-      : BasicFeedback(command, map, config), _robot(robot), _lower_limits(lower_limits), _upper_limits(upper_limits)
+      : BasicFeedback(command, map, config), _robot(robot), _lower_limits(lower_limits), _upper_limits(upper_limits), _motor_side(motor_side)
   {
     std::cout << "Loaded direct feedback from the robot - " << config["name"] << std::endl;
         if(!config["limits"])
@@ -113,6 +114,8 @@ protected:
   mwoibn::VectorN _pub;
   XBot::RobotInterface& _robot;
   mwoibn::robot_class::State _lower_limits, _upper_limits;
+  mwoibn::robot_class::State& _motor_side;
+
   virtual bool _inLimits(mwoibn::Interface interface);
   virtual bool _inLimits(int i, mwoibn::Interface interface);
 

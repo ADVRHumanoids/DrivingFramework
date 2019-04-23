@@ -21,6 +21,9 @@ void mgnss::controllers::CentralizedController::_construct(YAML::Node config){
         _gravity_compensation_ptr.reset(
                 new mwoibn::gravity_compensation::SimpleQRGravityCompensation(
                         *_dynamic_model_ptr, _robot));
+        
+        for(int i = 0; i < 30; i++)  
+            _names.push_back("tau_des_"+std::to_string(i));
 }
 
 void mgnss::controllers::CentralizedController::init(){

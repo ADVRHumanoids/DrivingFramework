@@ -33,6 +33,7 @@ mwoibn::robot_class::Robot::Robot(std::string urdf_description,
         _init(urdf_description, srdf_description);
 }
 
+
 void mwoibn::robot_class::Robot::_init(std::string urdf_description,
                                        std::string srdf_description)
 {
@@ -69,6 +70,8 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
 
         state.restart(getDofs());
         command.restart(getDofs());
+        motor.restart(getDofs());
+
         lower_limits.restart(getDofs());
         upper_limits.restart(getDofs());
 
