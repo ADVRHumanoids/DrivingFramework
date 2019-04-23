@@ -4,7 +4,7 @@ mwoibn:
         #                 dofs:
         #                         chain: position_lower_body
         feedbacks:
-                online: [link_side_online, odometry]
+                online: [link_side_online, odometry, upper_body]
 #        ros:
 #                source:
 #                       urdf: "/robot_lower_body"

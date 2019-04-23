@@ -18,18 +18,18 @@ public:
 
 
   TorusVelocity(robot_points::TorusModel& torus, mwoibn::robot_class::Robot& robot):
-    Torus(torus), _robot(robot){
+    Torus(torus, robot){
           _init();
   }
 
   TorusVelocity( TorusVelocity&& other)
-      : Torus(other), _robot(other._robot)
+      : Torus(other)
   {
     _init();
   }
 
   TorusVelocity(const TorusVelocity& other)
-      : Torus(other), _robot(other._robot)
+      : Torus(other)
   {
     _init();
   }
@@ -42,8 +42,8 @@ public:
     mwoibn::Vector3 _support_offset;
     mwoibn::Matrix3 _support_jacobian;
 
-  protected:
-    mwoibn::robot_class::Robot& _robot;
+  // protected:
+  //   mwoibn::robot_class::Robot& _robot;
 
 };
 

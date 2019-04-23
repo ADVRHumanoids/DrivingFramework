@@ -32,7 +32,7 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
                       new mwoibn::robot_points::GroundWheel(torus_->axis(), torus_->groundNormal())));
 
             _contact_points.add(std::move(torus_));
-            _torus_acceleration.add(mwoibn::dynamic_points::Torus(_contact_points.end(0) ) );
+            _torus_acceleration.add(mwoibn::dynamic_points::Torus(_contact_points.end(0), _robot ) );
 
             std::cout << "contacts: " << contact->getName() << "\t" << name << std::endl;
         }
