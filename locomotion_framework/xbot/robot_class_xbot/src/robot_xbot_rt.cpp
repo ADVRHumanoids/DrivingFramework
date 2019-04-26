@@ -235,6 +235,10 @@ void mwoibn::robot_class::RobotXBotRT::_loadFeedbacks(
       throw(std::invalid_argument("Please defined type of a feedback " +
                                   entry.first.as<std::string>()));
 
+    if(feedbacks.has(entry.first.as<std::string>())) continue;
+    if(feedbacks.has("shared_"+entry.first.as<std::string>())) continue;
+
+
     if (entry.second["layer"].as<std::string>() == "RT")
     {
       if (entry.second["space"].as<std::string>() == "JOINT")

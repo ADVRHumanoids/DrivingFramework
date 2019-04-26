@@ -23,7 +23,7 @@ public:
 
    template<typename Type>
    void add(std::unique_ptr<Type> module, std::string name){
-     if(_modules.count("name"))
+     if(_modules.count(name))
      throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + std::string(": Communication module ") + std::string(name) + " has already been registered in the stack." );
 
       _modules[name] = std::move(module);
@@ -31,7 +31,7 @@ public:
 
    template<typename Type>
    void add(Type&& module, std::string name){
-     if(_modules.count("name"))
+     if(_modules.count(name))
      throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + std::string(": Communication module ") + std::string(name) + " has already been registered in the stack." );
 
       _modules[name] = std::unique_ptr<CommunicationBase>(new Type(module));
@@ -39,7 +39,7 @@ public:
 
    template<typename Type>
    void add(Type& module, std::string name){
-     if(_modules.count("name"))
+     if(_modules.count(name))
      throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) + std::string(": Communication module ") + std::string(name) + " has already been registered in the stack." );
       _modules[name] = std::unique_ptr<CommunicationBase>(new Type(module));
    }

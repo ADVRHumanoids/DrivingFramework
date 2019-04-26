@@ -3,6 +3,7 @@
 bool mwoibn::communication_modules::RosController::run()
 {
 
+  // std::cout << "run" << std::endl;
   if(!_initialized) {initialize();}
 
   if (_position)
@@ -39,11 +40,13 @@ bool mwoibn::communication_modules::RosController::run()
     }
     */
     mapTo(_command.torque.get(), _des_q.effort);
+    // std::cout << _command.torque.get().transpose() << std::endl;
     //des_q.effort = pub_qq;
   }
 
   // des_q.header.stamp = ros::Time::now();
   _command_pub.publish(_des_q);
+  // std::cout << "publish" << std::endl;
 
   return _initialized;
 }

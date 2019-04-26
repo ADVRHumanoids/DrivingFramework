@@ -1253,7 +1253,7 @@ void mwoibn::robot_class::Robot::_shareControllers(YAML::Node config, mwoibn::co
                                 controllers.add(std::unique_ptr<mwoibn::communication_modules::CommunicationBase>(
                                                         new mwoibn::communication_modules::SharedController(
                                                                 static_cast<mwoibn::communication_modules::BasicController&>(controllers[entry.first.as<std::string>()]),
-                                                                shared, entry.first.as<std::string>())), entry.first.as<std::string>());  // thats unsafe
+                                                                shared, entry.first.as<std::string>())), "shared_"+entry.first.as<std::string>());  // thats unsafe
                         }
                 }
                 catch (const std::invalid_argument& e)

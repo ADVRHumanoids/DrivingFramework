@@ -20,12 +20,13 @@ class QrDecomposition : public BasicModel
 public:
 QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<dynamic_models::DYNAMIC_MODEL> update = {}) : BasicModel(robot, update)
 {
-        _qr_ptr.reset(new Eigen::ColPivHouseholderQR<Eigen::MatrixXd>(
-                              _robot.contacts().jacobianCols(), _robot.contacts().jacobianRows()));
 
+        std::cout << _robot.contacts().jacobianCols() << "\t" << _robot.contacts().jacobianRows() << std::endl;
         _resize(std::min(_robot.contacts().jacobianCols(),
                          _robot.contacts().jacobianRows()));
+
         _contacts_transpose = _robot.contacts().getJacobian().transpose();
+        _qr_ptr.reset(new Eigen::ColPivHouseholderQR<mwoibn::MatrixLimited>(_contacts_transpose));
         _qr_ptr->compute(_contacts_transpose);
 }
 virtual ~QrDecomposition() {
@@ -53,10 +54,10 @@ virtual const mwoibn::Matrix& getInertia()
 
         return _qr_inertia;
 }
-
-const mwoibn::Matrix& getQMatrix(){
-        return _q;
-}
+//
+// const mwoibn::Matrix& getQMatrix(){
+//         return _q;
+// }
 
 mwoibn::Matrix getRMatrix() const
 {
@@ -103,11 +104,12 @@ const mwoibn::Matrix& getTransformationMatrix() const {
 
 protected:
 //  Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic>_permutation;
-std::unique_ptr<Eigen::ColPivHouseholderQR<Eigen::MatrixXd> > _qr_ptr;
-mwoibn::Matrix _independent, _qr_inertia;   //< matrix to extract independent rows
+std::unique_ptr<Eigen::ColPivHouseholderQR<mwoibn::MatrixLimited> > _qr_ptr;
+mwoibn::Matrix _qr_inertia;   //< matrix to extract independent rows
 int _rank;
 bool _changed;
-mwoibn::Matrix _contacts_transpose, _q_cut, _q;
+mwoibn::MatrixLimited _q;
+mwoibn::Matrix _contacts_transpose, _i, _independent;
 mwoibn::VectorN _qr_gravity, _qr_non_linear;
 void _resize(int rank)
 {
@@ -117,7 +119,9 @@ void _resize(int rank)
         _qr_non_linear.setZero(_robot.getDofs()-_rank);
         _qr_inertia.setZero(_robot.getDofs()-rank, _robot.getDofs());
         _q.setZero(_robot.getDofs(), _robot.getDofs());
-        _q_cut.setZero(_robot.getDofs()-_rank, _robot.getDofs());
+        _i.setIdentity(_robot.getDofs(), _robot.getDofs()-_rank);
+
+        // _q_cut.setZero(_robot.getDofs()-_rank, _robot.getDofs());
 
         _changed = true;
 //    _qr_non_linear.setZero(_robot.getDofs()-_rank);
@@ -153,15 +157,19 @@ void _updateDecomposition()
 
         _qr_ptr->compute(_contacts_transpose);
 
-        _q = _qr_ptr->matrixQ();
+        _q.noalias() = _qr_ptr->householderQ()*_i;
+
+        // _qr_ptr->matrixQ();
+        // _q.noalias() = _qr_ptr->matrixQ();
+
 
         if (getRank() != _rank)
                 resize();  // NRT
         else
                 _changed = false;
 
-        _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
-        _independent.noalias() = _q_cut.transpose();
+        // _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
+        _independent.noalias() = _q.transpose();
 }
 
 

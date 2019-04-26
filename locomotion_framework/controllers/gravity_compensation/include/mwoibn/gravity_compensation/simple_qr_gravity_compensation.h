@@ -72,11 +72,8 @@ void updateModel() {
 virtual void compute()
 {
 
-        if (_dynamic_model.changed())
-                _transform = _dynamic_model.getTransformationMatrix();
-        else
-                _transform.noalias() =
-                        _dynamic_model.getTransformationMatrix();  // size may chenge here
+        _transform = _dynamic_model.getTransformationMatrix();
+
 
         for (int i = 0; i < _dynamic_model.getRobot().getActuationState().size();
              i++)
@@ -92,7 +89,10 @@ virtual void compute()
         _command.noalias() =
                 _transformation_inverser.get() * _dynamic_model.getGravity();
 
-        //std::cout << "command\t" << _command.transpose() << std::endl;
+        // std::cout << "command\t" << _command.size() << std::endl;
+        // std::cout << "gravity\t" << _dynamic_model.getGravity().size() << std::endl;
+        // std::cout << "_transform\t" <<   _transformation_inverser.get().rows() << "\t" <<   _transformation_inverser.get().cols() << std::endl;
+
         //std::cout << "_transformation_inverser.get()\t" << _transformation_inverser.get() << std::endl;
 
 }

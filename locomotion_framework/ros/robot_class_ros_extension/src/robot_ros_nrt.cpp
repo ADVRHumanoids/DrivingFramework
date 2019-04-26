@@ -146,6 +146,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadFeedbacks(YAML::Node config)
 
                 BiMap map = readBiMap(entry.second["dofs"]);
                 if(feedbacks.has(entry.second["name"].as<std::string>())) continue;
+                if(feedbacks.has("shared_"+entry.second["name"].as<std::string>())) continue;
 
                 if (entry.second["space"].as<std::string>() == "JOINT")
                 {

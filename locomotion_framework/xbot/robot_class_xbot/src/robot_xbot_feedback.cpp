@@ -93,6 +93,9 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadFeedbacks(YAML::Node config)
 
     BiMap map = readBiMap(entry.second["dofs"]);
 
+    if(feedbacks.has(entry.first.as<std::string>())) continue;
+    if(feedbacks.has("shared_"+entry.first.as<std::string>())) continue;
+
     if (entry.second["space"].as<std::string>() == "JOINT")
     {
 
@@ -133,7 +136,7 @@ void mwoibn::robot_class::RobotXBotFeedback::_loadControllers(YAML::Node config)
     if (entry.first.as<std::string>() == "mode") continue;
     if (entry.first.as<std::string>() == "gains") continue;
     if (entry.first.as<std::string>() == "source") continue;
-    
+
     std::cout << "XBOT feedback controllers\t" << entry.first << std::endl;
 
     if (!entry.second["layer"])
