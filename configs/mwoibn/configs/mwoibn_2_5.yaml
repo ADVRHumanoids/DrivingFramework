@@ -288,7 +288,7 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false #true
+                                effort:  true
                         initialize: link_side_online
                 velocity_controller:
                         type: ""
@@ -777,7 +777,7 @@ mwoibn:
                 shared:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        # plugins: [odometry2::odometry]
+                        # plugins: [odometry2::odometry, gravity_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
                         plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]

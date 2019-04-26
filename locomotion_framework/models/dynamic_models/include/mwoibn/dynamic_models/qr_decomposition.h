@@ -109,7 +109,7 @@ mwoibn::Matrix _qr_inertia;   //< matrix to extract independent rows
 int _rank;
 bool _changed;
 mwoibn::MatrixLimited _q;
-mwoibn::Matrix _contacts_transpose, _i, _independent;
+mwoibn::Matrix _contacts_transpose, _i, _independent, _q_cut;
 mwoibn::VectorN _qr_gravity, _qr_non_linear;
 void _resize(int rank)
 {
@@ -119,9 +119,9 @@ void _resize(int rank)
         _qr_non_linear.setZero(_robot.getDofs()-_rank);
         _qr_inertia.setZero(_robot.getDofs()-rank, _robot.getDofs());
         _q.setZero(_robot.getDofs(), _robot.getDofs());
-        _i.setIdentity(_robot.getDofs(), _robot.getDofs()-_rank);
+        _i.setIdentity(_robot.getDofs(), _robot.getDofs());
 
-        // _q_cut.setZero(_robot.getDofs()-_rank, _robot.getDofs());
+        _q_cut.setZero(_robot.getDofs()-_rank, _robot.getDofs());
 
         _changed = true;
 //    _qr_non_linear.setZero(_robot.getDofs()-_rank);
@@ -157,19 +157,29 @@ void _updateDecomposition()
 
         _qr_ptr->compute(_contacts_transpose);
 
-        _q.noalias() = _qr_ptr->householderQ()*_i;
 
-        // _qr_ptr->matrixQ();
-        // _q.noalias() = _qr_ptr->matrixQ();
+        // _q = _qr_ptr->matrixQ();
 
+        // if (getRank() != _rank)
+                // resize();  // NRT
+        // else
+                // _changed = false;
+        _q = _qr_ptr->householderQ()*_i;
+        _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
 
-        if (getRank() != _rank)
-                resize();  // NRT
-        else
-                _changed = false;
+        // std::cout << "householderQ\t" << _q.rows() << "\t" << _q.cols() << std::endl;
+        // std::cout << "matrixQ\t" << _q_cut.rows() << "\t" << _q_cut.cols() << std::endl;
+        // // std::cout << "householderQ\t" << h << std::endl;
+        // // std::cout << "matrixQ\t" << _q << std::endl;
+        // std::cout << "diff\t" << h-_q << std::endl;
+        //
+        // std::cout << "permutation\t" << _qr_ptr->colsPermutation().indices() << std::endl;
 
-        // _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
-        _independent.noalias() = _q.transpose();
+        // std::cout << "diff\t" << _q_cut-_q << std::endl;
+
+        _independent = _q_cut.transpose();
+
+        // _independent.noalias() = _q.transpose();
 }
 
 
