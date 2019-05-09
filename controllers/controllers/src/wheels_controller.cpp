@@ -40,19 +40,19 @@ void mgnss::controllers::WheelsController::compute()
         _command.noalias() = _ik_ptr->update();
 
         // std::cout << "IK\t" << _command.transpose() << std::endl;
+        // std::cout << "position\t" << _robot.command.velocity.set(_command, _select_ik) << std::endl;
         _robot.command.velocity.set(_command, _select_ik);
-
         _command.noalias() = _command * _robot.rate();
         //_active_state = _command;
-        // std::cout << "position\t" << _robot.command.position.get().transpose() << std::endl;
+        // std::cout << "position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
 
-        _robot.state.position.get(_active_state, _select_ik);
+        _robot.command.position.get(_active_state, _select_ik);
 
         for(int i = 0; i < _select_ik.size(); i++)
         _command[_select_ik[i]] += _active_state[i];
 
         _robot.command.position.set(_command, _select_ik);
-        // std::cout << "after position\t" << _robot.command.position.get().transpose() << std::endl;
+        // std::cout << "after position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
 
 
 }
