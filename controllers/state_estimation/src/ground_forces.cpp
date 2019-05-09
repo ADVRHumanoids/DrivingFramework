@@ -149,7 +149,7 @@ void mgnss::state_estimation::GroundForces::update()
       // std::cout << "nonlinear\t" << _gravity.getNonlinearEffects().transpose() << std::endl;
 
       _state = _state_no_torque + _robot.state.torque.get();
-      _robot.state["OVERALL_FORCE"].set(_state);
+      _robot.state["OVERALL_FORCE"].set(_state); // ACTING FORCE?
       _robot.state["BIAS_FORCE"].set(_state_no_torque);
       // std::cout << __PRETTY_FUNCTION__ << std::string(":\t") << _robot.state["BIAS_FORCE"].get().transpose() << std::endl;
       // std::cout << _robot.state.torque.get().transpose() << std::endl;
