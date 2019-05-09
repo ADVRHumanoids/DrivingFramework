@@ -123,6 +123,7 @@ void mgnss::higher_level::QrTask::solve(){
     _llt.compute(_cost.quadratic);
     _cost.trace = _cost.quadratic.trace();
 
+    if(std::isinf(_optimal_cost)) _optimal_state.setZero();
     _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
     // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);
