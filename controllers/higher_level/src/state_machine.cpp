@@ -102,9 +102,12 @@ void mgnss::higher_level::StateMachine::_marginJacobians(){
 
     for(int i = 0; i < _contact_points.size(); i++){
 
-            mwoibn::Vector3 point = _wheel_transforms[i]->rotation.transpose()*_points[i].get();
-            mwoibn::Vector3 base_this = _wheel_transforms[i]->rotation.transpose()*_base_points[i].get();
-            mwoibn::Vector3 base_other = _wheel_transforms[i]->rotation.transpose()*_base_points[_margin_pairs[i].second].get();
+            // mwoibn::Vector3 point = _wheel_transforms[i]->rotation.transpose()*_points[i].get();
+            // mwoibn::Vector3 base_this = _wheel_transforms[i]->rotation.transpose()*_base_points[i].get();
+            // mwoibn::Vector3 base_other = _wheel_transforms[i]->rotation.transpose()*_base_points[_margin_pairs[i].second].get();
+            mwoibn::Vector3 point = _points[i].get();
+            mwoibn::Vector3 base_this = _base_points[i].get();
+            mwoibn::Vector3 base_other = _base_points[_margin_pairs[i].second].get();
 
       // point 1 x
       _margins.setJacobian().row(i)[_margin_pairs[i].first*3] = -point[0]*(_margins.getState()[i])/std::pow(_norms[i],2) - (base_other[1])/_norms[i];
@@ -148,8 +151,10 @@ void mgnss::higher_level::StateMachine::update(){
     vec_1.noalias() += _torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
 
     // std::cout << "_state_machine\n" << _support_jacobian  << std::endl;
-    _support_jacobian.noalias() = _wheel_transforms[i]->rotation.transpose()*mat_1;
-    _support_offset.noalias() = _wheel_transforms[i]->rotation.transpose()*vec_1;
+    // _support_jacobian.noalias() = _wheel_transforms[i]->rotation.transpose()*mat_1;
+    // _support_offset.noalias() = _wheel_transforms[i]->rotation.transpose()*vec_1;
+    _support_jacobian.noalias() = mat_1;
+    _support_offset.noalias() = vec_1;
 
     _state_jacobian.block<2,3>(2*i, 3*i) = _support_jacobian.topRows<2>();
     _state_offset.segment<2>(2*i) = _support_offset.head<2>();
@@ -173,6 +178,8 @@ void mgnss::higher_level::StateMachine::update(){
   _margins.error = (_margins.getState() - _margins.limit)/_robot.rate();
   _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.getState())/_robot.rate();
 
+  std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
+  std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){
@@ -182,7 +189,7 @@ void mgnss::higher_level::StateMachine::_computeWorkspace(){
 
 void mgnss::higher_level::StateMachine::_workspaceJacobian(){
   for(int i = 0; i < _contact_points.size(); i++)
-    _workspace.setJacobian().block<1,2>(i,2*i) =  -(2*_wheel_transforms[i]->rotation.transpose()*_workspace_points[i].get()).head<2>();
+    _workspace.setJacobian().block<1,2>(i,2*i) =  -(2*_workspace_points[i].get()).head<2>();
   // for(int i = 0; i < _contact_points.size(); i++)
   //   _workspace.jacobian.block<8,2>(0, 2*i) = _workspace.jacobian.block<8,2>(0, 2*i)*_contact_points[i].getJacobianWheel().block<2,2>(0,0);
 }

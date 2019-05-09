@@ -371,8 +371,8 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
             _names.push_back("camber_qr_" + std::to_string(i));
             _names.push_back("camber_des_" + std::to_string(i));
             _names.push_back("camber_err_" + std::to_string(i));
-            _names.push_back("v_cp_"   + std::to_string(i+1)); // current Cp
-            _names.push_back("v_cp_des_"   + std::to_string(i+1)); // desired Cp
+            // _names.push_back("v_cp_"   + std::to_string(i+1)); // current Cp
+            // _names.push_back("v_cp_des_"   + std::to_string(i+1)); // desired Cp
           }
 
         // for(int i = 1; i < 5; i++){
@@ -569,8 +569,8 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
           _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get();
           logger.add(_names[counter], _eigen_scalar[0]); ++counter;
           logger.add(_names[counter], (-30*_leg_tasks["CAMBER"].first.getError()[i])); ++counter;
-          logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.command.velocity.get())[0] ); ++counter;
-          logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.state.velocity.get())[0] ); ++counter;
+          // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.command.velocity.get())[0] ); ++counter;
+          // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.state.velocity.get())[0] ); ++counter;
 
         }
 

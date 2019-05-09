@@ -90,7 +90,8 @@ virtual void run(){
     // mwoibn::VectorN _modified_support(8);
 
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
-    _qr_task.task(0).transform();
+    _qr_task.task(0).transform(); //?
+    std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
     _support_world.noalias()  =  _state_machine.stateJacobian()*_qr_task.task(0).get();
     _support_world +=  _state_machine.stateOffset();
     //
@@ -119,28 +120,32 @@ virtual void run(){
     _modified_support.setZero();
     support_i.setZero();
       for(int i =0; i < 4; i++){
-        if(_support_world.segment<2>(2*i).norm() > 0.05){
 
         support_i.setZero();
         support_i[0] = _support_world[2*i];
+        support_i[1] = _support_world[2*i+1];
 
         // support_i.head<2>() = _support_world.segment<2>(2*i);
 
-        test__.noalias() = _state_machine.steeringFrames()[i]->rotation*support_i;
-        //std::cout << "active" << std::endl;
-        _modified_support.segment<3>(3*i) = test__;
+        test__.noalias() = _state_machine.steeringFrames()[i]->rotation.transpose()*support_i;
+        test__[1] = 0;
+        support_i = _state_machine.steeringFrames()[i]->rotation*test__;
+        _modified_support.segment<3>(3*i) = _contact_point.getCurrentWorld(i);
+        _modified_support.segment<2>(2*i) += _support_world.segment<2>(2*i)*_robot.rate();
+
+        if(_support_world.segment<2>(2*i).norm() > 0.01){
 
         // std::cout << "get before\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
-        vel__ = _contact_point.getReferenceWorld(i)+  test__*_robot.rate();
-        _contact_point.setReferenceWorld(i, vel__, false);
+          vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
+          _contact_point.setReferenceWorld(i, vel__, false);
         // _contact_point.setReferenceWorld(i,_contact_point.getReferenceWorld(i), false);
-        std::cout << "vel__\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
+        // std::cout << "vel__\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
       }
     }
     // _contact_point.setVelocity(_modified_support);
 
-    std::cout << "_support steering\t" << _support_world.transpose() << std::endl;
-    std::cout << "_support world\t" << _modified_support.transpose() << std::endl;
+    std::cout << "_support world\t" << _support_world.transpose() << std::endl;
+    std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
       _caster.update();
 
@@ -153,14 +158,18 @@ virtual void run(){
 virtual void release(){ }
 
 void log(  mwoibn::common::Logger& logger){
+  logger.add("ref", 0  );
+
  for(int i =0 ; i < 4; i++){
-   logger.add("cp_des_"   + std::to_string(i) + "_x", temp_des[3*i] );
-   logger.add("cp_des_"   + std::to_string(i) + "_y", temp_des[3*i+1] );
+   logger.add("cp_des_"   + std::to_string(i) + "_x", _contact_point.getReferenceWorld(i)[0] );
+   logger.add("cp_des_"   + std::to_string(i) + "_y", _contact_point.getReferenceWorld(i)[1] );
+   logger.add("cp_qr_"   + std::to_string(i) + "_x", _modified_support[3*i] );
+   logger.add("cp_qr_"   + std::to_string(i) + "_y", _modified_support[3*i+1] );
+
+   logger.add("cp_"   + std::to_string(i) + "_x", _contact_point.getCurrentWorld(i)[0] );
+   logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
-   logger.add("v_steer_"   + std::to_string(i), _desired_steer[i] );
-   logger.add("current_"   + std::to_string(i), _current_steer[i] );
-   logger.add("v_current_"   + std::to_string(i), (_steering[i].getJacobian()*_robot.state.velocity.get())[0] );
  }
     if(std::isinf(_qr_task.optimalCost()))
         logger.add("cost_", -mwoibn::NON_EXISTING );
