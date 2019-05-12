@@ -125,7 +125,6 @@ void mgnss::higher_level::QpAggravated::_update(){
 
 
   QrTask::_update();
-  // std::cout << "soft_gains\t" << _soft_gains.transpose() << std::endl;
 
 }
 

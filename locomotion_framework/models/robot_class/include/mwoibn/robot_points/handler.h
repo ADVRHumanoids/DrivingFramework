@@ -140,7 +140,8 @@ public:
       return _jacobian;
     }
 
-    const mwoibn::Matrix& passJacobian() const {return _jacobian;}
+    const mwoibn::Matrix& jacobian() const {return _jacobian;}
+    const mwoibn::VectorN& state() const {return _positions;}
 
 
     std::vector<mwoibn::Matrix> getJacobians()
