@@ -634,12 +634,12 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 90
-                                        BASE: [70, 70, 60, 60, 60, 100]
-                                        CONTACT_POINTS: 35
+                                        STEERING: 20
+                                        BASE: [3, 3, 3, 3, 3, 3]
+                                        CONTACT_POINTS: 4
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 20 # 100
-                                        CASTER: 30 # 14
+                                        CAMBER: 0.7 # 100
+                                        CASTER: 1.5 # 14
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0

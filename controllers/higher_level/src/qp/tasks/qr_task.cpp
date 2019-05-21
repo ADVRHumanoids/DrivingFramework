@@ -60,8 +60,9 @@ void mgnss::higher_level::QrTask::_update(){
     }
     _equality.setState() = equality.getState();
 
+    equality.getJacobian();
     for(int i = 0; i < _equality.active_dofs.size(); i++ )
-      _equality.setJacobian().col(i) = equality.getJacobian().col(_equality.active_dofs[i]);
+      _equality.setJacobian().col(i) = equality.jacobian().col(_equality.active_dofs[i]);
 
     // std::cout << _equality.getState().transpose() << std::endl;
     _equality.transpose();
@@ -74,8 +75,9 @@ void mgnss::higher_level::QrTask::_update(){
     _inequality.setState().head(hard_inequality.rows()) = hard_inequality.getState();
 
     // this is very inefficient!
+    hard_inequality.getJacobian();
     for(int i = 0; i < _inequality.active_dofs.size(); i++)
-      _inequality.setJacobian().block(0, i, hard_inequality.rows(), 1) = hard_inequality.getJacobian().col(_inequality.active_dofs[i]);
+      _inequality.setJacobian().block(0, i, hard_inequality.rows(), 1) = hard_inequality.jacobian().col(_inequality.active_dofs[i]);
 
     // _inequality.setJacobian().block(0,0, hard_inequality.rows(), _vars) = hard_inequality.getJacobian();
   }
@@ -87,8 +89,9 @@ void mgnss::higher_level::QrTask::_update(){
     }
 
     _inequality.setState().segment(hard_inequality.rows(), soft_inequality.rows()) = soft_inequality.getState();
+    soft_inequality.getJacobian();
     for(int i = 0; i < _inequality.active_dofs.size(); i++)
-        _inequality.setJacobian().block(hard_inequality.rows(),i, soft_inequality.rows(), 1) =  soft_inequality.getJacobian().col(_inequality.active_dofs[i]);
+        _inequality.setJacobian().block(hard_inequality.rows(),i, soft_inequality.rows(), 1) =  soft_inequality.jacobian().col(_inequality.active_dofs[i]);
 
     // _inequality.setJacobian().block(hard_inequality.rows(),0, soft_inequality.rows(), _vars) =  soft_inequality.getJacobian();
   }
@@ -123,6 +126,7 @@ void mgnss::higher_level::QrTask::solve(){
     _llt.compute(_cost.quadratic);
     _cost.trace = _cost.quadratic.trace();
 
+    if(std::isinf(_optimal_cost)) _optimal_state.setZero();
     _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
     // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);

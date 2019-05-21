@@ -30,7 +30,7 @@ namespace dynamic_points
   }
 
   void TorusVelocity::compute(){
-      _point = _torus.get();
+      _point = _torus.get();  //?
 
   }
 

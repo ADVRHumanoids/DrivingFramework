@@ -2,8 +2,8 @@
 #define __MWOIBN__DYNAMIC_POINTS__FORCE_H
 
 #include "mwoibn/dynamic_points/dynamic_point.h"
-#include "mwoibn/point_handling/frame_plus.h"
-#include "mwoibn/point_handling/linear_velocity.h"
+//#include "mwoibn/point_handling/frame_plus.h"
+// #include "mwoibn/point_handling/linear_velocity.h"
 //#include "mwoibn/point_handling/linear_acceleration.h"
 #include "mwoibn/dynamic_models/basic_model.h"
 
@@ -19,24 +19,24 @@ class Force: public DynamicPoint
 public:
 
 
-  Force(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::robot_points::Point& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
+  Force(RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::dynamic_points::DynamicPoint& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
     DynamicPoint(model, state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
           _init();
   }
 
-  Force(mwoibn::robot_class::Robot& robot, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::robot_points::Point& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
+  Force(mwoibn::robot_class::Robot& robot, mwoibn::dynamic_models::BasicModel& dynamic_model, mwoibn::dynamic_points::DynamicPoint& frame, mwoibn::Interface interface = "OVERALL_FORCE"):
       DynamicPoint(robot.getModel(), robot.state), _frame(frame), _dynamic_model(dynamic_model), _interface(interface){
     _init();
   }
 
 
-  Force( Force&& other, robot_points::Point& frame)
+  Force( Force&& other, dynamic_points::DynamicPoint& frame)
       : DynamicPoint(other), _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
   }
 
-  Force(const Force& other, robot_points::Point& frame)
+  Force(const Force& other, dynamic_points::DynamicPoint& frame)
       : DynamicPoint(other),  _frame(frame), _dynamic_model(other._dynamic_model), _interface(other._interface)
   {
     _init();
@@ -67,13 +67,13 @@ public:
 
 
 protected:
-  //mwoibn::point_handling::LinearVelocity _velocity;
+  //mwoibn::point_handling:: _velocity;
   std::unique_ptr<mwoibn::Inverse> _contacts_inverse;
   mwoibn::dynamic_models::BasicModel& _dynamic_model;
   //mwoibn::Matrix _temp;
   mwoibn::Matrix _point_jacobian, _jacobian_temp, _point_transposed, _point_inverse, _point_temp;
   //mwoibn::Matrix3 _inverse;
-  mwoibn::robot_points::Point& _frame;
+  mwoibn::dynamic_points::DynamicPoint& _frame;
   mwoibn::Interface _interface;
   void _init(){
     _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE);

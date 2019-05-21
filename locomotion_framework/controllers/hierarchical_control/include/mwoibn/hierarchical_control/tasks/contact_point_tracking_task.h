@@ -130,6 +130,16 @@ virtual void updateState() final {
       return _baseToWorld(reference);
     }
 
+    virtual mwoibn::Vector3 getCurrentWorld(int i)
+    {
+
+          mwoibn::Vector3 current;
+          current = _minus[i].get().head<3>();
+
+          return _baseToWorld(current);
+        }
+
+
     virtual const mwoibn::Vector3& getVelocityReference(int i)
     {
       // std::cout << "velocity\t" << _velocity.segment<3>(3*i).transpose() << std::endl;
@@ -162,7 +172,7 @@ virtual void claimContact(int i) { _selector[i] = false; }
 void setVelocity(mwoibn::VectorN& velocity){
 
   for (int i = 0; i < _contacts.size(); i++)
-    _velocity_reference.segment<3>(3*i) = _wheel_transforms[i]->rotation.transpose()*velocity.segment<3>(3*i);
+    _velocity_reference.segment<3>(3*i) = velocity.segment<3>(3*i);
   // std::cout << "wheel 3\n" << _wheel_transforms[i]->rotation;
   // std::cout << "after" << "\t" << _velocity.transpose() << std::endl;
 }
