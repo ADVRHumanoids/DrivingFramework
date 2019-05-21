@@ -318,20 +318,20 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
     shape_action__->init();
 
     _names.push_back("time");
-//    _names.push_back("th");
-//    _names.push_back("r_th");
-//
-   // for(int i = 0; i < 3; i++){
-//            _names.push_back(std::string("com_") + char('x'+i));
-//            _names.push_back(std::string("r_base_") + char('x'+i));
-//            _names.push_back(std::string("base_") + char('x'+i));
-//
-          // for(int k = 0; k < 4; k++){
-//             _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
-//             _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
-//           //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
-          // }
-        // }
+   _names.push_back("th");
+   _names.push_back("r_th");
+
+   for(int i = 0; i < 3; i++){
+           _names.push_back(std::string("com_") + char('x'+i));
+           _names.push_back(std::string("r_base_") + char('x'+i));
+           _names.push_back(std::string("base_") + char('x'+i));
+
+          for(int k = 0; k < 4; k++){
+            _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
+            _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
+          //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
+          }
+        }
 
         for(int i = 0; i < 30; i++){
             _names.push_back("pos_des_" + std::to_string(i));
@@ -512,24 +512,24 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
   int counter = 0;
   logger.add(_names[counter], time); ++counter;
 //
-//   logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
-//   logger.add(_names[counter], _heading); ++counter;
+  logger.add(_names[counter], _robot.state.position.get()[5]); ++counter;
+  logger.add(_names[counter], _heading); ++counter;
 //   //
 //   _forces = _robot.contacts().getReactionForce();
-       // for(int i = 0; i < 3; i++){
-//
-//         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-//         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
-//         logger.add(_names[counter], getBaseReference()[i]); ++counter;
-//         logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
-//
-        // for(int k = 0; k < 4; k++){
+       for(int i = 0; i < 3; i++){
 
-//           logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
-//           logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
-//         //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
-        // }
-      // }
+        // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
+        logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
+        logger.add(_names[counter], getBaseReference()[i]); ++counter;
+        logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
+
+        for(int k = 0; k < 4; k++){
+
+          logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
+          logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
+        //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
+        }
+      }
 //
       for(int i = 0; i < 30; i++){
           logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;

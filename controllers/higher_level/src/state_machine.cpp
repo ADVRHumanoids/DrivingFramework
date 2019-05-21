@@ -222,6 +222,10 @@ void mgnss::higher_level::StateMachine::log(mwoibn::common::Logger& logger){
       logger.add(std::string("est_") + std::to_string(k) + std::string("_") + char('x'+i), _torus_acceleration[k].getEstimate()[i]);
       logger.add(std::string("vel_") + std::to_string(k) + std::string("_")+ char('x'+i), _torus_acceleration[k].getVelocity()[i]);
     }
+
+    logger.add(std::string("mar_") + std::to_string(k), _margins.error[k]);
+    logger.add(std::string("work_") + std::to_string(k), _workspace.error[k]);
+
   }
 
 }

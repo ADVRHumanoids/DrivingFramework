@@ -74,8 +74,9 @@ void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
        logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
 
     for (int i = 0; i < _size; i++){
-       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
-       logger.add(std::string("error_workspace_") + std::to_string(i), _inequality.getState()[4+i]);
+       //logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
+       logger.add(std::string("error_workspace_") + std::to_string(i), soft_inequality[1].getState()[i]);
+       logger.add(std::string("error_margin_") + std::to_string(i), soft_inequality[0].getState()[i]);
      }
 
     for (int i = 0; i < _slack; i++)

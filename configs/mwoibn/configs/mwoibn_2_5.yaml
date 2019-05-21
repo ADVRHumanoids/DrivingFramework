@@ -558,7 +558,7 @@ mwoibn:
 #                        tunning: ZMP_INDIRECT
                         steering: whole_body
 #                        position_gain: 200
-                        tunning: whole_body
+                        tunning: reactif
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
@@ -630,6 +630,19 @@ mwoibn:
                                         damp: 0.0004
                                         tracking: 1.0
                         tunnings:
+                                reactif: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 20
+                                        BASE: [0.25, 0.25, 1, 3, 3, 3]
+                                        CONTACT_POINTS: 4
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 0.7 # 100
+                                        CASTER: 1.5 # 14
+                                        CAMBER_DAMP: 0.08
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 whole_body: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
@@ -778,6 +791,6 @@ mwoibn:
                         layer: NRT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
                         # plugins: [odometry2::odometry, gravity_compensation]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
+                        #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]

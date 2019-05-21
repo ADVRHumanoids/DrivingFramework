@@ -49,7 +49,7 @@ void mgnss::controllers::WheelsController::compute()
         _robot.command.position.get(_active_state, _select_ik);
 
         for(int i = 0; i < _select_ik.size(); i++)
-        _command[_select_ik[i]] += _active_state[i];
+          _command[i] += _active_state[i];
 
         _robot.command.position.set(_command, _select_ik);
         // std::cout << "after position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
