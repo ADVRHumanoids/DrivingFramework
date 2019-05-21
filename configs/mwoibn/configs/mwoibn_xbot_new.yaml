@@ -92,8 +92,12 @@ mwoibn:
                 offline: [lower_body]
                 simulated: [simulation_base, simulation_state]
         controllers:
-                direct:
+                impedance:
+                        list: [torque_controller, velocity_controller]
+                joint:
                         list: [position_controller, velocity_controller]
+                direct:
+                        list: [position_controller, torque_controller, velocity_controller]                        
                 position_reference:
                         list: [whole_body]
                 torque_reference:
@@ -287,8 +291,19 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false #true
+                                effort: false
                         initialize: link_side_online
+                torque_controller:
+                        type: ""
+                        dofs:
+                                chain: position
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: false
+                                velocity: false
+                                effort: true
+                        initialize: link_side_online                        
                 velocity_controller:
                         type: ""
                         dofs:
@@ -424,6 +439,10 @@ mwoibn:
                                 type: custom_controller/ActuatorPositionControllerClasses
                                 sink: /command
                                 ff_service: /set_ff_torque
+                        torque_controller:
+                                type: custom_controller/ActuatorPositionControllerClasses
+                                sink: /command
+                                ff_service: /set_ff_torque
                         velocity_controller:
                                 type: custom_controller/ActuatorVelocityController
                                 sink: /command
@@ -511,6 +530,10 @@ mwoibn:
                                 layer: lower_level
                                 dofs:
                                         mapping: XBOT
+                        torque_controller:
+                                layer: lower_level
+                                dofs:
+                                        mapping: XBOT                                        
                         velocity_controller:
                                 layer: lower_level
                                 dofs:
@@ -534,7 +557,7 @@ mwoibn:
                 joint_states:
                         layer: RT
                         robot: joint_space
-                        controller: direct
+                        controller: joint
                         mode: full
                 joint_reference:
                         layer: RT
@@ -725,7 +748,7 @@ mwoibn:
                         secondary_file:
                              path: *support
                              file: lower_body.yaml
-                        mode: idle
+                        mode: full
                 compliance_compensation:
                         layer: RT
                         robot: default
@@ -774,6 +797,6 @@ mwoibn:
                         layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

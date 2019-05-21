@@ -158,24 +158,9 @@ void _updateDecomposition()
         _qr_ptr->compute(_contacts_transpose);
 
 
-        // _q = _qr_ptr->matrixQ();
-
-        // if (getRank() != _rank)
-                // resize();  // NRT
-        // else
-                // _changed = false;
         _q = _qr_ptr->householderQ()*_i;
         _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
 
-        // std::cout << "householderQ\t" << _q.rows() << "\t" << _q.cols() << std::endl;
-        // std::cout << "matrixQ\t" << _q_cut.rows() << "\t" << _q_cut.cols() << std::endl;
-        // // std::cout << "householderQ\t" << h << std::endl;
-        // // std::cout << "matrixQ\t" << _q << std::endl;
-        // std::cout << "diff\t" << h-_q << std::endl;
-        //
-        // std::cout << "permutation\t" << _qr_ptr->colsPermutation().indices() << std::endl;
-
-        // std::cout << "diff\t" << _q_cut-_q << std::endl;
 
         _independent = _q_cut.transpose();
 

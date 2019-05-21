@@ -88,6 +88,13 @@
       <link name="ankle2_4"/>
    </group>
 
+   <group name="gc">
+      <link name="ankle2_1"/>
+      <link name="ankle2_2"/>
+      <link name="ankle2_3"/>
+      <link name="ankle2_4"/>
+   </group>
+
    <group name="front_left_leg_no_wheel">
       <chain base_link="pelvis" tip_link="ankle2_1"/>
    </group>
