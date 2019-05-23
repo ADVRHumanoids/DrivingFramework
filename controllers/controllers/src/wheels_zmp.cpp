@@ -588,6 +588,6 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //        // }
 //
         shape_action__->log(logger);
-
+        state_machine__->log(logger);
 
 }

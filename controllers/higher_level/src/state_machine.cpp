@@ -64,7 +64,7 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
 
         _margins.limit.setZero(4);
         _workspace.limit.setZero(4);
-        _margins.limit << 0.25, 0.18, 0.18, 0.25;
+        _margins.limit << 0.25, 0.215, 0.215, 0.25;
         _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
         _margins.setState().setZero(_size);
         _workspace.setState().setZero(_size);
@@ -177,9 +177,9 @@ void mgnss::higher_level::StateMachine::update(){
 
   _margins.error = (_margins.getState() - _margins.limit)/_robot.rate();
   _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.getState())/_robot.rate();
-
-  std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
-  std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
+  //
+  // std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
+  // std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){
@@ -223,8 +223,8 @@ void mgnss::higher_level::StateMachine::log(mwoibn::common::Logger& logger){
       logger.add(std::string("vel_") + std::to_string(k) + std::string("_")+ char('x'+i), _torus_acceleration[k].getVelocity()[i]);
     }
 
-    logger.add(std::string("mar_") + std::to_string(k), _margins.error[k]);
-    logger.add(std::string("work_") + std::to_string(k), _workspace.error[k]);
+    logger.add(std::string("mar_") + std::to_string(k), _margins.getState()[k]);
+    logger.add(std::string("work_") + std::to_string(k), _workspace.getState()[k]);
 
   }
 
