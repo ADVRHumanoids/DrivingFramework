@@ -178,8 +178,8 @@ void mgnss::higher_level::StateMachine::update(){
   _margins.error = (_margins.getState() - _margins.limit)/_robot.rate();
   _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.getState())/_robot.rate();
 
-  std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
-  std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
+  //std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
+  //std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){
@@ -218,10 +218,13 @@ void mgnss::higher_level::StateMachine::_update(){
 void mgnss::higher_level::StateMachine::log(mwoibn::common::Logger& logger){
 
   for(int k = 0; k < 4; k++){
-    for(int i = 0; i < 3; i++){
-      logger.add(std::string("est_") + std::to_string(k) + std::string("_") + char('x'+i), _torus_acceleration[k].getEstimate()[i]);
-      logger.add(std::string("vel_") + std::to_string(k) + std::string("_")+ char('x'+i), _torus_acceleration[k].getVelocity()[i]);
-    }
+//    for(int i = 0; i < 3; i++){
+//      logger.add(std::string("est_") + std::to_string(k) + std::string("_") + char('x'+i), _torus_acceleration[k].getEstimate()[i]);
+//      logger.add(std::string("vel_") + std::to_string(k) + std::string("_")+ char('x'+i), _torus_acceleration[k].getVelocity()[i]);
+//    }
+//    
+    logger.add(std::string("mar_") + std::to_string(k),  _margins.error[k]   );
+    logger.add(std::string("work_") + std::to_string(k), _workspace.error[k] );
   }
 
 }

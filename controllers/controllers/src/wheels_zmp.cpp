@@ -166,6 +166,9 @@ void mgnss::controllers::WheelsZMP::_setInitialConditions(){
         // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
 
         _steering_ref_ptr->set(_temp_4);
+        _robot.command.position.set(_robot.state.position.get());
+
+        //std::cout << _robot.command.position.get() << std::endl;
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
 
@@ -321,8 +324,8 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
 //    _names.push_back("th");
 //    _names.push_back("r_th");
 //
-   // for(int i = 0; i < 3; i++){
-//            _names.push_back(std::string("com_") + char('x'+i));
+        for(int i = 0; i < 3; i++){
+            _names.push_back(std::string("com_") + char('x'+i));
 //            _names.push_back(std::string("r_base_") + char('x'+i));
 //            _names.push_back(std::string("base_") + char('x'+i));
 //
@@ -331,7 +334,13 @@ void mgnss::controllers::WheelsZMP::_initIK(YAML::Node config){
 //             _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
 //           //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
           // }
-        // }
+        }
+        
+//      for(int i = 0; i < 3; i++){
+//            _names.push_back(std::string("e_base_") + char('x'+i));
+//            _names.push_back(std::string("base_") + char('x'+i));
+//            _names.push_back(std::string("r_base_") + char('x'+i));
+//          }
 
         for(int i = 0; i < 30; i++){
             _names.push_back("pos_des_" + std::to_string(i));
@@ -516,10 +525,10 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //   logger.add(_names[counter], _heading); ++counter;
 //   //
 //   _forces = _robot.contacts().getReactionForce();
-       // for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 3; i++){
 //
 //         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
-//         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
+         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
 //         logger.add(_names[counter], getBaseReference()[i]); ++counter;
 //         logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
 //
@@ -529,8 +538,14 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //           logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
 //         //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
         // }
-      // }
+        }
 //
+//      for(int i = 0; i < 3; i++){
+//            logger.add(_names[counter], _pelvis_orientation_ptr->getError()[i]); ++counter;
+//            logger.add(_names[counter], _robot.state.position.get()[3+i]); ++counter;
+//            logger.add(_names[counter], _robot.command.position.get()[3+i]); ++counter;
+//          }
+
       for(int i = 0; i < 30; i++){
           logger.add(_names[counter], _robot.command.position.get()[i]); ++counter;
           logger.add(_names[counter], _robot.command.velocity.get()[i]); ++counter;
@@ -588,6 +603,7 @@ void mgnss::controllers::WheelsZMP::log(mwoibn::common::Logger& logger, double t
 //        // }
 //
         shape_action__->log(logger);
+        state_machine__->log(logger);
 
 
 }
