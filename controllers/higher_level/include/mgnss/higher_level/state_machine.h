@@ -25,7 +25,44 @@ namespace mgnss
 namespace higher_level
 {
 
+class StateOffset{
+  public:
+    const mwoibn::VectorN& get(){return _offset; }
+    mwoibn::VectorN& set(){return _offset; }
 
+  protected:
+    mwoibn::VectorN _offset;
+};
+
+class StateJacobian{
+
+  public:
+    const mwoibn::Matrix& get(){return _jacobian; }
+    mwoibn::Matrix& set(){return _jacobian; }
+
+  protected:
+    mwoibn::Matrix _jacobian;
+};
+
+class StateTransformation{
+  public:
+    StateOffset offset;
+    StateJacobian jacobian;
+    virtual void update(){};
+};
+
+class SupportState: public StateTransformation{
+  public:
+    SupportState(mwoibn::robot_class::Robot& robot): _robot(robot){}
+    virtual void update();
+    mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus> torus_acceleration;
+
+  protected:
+    mwoibn::robot_class::Robot& _robot;
+    mwoibn::Matrix3 _support_jacobian, mat_1;
+    mwoibn::Vector3 _support_offset, vec_1;
+
+};
 
 /*
  *  Steering version with contact point open-loop reference
@@ -41,57 +78,36 @@ public:
   ~StateMachine(){}
 
   void init();
-  void update();
+  virtual void update();
 
-  // bool state(){ return _state; }
-
-
-  // bool restart() { return _restart;}
 
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steeringFrames(){return _wheel_transforms;}
-  std::vector<mwoibn::Matrix3> desiredSteer;
-  //
-  // const mwoibn::VectorN& margins(){return _margins;}
-  // const mwoibn::VectorN& workspace(){return _workspace;}
-  //
-  // const mwoibn::Matrix& marginsJacobian(){return _margins_jacobian;}
-  // const mwoibn::Matrix& workspaceJacobian(){return _workspace_jacobian;}
+  // std::vector<mwoibn::Matrix3> desiredSteer;
+
   const Limit& margin(){return _margins;}
   const Limit& workspace(){return _workspace;}
 
-  const mwoibn::Matrix& stateJacobian(){return _state_jacobian;}
-  const mwoibn::Matrix& worldJacobian(){return _world_jacobian;}
-  // const mwoibn::Matrix& steerJacobian(){return _steer_jacobian;}
-  // const mwoibn::Matrix& desiredJacobian(){return _desired_jacobian;}
-  const mwoibn::VectorN& stateOffset(){return _state_offset;}
-  // const mwoibn::VectorN& nextStateOffset(){return _next_state_offset;}
+  // const mwoibn::Matrix& stateJacobian(){return _state_jacobian;}
+  // const mwoibn::Matrix& worldJacobian(){return _world_jacobian;}
 
-  mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus>& accelerations(){return _torus_acceleration;}
-  const mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& wheelOrientation(){return _wheel_orientation;}
+  // const mwoibn::VectorN& stateOffset(){return _state_offset;}
+  SupportState cost_I;
+  StateTransformation cost_II;
+  // mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus>& accelerations(){return _torus_acceleration;}
+  // const mwoibn::robot_points::Handler<mwoibn::robot_points::Point>& wheelOrientation(){return _wheel_orientation;}
 
   void log(mwoibn::common::Logger& logger);
-  // bool valid();
 
-  // const mwoibn::VectorN& marginsLimits(){return _safety_margins;}
-  // const mwoibn::VectorN& workspaceLimits(){return _max_workspace;}
-  //
-  // const mwoibn::VectorN& marginSafety();
-  // const mwoibn::VectorN& workspaceSafety();
 
 protected:
   mwoibn::robot_class::Robot& _robot;
   mwoibn::robot_points::Point& _base;
 
   unsigned int _size;
-  // mgnss::higher_level::SupportShapingV3& _shape;
-  // mgnss::higher_level::QrTracking& _restore;
-
-  // bool _state, _restart;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _wheel_orientation;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::TorusModel> _contact_points;
-  mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus> _torus_acceleration;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _points;
   mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _base_points;
@@ -104,22 +120,17 @@ protected:
 
   Limit _margins, _workspace;
 
-  mwoibn::VectorN _norms, _state_offset;//, _next_state_offset;
-  mwoibn::Matrix _state_jacobian, _world_jacobian, _steer_jacobian;//, _desired_jacobian;
+  mwoibn::VectorN _norms;//, _state_offset;//, _next_state_offset;
+  // mwoibn::Matrix _state_jacobian;//, _desired_jacobian;
 
-  mwoibn::Matrix3 _support_jacobian, mat_1;
-  mwoibn::Vector3 _support_offset, vec_1;
 
   void _computeMargin(int i);
-  void _marginJacobians();
+  virtual void _marginJacobians();
 
   void _computeWorkspace();
-  void _workspaceJacobian();
+  virtual void _workspaceJacobian();
 
   void _update();
-
-
-
 
 };
 }

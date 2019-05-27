@@ -1,5 +1,5 @@
-#ifndef __MGNSS_CONTROLLERS_WHEELS_ZMP_H
-#define __MGNSS_CONTROLLERS_WHEELS_ZMP_H
+#ifndef __MGNSS__CONTROLLERS__WHEELS_ZMP_II__H
+#define __MGNSS__CONTROLLERS__WHEELS_ZMP_II__H
 
 #include "mgnss/controllers/wheels_controller_extend.h"
 #include <mwoibn/hierarchical_control/tasks/aggravated.h>
@@ -30,8 +30,10 @@
 //TEMP
 #include <mwoibn/dynamic_models/basic_model.h>
 
+#include <mgnss/higher_level/state_machine_II.h>
 #include <mgnss/higher_level/state_machine.h>
-#include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
+// #include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
+#include <mgnss/higher_level/qp/tasks/support_shaping_v5.h>
 // #include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
@@ -45,11 +47,11 @@ namespace mgnss
 
 namespace controllers {
 
-class WheelsZMP : public WheelsControllerExtend
+class WheelsZMPII : public WheelsControllerExtend
 {
 
 public:
-WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMPII( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
@@ -62,7 +64,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 
 
 
-WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMPII( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
@@ -71,7 +73,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControl
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
-virtual ~WheelsZMP() {
+virtual ~WheelsZMPII() {
 }
 
 void compute();
@@ -237,7 +239,7 @@ protected:
   // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
   // std::unique_ptr<mgnss::higher_level::SteeringShape> _steering_shape_ptr;
 
-  std::unique_ptr<mgnss::higher_level::StateMachine> state_machine__;
+  std::unique_ptr<mgnss::higher_level::StateMachineII> state_machine__;
   std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeAction> shape_action__;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;

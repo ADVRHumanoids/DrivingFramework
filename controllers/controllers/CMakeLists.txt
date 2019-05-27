@@ -31,7 +31,7 @@ catkin_package(
   LIBRARIES
         mgnss_controllers_wheels
         mgnss_controllers_centralized
-        mgnss_controllers_joint_space        
+        mgnss_controllers_joint_space
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -57,6 +57,7 @@ add_library(mgnss_controllers_wheels
 #   src/wheeled_motion_world.cpp
 #   src/wheels_reactif.cpp
    src/wheels_zmp.cpp
+   src/wheels_zmp_II.cpp
  )
 
 add_dependencies(mgnss_controllers_wheels ${catkin_EXPORTED_TARGETS})

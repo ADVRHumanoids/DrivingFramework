@@ -7,6 +7,8 @@
 
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/controllers/wheels_zmp.h"
+#include "mgnss/controllers/wheels_zmp_II.h"
+
 #include "mgnss/controllers/wheels_second_order.h"
 
 #include "mgnss/controllers/wheels_reactif.h"
@@ -180,6 +182,21 @@ protected:
   }
 };
 
+  template<typename Subscriber, typename Service, typename Node>
+  class WheelsZMPII : public WheelsControllerExtend<Subscriber, Service, Node>
+  {
+    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+    public:
+      WheelsZMPII() : Precedesor_(){}
+      virtual ~WheelsZMPII(){
+      }
+
+    protected:
+      virtual void _resetPrt(YAML::Node config){
+              Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMPII(*Precedesor_::_robot_ptr.begin()->second, config));
+      }
+   };
 
 template<typename Subscriber, typename Service, typename Node>
 class WheeledMotionMergeV1 : public WheeledMotionEvent3<Subscriber, Service, Node>

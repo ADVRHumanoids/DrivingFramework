@@ -1,6 +1,6 @@
 
-#ifndef __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_H
-#define __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_H
+#ifndef __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_II_H
+#define __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_II_H
 
 #include "mwoibn/hierarchical_control/actions/primary.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
@@ -19,7 +19,7 @@ namespace hierarchical_control {
 namespace actions {
 
 
-class ShapeAction : public Primary {
+class ShapeActionII : public Primary {
 public:
 ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
             std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
@@ -92,8 +92,8 @@ virtual void run(){
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
     _qr_task.task(0).transform(); //?
     // std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
-    _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get().head<12>();
-    _support_world +=  _state_machine.cost_I.offset.get().head<8>();
+    _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get();
+    _support_world +=  _state_machine.cost_I.offset.get();
     //
     // for(int i =0; i < 4; i++){
     //   test__ = mwoibn::Vector3::Zero();

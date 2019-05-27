@@ -1,13 +1,13 @@
-#include "mgnss/higher_level/qp/tasks/support_shaping_v4_0.h"
+#include "mgnss/higher_level/qp/tasks/support_shaping_v5.h"
 
 
 
-mgnss::higher_level::SupportShapingV4::SupportShapingV4(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
-  QrTask(8, 12), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
+mgnss::higher_level::SupportShaping5::SupportShaping5(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
+  QrTask(8+2+12, 8), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
     if(!_is_margin) resize(8,0);
 }
 
-void mgnss::higher_level::SupportShapingV4::_allocate(){
+void mgnss::higher_level::SupportShaping5::_allocate(){
 
           _size = 4;
           _return_state.setZero(_vars); // state + slack
@@ -22,7 +22,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
               addSoft(Constraint(4,_vars), 5e1); // wirkspace
 
               QrTask::init();
-
+              _cost.quadratic.setZero();
               for(int i = 0; i < 4; i++){
                 // _vector_cost_[2*i] = 1;
                 // _vector_cost_[2*i+1] = 3;
@@ -40,7 +40,7 @@ void mgnss::higher_level::SupportShapingV4::_allocate(){
 }
 
 
-void mgnss::higher_level::SupportShapingV4::_update(){
+void mgnss::higher_level::SupportShaping5::_update(){
 
      _optimal_state.setZero();
 
@@ -50,20 +50,31 @@ void mgnss::higher_level::SupportShapingV4::_update(){
         soft_inequality[1].setState()[i] = (_workspace.limit[i]*_workspace.limit[i] - _workspace.getState()[i])/_robot.rate();
         // soft_inequality[1].state[4+i] = _workspace.getState()[i]/_robot.rate(); //? what is is
     //    soft_inequality[1].setState()[4+i] = -(0.0*0.0 - _workspace.getState()[i])/_robot.rate(); //Avoid going under the robot?
+        soft_inequality[1].setJacobian().block<4,2>(0,2*i) = -_workspace.getJacobian().middleCols<2>(3*i);
+        soft_inequality[1].setJacobian().block<4,2>(0,2*_size+2+3*i) = -_workspace.getJacobian().middleCols(3*_size+2+3*i,2);
+
+
     }
 
-    soft_inequality[1].setJacobian().block<4,8>(0,0) = -_workspace.getJacobian();
     //soft_inequality[1].setJacobian().block<4,8>(4,0) = _workspace.getJacobian();
     if(_is_margin)
       soft_inequality[0].setState() = (_margin.getState() - _margin.limit)/_robot.rate();
-
-    QrTask::_update();
-    // 
+    //
     // std::cout << "soft_inequality 0\n" << soft_inequality[0].getJacobian() << std::endl;
     // std::cout << "soft_inequality 1\n" << soft_inequality[1].getJacobian() << std::endl;
+
+    soft_inequality[0].setJacobian().block<4,2>(0,2*_size) = _margin.getJacobian().middleCols<2>(3*_size);
+
+    QrTask::_update();
+    std::cout << "soft_inequality 0\n" << soft_inequality[0].getJacobian() << std::endl;
+    std::cout << "soft_inequality 1\n" << soft_inequality[1].getJacobian() << std::endl;
+    std::cout << "workspace\n" << _workspace.getJacobian() << std::endl;
+
     // std::cout << "cost quadratic\n" << _cost.quadratic << std::endl;
     // std::cout << "cost linear\n" << _cost.linear<< std::endl;
-    // std::cout << "soft_inequality\n" << soft_inequality[0].getJacobian() << std::endl;
+    // std::cout << "margin.getJacobian()\t" << soft_inequality[0].getJacobian().transpose() << std::endl;
+    // std::cout << "workspace.getJacobian()\t" << soft_inequality[1].getJacobian().transpose() << std::endl;
+
     // std::cout << "hard_inequality\n" << hard_inequality[0].getJacobian() << std::endl;
     // std::cout << "margin.getState()\t" << soft_inequality[0].getState().transpose() << std::endl;
     // std::cout << "workspace.getState()\t" << soft_inequality[1].getState().transpose() << std::endl;
@@ -71,7 +82,7 @@ void mgnss::higher_level::SupportShapingV4::_update(){
 
 }
 
-void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
+void mgnss::higher_level::SupportShaping5::log(mwoibn::common::Logger& logger){
 
     logger.add("cost", _optimal_cost);
 
@@ -90,7 +101,7 @@ void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
 }
 
 
-void mgnss::higher_level::SupportShapingV4::_outputTransform(){
+void mgnss::higher_level::SupportShaping5::_outputTransform(){
 
   // std::cout << "_cost\t" << _optimal_cost << std::endl;
   mwoibn::Vector3 temp__;
