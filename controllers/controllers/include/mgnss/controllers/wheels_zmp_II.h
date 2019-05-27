@@ -34,7 +34,6 @@
 #include <mgnss/higher_level/state_machine.h>
 // #include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
 #include <mgnss/higher_level/qp/tasks/support_shaping_v5.h>
-// #include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v3.h>
