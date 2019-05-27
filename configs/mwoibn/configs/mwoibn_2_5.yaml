@@ -634,12 +634,12 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 50
+                                        STEERING: 30 #50
                                         BASE: [0.10, 0.10, 1, 2, 2, 3]
                                         CONTACT_POINTS: 4
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 5.0 # 100
-                                        CASTER: 10.0 # 14
+                                        CAMBER: 0.7 # 5
+                                        CASTER: 1.5 # 10
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0
@@ -793,4 +793,4 @@ mwoibn:
                         # plugins: [odometry2::odometry, gravity_compensation]
                         #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
