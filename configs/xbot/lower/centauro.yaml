@@ -61,7 +61,7 @@ x_bot_ecat:
 
 ec_board_ctrl:
   eth_iface: rteth0
-  sync_cycle_time_ns: 2500000
+  sync_cycle_time_ns: 2000000
   sync_cycle_offset_ns: 1000000000
   power_off_boards: false
   use_pipes: false

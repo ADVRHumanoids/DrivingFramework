@@ -53,6 +53,9 @@ void mgnss::controllers::WheelsController::compute()
 
         _robot.command.position.set(_command, _select_ik);
         // std::cout << "after position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
+//
+//        std::cout << "command position\t" << _robot.command.position.get().transpose() << std::endl;
+//        std::cout << "state position\t" << _robot.state.position.get().transpose() << std::endl;
 
 
 }

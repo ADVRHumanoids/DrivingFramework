@@ -73,7 +73,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        std::cerr << "inf\t" << infs << std::endl;
+        //std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -91,7 +91,7 @@ virtual void run(){
 
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
     _qr_task.task(0).transform(); //?
-    std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
+    //std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
     _support_world.noalias()  =  _state_machine.stateJacobian()*_qr_task.task(0).get();
     _support_world +=  _state_machine.stateOffset();
     //
@@ -144,8 +144,8 @@ virtual void run(){
     }
     // _contact_point.setVelocity(_modified_support);
 
-    std::cout << "_support world\t" << _support_world.transpose() << std::endl;
-    std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
+    //std::cout << "_support world\t" << _support_world.transpose() << std::endl;
+    //std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
       _caster.update();
 

@@ -97,7 +97,7 @@ mwoibn:
                 joint:
                         list: [position_controller, velocity_controller]
                 direct:
-                        list: [position_controller, torque_controller, velocity_controller]                        
+                        list: [position_controller, velocity_controller]                        
                 position_reference:
                         list: [whole_body]
                 torque_reference:
@@ -656,12 +656,12 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 90
-                                        BASE: [70, 70, 60, 60, 60, 120]
-                                        CONTACT_POINTS: 35
+                                        STEERING: 20
+                                        BASE: [0.5, 0.5, 0.5, 3, 3, 3]
+                                        CONTACT_POINTS: 4
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 20 # 100
-                                        CASTER: 30 # 14
+                                        CAMBER: 0.7 # 100
+                                        CASTER: 1.5 # 14
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0
@@ -796,7 +796,7 @@ mwoibn:
                 shared:
                         layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
