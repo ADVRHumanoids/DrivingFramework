@@ -94,7 +94,8 @@ void mgnss::plugins::XbotShared::on_start(double time)
 {
         _start = time;
 
-        for(auto& robot: _robot_ptr)  _valid = robot.second->get() && _valid;
+        for(auto& robot: _robot_ptr)  //_valid = robot.second->get() && _valid;
+        _valid = robot.second->get() &&  robot.second->feedbacks.reset() && _valid;
 
 
         _rate = true;

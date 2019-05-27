@@ -137,6 +137,7 @@ bool mwoibn::communication_modules::XBotOperationalEuler::reset(){
         
 
         _initialized = true;
+        run();
 
 
         return _initialized;
