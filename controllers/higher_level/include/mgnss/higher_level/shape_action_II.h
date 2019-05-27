@@ -1,6 +1,5 @@
-
-#ifndef __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_II_H
-#define __MWOIBN_HIERARCHICAL_CONTROL_SHAPE_ACTIONS_II_H
+#ifndef __MWOIBN__HIERARCHICAL_CONTROL__SHAPE_ACTIONS_II__H
+#define __MWOIBN__HIERARCHICAL_CONTROL__SHAPE_ACTIONS_II__H
 
 #include "mwoibn/hierarchical_control/actions/primary.h"
 #include "mwoibn/hierarchical_control/tasks/controller_task.h"
@@ -21,11 +20,11 @@ namespace actions {
 
 class ShapeActionII : public Primary {
 public:
-ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
+ShapeActionII(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
             std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
-             mgnss::higher_level::StateMachine& state_machine,
+             mgnss::higher_level::StateMachineIII& state_machine,
             hierarchical_control::State& state, mwoibn::Vector3& next_step, double dt, mwoibn::robot_class::Robot& robot) :
             Primary(task, state.memory), _qr_task(task), _contact_point(contact_point), _steering(steering),
             _steering_reference(steering_reference), _aggravated(aggravated), _angles(angles), _caster(caster), _camber(camber),
@@ -34,7 +33,7 @@ ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_contro
                _desired_steer.setZero(4);
                _current_steer.setZero(4);
                _modified_support.setZero(12);
-               _support_world.setZero(8);
+               _support_world.setZero(12);
                _support.setZero(12);
                _eigen_scalar.setZero(1);
                _state.setZero(_robot.getDofs());
@@ -92,8 +91,8 @@ virtual void run(){
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
     _qr_task.task(0).transform(); //?
     // std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
-    _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get();
-    _support_world +=  _state_machine.cost_I.offset.get();
+    _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get().head<12>();
+    _support_world +=  _state_machine.cost_I.offset.get().head<12>();
     //
     // for(int i =0; i < 4; i++){
     //   test__ = mwoibn::Vector3::Zero();
@@ -122,8 +121,8 @@ virtual void run(){
       for(int i =0; i < 4; i++){
 
         support_i.setZero();
-        support_i[0] = _support_world[2*i];
-        support_i[1] = _support_world[2*i+1];
+        support_i[0] = _support_world[3*i];
+        support_i[1] = _support_world[3*i+1];
 
         // support_i.head<2>() = _support_world.segment<2>(2*i);
 
@@ -131,9 +130,9 @@ virtual void run(){
         test__[1] = 0;
         support_i = _state_machine.steeringFrames()[i]->rotation*test__;
         _modified_support.segment<3>(3*i) = _contact_point.getCurrentWorld(i);
-        _modified_support.segment<2>(2*i) += _support_world.segment<2>(2*i)*_robot.rate();
+        _modified_support.segment<2>(2*i) += _support_world.segment<2>(3*i)*_robot.rate();
 
-        if(_support_world.segment<2>(2*i).norm() > 0.01){
+        if(_support_world.segment<2>(3*i).norm() > 0.01){
 
         // std::cout << "get before\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
           vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
@@ -191,7 +190,7 @@ protected:
   mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
   mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;
   // mgnss::higher_level::QrTask& _unconstrainted;
-  mgnss::higher_level::StateMachine& _state_machine;
+  mgnss::higher_level::StateMachineIII& _state_machine;
   mwoibn::VectorN _state;
   mwoibn::VectorN _weight;
   mwoibn::VectorN _desired_steer, _modified_support, _support_world, _support, _current_steer;

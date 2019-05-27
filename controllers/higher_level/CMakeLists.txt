@@ -69,6 +69,7 @@ add_library(steering
 
     src/qp/tasks/support_shaping_v4_0.cpp
     src/qp/tasks/support_shaping_v5.cpp
+    src/qp/tasks/support_shaping_v6.cpp
     #src/qp/tasks/qr_tracking.cpp
     src/qp/tasks/qr_task.cpp
     src/qp/tasks/qr_joint_space_v2.cpp
@@ -76,7 +77,7 @@ add_library(steering
     src/qp/tasks/qp_aggravated.cpp
     src/state_machine.cpp
     src/state_machine_II.cpp
-
+    src/state_machine_III.cpp
   )
   add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})
 

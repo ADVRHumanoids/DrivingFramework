@@ -58,6 +58,7 @@ add_library(mgnss_controllers_wheels
 #   src/wheels_reactif.cpp
    src/wheels_zmp.cpp
    src/wheels_zmp_II.cpp
+   src/wheels_zmp_III.cpp
  )
 
 add_dependencies(mgnss_controllers_wheels ${catkin_EXPORTED_TARGETS})
