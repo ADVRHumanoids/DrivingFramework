@@ -80,7 +80,13 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _filter_torque_ptr->reset(_robot.state.torque.get());
 
   for(auto& contact: _robot.contacts()){
-      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame));
+      _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame, "ZERO"));
+
+      std::string name = _robot.getBodyName(contact->wrench().getBodyId());
+
+      _wheel_frames.add(mwoibn::point_handling::FramePlus( name, _robot.getModel(), _robot.state));
+      _wheel_centers.add(mwoibn::point_handling::AngularVelocity( _wheel_frames.end(0) ));// ??
+
     }
 
 //   for(int i = 0; i < 3; i++){
@@ -89,8 +95,10 @@ void mgnss::state_estimation::GroundForces::_allocate(){
 //   }
 
    for(int contact = 0; contact < _robot.contacts().size(); contact++){
-       for(int i = 0; i < 3; i++)
+       for(int i = 0; i < 3; i++){
            _log_names.push_back(_name + std::string("__RF_")+std::to_string(contact) + "_" + char('x'+i));
+           _log_names.push_back(_name + std::string("__ddot_cp_")+std::to_string(contact) + "_" + char('x'+i));
+        }
    }
 
   // for(int i =6; i< _robot.getDofs(); i++)
@@ -122,54 +130,41 @@ void mgnss::state_estimation::GroundForces::update()
       _gravity.update();
       _contacts_jacobian = _robot.contacts().getWorldJacobian();
       _contacts_transposed = _contacts_jacobian.transpose();
-      //_inertia_inverse->compute(_gravity.getInertia());
 
       _contacts_inversed.noalias() = _contacts_jacobian*_gravity.getInertiaInverse();
       _contacts_temp.noalias() = _contacts_inversed*_contacts_transposed;
       _contacts_inverse->compute(_contacts_temp);
 
-      _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get();
+      _force_1 = _gravity.getNonlinearEffects() - _robot.state.torque.get(); // with  zero interface for accelerations it wont - the RBDL model is not updated anyway?
       _force_2.noalias() = _contacts_inversed*_force_1;
-      _force_3 = _force_2  - _accelerations.getWorld(); // ???
+      _force_2 -= _accelerations.getWorld();
 
-      _world_contacts.noalias() = _contacts_inverse->get()*_force_3;
+      for(int i = 0; i < _robot.contacts().size(); i++){
+          _temp_vector = _wheel_frames[i].rotation().getWorld()*_robot.contacts()[i].getFrame().getLinearFixed();
+          _force_3.segment<3>(3*i) = _wheel_centers[i].getWorld().head<3>().cross(_temp_vector); // Add assummed acceleration
+      }
+
+      _force_2 += _force_3;
+      _world_contacts.noalias() = _contacts_inverse->get()*_force_2;
 
       for(int i = 0; i < _robot.contacts().size(); i++){
             _set_force = _world_contacts.segment<3>(3*i);
             _robot.contacts()[i].wrench().force.setWorld(_set_force);
             _robot.contacts()[i].wrench().synch();
-            // std::cout << "i\t" << _robot.contacts()[i].wrench().force.getFixed().transpose() << std::endl;
       }
 
       _state_no_torque.noalias() = _contacts_transposed*_robot.contacts().getReactionForce();
-      // std::cout << "RF\t" << _state_no_torque.transpose() << std::endl;
 
       _state_no_torque -= _gravity.getNonlinearEffects();
-
-      // std::cout << "nonlinear\t" << _gravity.getNonlinearEffects().transpose() << std::endl;
 
       _state = _state_no_torque + _robot.state.torque.get();
       _robot.state["OVERALL_FORCE"].set(_state); // ACTING FORCE?
       _robot.state["BIAS_FORCE"].set(_state_no_torque);
-      // std::cout << __PRETTY_FUNCTION__ << std::string(":\t") << _robot.state["BIAS_FORCE"].get().transpose() << std::endl;
-      // std::cout << _robot.state.torque.get().transpose() << std::endl;
-      // std::cout << "_world_contacts\t" << _world_contacts.transpose() << std::endl;
 
-      _state_2.noalias() = _gravity.getInertiaInverse()*_state;
-      _robot.state.acceleration.set(_state_2);
+      // ACCELERATION ESTIMATION
+      //_state_2.noalias() = _gravity.getInertiaInverse()*_state;
+      //_robot.state.acceleration.set(_state_2);
 
-      // _state = _state_no_torque + _robot.lower_limits.torque.get();
-      // _state_2.noalias() = _gravity.getInertiaInverse()*_state;
-      // _robot.lower_limits["ACCELERATION"].set(_state_2); // should it be send as state?
-      //
-      // _state = _state_no_torque + _robot.upper_limits.torque.get();
-      // _state_2.noalias() = _gravity.getInertiaInverse()*_state;
-      // _robot.upper_limits["ACCELERATION"].set(_state_2);
-      // _points_force.update(true);
-      //
-      // _linear_force.update(true);
-      // TEST
-      // compute current contact point with respect to the CoM force and torques out of that and see if there is a difference
 
 }
 
@@ -188,9 +183,8 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
 
         for(int contact = 0; contact < _robot.contacts().size(); contact++){
             for(int i = 0; i < 3; i++){
-              logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]);
-//              logger.add(_log_names[id+1], _points_force[contact].get()[i]);
-              id += 1;
+              logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]); ++id;
+              logger.add(_log_names[id], _force_3[3*contact+i]); ++id;
             }
         }
 

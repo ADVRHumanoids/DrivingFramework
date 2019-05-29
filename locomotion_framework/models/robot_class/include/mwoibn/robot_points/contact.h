@@ -155,6 +155,9 @@ point_handling::Wrench& wrench() {return _wrench;}
 const mwoibn::Vector3& getGroundNormal() const {return _ground_normal;}
 void setGroundNormal(const mwoibn::Vector3& ground_normal){_ground_normal = ground_normal;}
 
+//const mwoibn::Matrix3& getRotationFrame(){return _frame.getRotationWorld();}
+point_handling::Frame& getFrame(){return _frame;}
+
 protected:
 
 virtual void _resize(){
