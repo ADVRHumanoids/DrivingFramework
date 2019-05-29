@@ -9,6 +9,20 @@
 
 namespace mwoibn
 {
+  namespace common{
+    class Flag {
+    public:
+      Flag(): _is(true){}
+
+      Flag(bool is): _is(is){}
+
+      bool get(){return _is;}
+      void set(bool is){_is = is;}
+
+    protected:
+      bool _is;
+    };
+  }
 
 namespace robot_class
 {

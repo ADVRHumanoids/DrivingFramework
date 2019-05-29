@@ -37,7 +37,7 @@ public:
       return _rate_ptr->expectedCycleTime().toSec();
     }
 
-  virtual void wait(bool spin = true) {_rate_ptr->sleep(); }
+  virtual void wait(bool spin = true) {_rate_ptr->sleep(); kinematics_update.set(true);}
   virtual bool isRunning() { return _robot->isRunning(); }
 protected:
   virtual void _loadFeedbacks(YAML::Node config);

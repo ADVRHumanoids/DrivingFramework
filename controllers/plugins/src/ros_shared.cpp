@@ -123,11 +123,12 @@ void mgnss::plugins::RosShared::control_loop(double time)
         if (!_valid)
                 return;
 
-  for(auto& robot: _robot_ptr)
-        robot.second->updateKinematics();
 
   if (!_initialized)
   {
+          for(auto& robot: _robot_ptr)
+              robot.second->updateKinematics();
+
           if(_valid){
 
               for(auto& controller: _controller_ptrs) {controller->init();
@@ -140,17 +141,39 @@ void mgnss::plugins::RosShared::control_loop(double time)
           if(_rate && _valid)  _initialized = true;
   }
 
+  // std::cout << "CONTROLER LOOP" << std::endl;
+
   for(auto& controller: _controller_ptrs){
-    for(auto& robot: _robot_ptr)
-        robot.second->get(); // this will cause unecessary update on external feedbacks (think how to separate both), but it should not be expensive
+    // std::cout << "controller\t" << controller->name() << std::endl;
+
+    if(controller->kinematics.get()){
+        controller->model().get();
+        // if (controller->model().kinematics_update.get()) std::cout << "updateKinematics" << std::endl;
+        controller->model().updateKinematics();
+    }
+    // for(auto& robot: _robot_ptr)
+    //     robot.second->get(); // this will cause unecessary update on external feedbacks (think how to separate both), but it should not be expensive only if not updated?
 
         controller->update();
         controller->send();
+        if(controller->modify.get()) controller->model().kinematics_update.set(true);
+        // if (controller->model().kinematics_update.get()) std::cout << "modify" << std::endl;
+
         controller->log(*_logger_ptr.get(), time-_start);
   }
   _logger_ptr->write();
 
+
   _robot_ptr.begin()->second->wait();
+
+  // std::cout << "reset kinematics" << std::endl;
+  for(auto& robot: _robot_ptr)
+    robot.second->kinematics_update.set(false);
+
+  for(auto& controller: _controller_ptrs){
+    if(controller->kinematics.get()) controller->model().kinematics_update.set(true);
+
+  }
 
 }
 

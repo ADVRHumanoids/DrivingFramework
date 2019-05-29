@@ -23,7 +23,7 @@ public:
   RobotXBotFeedback(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotXBotFeedback() {}
-  virtual void wait(bool spin = true){ _sense = spin;}
+  virtual void wait(bool spin = true){ _sense = spin; kinematics_update.set(true);}
 
 //  virtual void update()
 //  {

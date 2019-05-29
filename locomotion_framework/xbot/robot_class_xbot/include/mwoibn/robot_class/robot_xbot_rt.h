@@ -45,7 +45,7 @@ public:
 
 
 //  virtual void wait(bool spin = true){}
-  virtual void wait(bool spin = true){ _sense = spin;}
+  virtual void wait(bool spin = true){ _sense = spin; kinematics_update.set(true);}
 
 
 protected:

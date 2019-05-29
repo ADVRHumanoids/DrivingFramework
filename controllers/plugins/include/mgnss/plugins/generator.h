@@ -139,10 +139,18 @@ std::string readConfig(std::string config_file, YAML::Node& config, YAML::Node& 
 
 virtual void initModule(YAML::Node config, YAML::Node plugin_config){
   config = mwoibn::robot_class::Robot::readFullConfig(config, plugin_config["robot"].as<std::string>());
-  config = config["modules"][name];
+  config = config["modules"][name]; // here I should have the information about the module - I can add the modify, kinematic and dynamics info?
   config["name"] = name;
+
   _resetPrt(config);
   _initCallbacks(config);
+
+  // std::cout << __PRETTY_FUNCTION__ << std::endl;
+  // for(auto entry: config) std::cout << entry.first << std::endl;
+
+  controller_ptr->kinematics.set(config["kinematics"].as<bool>());
+  controller_ptr->dynamics.set(config["dynamics"].as<bool>());
+  controller_ptr->modify.set(config["model_change"].as<bool>());
 
   for(auto& robot: _robot_ptr){
     robot.second->get();
@@ -155,9 +163,17 @@ virtual void initModule(YAML::Node config, YAML::Node plugin_config, mwoibn::com
   config = config["modules"][name];
   config["name"] = name;
 
+
+    // std::cout << __PRETTY_FUNCTION__ << std::endl;
+    // for(auto entry: config) std::cout << entry.first << std::endl;
+
   _resetPrt(config);
   _initCallbacks(config);
   _initCallbacks(config, share);
+
+  controller_ptr->kinematics.set(config["kinematics"].as<bool>());
+  controller_ptr->dynamics.set(config["dynamics"].as<bool>());
+  controller_ptr->modify.set(config["model_change"].as<bool>());
 
   for(auto& robot: _robot_ptr){
     robot.second->get();
@@ -206,6 +222,15 @@ virtual std::string _checkConfig(YAML::Node plugin_config, std::string config_fi
         if (!plugin_config["controller"])
                 throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
                                             std::string("\n\t Please specify controllers to be loaded ."));
+        if (!plugin_config["kinematics"])
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify the kinematics update."));
+        if (!plugin_config["dynamics"])
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify the dynamics update."));
+        if (!plugin_config["model_change"])
+                throw std::invalid_argument(__PRETTY_FUNCTION__ + std::string(": ") +  config_file +
+                                            std::string("\n\t Please specify if the robot model changes."));
 
 
         std::string secondary_file = "";

@@ -98,11 +98,12 @@ void updateKinematics()
 //    RigidBodyDynamics::UpdateKinematicsCustom(
 //        _model, &state.state("POSITION"),
 //        &state.state("VELOCITY"), nullptr);
-
+        if(!kinematics_update.get()) return;
         RigidBodyDynamics::UpdateKinematics(
                 _model, state.position.get(), state.velocity.get(), _zeroVec);
-
+        kinematics_update.set(false);
 }
+
 virtual bool isRunning() {
         return true;
 }
@@ -113,6 +114,7 @@ virtual bool send(){
         return controllers.run();
 }
 virtual void wait(bool spin = true){
+  kinematics_update.set(true);
 }
 ///@}
 ///
@@ -267,6 +269,8 @@ virtual void loadControllers(YAML::Node full_config, std::string config_name,
 
 
 std::string name(){return _name;}
+
+common::Flag  kinematics_update;
 
 protected:
 //! Alternative robot class initializer,
