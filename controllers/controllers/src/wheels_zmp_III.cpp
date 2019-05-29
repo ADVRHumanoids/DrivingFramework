@@ -161,9 +161,12 @@ void mgnss::controllers::WheelsZMPIII::_setInitialConditions(){
         // _tasks["BASE"]->update();
         // _tasks["CAMBER"]->update();
         // mwoibn::VectorN init_steer(4);
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < 4; i++){
           _temp_4[i] = _leg_tasks["STEERING"].second[i].getCurrent();
+          _leg_tasks["CAMBER"].second[i].setReference(0);
+          }
         // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
+
 
         _steering_ref_ptr->set(_temp_4);
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
