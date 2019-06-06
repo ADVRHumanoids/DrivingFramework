@@ -6,7 +6,7 @@ project(robot_point_handling)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 option(MAKE_TEST_LOG "If on running test will generate new resources files, DO NOT OVERWIRTE THEM WITHOUT CLEAR AND JUSTIFIED REASON" OFF)
 if(MAKE_TEST_LOG)

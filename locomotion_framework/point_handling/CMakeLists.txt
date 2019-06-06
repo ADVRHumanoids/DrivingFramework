@@ -4,7 +4,8 @@ project(point_handling)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+## set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 14)
 
 option(MAKE_TEST_LOG "If on running test will generate new resources files, DO NOT OVERWIRTE THEM WITHOUT CLEAR AND JUSTIFIED REASON" ON)
 option(LOGGER ON)
@@ -63,7 +64,7 @@ catkin_package(
    ${catkin_LIBRARIES}
  )
 
- 
+
 
 
 #############

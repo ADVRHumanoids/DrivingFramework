@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(collision_model_ros_extension)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 option(VISUALIZATION_MODULE OFF)
 ## Find catkin macros and libraries

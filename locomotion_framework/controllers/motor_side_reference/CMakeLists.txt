@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(motor_side_reference)
 
 add_definitions(-std=c++11)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
