@@ -24,7 +24,7 @@ Constraints(mwoibn::robot_class::Robot& robot)
         : BasicTask(), _robot(robot)
 {
         _init(robot.contacts().jacobianRows(), robot.getDofs());
-        _selector = mwoibn::VectorBool::Constant(robot.contacts().size(), true); // on init assume all constacts should be considered in a task
+        _selector.assign(robot.contacts().size(), true); // on init assume all constacts should be considered in a task
 
         update();
 }
@@ -53,7 +53,8 @@ protected:
 //!pointer to the point handler mamber for point controlled by this task instance
 mwoibn::robot_class::Robot& _robot;
 //! keeps an information which contacts should be off by higher level scheme
-mwoibn::VectorBool _selector;
+// mwoibn::VectorBool _selector;
+std::vector<bool> _selector;
 std::vector<int> dof_selector;
 
 };

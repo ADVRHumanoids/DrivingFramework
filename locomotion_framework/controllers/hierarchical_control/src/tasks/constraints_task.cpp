@@ -6,7 +6,16 @@ void mwoibn::hierarchical_control::tasks::Constraints::updateJacobian()
 {
 
   _last_jacobian.noalias() = _jacobian;
-  _jacobian.noalias() = _robot.contacts().getJacobian();
+  _jacobian.setZero();
+
+  int i = 0;
+  for(auto&& [contact, is]:  ranges::view::zip(_robot.contacts(), _selector )){
+    if(is) _jacobian.middleRows(i, contact->jacobianSize()) = contact->getJacobian();
+    i += contact->jacobianSize();
+  }
+
+
+
   //
   // int row = 0;
   // int size;
