@@ -13,6 +13,7 @@ namespace dynamic_points
       double scl2 = alf.transpose()*_torus._ground_normal;
       double ksi = 1/std::sqrt(1 - scl2 );
 
+
       mwoibn::Vector3 w_wheel = _torus._v_centre.angular().getWorld();
 
       mwoibn::Matrix3 s_alf, eta, s_wheel, s_y;
@@ -80,22 +81,24 @@ namespace dynamic_points
       _constant = _independend;
       _constant.noalias() += _dependend*w_wheel;
 
-      mat_2 = eta+s_alf;
-      mat_3.noalias() = zeta*mat_2;
-      mat_3 -= s_n;
-      mat_3 -= eta;
-      mwoibn::Matrix3 j_test__;
-      j_test__.noalias() = mat_3*ksi*_torus._R;
-      j_test__ -= s_n*_torus._r;
 
-      vec_1.noalias() = _torus._v_centre.angular().getJacobian()*_state.acceleration.get();
-      est_.noalias() = j_test__*vec_1;
-      est_ += _constant;
-      est_ = est_*_robot.rate(); // I need robot rate here
-      est_ += last_;
-      // est_ = last_ + (_constant + j_test__*_torus._v_centre.angular().getJacobian()*_state.acceleration.get())*0.005;
+      _jacobian = _torus.getJacobian();
+      // mat_2 = eta+s_alf;
+      // mat_3.noalias() = zeta*mat_2;
+      // mat_3 -= s_n;
+      // mat_3 -= eta;
+      // mwoibn::Matrix3 j_test__;
+      // j_test__.noalias() = mat_3*ksi*_torus._R;
+      // j_test__ -= s_n*_torus._r;
 
-      last_.noalias() = _torus.getJacobian()*_state.velocity.get();
+      // vec_1.noalias() = _torus._v_centre.angular().getJacobian()*_state.acceleration.get();
+      // est_.noalias() = j_test__*vec_1;
+      // est_ += _constant;
+      // est_ = est_*_robot.rate(); // I need robot rate here
+      // est_ += last_;
+      // // est_ = last_ + (_constant + j_test__*_torus._v_centre.angular().getJacobian()*_state.acceleration.get())*0.005;
+      //
+      // last_.noalias() = _torus.getJacobian()*_state.velocity.get();
 
   }
 
