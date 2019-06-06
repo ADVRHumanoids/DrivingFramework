@@ -204,6 +204,7 @@ void mgnss::state_estimation::OdometryV3::update()
         _robot.state.position.set(_base, _base_map);
 
 
+        //std::cout << _base[5].transpose() << std::endl;
         _velocity_ptr->update();
 //        //here I should estimate velocity
         _raw = _velocity_ptr->get();
@@ -597,8 +598,6 @@ void mgnss::state_estimation::Twist::update()
         _measure();
         // std::cout << "_selector " << _selector.transpose() << std::endl;
 
-        // std::cout << "_twists " << _twists.transpose() << std::endl;
-        // std::cout << "_sum_twists " << _sum_twists.transpose() << std::endl;
         _compute();
 
 }

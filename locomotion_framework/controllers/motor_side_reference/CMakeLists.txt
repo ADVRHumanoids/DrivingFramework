@@ -26,7 +26,7 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 catkin_package(
   INCLUDE_DIRS
 	include
-    ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include    
+    ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
   LIBRARIES
 	motor_side_reference
   CATKIN_DEPENDS
@@ -44,7 +44,7 @@ include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include  
+  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 )
 
 ## Declare a C++ library

@@ -109,9 +109,12 @@ void mgnss::higher_level::QrTask::solve(){
      // std::cout << "QP _cost.quadratic\n" << _cost.quadratic << std::endl;
      // std::cout << "QP _cost.linear\n" << _cost.linear.transpose() << std::endl;
      // std::cout << "QP soft_inequality.state\t" << soft_inequality.getState().transpose() << std::endl;
-     // std::cout << "QP soft_inequality.jacobian\t" << soft_inequality.getJacobian().transpose() << std::endl;
-
+     // std::cout << "QP soft_inequality.jacobian\n" << soft_inequality.getJacobian() << std::endl;
      // std::cout << "QP hard_inequality.state\t" << hard_inequality.getState().transpose() << std::endl;
+     // std::cout << "QP hard_inequality.jacobian\n" << hard_inequality.getJacobian() << std::endl;
+     // std::cout << "QP equality.state\t" << equality.getState().transpose() << std::endl;
+     // std::cout << "QP equality.jacobian\n" << equality.getJacobian() << std::endl;
+          // std::cout << "QP hard_inequality.state\t" << hard_inequality.getState().transpose() << std::endl;
      // std::cout << "inequality.state\t" << _inequality.getState().transpose() << std::endl;
      // std::cout << "inequality.jacobian\t" << _inequality.jacobian << std::endl;
      // std::cout << "inequality.jacobian\t" << _inequality.jacobian << std::endl;

@@ -24,8 +24,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 catkin_package(
-  INCLUDE_DIRS 
-        include 
+  INCLUDE_DIRS
+        include
         ${catkin_INCLUDE_DIRS}
         ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
@@ -46,6 +46,7 @@ add_library(mgnss_state_estimation
    #src/odometry.cpp
    src/odometry_v2.cpp
    src/odometry_v3.cpp
+   src/odometry_v4.cpp
 
    src/ground_forces.cpp
    src/acceleration_test.cpp

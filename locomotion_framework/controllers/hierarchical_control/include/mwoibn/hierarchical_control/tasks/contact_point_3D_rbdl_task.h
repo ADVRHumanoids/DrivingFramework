@@ -119,7 +119,7 @@ protected:
       //_jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
 
       _jacobian.row(i) = _temp_jacobian.row(0);
-      _jacobian.row(i) -= (_rot*_base_ang_vel.getJacobian()).row(0);
+      _jacobian.row(i) -= (_rot*_base_ang_vel.getJacobian()).row(0); // here I have only a 1D task
       //_jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
       // if (_selector[i])
         // _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();

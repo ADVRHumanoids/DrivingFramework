@@ -230,6 +230,12 @@ LIST( APPEND INSTALL_TARGETS
       ${XCM_LIBRARIES}
     )
 
+
+      if ( Xenomai_FOUND )
+        message(WARNING "set_xeno_flags")
+        set_xeno_flags(odometry)
+      endif()
+
     LIST( APPEND INSTALL_TARGETS odometry2 )
 
     add_library(odometry2 SHARED
@@ -243,8 +249,26 @@ LIST( APPEND INSTALL_TARGETS
 
   if ( Xenomai_FOUND )
     message(WARNING "set_xeno_flags")
-    set_xeno_flags(odometry)
+    set_xeno_flags(odometry2)
   endif()
+
+
+      LIST( APPEND INSTALL_TARGETS odometry3 )
+
+      add_library(odometry3 SHARED
+         src/plugins/odometry_4.cpp
+       )
+      add_dependencies(odometry3 ${catkin_EXPORTED_TARGETS})
+      target_link_libraries(odometry3
+         ${catkin_LIBRARIES}
+         ${XCM_LIBRARIES}
+       )
+
+    if ( Xenomai_FOUND )
+      message(WARNING "set_xeno_flags")
+      set_xeno_flags(odometry3)
+    endif()
+
 
 #    LIST( APPEND INSTALL_TARGETS NwheelsWorld )
 #

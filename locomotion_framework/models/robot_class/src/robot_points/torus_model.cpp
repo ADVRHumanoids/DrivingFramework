@@ -46,7 +46,6 @@
     // std::cout << "centre" << _centre.position.getWorld() << std::endl;
         _axis_world = _centre.rotation().getWorld() * _axis;
        _point = _centre.position.getWorld() + _positionOffset();
-    // std::cout << "torus_model" << _point << std::endl;
   }
 
   void mwoibn::robot_points::TorusModel::computeJacobian() {

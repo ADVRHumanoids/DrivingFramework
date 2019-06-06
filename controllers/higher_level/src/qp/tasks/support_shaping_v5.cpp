@@ -66,15 +66,13 @@ void mgnss::higher_level::SupportShaping5::_update(){
     soft_inequality[0].setJacobian().block<4,2>(0,2*_size) = _margin.getJacobian().middleCols<2>(3*_size);
 
     QrTask::_update();
-    std::cout << "soft_inequality 0\n" << soft_inequality[0].getJacobian() << std::endl;
-    std::cout << "soft_inequality 1\n" << soft_inequality[1].getJacobian() << std::endl;
-    std::cout << "workspace\n" << _workspace.getJacobian() << std::endl;
-
+    // std::cout << "soft_inequality 0\n" << soft_inequality[0].getJacobian() << std::endl;
+    // std::cout << "soft_inequality 1\n" << soft_inequality[1].getJacobian() << std::endl;
+    //
     // std::cout << "cost quadratic\n" << _cost.quadratic << std::endl;
     // std::cout << "cost linear\n" << _cost.linear<< std::endl;
     // std::cout << "margin.getJacobian()\t" << soft_inequality[0].getJacobian().transpose() << std::endl;
     // std::cout << "workspace.getJacobian()\t" << soft_inequality[1].getJacobian().transpose() << std::endl;
-
     // std::cout << "hard_inequality\n" << hard_inequality[0].getJacobian() << std::endl;
     // std::cout << "margin.getState()\t" << soft_inequality[0].getState().transpose() << std::endl;
     // std::cout << "workspace.getState()\t" << soft_inequality[1].getState().transpose() << std::endl;
