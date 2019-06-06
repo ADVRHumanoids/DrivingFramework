@@ -95,10 +95,10 @@ void mgnss::state_estimation::GroundForces::_allocate(){
 //   }
 
    for(int contact = 0; contact < _robot.contacts().size(); contact++){
-       for(int i = 0; i < 3; i++){
+       for(int i = 0; i < 3; i++)//{
            _log_names.push_back(_name + std::string("__RF_")+std::to_string(contact) + "_" + char('x'+i));
-           _log_names.push_back(_name + std::string("__ddot_cp_")+std::to_string(contact) + "_" + char('x'+i));
-        }
+           // _log_names.push_back(_name + std::string("__ddot_cp_")+std::to_string(contact) + "_" + char('x'+i));
+        // }
    }
 
   // for(int i =6; i< _robot.getDofs(); i++)
@@ -182,10 +182,10 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
 //        }
 
         for(int contact = 0; contact < _robot.contacts().size(); contact++){
-            for(int i = 0; i < 3; i++){
+            for(int i = 0; i < 3; i++)//{
               logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]); ++id;
-              logger.add(_log_names[id], _force_3[3*contact+i]); ++id;
-            }
+              // logger.add(_log_names[id], _force_3[3*contact+i]); ++id;
+            // }
         }
 
         // for(int i =6; i< _robot.getDofs(); i++){

@@ -521,7 +521,9 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
         logger.add(_names[counter], getBaseReference()[i]); ++counter;
-        logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
+        // logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
+        logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
+
 
         for(int k = 0; k < 4; k++){
 

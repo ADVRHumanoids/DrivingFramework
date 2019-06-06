@@ -162,9 +162,9 @@ void log(  mwoibn::common::Logger& logger){
  for(int i =0 ; i < 4; i++){
    // logger.add("cp_des_"   + std::to_string(i) + "_x", _contact_point.getReferenceWorld(i)[0] );
    // logger.add("cp_des_"   + std::to_string(i) + "_y", _contact_point.getReferenceWorld(i)[1] );
-   // logger.add("cp_qr_"   + std::to_string(i) + "_x", _modified_support[3*i] );
-   // logger.add("cp_qr_"   + std::to_string(i) + "_y", _modified_support[3*i+1] );
-
+   logger.add("d cp_qr_"   + std::to_string(i) + "_x", _support_world[3*i] );
+   logger.add("d cp_qr_"   + std::to_string(i) + "_y", _support_world[3*i+1] );
+   logger.add("d cp_qr_"   + std::to_string(i) + "_z", _support_world[3*i+2] );
    // logger.add("cp_"   + std::to_string(i) + "_x", _contact_point.getCurrentWorld(i)[0] );
    // logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
