@@ -37,7 +37,7 @@ public:
   double forceFactor() {return 1-_force_factor;}
   double comFactor() {return _force_factor;}
   void tracking() { _tracking = true; }
-  void balance(){ _tracking = false; _error.setZero();}
+//  void balance(){ _tracking = false; _error.setZero();}
 
 protected:
   double _force_factor, _gain;
