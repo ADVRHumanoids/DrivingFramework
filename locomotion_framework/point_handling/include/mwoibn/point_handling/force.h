@@ -46,12 +46,14 @@ public:
 
   virtual ~Force() {}
 
+  virtual Force* clone_impl() const {return new Force(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false);
 
-  virtual Point::Current
-  getWorld(bool update = false) const;
+  // virtual Point::Current
+  // getWorld(bool update = false) const;
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const;
@@ -61,8 +63,8 @@ public:
                         bool update = false);
 
   /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const;
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

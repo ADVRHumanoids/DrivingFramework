@@ -19,7 +19,7 @@ public:
       : State(frame, 3, name), _acceleration_interface(acceleration_interface)
   {  }
 
-  LinearAcceleration(Point::Current current, point_handling::FramePlus& frame, mwoibn::Interface acceleration_interface = "ACCELERATION", std::string name = "")
+  LinearAcceleration(const Point::Current& current, point_handling::FramePlus& frame, mwoibn::Interface acceleration_interface = "ACCELERATION", std::string name = "")
       : State(current, frame, name), _acceleration_interface(acceleration_interface)
   { _size = 3; }
 
@@ -41,6 +41,8 @@ public:
 
   virtual ~LinearAcceleration() {}
 
+  virtual LinearAcceleration* clone_impl() const {return new LinearAcceleration(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
@@ -51,12 +53,12 @@ public:
       return _temp_world;
 
   }
-
-  virtual Point::Current
-  getWorld(bool update = false) const {
-    return CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
-                                         _state[_acceleration_interface].get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current_fixed;
-  }
+  //
+  // virtual Point::Current
+  // getWorld(bool update = false) const {
+  //   return CalcPointAcceleration(_model, _state.position.get(), _state.velocity.get(),
+  //                                        _state[_acceleration_interface].get(), _body_id, frame.position.getFixed()) + frame.rotation().getWorld()*_current_fixed;
+  // }
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const {
@@ -69,12 +71,12 @@ public:
                         bool update = false){
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
-
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  //
+  // /** @brief get Position in a user-defined reference frame */
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const {
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {

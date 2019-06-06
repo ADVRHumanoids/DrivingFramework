@@ -77,10 +77,10 @@ Frame::getPositionJacobian(bool update)
   return _velocity.linear().getJacobian();
 }
 
-mwoibn::Matrix
-Frame::getPositionJacobian(bool update) const{
-  return _velocity.linear().getJacobian();
-}
+// mwoibn::Matrix
+// Frame::getPositionJacobian(bool update) const{
+//   return _velocity.linear().getJacobian();
+// }
 
 /** @bried returnes full jacobian of a point **/
 const mwoibn::Matrix&
@@ -88,10 +88,10 @@ Frame::getOrientationJacobian(bool update)
 {
   return _velocity.angular().getJacobian();
 }
-
-mwoibn::Matrix Frame::getOrientationJacobian(bool update) const{
-  return _velocity.angular().getJacobian();
-}
+// 
+// mwoibn::Matrix Frame::getOrientationJacobian(bool update) const{
+//   return _velocity.angular().getJacobian();
+// }
 
 /** @bried returnes full jacobian of a point **/
 const mwoibn::Matrix&

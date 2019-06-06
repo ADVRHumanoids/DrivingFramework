@@ -20,7 +20,7 @@ public:
       : State(force.frame, 3, name), force(force)
   {  }
 
-  Torque(Point::Current current,
+  Torque(const Point::Current& current,
         point_handling::Force& force, std::string name = "")
       : State(current, force.frame, name), force(force)
   {
@@ -45,12 +45,14 @@ public:
 
   virtual ~Torque() {}
 
+  virtual Torque* clone_impl() const {return new Torque(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false);
 
-  virtual Point::Current
-  getWorld(bool update = false) const;
+  // virtual Point::Current
+  // getWorld(bool update = false) const;
 
   void getWorld(Point::Current& angular, bool update) const;
 
@@ -59,9 +61,9 @@ public:
   virtual void setWorld(const Point::Current& current,
                         bool update = false);
 
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const;
+  // /** @brief get Position in a user-defined reference frame */
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const;
 
   /** @brief get Position in a user-defined reference frame */
   virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

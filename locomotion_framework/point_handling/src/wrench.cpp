@@ -20,14 +20,14 @@ namespace point_handling
     force.getWorld(current,update);
   }
 
-  Point::Current
-  Wrench::getWorld(bool update) const{
-
-    Point::Current current(size());
-    _get(current, force.getWorld(update), torque.getWorld(false));
-
-    return current;
-  }
+  // Point::Current
+  // Wrench::getWorld(bool update) const{
+  //
+  //   Point::Current current(size());
+  //   _get(current, force.getWorld(update), torque.getWorld(false));
+  //
+  //   return current;
+  // }
 
   void Wrench::setFixed(const mwoibn::Vector6& current){
 
@@ -65,15 +65,15 @@ namespace point_handling
     synch();
   }
 
-  /** @brief get Position in a user-defined reference frame */
-  Point::Current
-  Wrench::getReference(unsigned int refernce_id, bool update) const{
-
-      Point::Current reference_(size());
-      _get(reference_, force.getReference(refernce_id, update), torque.getReference(refernce_id, false));
-
-      return reference_;
-  }
+  // /** @brief get Position in a user-defined reference frame */
+  // Point::Current
+  // Wrench::getReference(unsigned int refernce_id, bool update) const{
+  //
+  //     Point::Current reference_(size());
+  //     _get(reference_, force.getReference(refernce_id, update), torque.getReference(refernce_id, false));
+  //
+  //     return reference_;
+  // }
 
   void
   Wrench::getReference(Point::Current& current, unsigned int refernce_id, bool update) const{

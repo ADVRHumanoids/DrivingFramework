@@ -15,6 +15,13 @@ namespace point_handling
     return _temp_world;
   }
 
+  void
+  Rotation::getWorld(Rotation::R& rotation, bool update) const {
+    rotation = RigidBodyDynamics::CalcBodyWorldOrientation(
+                         _model, _state.position.get(), _body_id, update).transpose()*getFixed();
+  }
+
+
   Rotation::R Rotation::getWorld(bool update) const{
     return RigidBodyDynamics::CalcBodyWorldOrientation(
           _model, _state.position.get(), _body_id, update).transpose()*getFixed();
@@ -43,13 +50,13 @@ namespace point_handling
   //   return J_part;
   // }
 
-  Rotation::R
-  Rotation::getReference(unsigned int reference_id, bool update) const
-  {
-    return  RigidBodyDynamics::CalcBodyWorldOrientation(
-                _model, _state.position.get(), reference_id, update) *
-            getWorld();;
-  }
+  // Rotation::R
+  // Rotation::getReference(unsigned int reference_id, bool update) const
+  // {
+  //   return  RigidBodyDynamics::CalcBodyWorldOrientation(
+  //               _model, _state.position.get(), reference_id, update) *
+  //           getWorld();;
+  // }
 
   void Rotation::setWorld(const Rotation::R& rotation, bool update)
   {

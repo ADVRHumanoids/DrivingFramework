@@ -26,13 +26,13 @@ public:
   {
   }
 
-  Base(Type current, unsigned int body_id,
+  Base(const Type& current, unsigned int body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         unsigned int size, std::string name = "")
       : TempBase<Type>(body_id, model, state, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
-  Base(Type current, std::string body_name,
+  Base(const Type& current, std::string body_name,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         unsigned int size, std::string name = "")
       : TempBase<Type>(body_name, model, state, size, name), _current_fixed(current), _temp_world(current)
@@ -57,12 +57,12 @@ public:
   {  }
 
   template<typename Source>
-  Base(Type current,  Source&& other, int size, std::string name = "")
+  Base(Type& current,  Source&& other, int size, std::string name = "")
       : TempBase<Type>(other, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
   template<typename Source>
-  Base(Type current, const Source& other, int size, std::string name = "")
+  Base(Type& current, const Source& other, int size, std::string name = "")
       : TempBase<Type>(other, size, name), _current_fixed(current), _temp_world(current)
   {  }
 
@@ -82,20 +82,18 @@ public:
 
   /** @brief Remove - it is unsafe */
   virtual Type
-  getWorld(bool update = false) const = 0;
+  getWorld(bool update = false) const  { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Type& current,
                         bool update = false) = 0;
 
   /** @brief Remove - it is unsafe */
   virtual Type
-  getReference(unsigned int refernce_id, bool update = false) const = 0;
+  getReference(unsigned int refernce_id, bool update = false) const { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__); }
 
   /** @brief Remove - it is unsafe */
   Type
-  getReference(std::string reference_name, bool update = false) const{
-    return getReference(TempBase<Type>::_checkBody(reference_name), update);
-  }
+  getReference(std::string reference_name, bool update = false) const { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__); }
 
   virtual void setReference(const Type& current,
                             unsigned int reference_id,
@@ -107,6 +105,7 @@ public:
                             setReference(current, TempBase<Type>::_checkBody(reference_name), update);
                           }
 
+  // virtual Base* clone_impl() const {return new Base(*this);}
 
 protected:
   Type _current_fixed, _temp_world;

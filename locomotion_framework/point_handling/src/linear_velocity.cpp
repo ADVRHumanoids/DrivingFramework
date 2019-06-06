@@ -16,14 +16,14 @@ namespace point_handling
     }
 
 
-  mwoibn::Matrix LinearVelocity::getJacobian(bool update) const{
-    mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
-
-    CalcPointJacobian(_model, _state.position.get(), _body_id, frame.position.getFixed(), J,
-                      update);
-
-    return J;
-  }
+  // mwoibn::Matrix LinearVelocity::getJacobian(bool update) const{
+  //   mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
+  //
+  //   CalcPointJacobian(_model, _state.position.get(), _body_id, frame.position.getFixed(), J,
+  //                     update);
+  //
+  //   return J;
+  // }
 
   void LinearVelocity::getJacobian(mwoibn::Matrix& current, bool update) const{
     current.setZero();

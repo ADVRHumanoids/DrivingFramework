@@ -21,7 +21,7 @@ public:
   {
       _J_full.setZero(6, _state.velocity.size()); }
 
-  AngularVelocity(Point::Current current,
+  AngularVelocity(const Point::Current& current,
         point_handling::FramePlus& frame, std::string name = "")
       : Velocity(current, frame, name)
   {
@@ -52,10 +52,10 @@ public:
       return _temp_world;
   }
 
-  virtual Point::Current
-  getWorld(bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // virtual Point::Current
+  // getWorld(bool update = false) const {
+  //   throw mwoibn::std_utils::deprecated(__PRETTY_FUNCTION__);
+  // }
   /** @brief set new tracked point giving data in a world frame*/
   virtual void getWorld(Point::Current& current, bool update = false) const {
     current = CalcPointVelocity6D(_model, _state.position.get(), _state.velocity.get(), _body_id, frame.position.getFixed(), false).head<3>();
@@ -68,10 +68,10 @@ public:
   }
 
   /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const {
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
   virtual void getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
@@ -84,7 +84,7 @@ public:
   }
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false);
-  virtual mwoibn::Matrix getJacobian(bool update = false) const;
+  // virtual mwoibn::Matrix getJacobian(bool update = false) const;
   virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const;
 
 protected:

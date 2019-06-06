@@ -26,7 +26,7 @@ public:
   {   }
 
   template<typename Type>
-  Frame(Point::Current linear, Type body_id,
+  Frame(const Point::Current& linear, Type body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         Orientation::O quat = Orientation::O(),  std::string name = "")
       : TempBase(body_id, model, state, 7, name), _frame(body_id, model, state, name), _velocity(_frame, name)
@@ -46,6 +46,7 @@ public:
   {  }
 
   virtual ~Frame() {}
+  virtual Frame* clone_impl() const {return new Frame(*this);}
 
   /** @brief set new tracked point giving data in a point fixed frame*/
   void setLinearFixed(const Point::Current& pos)
@@ -70,7 +71,7 @@ public:
   getLinearWorld(mwoibn::Vector3& current, bool update = false) const {_frame.position.getWorld(current);}
 
   virtual Point::Current
-  getLinearWorld(bool update = false) const {return _frame.position.getWorld();}
+  getLinearWorld(bool update = false) const final { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
 
 
   /** @brief set new tracked point giving data in a world frame*/
@@ -87,9 +88,7 @@ public:
 
   /** @brief get Position in a user-defined reference frame */
   virtual Point::Current
-  getLinearReference(unsigned int refernce_id, bool update = false) const {
-    return _frame.position.getReference(refernce_id, update);
-  }
+  getLinearReference(unsigned int refernce_id, bool update = false) const final { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
 
   virtual void
   getLinearReference(Point::Current& current, unsigned int refernce_id, bool update = false){
@@ -173,7 +172,7 @@ public:
   void getOrientationWorld(Orientation::O& angular, bool update = false) const
   {
 
-    angular = _frame.orientation.getWorld(update);
+     _frame.orientation.getWorld(angular, update);
 
     return;
   }
@@ -244,9 +243,7 @@ public:
     return _frame.orientation.rotation().getWorld();
   }
 
-  Rotation::R getRotationWorld(bool update = false) const{
-    return _frame.orientation.rotation().getWorld();
-  }
+  Rotation::R getRotationWorld(bool update = false) const { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
 
   /** @brief set new tracked point giving data in a world frame
    */
@@ -279,7 +276,7 @@ public:
   const mwoibn::Matrix&
   getPositionJacobian(bool update = false);
   mwoibn::Matrix
-  getPositionJacobian(bool update = false) const;
+  getPositionJacobian(bool update = false) const{ throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
   /** returnes number of jacobian rows as returned by getPositionJacobian
    *
    * @see getPositionJacobian, getJacobianCols
@@ -296,7 +293,7 @@ public:
   const mwoibn::Matrix&
   getOrientationJacobian(bool update = false);
 
-  mwoibn::Matrix getOrientationJacobian(bool update = false) const;
+  mwoibn::Matrix getOrientationJacobian(bool update = false) const { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
   /** returnes number of jacobian rows as returned by getOrientationJacobian
    *
    * @see getOrientationJacobian, getOrientationJacobianCols

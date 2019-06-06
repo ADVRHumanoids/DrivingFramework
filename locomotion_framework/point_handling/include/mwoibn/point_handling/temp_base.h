@@ -65,6 +65,9 @@ public:
     return _state;
   }
 
+  auto clone() {return std::unique_ptr<TempBase>(clone_impl()); }
+  virtual TempBase* clone_impl() const {return new TempBase(*this);}
+
 
 protected:
   /** human-readable name of a point*/
