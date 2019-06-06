@@ -30,7 +30,7 @@ SimpleQRGravityCompensation(
                 dynamic_model.getRobot(), interface),
         _dynamic_model(dynamic_model)
 {
-        _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
+        _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -47,7 +47,7 @@ SimpleQRGravityCompensation(
         : mwoibn::basic_controllers::LowerLevelController(robot_real, interface),
         _dynamic_model(dynamic_model)
 {
-       _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
+       _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR);
         updateModel();
         _transform = _dynamic_model.getTransformationMatrix();
         _transformation_inverser.init(_transform, 1e-10);
@@ -55,7 +55,7 @@ SimpleQRGravityCompensation(
         compute();
 }
 virtual ~SimpleQRGravityCompensation() {
-  _dynamic_model.unsubscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::GRAVITY);
+  _dynamic_model.unsubscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR);
 
 }
 
@@ -87,7 +87,7 @@ virtual void compute()
         //std::cout << _transformation_inverser.get() << std::endl;
 
         _command.noalias() =
-                _transformation_inverser.get() * _dynamic_model.getGravity();
+                _transformation_inverser.get() * _dynamic_model.getNonlinearEffects();
 
         // std::cout << "command\t" << _command.size() << std::endl;
         // std::cout << "gravity\t" << _dynamic_model.getGravity().size() << std::endl;

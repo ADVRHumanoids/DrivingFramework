@@ -36,7 +36,7 @@ TEST( DISABLED_QRTest, testInitializationAndMethods){
   qr.update();
 
   // here comparison with preset values should be made
-  qr.getGravity();
+  // qr.getGravity();
   // here comparison with preset values should be made
   qr.getInertia();
   std::cerr << qr.getInertia() << std::endl;
