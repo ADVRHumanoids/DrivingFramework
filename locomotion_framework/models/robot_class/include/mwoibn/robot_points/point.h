@@ -44,7 +44,7 @@ public:
   int rows() {return _jacobian.rows();}
   int cols() {return _jacobian.cols();}
 
-  Point& operator=(const Point& other);
+  virtual Point& operator=(const Point& other);
 
   Point& operator+(const Point& other);
 

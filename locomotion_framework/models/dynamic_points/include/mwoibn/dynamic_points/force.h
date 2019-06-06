@@ -59,7 +59,7 @@ public:
 
   }
 
-  using Point::operator=;
+  using DynamicPoint::operator=;
 
     virtual void compute();
 

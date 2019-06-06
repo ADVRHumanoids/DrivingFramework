@@ -26,6 +26,19 @@ public:
 
   // virtual const mwoibn::Matrix& getJacobianDot() {return _dot_jacobian;}
   virtual const mwoibn::VectorN& getConstant() { return _constant;}
+  virtual DynamicPoint& operator=(const mwoibn::dynamic_points::DynamicPoint& other) {
+      if (this != &other){
+          _jacobian = other._jacobian;
+          _point = other._point;
+          _constant = other._constant;
+      }
+      return *this;
+  }
+
+
+  virtual void compute(){
+    _point = _jacobian*_state.acceleration.get() + _constant;
+  }
 
 protected:
   // mwoibn::Matrix _dot_jacobian;

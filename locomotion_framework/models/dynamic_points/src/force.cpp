@@ -22,7 +22,7 @@ namespace dynamic_points
 
     _jacobian_temp.noalias() = _contacts_inverse->get()*_point_inverse;
     _point.noalias() = _jacobian_temp*(_state[_interface].get());
-    _point -= _point_inverse*_frame.getConstant();
+    _point += _contacts_inverse->get()*_frame.getConstant();
 
   }
 
