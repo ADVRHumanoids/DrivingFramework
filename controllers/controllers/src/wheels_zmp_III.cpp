@@ -169,6 +169,8 @@ void mgnss::controllers::WheelsZMPIII::_setInitialConditions(){
 
 
         _steering_ref_ptr->set(_temp_4);
+        _robot.command.position.set(_robot.state.position.get());
+
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
 

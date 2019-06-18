@@ -517,12 +517,12 @@ void mgnss::state_estimation::OdometryV4::log(mwoibn::common::Logger& logger, do
 //        logger.add("base", _robot.state.position.get()[3]);
 //        logger.add("imu_e3", _temp_est[2]);
 //        logger.add("imu_f3", _temp_fil[2]);
-        logger.add("vx", _robot.command.velocity.get()[0]);
-        logger.add("vy", _robot.command.velocity.get()[1]);
-        logger.add("vz", _robot.command.velocity.get()[2]);
-        logger.add("wx", _robot.command.velocity.get()[3]);
-        logger.add("wy", _robot.command.velocity.get()[4]);
-        logger.add("wz", _robot.command.velocity.get()[5]);
+        logger.add("vx", _robot.command.position.get()[0]);
+        logger.add("vy", _robot.command.position.get()[1]);
+        logger.add("vz", _robot.command.position.get()[2]);
+//        logger.add("wx", _robot.command.position.get()[3]);
+//        logger.add("wy", _robot.command.position.get()[4]);
+//        logger.add("wz", _robot.command.position.get()[5]);
 
         logger.add("rvx", _raw[0]);
         logger.add("rvy", _raw[1]);

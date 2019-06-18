@@ -73,7 +73,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        std::cerr << "inf\t" << infs << std::endl;
+        //std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -161,13 +161,13 @@ void log(  mwoibn::common::Logger& logger){
   logger.add("ref", 0  );
 
  for(int i =0 ; i < 4; i++){
-   // logger.add("cp_des_"   + std::to_string(i) + "_x", _contact_point.getReferenceWorld(i)[0] );
-   // logger.add("cp_des_"   + std::to_string(i) + "_y", _contact_point.getReferenceWorld(i)[1] );
-   // logger.add("cp_qr_"   + std::to_string(i) + "_x", _modified_support[3*i] );
-   // logger.add("cp_qr_"   + std::to_string(i) + "_y", _modified_support[3*i+1] );
+   logger.add("cp_des_"   + std::to_string(i) + "_x", _contact_point.getReferenceWorld(i)[0] );
+   logger.add("cp_des_"   + std::to_string(i) + "_y", _contact_point.getReferenceWorld(i)[1] );
+   logger.add("cp_qr_"   + std::to_string(i) + "_x", _modified_support[3*i] );
+   logger.add("cp_qr_"   + std::to_string(i) + "_y", _modified_support[3*i+1] );
 
-   // logger.add("cp_"   + std::to_string(i) + "_x", _contact_point.getCurrentWorld(i)[0] );
-   // logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
+   logger.add("cp_"   + std::to_string(i) + "_x", _contact_point.getCurrentWorld(i)[0] );
+   logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
  }
@@ -175,7 +175,7 @@ void log(  mwoibn::common::Logger& logger){
         logger.add("cost_", -mwoibn::NON_EXISTING );
     else
         logger.add("cost_", _qr_task.optimalCost() );
-  // logger.add("_modified_support",_modified_support.norm() );
+  logger.add("_modified_support",_modified_support.norm() );
 
 //    logger.add("elapsed_solve", elapsed_solve.count()     );
 

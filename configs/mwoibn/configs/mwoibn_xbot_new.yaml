@@ -92,8 +92,12 @@ mwoibn:
                 offline: [lower_body]
                 simulated: [simulation_base, simulation_state]
         controllers:
-                direct:
+                impedance:
+                        list: [torque_controller, velocity_controller]
+                joint:
                         list: [position_controller, velocity_controller]
+                direct:
+                        list: [position_controller, velocity_controller]                        
                 position_reference:
                         list: [whole_body]
                 torque_reference:
@@ -287,8 +291,19 @@ mwoibn:
                         interface:
                                 position: true
                                 velocity: false
-                                effort: false #true
+                                effort: false
                         initialize: link_side_online
+                torque_controller:
+                        type: ""
+                        dofs:
+                                chain: position
+                                type: actuated
+                                mapping: PYTHON
+                        interface:
+                                position: false
+                                velocity: false
+                                effort: true
+                        initialize: link_side_online                        
                 velocity_controller:
                         type: ""
                         dofs:
@@ -424,6 +439,10 @@ mwoibn:
                                 type: custom_controller/ActuatorPositionControllerClasses
                                 sink: /command
                                 ff_service: /set_ff_torque
+                        torque_controller:
+                                type: custom_controller/ActuatorPositionControllerClasses
+                                sink: /command
+                                ff_service: /set_ff_torque
                         velocity_controller:
                                 type: custom_controller/ActuatorVelocityController
                                 sink: /command
@@ -511,6 +530,10 @@ mwoibn:
                                 layer: lower_level
                                 dofs:
                                         mapping: XBOT
+                        torque_controller:
+                                layer: lower_level
+                                dofs:
+                                        mapping: XBOT                                        
                         velocity_controller:
                                 layer: lower_level
                                 dofs:
@@ -534,8 +557,11 @@ mwoibn:
                 joint_states:
                         layer: RT
                         robot: joint_space
-                        controller: direct
+                        controller: joint
                         mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false                        
                 joint_reference:
                         layer: RT
                         robot: default
@@ -544,12 +570,18 @@ mwoibn:
                             path: *support
                             file: upper_body.yaml
                         mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false                        
                 wheeled_motion:
                         layer: RT
                         robot: default
                         # controller: position_reference
                         controller: direct
-                        mode: full
+                        mode: idle
+                        kinematics: true
+                        dynamics: true
+                        model_change: false                        
                         chain: lower_body
                         secondary_file:
                             path: *support
@@ -596,7 +628,7 @@ mwoibn:
                                   y: -1
                                   z: 0
                         # IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
-                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER, CASTER]
+                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER]
                         SUPPORT: [CAMBER, CASTER]
                         SHAPE: [SHAPE_JOINT]
                         steerings:
@@ -629,17 +661,29 @@ mwoibn:
                                         damp: 0.0004
                                         tracking: 1.0
                         tunnings:
+                                reactif: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 45
+                                        BASE: [0.1, 0.1, 4, 2, 2, 3]
+                                        CONTACT_POINTS: 4
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 2 # 100
+                                        CASTER: 1.5 # 14
+                                        CAMBER_DAMP: 0.01
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
                                 whole_body: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 90
-                                        BASE: [70, 70, 60, 60, 60, 120]
-                                        CONTACT_POINTS: 35
-#                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 20 # 100
-                                        CASTER: 30 # 14
-                                        CAMBER_DAMP: 0.08
+                                        STEERING: 20
+                                        BASE: [0.1, 0.1, 3, 2, 2, 3]
+                                        CONTACT_POINTS: 3 
+                                        CAMBER: 4 # 100
+                                        CASTER: 1.5 # 14
+                                        CAMBER_DAMP: 0.04
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 RT: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -716,6 +760,9 @@ mwoibn:
                             file: odometry.yaml
 #                        mode: full
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: true                        
                         wheel_radius: 0.078
                         chain: wheels
                 gravity_compensation:
@@ -725,7 +772,10 @@ mwoibn:
                         secondary_file:
                              path: *support
                              file: lower_body.yaml
-                        mode: idle
+                        mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                 compliance_compensation:
                         layer: RT
                         robot: default
@@ -734,6 +784,9 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
 #                        type: online
 #                        reference: reference
 #                        compliance: True
@@ -742,6 +795,9 @@ mwoibn:
                         robot: default
                         controller: empty
                         mode: full
+                        kinematics: true
+                        dynamics: true
+                        model_change: false                        
                         secondary_file:
                             path: *support
                             file: lower_body.yaml
@@ -753,6 +809,9 @@ mwoibn:
                         robot: force_test
                         controller: empty
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                         secondary_file:
                             path: *support
                             file: torque.yaml
@@ -770,10 +829,13 @@ mwoibn:
                         robot: joint_space
                         controller: direct
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                 shared:
                         layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation]
+                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
+                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

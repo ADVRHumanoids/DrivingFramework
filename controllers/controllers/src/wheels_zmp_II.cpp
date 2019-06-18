@@ -105,7 +105,7 @@ void mgnss::controllers::WheelsZMPII::steering()
 
 
 void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
-
+        
   // if(!_steering_select.all())
       _steering_ptr->reset();
 
@@ -140,7 +140,10 @@ void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
 
         WheelsController::_setInitialConditions();
 
+//        std::cout << "_state\t" << _robot.state.position.get().transpose() << std::endl;
         _pelvis_position_ptr->points().point(0).getLinearWorld(_position);
+//        std::cout << "_position\t" << _position.transpose() << std::endl;
+
         // DIRECT COM CONTROL
         //_position.head<2>() = _robot.centerOfMass().get().head<2>();
         _pelvis_position_ptr->setReference(0, _position);
@@ -161,11 +164,15 @@ void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
         // _tasks["BASE"]->update();
         // _tasks["CAMBER"]->update();
         // mwoibn::VectorN init_steer(4);
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < 4; i++){
           _temp_4[i] = _leg_tasks["STEERING"].second[i].getCurrent();
+          _leg_tasks["CAMBER"].second[i].setReference(0);
+        }
         // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
 
         _steering_ref_ptr->set(_temp_4);
+        _robot.command.position.set(_robot.state.position.get());
+
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
 
@@ -325,12 +332,14 @@ void mgnss::controllers::WheelsZMPII::_initIK(YAML::Node config){
            _names.push_back(std::string("com_") + char('x'+i));
            _names.push_back(std::string("r_base_") + char('x'+i));
            _names.push_back(std::string("base_") + char('x'+i));
-
-          for(int k = 0; k < 4; k++){
-            _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
-            _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
-          //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
-          }
+           _names.push_back(std::string("e_base_") + char('x'+i));
+           _names.push_back(std::string("state_") + std::to_string(i));
+//
+//          for(int k = 0; k < 4; k++){
+//            _names.push_back("cp_"   + std::to_string(k+1) + "_" + char('x'+i));
+//            _names.push_back("r_cp_" + std::to_string(k+1) + "_" + char('x'+i));
+//          //   _names.push_back("F_" + std::to_string(k+1) + "_" + char('x'+i));
+//          }
         }
 
         for(int i = 0; i < 30; i++){
@@ -386,6 +395,7 @@ void mgnss::controllers::WheelsZMPII::_initIK(YAML::Node config){
         //   _names.push_back("tan_icm_" + std::to_string(i));
         //   _names.push_back("tan_" + std::to_string(i));
         // }
+
 
 }
 
@@ -516,21 +526,30 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
   logger.add(_names[counter], _heading); ++counter;
 //   //
 //   _forces = _robot.contacts().getReactionForce();
+        mwoibn::Vector3 temp_pos;
+        _pelvis_position_ptr->points().point(0).getLinearWorld(temp_pos);
        for(int i = 0; i < 3; i++){
 
         // logger.add(std::string("cop_") + char('x'+i), _robot.centerOfPressure().get()[i]);
         logger.add(_names[counter], _robot.centerOfMass().get()[i]); ++counter;
-        logger.add(_names[counter], getBaseReference()[i]); ++counter;
+        //logger.add(_names[counter], getBaseReference()[i]); ++counter;
+        //logger.add(_names[counter], getBaseReference()[i]); ++counter;
+        logger.add(_names[counter],  _pelvis_position_ptr->getReference(0)[i]); ++counter;
+
         // logger.add(_names[counter], _steering_ptr->base.get()[i]); ++counter;
-        logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
+        // logger.add(_names[counter], _robot.state.position.get()[i]); ++counter;
 
+        logger.add(_names[counter], temp_pos[i]); ++counter;
+        logger.add(_names[counter],  _pelvis_position_ptr->getError()[i]); ++counter;
+        logger.add(_names[counter],  _robot.state.position.get()[i]); ++counter;
 
-        for(int k = 0; k < 4; k++){
-
-          logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
-          logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
-        //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
-        }
+//
+//        for(int k = 0; k < 4; k++){
+//
+//          logger.add(_names[counter], _steering_ptr->getPointStateReference(k)[i]); ++counter;
+//          logger.add(_names[counter], _steering_ptr->getReference()[k*3+i]); ++counter;
+//        //   logger.add(_names[counter], _forces[k*3+i]); ++counter;
+//        }
       }
 //
       for(int i = 0; i < 30; i++){
@@ -591,5 +610,8 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //
         shape_action__->log(logger);
         state_machine__->log(logger);
+        
+//        for(auto task: _tasks) std::cout << task.first << "\t" << task.second->getError().transpose() << std::endl;
+
 
 }

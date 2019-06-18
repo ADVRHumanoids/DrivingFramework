@@ -128,10 +128,13 @@ void mgnss::higher_level::StateMachine::update(){
   // ACCELERATION BASED
   cost_I.update();
   cost_II.jacobian.set() = _wheel_orientation.jacobian();
+
   // VELOCITY BASED
   // for(int i = 0; i < _contact_points.size(); i++)
   //   // temp__.setZero();
-  //   cost_I.jacobian.set().middleRows<2>(2*i) = (_wheel_transforms[i]->rotation.transpose()*_contact_points[i].getJacobian()).topRows<2>();
+  //   _state_jacobian.middleRows<2>(2*i) = (_wheel_transforms[i]->rotation.transpose()*_contact_points[i].getJacobian()).topRows<2>();
+
+
 
   for(int i = 0; i < _size; i++)
      _computeMargin(i);
@@ -142,14 +145,9 @@ void mgnss::higher_level::StateMachine::update(){
 
   _margins.error = (_margins.getState() - _margins.limit)/_robot.rate();
   _workspace.error = (_workspace.limit.cwiseProduct(_workspace.limit) - _workspace.getState())/_robot.rate();
-  //
-  std::cout << "_margins\t" << _margins.getState().transpose() << std::endl;
-  std::cout << "_workspace\t" << _workspace.getState().transpose() << std::endl;
-  // std::cout << "cost_I.jacobian\n" << cost_I.jacobian.get() << std::endl;
-  // std::cout << "cost_I.offset\n" << cost_I.offset.get().transpose() << std::endl;
-  // std::cout << "cost_II.jacobian\n" << cost_II.jacobian.get() << std::endl;
-  // std::cout << "cost_II.offset\n" << cost_II.offset.get().transpose() << std::endl;
 
+  //std::cout << "_margins\t" << _margins.error.transpose() << std::endl;
+  //std::cout << "_workspace\t" << _workspace.error.transpose() << std::endl;
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){

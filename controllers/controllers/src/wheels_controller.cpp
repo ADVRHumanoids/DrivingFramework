@@ -49,7 +49,7 @@ void mgnss::controllers::WheelsController::compute()
         _robot.command.position.get(_active_state, _select_ik);
 
         for(int i = 0; i < _select_ik.size(); i++)
-          _command[i] += _active_state[i];
+        _command[i] += _active_state[i];
 
         _robot.command.position.set(_command, _select_ik);
         // std::cout << "after position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
@@ -84,8 +84,9 @@ void mgnss::controllers::WheelsController::_setInitialConditions()
 {
       _pelvis_orientation_ptr->points().point(0).getOrientationWorld(_orientation);
       _heading = _orientation.swingTwist(_robot.contacts().contact(0).getGroundNormal(), _orientation).angle();
-      _pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_robot.contacts().contact(0).getGroundNormal(), _heading)*(_orientation));
-
+      //_pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_robot.contacts().contact(0).getGroundNormal(), _heading));
+      _pelvis_orientation_ptr->setReference(0,mwoibn::Quaternion());
+      
 }
 
 void mgnss::controllers::WheelsController::_createTasks(YAML::Node config){

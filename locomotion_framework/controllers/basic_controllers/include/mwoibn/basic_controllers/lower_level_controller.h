@@ -23,6 +23,7 @@ public:
 
   /** sends command directly to the robot */
   virtual void setCommand() { _robot.command[_interface].set(_command); }
+  virtual void setCommand(const mwoibn::VectorN& command) { _command = command; }
 
   /** provides access to the robot */
   mwoibn::robot_class::Robot& getRobot(){return _robot;}
