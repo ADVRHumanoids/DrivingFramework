@@ -64,6 +64,9 @@ bool _initialized = false, _valid = false, _rate = false;
 std::string _name = "";
 double _start;
 
+virtual void _init(double time);
+virtual void _resetUpdates();
+
 };
 }
 }

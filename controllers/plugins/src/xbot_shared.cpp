@@ -99,26 +99,22 @@ void mgnss::plugins::XbotShared::on_start(double time)
 }
 
 void mgnss::plugins::XbotShared::_init(double time){
-        
-          for(auto& controller: _controller_ptrs){
 
-            if(controller->kinematics.get()){
-                if(!controller->model().get()) return;    
-                controller->model().updateKinematics();
-            }
-            
-            controller->init();
-            controller->update();
-            controller->send();
-            if(controller->modify.get()) controller->model().kinematics_update.set(true);
+  for(auto& controller: _controller_ptrs){
+    if(!controller->model().get()) return;
+    if(controller->kinematics.get()) controller->model().updateKinematics();
 
-            controller->log(*_logger_ptr.get(), time-_start);
-          }
+    controller->init();
+            //controller->update();
+    controller->send();
+    if(controller->modify.get()) controller->model().kinematics_update.set(true);
 
+    _logger_ptr->prefix(controller->name());
+    controller->log(*_logger_ptr.get(), time-_start);
+  }
 
   _logger_ptr->write();
   _resetUpdates();
-
   if(_rate)  _initialized = true;
 
 }
@@ -140,27 +136,27 @@ void mgnss::plugins::XbotShared::on_stop(double time) {
 }
 
 void mgnss::plugins::XbotShared::control_loop(double time)
-{    
+{
 
 
-  if (!_initialized) {_init(time); return;}
+  if (!_initialized) { _init(time); return; }
 
   // std::cout << "CONTROLER LOOP" << std::endl;
 
   for(auto& controller: _controller_ptrs){
 
     if(controller->kinematics.get()){
-        if(!controller->model().get()) return;    
+        if(!controller->model().get()) return;
         controller->model().updateKinematics();
     }
-    
+
     controller->update();
     controller->send();
     if(controller->modify.get()) controller->model().kinematics_update.set(true);
-
+    _logger_ptr->prefix(controller->name());
     controller->log(*_logger_ptr.get(), time-_start);
   }
-  
+
   _logger_ptr->write();
 
   _resetUpdates();

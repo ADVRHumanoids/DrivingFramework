@@ -93,20 +93,25 @@ bool mgnss::plugins::RosShared::init()
 
 void mgnss::plugins::RosShared::start(double time)
 {
+        // _start = time;
+        //
+        // for(auto& robot: _robot_ptr)  _valid = robot.second->get() && _valid;
+        //
+        //
+        // _rate = true;
+        //
+        // if (_valid)
+        // {
+        //   for(auto& robot: _robot_ptr) robot.second->updateKinematics();
+        //   for(auto& controller: _controller_ptrs)  controller->init();
+        //
+        //   _initialized = true;
+        // }
+
         _start = time;
-
-        for(auto& robot: _robot_ptr)  _valid = robot.second->get() && _valid;
-
-
         _rate = true;
 
-        if (_valid)
-        {
-          for(auto& robot: _robot_ptr) robot.second->updateKinematics();
-          for(auto& controller: _controller_ptrs)  controller->init();
-
-          _initialized = true;
-        }
+        _init(time);
 
 }
 
@@ -116,30 +121,32 @@ void mgnss::plugins::RosShared::stop() {
 
 void mgnss::plugins::RosShared::control_loop(double time)
 {
-  _valid = true;
-  for(auto& robot: _robot_ptr)
-    _valid = robot.second->get() && _valid;
+  // _valid = true;
+  // for(auto& robot: _robot_ptr)
+  //   _valid = robot.second->get() && _valid;
+  //
+  //       if (!_valid)
+  //               return;
+  //
+  //
+  // if (!_initialized)
+  // {
+  //         for(auto& robot: _robot_ptr)
+  //             robot.second->updateKinematics();
+  //
+  //         if(_valid){
+  //
+  //             for(auto& controller: _controller_ptrs) {controller->init();
+  //               controller->send();
+  //               for(auto& robot: _robot_ptr)
+  //                   robot.second->get();
+  //             }
+  //         }
+  //
+  //         if(_rate && _valid)  _initialized = true;
+  // }
 
-        if (!_valid)
-                return;
-
-
-  if (!_initialized)
-  {
-          for(auto& robot: _robot_ptr)
-              robot.second->updateKinematics();
-
-          if(_valid){
-
-              for(auto& controller: _controller_ptrs) {controller->init();
-                controller->send();
-                for(auto& robot: _robot_ptr)
-                    robot.second->get();
-              }
-          }
-
-          if(_rate && _valid)  _initialized = true;
-  }
+  if (!_initialized) { _init(time); return; }
 
   // std::cout << "CONTROLER LOOP" << std::endl;
 
@@ -158,7 +165,7 @@ void mgnss::plugins::RosShared::control_loop(double time)
         controller->send();
         if(controller->modify.get()) controller->model().kinematics_update.set(true);
         // if (controller->model().kinematics_update.get()) std::cout << "modify" << std::endl;
-
+        _logger_ptr->prefix(controller->name());
         controller->log(*_logger_ptr.get(), time-_start);
   }
   _logger_ptr->write();
@@ -183,4 +190,38 @@ bool mgnss::plugins::RosShared::close() {
         _logger_ptr->flush();
         _logger_ptr->close();
         return true;
+}
+
+
+void mgnss::plugins::RosShared::_init(double time){
+
+  for(auto& controller: _controller_ptrs){
+    if(controller->kinematics.get()){
+          if(!controller->model().get()) return;
+          controller->model().updateKinematics();
+    }
+    controller->init();
+            //controller->update();
+    controller->send();
+    if(controller->modify.get()) controller->model().kinematics_update.set(true);
+    _logger_ptr->prefix(controller->name());
+    controller->log(*_logger_ptr.get(), time-_start);
+  }
+
+  _logger_ptr->write();
+  _resetUpdates();
+  if(_rate)  _initialized = true;
+
+}
+
+void mgnss::plugins::RosShared::_resetUpdates(){
+      _robot_ptr.begin()->second->wait(true);
+
+  // std::cout << "reset kinematics" << std::endl;
+  for(auto& robot: _robot_ptr)
+    robot.second->kinematics_update.set(false);
+
+  for(auto& controller: _controller_ptrs){
+    if(controller->kinematics.get()) controller->model().kinematics_update.set(true);
+  }
 }
