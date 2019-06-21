@@ -273,7 +273,7 @@ virtual void _updateSupport()
 }
 
 private:
-  std::vector<std::string> _names;
+  // std::vector<std::string> _names;
   // const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
   // const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
   // const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
@@ -286,7 +286,7 @@ private:
 
 
   mwoibn::VectorN _forces;
-
+  std::string _log_name, _char;
 
 
 };

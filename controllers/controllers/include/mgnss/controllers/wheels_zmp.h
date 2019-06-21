@@ -271,7 +271,7 @@ virtual void _updateSupport()
 }
 
 private:
-  std::vector<std::string> _names;
+  // std::vector<std::string> _names;
   // const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
   // const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
   // const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
@@ -282,9 +282,8 @@ private:
   const std::string ESTIMATED_TORQUES = "ESTIMATED_TORQUES";
   const std::string CONTROLLER_TORQUES = "CONTROLLER_TORQUES";
 
-
   mwoibn::VectorN _forces;
-
+  std::string _log_name, _char;
 
 
 };
