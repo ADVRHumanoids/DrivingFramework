@@ -108,6 +108,7 @@ public:
     _selector.setZero(mwoibn::std_utils::factorial(size)/mwoibn::std_utils::factorial(2)/mwoibn::std_utils::factorial(size-2));
     __es_2.setZero(2);
     __st_2.setZero(2);
+    _estimate = 0;
 
   }
 

@@ -578,7 +578,7 @@ mwoibn:
                         robot: default
                         # controller: position_reference
                         controller: direct
-                        mode: idle
+                        mode: full
                         kinematics: true
                         dynamics: true
                         model_change: false                        
@@ -628,7 +628,7 @@ mwoibn:
                                   y: -1
                                   z: 0
                         # IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
-                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER]
+                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER, CASTER]
                         SUPPORT: [CAMBER, CASTER]
                         SHAPE: [SHAPE_JOINT]
                         steerings:
@@ -678,12 +678,12 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 20
+                                        STEERING: 30
                                         BASE: [0.1, 0.1, 3, 2, 2, 3]
-                                        CONTACT_POINTS: 3 
+                                        CONTACT_POINTS: 4 
                                         CAMBER: 4 # 100
                                         CASTER: 1.5 # 14
-                                        CAMBER_DAMP: 0.04
+                                        CAMBER_DAMP: 0.07
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 RT: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -838,4 +838,3 @@ mwoibn:
                         plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

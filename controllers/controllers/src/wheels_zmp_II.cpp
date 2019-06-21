@@ -105,7 +105,7 @@ void mgnss::controllers::WheelsZMPII::steering()
 
 
 void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
-
+        
   // if(!_steering_select.all())
       _steering_ptr->reset();
 
@@ -171,7 +171,10 @@ void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
         // std::cout << "init steer\t" << init_steer.transpose() << std::endl;
 
         _steering_ref_ptr->set(_temp_4);
+        _robot.command.position.set(_robot.state.zero.get());
+        _robot.command.torque.set(_robot.state.zero.get());
         _robot.command.position.set(_robot.state.position.get());
+        _robot.command.velocity.set(_robot.state.zero.get());
 
 //        _qr_wrappers["SHAPE_WHEEL"]->update();
         // _qr_wrappers["SHAPE_JOINT"]->update();
@@ -325,7 +328,6 @@ void mgnss::controllers::WheelsZMPII::_initIK(YAML::Node config){
     _shape_extend_ptr->init();
     shape_action__->init();
 
-
 }
 
 
@@ -448,18 +450,16 @@ void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
 
 
 void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double time){
-
-
   logger.add("time", time);
 //
   logger.add("th", _robot.state.position.get()[5]);
   logger.add("r_th", _heading);
-
 //   //
 //   _forces = _robot.contacts().getReactionForce();
         mwoibn::Vector3 temp_pos;
         _pelvis_position_ptr->points().point(0).getLinearWorld(temp_pos);
        for(int i = 0; i < 3; i++){
+
          _log_name = "com_";
          _char = char('x'+i);
          _log_name += _char;
@@ -491,8 +491,6 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //        //   logger.add(_names[counter], _forces[k*3+i]);
 //        }
       }
-
-
 //
       for(int i = 0; i < 30; i++){
         _char = std::to_string(i);
@@ -538,7 +536,6 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
           logger.add(_log_name,  _robot.state["BIAS_FORCE"][i]);
       }
 
-
 //
       for(int i = 0; i < 30; i++){
         _log_name = "pos_qr_";
@@ -572,9 +569,6 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 
         }
 
-
-
-
 //
 //        // for(int i = 0; i < 4 ; i++){
 //        //     logger.add("st_icm_" + std::to_string(i), _steering_ref_ptr->getICM()[i]);
@@ -588,12 +582,9 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //        //     logger.add("tan_" + std::to_string(i), _steering_ref_ptr->damp()[i]);
 //        // }
 //
-
-
-
         shape_action__->log(logger);
         state_machine__->log(logger);
-
+        
 //        for(auto task: _tasks) std::cout << task.first << "\t" << task.second->getError().transpose() << std::endl;
 
 

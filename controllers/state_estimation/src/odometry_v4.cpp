@@ -88,6 +88,9 @@ void mgnss::state_estimation::OdometryV4::_allocate(std::vector<std::string> nam
         _base_map.setZero(6);
         _base_map << 0, 1, 2, 3, 4, 5;
         _raw.setZero(4);
+        _base_raw.setZero();
+        _base_filtered.setZero();
+        _raw.setZero();
 
         _ground_normal = _z;
         _projection.noalias() = _ground_normal*_ground_normal.transpose();
@@ -139,16 +142,17 @@ void mgnss::state_estimation::OdometryV4::init(){
         _filter_ptr->computeCoeffs(_robot.rate());
         _vel_ptr->computeCoeffs(_robot.rate());
         _estimation_ptr->computeCoeffs(_robot.rate());
-        _robot.get();
+//        _robot.get();
 
-        _robot.updateKinematics();
+//        _robot.kinematics_update.set(true);
+//        _robot.updateKinematics();
         _robot.state.position.get(_state, _ids);
         _base_pos = _robot.state.position.get().head<3>();
 
         _filter_ptr->reset(_base_pos);
         _vel_ptr->reset(_ang_vel);
         _estimation_ptr->reset(mwoibn::VectorN::Zero(4));
-        //std::cout << "OdometryV4 filter: initial state: " << _base_pos.transpose() << std::endl;
+        std::cout << "OdometryV4 filter: initial state: " << _base_pos.transpose() << std::endl;
 
         for(int i = 0; i < _estimated.size(); i++) {
                 _contact_points[i].noalias() = _wheels_frames[i].position.getWorld();
@@ -159,7 +163,15 @@ void mgnss::state_estimation::OdometryV4::init(){
 
         _previous_state.noalias() = _state;
 
+        _imu = mwoibn::Quaternion::fromAxisAngle(_x, _robot.state.position.get()[3]);
+        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_y, _robot.state.position.get()[4]);
+        _imu = _imu*mwoibn::Quaternion::fromAxisAngle(_z, _robot.state.position.get()[5]);
+        _last_imu = _imu;
+
+
+
         update(); // in here I should set it up to zero
+        std::cout << _velocity_ptr->get().transpose() << std::endl;
 
 
 }
@@ -182,8 +194,8 @@ void mgnss::state_estimation::OdometryV4::update()
 
         // which legs are in ground contact
         _selector.noalias() = _contacts;
-        //_wheels_frames.update(true);
         //_wheels_velocity.update(true);
+        //_wheels_frames.update(true);
 
         _removeTwist();
 
@@ -196,7 +208,7 @@ void mgnss::state_estimation::OdometryV4::update()
         // std::cout << "v_twist\t" << _velocity_ptr->get()[3] << std::endl;
 
         // _twist_es = mwoibn::Quaternion::fromAxisAngle(_z, _twist_ptr->get());
-
+        
 
         _poseEstimation();
         _filter();
@@ -209,7 +221,6 @@ void mgnss::state_estimation::OdometryV4::update()
         _robot.command.position.set(_base, _base_map);
         _robot.state.position.set(_base, _base_map);
 
-        //std::cout << _base[5].transpose() << std::endl;
         _velocity_ptr->update();
 //        //here I should estimate velocity
         _raw = _velocity_ptr->get();
@@ -221,9 +232,7 @@ void mgnss::state_estimation::OdometryV4::update()
 
 
         _previous_state.noalias() = _state;
-
-//       // std::cout << _velocity_ptr->get().transpose() << std::endl;
-//
+ //
 //        //  return _base;
 }
 
@@ -254,7 +263,6 @@ void mgnss::state_estimation::OdometryV4::_removeTwist(){
 
         _ang_vel = temp.log().axis();
 
-
         _temp_est = _ang_vel;
 
         _vel_ptr->update(_ang_vel);
@@ -263,8 +271,6 @@ void mgnss::state_estimation::OdometryV4::_removeTwist(){
         _ang_vel = 2*_ang_vel/_robot.rate();
 
         _ang_vel = _projection*_ang_vel; // RT!
-
-
         // remove the rotation ground ground component
         _twist_raw = _imu.twistSwing(_z,_swing);
 
@@ -296,7 +302,7 @@ void mgnss::state_estimation::OdometryV4::_filter(){
         _base_raw = _base;
 
         // filter the results
-        _filter_ptr->update(_base_pos);
+        //_filter_ptr->update(_base_pos);
 
         _base.head(3) = _base_pos;
 
@@ -513,7 +519,7 @@ void mgnss::state_estimation::OdometryV4::log(mwoibn::common::Logger& logger, do
         logger.add("time", time);
 //
 //        logger.add("heading", _twist_es.angle());
-//        logger.add("raw", _twist_raw.angle());
+        logger.add("twist", _twist);
 //        logger.add("base", _robot.state.position.get()[3]);
 //        logger.add("imu_e3", _temp_est[2]);
 //        logger.add("imu_f3", _temp_fil[2]);
@@ -524,10 +530,10 @@ void mgnss::state_estimation::OdometryV4::log(mwoibn::common::Logger& logger, do
 //        logger.add("wy", _robot.command.position.get()[4]);
 //        logger.add("wz", _robot.command.position.get()[5]);
 
-        logger.add("rvx", _raw[0]);
-        logger.add("rvy", _raw[1]);
-        logger.add("rvz", _raw[2]);
-        logger.add("rwx", _raw[3]);
+        logger.add("rvx", _base_raw[0]);
+        logger.add("rvy", _base_raw[1]);
+        logger.add("rvz", _base_raw[2]);
+        //logger.add("rwx", _raw[3]);
 
 //        logger.add("imu_x", _imu.x());
 //        logger.add("imu_y", _imu.y());
