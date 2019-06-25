@@ -178,37 +178,37 @@ include_directories(
 
 
 
-
+#### USED
 LIST( APPEND INSTALL_TARGETS
   shared
 )
 
- add_executable(shared src/exec/shared.cpp)
- add_dependencies(shared ${catkin_EXPORTED_TARGETS})
- target_link_libraries(shared
-     -ldl
-     ${catkin_LIBRARIES}
-     ${XCM_LIBRARIES}
-  )
+add_executable(shared src/exec/shared.cpp)
+add_dependencies(shared ${catkin_EXPORTED_TARGETS})
+target_link_libraries(shared
+   -ldl
+   ${catkin_LIBRARIES}
+   ${XCM_LIBRARIES}
+)
 
+#### USED
+#  LIST( APPEND INSTALL_TARGETS joint_states )
+#
+#  add_library(joint_states SHARED
+#     src/plugins/joint_states.cpp
+#   )
+#  add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
+#  target_link_libraries(joint_states
+#     ${catkin_LIBRARIES}
+#     ${XCM_LIBRARIES}
+#  )
 
-  LIST( APPEND INSTALL_TARGETS joint_states )
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(joint_states)
+#  endif()
 
-  add_library(joint_states SHARED
-     src/plugins/joint_states.cpp
-   )
-  add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(joint_states
-     ${catkin_LIBRARIES}
-     ${XCM_LIBRARIES}
-  )
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(joint_states)
-  endif()
-
-
+#### NOT USED
 #   LIST( APPEND INSTALL_TARGETS centralized )
 #
 #   add_library(centralized SHARED
@@ -219,55 +219,57 @@ LIST( APPEND INSTALL_TARGETS
 #      ${catkin_LIBRARIES}
 #    )
 
-   LIST( APPEND INSTALL_TARGETS odometry )
-
-   add_library(odometry SHARED
-      src/plugins/odometry_2.cpp
-    )
-   add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
-   target_link_libraries(odometry
-      ${catkin_LIBRARIES}
-      ${XCM_LIBRARIES}
-    )
-
-
-      if ( Xenomai_FOUND )
-        message(WARNING "set_xeno_flags")
-        set_xeno_flags(odometry)
-      endif()
-
-    LIST( APPEND INSTALL_TARGETS odometry2 )
-
-    add_library(odometry2 SHARED
-       src/plugins/odometry_3.cpp
-     )
-    add_dependencies(odometry2 ${catkin_EXPORTED_TARGETS})
-    target_link_libraries(odometry2
-       ${catkin_LIBRARIES}
-       ${XCM_LIBRARIES}
-     )
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(odometry2)
-  endif()
+#### NOT USED
+#   LIST( APPEND INSTALL_TARGETS odometry )
+#
+#   add_library(odometry SHARED
+#      src/plugins/odometry_2.cpp
+#    )
+#   add_dependencies(odometry ${catkin_EXPORTED_TARGETS})
+#   target_link_libraries(odometry
+#      ${catkin_LIBRARIES}
+#      ${XCM_LIBRARIES}
+#    )
 
 
-      LIST( APPEND INSTALL_TARGETS odometry3 )
+#      if ( Xenomai_FOUND )
+#        message(WARNING "set_xeno_flags")
+#        set_xeno_flags(odometry)
+#      endif()
 
-      add_library(odometry3 SHARED
-         src/plugins/odometry_4.cpp
-       )
-      add_dependencies(odometry3 ${catkin_EXPORTED_TARGETS})
-      target_link_libraries(odometry3
-         ${catkin_LIBRARIES}
-         ${XCM_LIBRARIES}
-       )
+#### USED
+#    LIST( APPEND INSTALL_TARGETS odometry2 )
+#
+#    add_library(odometry2 SHARED
+#       src/plugins/odometry_3.cpp
+#     )
+#    add_dependencies(odometry2 ${catkin_EXPORTED_TARGETS})
+#    target_link_libraries(odometry2
+#       ${catkin_LIBRARIES}
+#       ${XCM_LIBRARIES}
+#     )
 
-    if ( Xenomai_FOUND )
-      message(WARNING "set_xeno_flags")
-      set_xeno_flags(odometry3)
-    endif()
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(odometry2)
+#  endif()
+
+#### USED
+#
+#      LIST( APPEND INSTALL_TARGETS odometry3 )
+#
+#      add_library(odometry3 SHARED
+#         src/plugins/odometry_4.cpp
+#       )
+#      add_dependencies(odometry3 ${catkin_EXPORTED_TARGETS})
+#      target_link_libraries(odometry3
+#         ${catkin_LIBRARIES}
+#         ${XCM_LIBRARIES}
+#       )
+#    if ( Xenomai_FOUND )
+#      message(WARNING "set_xeno_flags")
+#      set_xeno_flags(odometry3)
+#    endif()
 
 
 #    LIST( APPEND INSTALL_TARGETS NwheelsWorld )
@@ -286,16 +288,17 @@ LIST( APPEND INSTALL_TARGETS
 #    set_xeno_flags(NwheelsWorld)
 #  endif()
 
-    LIST( APPEND INSTALL_TARGETS Nwheels3 )
-
-    add_library(Nwheels3 SHARED
-       src/plugins/wheels_3.cpp
-     )
-    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
-    target_link_libraries(Nwheels3
-       ${catkin_LIBRARIES}
-       ${XCM_LIBRARIES}
-     )
+#### USED
+#    LIST( APPEND INSTALL_TARGETS Nwheels3 )
+#
+#    add_library(Nwheels3 SHARED
+#       src/plugins/wheels_3.cpp
+#     )
+#    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+#    target_link_libraries(Nwheels3
+#       ${catkin_LIBRARIES}
+#       ${XCM_LIBRARIES}
+#     )
 
 #  if ( Xenomai_FOUND )
 #    message(WARNING "set_xeno_flags")
@@ -334,21 +337,22 @@ LIST( APPEND INSTALL_TARGETS
 #    set_xeno_flags(NwheelsMerge)
 #  endif()
 
-      LIST( APPEND INSTALL_TARGETS NwheelsZMP )
+#### USED
+#      LIST( APPEND INSTALL_TARGETS NwheelsZMP )
+#
+#      add_library(NwheelsZMP SHARED
+#         src/plugins/wheels_zmp.cpp
+#       )
+#      add_dependencies(NwheelsZMP ${catkin_EXPORTED_TARGETS})
+#      target_link_libraries(NwheelsZMP
+#         ${catkin_LIBRARIES}
+#         ${XCM_LIBRARIES}
+#    )
 
-      add_library(NwheelsZMP SHARED
-         src/plugins/wheels_zmp.cpp
-       )
-      add_dependencies(NwheelsZMP ${catkin_EXPORTED_TARGETS})
-      target_link_libraries(NwheelsZMP
-         ${catkin_LIBRARIES}
-         ${XCM_LIBRARIES}
-    )
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(NwheelsZMP)
-  endif()
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(NwheelsZMP)
+#  endif()
 
   LIST( APPEND INSTALL_TARGETS NwheelsZMPII )
 
@@ -366,91 +370,108 @@ message(WARNING "set_xeno_flags")
 set_xeno_flags(NwheelsZMPII)
 endif()
 
+#### NOT USED
+# LIST( APPEND INSTALL_TARGETS NwheelsZMPIII )
+#
+# add_library(NwheelsZMPIII SHARED
+#   src/plugins/wheels_zmp_III.cpp
+# )
+# add_dependencies(NwheelsZMPIII ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(NwheelsZMPIII
+#   ${catkin_LIBRARIES}
+#   ${XCM_LIBRARIES}
+#)
+#
+#if ( Xenomai_FOUND )
+#message(WARNING "set_xeno_flags")
+#set_xeno_flags(NwheelsZMPIII)
+#endif()
 
 
-LIST( APPEND INSTALL_TARGETS NwheelsZMPIII )
+LIST( APPEND INSTALL_TARGETS NwheelsZMPIV )
 
-add_library(NwheelsZMPIII SHARED
-   src/plugins/wheels_zmp_III.cpp
+add_library(NwheelsZMPIV SHARED
+   src/plugins/wheels_zmp_IV.cpp
  )
-add_dependencies(NwheelsZMPIII ${catkin_EXPORTED_TARGETS})
-target_link_libraries(NwheelsZMPIII
+add_dependencies(NwheelsZMPIV ${catkin_EXPORTED_TARGETS})
+target_link_libraries(NwheelsZMPIV
    ${catkin_LIBRARIES}
    ${XCM_LIBRARIES}
 )
 
 if ( Xenomai_FOUND )
 message(WARNING "set_xeno_flags")
-set_xeno_flags(NwheelsZMPIII)
+set_xeno_flags(NwheelsZMPIV)
 endif()
 
-#  LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
-#
-#  add_library(NwheelsSecondOrder SHARED
-#     src/plugins/wheels_second_order.cpp
-#   )
-#  add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
-#  target_link_libraries(NwheelsSecondOrder
-#     ${catkin_LIBRARIES}
-#     ${XCM_LIBRARIES}
-#)
+#### USED
+LIST( APPEND INSTALL_TARGETS NwheelsSecondOrder )
 
-#if ( Xenomai_FOUND )
-#message(WARNING "set_xeno_flags")
-#set_xeno_flags(NwheelsSecondOrder)
-#endif()
-
-
-     LIST( APPEND INSTALL_TARGETS ground_forces )
-
-     add_library(ground_forces SHARED
-        src/plugins/ground_forces.cpp
-      )
-     add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
-     target_link_libraries(ground_forces
-        ${catkin_LIBRARIES}
-        ${XCM_LIBRARIES}
-    )
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(ground_forces)
-  endif()
-
-      LIST( APPEND INSTALL_TARGETS gravity_compensation )
-
-      add_library(gravity_compensation SHARED
-         src/plugins/gravity_compensation.cpp
-       )
-      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
-      target_link_libraries(gravity_compensation
-         ${catkin_LIBRARIES}
-         ${XCM_LIBRARIES}
-     )
-
-
-  if ( Xenomai_FOUND )
-    message(WARNING "set_xeno_flags")
-    set_xeno_flags(gravity_compensation)
-  endif()
-
-
-  LIST( APPEND INSTALL_TARGETS compliance_compensation )
-
-  add_library(compliance_compensation SHARED
-     src/plugins/compliance_compensation.cpp
-   )
-  add_dependencies(compliance_compensation ${catkin_EXPORTED_TARGETS})
-  target_link_libraries(compliance_compensation
-     ${catkin_LIBRARIES}
-     ${XCM_LIBRARIES}
- )
-
+add_library(NwheelsSecondOrder SHARED
+   src/plugins/wheels_second_order.cpp
+)
+add_dependencies(NwheelsSecondOrder ${catkin_EXPORTED_TARGETS})
+target_link_libraries(NwheelsSecondOrder
+   ${catkin_LIBRARIES}
+   ${XCM_LIBRARIES}
+)
 
 if ( Xenomai_FOUND )
 message(WARNING "set_xeno_flags")
-set_xeno_flags(compliance_compensation)
+set_xeno_flags(NwheelsSecondOrder)
 endif()
+
+#### USED
+#     LIST( APPEND INSTALL_TARGETS ground_forces )
+#
+#     add_library(ground_forces SHARED
+#        src/plugins/ground_forces.cpp
+#      )
+#     add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
+#     target_link_libraries(ground_forces
+#        ${catkin_LIBRARIES}
+#        ${XCM_LIBRARIES}
+#    )
+#
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(ground_forces)
+#  endif()
+
+#      LIST( APPEND INSTALL_TARGETS gravity_compensation )
+#
+#      add_library(gravity_compensation SHARED
+#         src/plugins/gravity_compensation.cpp
+#       )
+#      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
+#      target_link_libraries(gravity_compensation
+#         ${catkin_LIBRARIES}
+#         ${XCM_LIBRARIES}
+#     )
+
+
+#  if ( Xenomai_FOUND )
+#    message(WARNING "set_xeno_flags")
+#    set_xeno_flags(gravity_compensation)
+#  endif()
+
+#### USED
+#  LIST( APPEND INSTALL_TARGETS compliance_compensation )
+#
+#  add_library(compliance_compensation SHARED
+#     src/plugins/compliance_compensation.cpp
+#   )
+#  add_dependencies(compliance_compensation ${catkin_EXPORTED_TARGETS})
+#  target_link_libraries(compliance_compensation
+#     ${catkin_LIBRARIES}
+#     ${XCM_LIBRARIES}
+# )
+
+
+#if ( Xenomai_FOUND )
+#message(WARNING "set_xeno_flags")
+#set_xeno_flags(compliance_compensation)
+#endif()
 
 #      LIST( APPEND INSTALL_TARGETS acceleration )
 #
