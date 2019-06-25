@@ -32,8 +32,7 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
                       new mwoibn::robot_points::GroundWheel(torus_->axis(), torus_->groundNormal())));
 
             _contact_points.add(std::move(torus_));
-            cost_I.torus_acceleration.add(mwoibn::dynamic_points::Torus(_contact_points.end(0), _robot ) );
-
+            cost_I.torus_acceleration.add(mwoibn::dynamic_points::TorusIntegratedRoll(_contact_points.end(0), _robot ) );
             std::cout << "contacts: " << contact->getName() << "\t" << name << std::endl;
         }
 
@@ -64,7 +63,9 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
 
         _margins.limit.setZero(_size);
         _workspace.limit.setZero(_size);
-        _margins.limit << 0.25, 0.215, 0.215, 0.25;
+        //_margins.limit << 0.40, 0.18, 0.18, 0.40;
+        //_margins.limit << 0.40, 0.10, 0.10, 0.40;
+        _margins.limit << 0.40, 0.215, 0.215, 0.40;
         _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
         _margins.setState().setZero(_size);
         _workspace.setState().setZero(_size);
@@ -151,8 +152,10 @@ void mgnss::higher_level::StateMachine::update(){
 }
 
 void mgnss::higher_level::StateMachine::_computeWorkspace(){
-  for(int i = 0; i < _contact_points.size(); i++)
+  for(int i = 0; i < _contact_points.size(); i++)//{
     _workspace.setState()[i] = _workspace_points[i].get().transpose()*_workspace_points[i].get();
+
+ // }
 }
 
 void mgnss::higher_level::StateMachine::_workspaceJacobian(){
@@ -201,34 +204,36 @@ void mgnss::higher_level::StateMachine::log(mwoibn::common::Logger& logger){
 void mgnss::higher_level::SupportState::update(){
   torus_acceleration.update(true);
 
+
   for(int i = 0; i < torus_acceleration.size(); i++){
-     mwoibn::Matrix3 toN, toPN;
-     toN.noalias() = torus_acceleration[i].torus().groundNormal()*torus_acceleration[i].torus().groundNormal().transpose();
-     toPN = mwoibn::Matrix3::Identity() - toN;
+    //  mwoibn::Matrix3 toN, toPN;
+    //  toN.noalias() = torus_acceleration[i].torus().groundNormal()*torus_acceleration[i].torus().groundNormal().transpose();
+    //  toPN = mwoibn::Matrix3::Identity() - toN;
+    //
+    // // VELOCITY
+    // _support_jacobian = torus_acceleration[i].torus().getJacobianWheel()/_robot.rate();
+    //
+    // mat_1.noalias() = torus_acceleration[i].getDependant()*toPN;
+    // mat_1 -= _support_jacobian;
+    // _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    //
+    // // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    // _support_offset += torus_acceleration[i].getIndependant();
+    // _support_jacobian.noalias() += torus_acceleration[i].getDependant()*toN;
+    // mat_1 = _support_jacobian*_robot.rate();
+    // vec_1 = _support_offset*_robot.rate();
+    //
+    // vec_1.noalias() += torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
+    //
+    // // std::cout << "_state_machine\n" << _support_jacobian  << std::endl;
+    // // _support_jacobian.noalias() = _wheel_transforms[i]->rotation.transpose()*mat_1;
+    // // _support_offset.noalias() = _wheel_transforms[i]->rotation.transpose()*vec_1;
+    // _support_jacobian.noalias() = mat_1;
+    // _support_offset.noalias() = vec_1;
 
-    // VELOCITY
-    _support_jacobian = torus_acceleration[i].torus().getJacobianWheel()/_robot.rate();
-
-    mat_1.noalias() = torus_acceleration[i].getDependant()*toPN;
-    mat_1 -= _support_jacobian;
-    _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
-
-    // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
-    _support_offset += torus_acceleration[i].getIndependant();
-    _support_jacobian.noalias() += torus_acceleration[i].getDependant()*toN;
-    mat_1 = _support_jacobian*_robot.rate();
-    vec_1 = _support_offset*_robot.rate();
-
-    vec_1.noalias() += torus_acceleration[i].torus().getJacobian()*_robot.state.velocity.get();
-
-    // std::cout << "_state_machine\n" << _support_jacobian  << std::endl;
-    // _support_jacobian.noalias() = _wheel_transforms[i]->rotation.transpose()*mat_1;
-    // _support_offset.noalias() = _wheel_transforms[i]->rotation.transpose()*vec_1;
-    _support_jacobian.noalias() = mat_1;
-    _support_offset.noalias() = vec_1;
-
-    jacobian.set().block<2,3>(2*i, 3*i) = _support_jacobian.topRows<2>();
-    offset.set().segment<2>(2*i) = _support_offset.head<2>();
+    jacobian.set().block<2,3>(2*i, 3*i) = torus_acceleration[i].getJacobianWheel().topRows<2>();
+    // offset.set().segment<2>(2*i) = 0.5*torus_acceleration[i].getConstant().head<2>();  // ? minus
 
   }
+
 }

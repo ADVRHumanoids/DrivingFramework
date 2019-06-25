@@ -25,8 +25,6 @@ namespace dynamic_points
 
      // std::cout << "_support_jacobian\t" << _support_jacobian << std::endl;
      // std::cout << "angular\t" <<  _torus._v_centre.angular().getJacobian() << std::endl;
-
-
   }
 
   void TorusVelocity::compute(){

@@ -64,7 +64,6 @@ public:
 WheelsSecondOrder( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : mgnss::modules::Base(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
 
-        _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
 
 
         _x << 1, 0, 0;
@@ -73,6 +72,9 @@ WheelsSecondOrder( mwoibn::robot_class::Robot& robot, std::string config_file, s
 
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
+        _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
+        _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _select_ik.size()));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -83,12 +85,13 @@ WheelsSecondOrder( mwoibn::robot_class::Robot& robot, std::string config_file, s
 
 WheelsSecondOrder( mwoibn::robot_class::Robot& robot, YAML::Node config) : mgnss::modules::Base(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
-  _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _robot.getDofs()));
-
 
   _x << 1, 0, 0;
   _y << 0, 1, 0;
   _z << 0, 0, 1;
+  _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+
+  _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _select_ik.size()));
 
         _create(config);
         for(auto& name: _robot.getLinks("wheels"))
@@ -336,6 +339,7 @@ protected:
   // std::unique_ptr<mgnss::higher_level::QRJointSpaceV2> shape_wheel__;
 
 
+  mwoibn::VectorN _active_state;
 
   double rate = 200;
   double _dt, orientation = 0, _heading;

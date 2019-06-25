@@ -10,6 +10,12 @@
 #include "mwoibn/robot_points/handler.h"
 
 #include "mwoibn/dynamic_points/torus.h"
+#include "mwoibn/dynamic_points/torus2.h"
+#include "mwoibn/dynamic_points/acceleration.h"
+// #include "mwoibn/point_handling/linear_acceleration.h"
+// #include "mwoibn/point_handling/linear_velocity.h"
+#include "mwoibn/dynamic_points/torus_roll.h"
+#include "mwoibn/dynamic_points/torus_integrated_roll.h"
 
 #include "mwoibn/robot_points/torus_model.h"
 #include "mwoibn/robot_points/linear_point.h"
@@ -55,7 +61,7 @@ class SupportState: public StateTransformation{
   public:
     SupportState(mwoibn::robot_class::Robot& robot): _robot(robot){}
     virtual void update();
-    mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus> torus_acceleration;
+    mwoibn::robot_points::Handler<mwoibn::dynamic_points::TorusIntegratedRoll> torus_acceleration;
 
   protected:
     mwoibn::robot_class::Robot& _robot;
@@ -131,6 +137,12 @@ protected:
   virtual void _workspaceJacobian();
 
   void _update();
+
+  //mwoibn::robot_points::Handler<mwoibn::dynamic_points::Torus2> _new_model_;
+  //typedef mwoibn::dynamic_points::Acceleration<mwoibn::point_handling::LinearAcceleration, mwoibn::point_handling::LinearVelocity> linear_acceleration;
+  //mwoibn::robot_points::Handler<linear_acceleration> _wheel_center_acceleration_;
+  // mwoibn::robot_points::Handler<mwoibn::dynamic_points::TorusRoll> _torus_roll;
+
 
 };
 }

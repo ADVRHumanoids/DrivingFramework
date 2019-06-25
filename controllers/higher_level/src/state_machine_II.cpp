@@ -68,7 +68,7 @@ void mgnss::higher_level::StateMachineII::update(){
   state_II.jacobian.set().row(3*_size) = _robot.centerOfMass().getJacobian().row(0);
   state_II.jacobian.set().row(3*_size+1) = _robot.centerOfMass().getJacobian().row(1);
   state_II.jacobian.set().bottomRows(3*_size) = _hips.getJacobian();
-  // 
+  //
   // std::cout << "state_I.jacobian\n" << state_I.jacobian.get() << std::endl;
   // std::cout << "state_I.offset\n" << state_I.offset.get().transpose() << std::endl;
   // std::cout << "state_II.jacobian\n" << state_II.jacobian.get() << std::endl;

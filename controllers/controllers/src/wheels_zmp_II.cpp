@@ -105,7 +105,7 @@ void mgnss::controllers::WheelsZMPII::steering()
 
 
 void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
-        
+
   // if(!_steering_select.all())
       _steering_ptr->reset();
 
@@ -400,7 +400,7 @@ void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
             state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
             // mwoibn::VectorInt dofs__ = ;
             _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShaping5>(new mgnss::higher_level::SupportShaping5(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
-            _qr_wrappers["SHAPE_WHEEL"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->state_I.jacobian.get(), state_machine__->state_I.offset.get(), _robot, 0 ));
+            _qr_wrappers["SHAPE_WHEEL"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->state_I.jacobian.get(), state_machine__->state_I.offset.get(), _robot, 5*1e-6 ));
             _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE_WHEEL"], state_machine__->state_II.jacobian.get(), state_machine__->state_II.offset.get(), _robot, 1e-7 ));
             // _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->cost_I.jacobian.get(), state_machine__->cost_I.offset.get(), _robot ));
 
@@ -584,7 +584,7 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //
         shape_action__->log(logger);
         state_machine__->log(logger);
-        
+
 //        for(auto task: _tasks) std::cout << task.first << "\t" << task.second->getError().transpose() << std::endl;
 
 

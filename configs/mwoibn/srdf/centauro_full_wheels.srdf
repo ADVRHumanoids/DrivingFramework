@@ -869,17 +869,17 @@
    </group_state>
 
    <group_state name="ankle_plus" group="chains">
-      <joint name="ankle_yaw_1" value="0.5"/>
-      <joint name="ankle_yaw_2" value="0.5"/>
-      <joint name="ankle_yaw_3" value="0.5"/>
-      <joint name="ankle_yaw_4" value="0.5"/>
+      <joint name="ankle_yaw_1" value="0.1"/>
+      <joint name="ankle_yaw_2" value="-0.1"/>
+      <joint name="ankle_yaw_3" value="-0.1"/>
+      <joint name="ankle_yaw_4" value="0.1"/>
    </group_state>
 
    <group_state name="ankle_minus" group="chains">
-      <joint name="ankle_yaw_1" value="-0.5"/>
-      <joint name="ankle_yaw_2" value="-0.5"/>
-      <joint name="ankle_yaw_3" value="-0.5"/>
-      <joint name="ankle_yaw_4" value="-0.5"/>
+      <joint name="ankle_yaw_1" value="-0.2"/>
+      <joint name="ankle_yaw_2" value="0.1"/>
+      <joint name="ankle_yaw_3" value="0.2"/>
+      <joint name="ankle_yaw_4" value="-0.1"/>
    </group_state>
 
    <group_state name="advr_home" group="chains">

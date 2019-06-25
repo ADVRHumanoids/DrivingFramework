@@ -85,7 +85,8 @@ void mgnss::higher_level::QRJointSpaceV2::_update(){
   _cost.quadratic.block(_vars, _vars, _slack, _slack)  = _soft_gains.asDiagonal();// this value should come from somewhere else (add memeber to the soft_inequality)
 
   _cost.linear.head(_vars).noalias()  = _task.cost().linear.head(_task.vars()).transpose() * _jacobian;
-  _cost.linear.head(_vars).noalias() += _offset.transpose()*_temp;
+  _cost.linear.head(_vars).noalias() += 2*_offset.transpose()*_temp; // 2?
+  //_cost.linear.head(_vars).noalias() += 2*_offset.transpose()*_temp; // 2?
   _cost.linear.tail(_task.slack())  = _task.cost().linear.tail(_task.slack());
 
   QrTask::_update();
