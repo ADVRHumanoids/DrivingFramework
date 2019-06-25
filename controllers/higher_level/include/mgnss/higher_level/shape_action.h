@@ -183,7 +183,7 @@ void log(  mwoibn::common::Logger& logger){
         logger.add("cost_", -mwoibn::NON_EXISTING );
     else
         logger.add("cost_", _qr_task.optimalCost() );
-  logger.add("_modified_support",_modified_support.norm() );
+  // logger.add("_modified_support",_modified_support.norm() );
 
 //    logger.add("elapsed_solve", elapsed_solve.count()     );
 

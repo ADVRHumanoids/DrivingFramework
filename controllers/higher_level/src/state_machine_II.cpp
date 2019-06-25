@@ -52,7 +52,7 @@ void mgnss::higher_level::StateMachineII::_workspaceJacobian(){
   for(int i = 0; i < _contact_points.size(); i++){
     _workspace.setJacobian().block<1,3>(i,3*i) =  -(2*_workspace_points[i].get());
     // std::cout << "workspace.getJacobian()\t" << i << "\n" << _workspace.getJacobian().transpose() << std::endl;
-    _workspace.setJacobian().block<1,3>(i,3*_size+2+3*i) =   (2*_workspace_points[i].get());
+    _workspace.setJacobian().block<1,3>(i,3*_size+2+3*i) =   (2*_workspace_points[i].get()); // plus?
     // std::cout << "workspace.getJacobian()\t" << i << "\n" << _workspace.getJacobian().transpose() << std::endl;
   }
   // for(int i = 0; i < _contact_points.size(); i++)

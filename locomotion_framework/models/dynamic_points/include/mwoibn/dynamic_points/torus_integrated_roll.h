@@ -57,7 +57,7 @@ public:
         //std::cout << "velocity\t" << (acceleration.getJacobianVelocity()*_robot.rate()) << std::endl;
         mwoibn::Matrix3 temp_2_ = temp_1_*_null_space;
         temp_2_ += torus().getJacobianWheel();
-        _constant = temp_2_*_torus._v_centre.angular().getWorld();
+        _constant.noalias() = temp_2_*_torus._v_centre.angular().getWorld();
         //std::cout << "1\t" << temp_1_ << std::endl;
         // std::cout << "2\t" << torus().getJacobianWheel() << std::endl;
 
@@ -73,11 +73,11 @@ public:
 
     virtual void computeJacobian(){
         acceleration.update(true);
-        _normal_projection = _torus.groundNormal()*_torus.groundNormal().transpose();
+        _normal_projection.noalias() = _torus.groundNormal()*_torus.groundNormal().transpose();
         _null_space = mwoibn::Matrix3::Identity() - _normal_projection;
-        _wheel_jacobian = acceleration.getJacobianWheel()*_null_space;
-        _wheel_jacobian += acceleration.getJacobianVelocity()*_normal_projection*_robot.rate();
-        _jacobian = _wheel_jacobian*_torus._v_centre.angular().getJacobian();
+        _wheel_jacobian.noalias() = acceleration.getJacobianWheel()*_null_space;
+        _wheel_jacobian.noalias() += acceleration.getJacobianVelocity()*_normal_projection*_robot.rate();
+        _jacobian.noalias() = _wheel_jacobian*_torus._v_centre.angular().getJacobian();
     }
     //
     // const mwoibn::Matrix& getDependant(){return _dependend;}

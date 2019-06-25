@@ -170,7 +170,7 @@ void mgnss::higher_level::StateMachine::_update(){
 
     _contact_points.update(true);
     _points.update(false);
-    _base_points.update(false);
+    _base_points.update(true);// false
 
     for(auto& wheel: _wheel_transforms)
       wheel->compute();
