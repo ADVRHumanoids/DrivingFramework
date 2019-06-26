@@ -41,10 +41,16 @@ protected:
   XBot::MatLogger::Ptr _logger;
 
   virtual void _addField(const std::string& name, double init_value){
-    _logger->add(name, init_value);
+    _full_name = _prefix;
+    _full_name += ":";
+    _full_name += name;
+    _logger->add(_full_name, init_value);
   }
   virtual void _addEntry(const std::string& name, double value){
-    _logger->add(name, value);
+    _full_name = _prefix;
+    _full_name += ":";
+    _full_name += name;
+    _logger->add(_full_name, value);
   }
 
   virtual void _start(){}

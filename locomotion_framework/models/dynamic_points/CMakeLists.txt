@@ -42,6 +42,9 @@ add_library(mwoibn_dynamic_points
                 src/force.cpp
 //                src/linear_force.cpp
                 src/torus.cpp
+                src/torus2.cpp
+                src/torus_roll.cpp
+
                 src/torus_velocity.cpp
 )
 

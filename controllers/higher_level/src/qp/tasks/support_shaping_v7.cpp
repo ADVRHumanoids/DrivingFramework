@@ -1,13 +1,13 @@
-#include "mgnss/higher_level/qp/tasks/support_shaping_v5.h"
+#include "mgnss/higher_level/qp/tasks/support_shaping_v7.h"
 
 
 
-mgnss::higher_level::SupportShaping5::SupportShaping5(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
-  QrTask(8+2+12, 8), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
+mgnss::higher_level::SupportShaping7::SupportShaping7(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
+  QrTask(8+2+12+2+8, 8), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
     if(!_is_margin) resize(8,0);
 }
 
-void mgnss::higher_level::SupportShaping5::_allocate(){
+void mgnss::higher_level::SupportShaping7::_allocate(){
 
           _size = 4;
           _return_state.setZero(_vars); // state + slack
@@ -23,23 +23,31 @@ void mgnss::higher_level::SupportShaping5::_allocate(){
 
               QrTask::init();
               _cost.quadratic.setZero();
-              for(int i = 0; i < 4; i++){
-                // _vector_cost_[2*i] = 1;
-                // _vector_cost_[2*i+1] = 3;
-                _cost.quadratic(2*i, 2*i) = 1;
-                _cost.quadratic(2*i+1, 2*i+1) = 1;
-
-                // _vector_cost_[12+i] = 1000;
-              }
+              // for(int i = 0; i < 4; i++){
+              //   // _vector_cost_[2*i] = 1;
+              //   // _vector_cost_[2*i+1] = 3;
+              //   _cost.quadratic(2*i, 2*i) = 1;
+              //   _cost.quadratic(2*i+1, 2*i+1) = 1;
+              //   // _vector_cost_[12+i] = 1000;
+              // }
+              // contact point tracking
+              _cost.quadratic.block(0, 0, 8, 8).setIdentity();
+              // _cost.quadratic.block<2,2>(8+2+12, 8+2+12).diagonal().setConstant(4);
+              // for(int i = 0; i < 4; i++){
+              //   _cost.quadratic.block<2,2>(2*i, 8+2+12).diagonal().setConstant(-1);
+              //   _cost.quadratic.block<2,2>(8+2+12, 2*i).diagonal().setConstant(-1);
+              // }
               // _vector_cost_[8+i] = 50;
 
               // _cost.quadratic =_vector_cost_.asDiagonal(); // this is a velocity component
               _cost.quadratic.block(_vars, _vars, 4, 4) = soft_inequality[0].getGain().asDiagonal();
               _cost.quadratic.block(_vars+4, _vars+4, 4, 4) = soft_inequality[1].getGain().asDiagonal();
+
+              std::cout << "quadratic\n" << _cost.quadratic << std::endl;
 }
 
 
-void mgnss::higher_level::SupportShaping5::_update(){
+void mgnss::higher_level::SupportShaping7::_update(){
 
      _optimal_state.setZero();
 
@@ -47,12 +55,11 @@ void mgnss::higher_level::SupportShaping5::_update(){
         soft_inequality[0].setJacobian().block<4,2>(0,2*i) = _margin.getJacobian().middleCols<2>(3*i);
         // soft_inequality[1].state[4+i] = _workspace.getState()[i]/_robot.rate(); //? what is is
     //    soft_inequality[1].setState()[4+i] = -(0.0*0.0 - _workspace.getState()[i])/_robot.rate(); //Avoid going under the robot?
-        soft_inequality[1].setJacobian().block<4,2>(0,2*i) = -_workspace.getJacobian().middleCols<2>(3*i);
-        soft_inequality[1].setJacobian().block<4,2>(0,2*_size+2+3*i) = -_workspace.getJacobian().middleCols(3*_size+2+3*i,2);
-
-
+        soft_inequality[1].setJacobian().block<4,2>(0,2*_size+2+3*i) = -_workspace.getJacobian().middleCols<2>(3*_size+2+3*i);
     }
+
     soft_inequality[1].setState() = _workspace.error;
+    soft_inequality[1].setJacobian().block<4,8>(0,2*_size+2+3*_size+2) = -_workspace.getJacobian().middleCols<8>(3*_size+2+3*_size+2);
 
     //soft_inequality[1].setJacobian().block<4,8>(4,0) = _workspace.getJacobian();
 
@@ -79,7 +86,7 @@ void mgnss::higher_level::SupportShaping5::_update(){
 
 }
 
-void mgnss::higher_level::SupportShaping5::log(mwoibn::common::Logger& logger){
+void mgnss::higher_level::SupportShaping7::log(mwoibn::common::Logger& logger){
 
     logger.add("cost", _optimal_cost);
 
@@ -98,7 +105,7 @@ void mgnss::higher_level::SupportShaping5::log(mwoibn::common::Logger& logger){
 }
 
 
-void mgnss::higher_level::SupportShaping5::_outputTransform(){
+void mgnss::higher_level::SupportShaping7::_outputTransform(){
 
   // std::cout << "_cost\t" << _optimal_cost << std::endl;
   mwoibn::Vector3 temp__;

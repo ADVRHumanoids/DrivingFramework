@@ -7,6 +7,10 @@ namespace dynamic_points
 
   void Torus::computeJacobian(){
 
+      // is this under the rolling assumption or not? - how can I check it - the results are the same for the robot on the ground and different when the contact breaks that suggests it is under the rolling assumption also I am leaving the linear component for the constant -> that also suggests it is under the assumption
+      // furthermore I am using this directly in the linear model -> it should be under the rolling assumption
+      // check one more time the new model is correct
+      // correct the rolling model + differrentiate
       double scl = _torus._ground_normal.transpose()*_torus._axis_world;
       mwoibn::Vector3 alf = _torus._axis_world*scl;
 
@@ -103,6 +107,7 @@ namespace dynamic_points
   }
 
   void Torus::compute(){
+    _point = _jacobian*_state.acceleration.get() + _constant;
       //acceleration or force?
   }
 

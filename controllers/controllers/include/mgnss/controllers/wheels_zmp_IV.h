@@ -1,5 +1,5 @@
-#ifndef __MGNSS__CONTROLLERS__WHEELS_ZMP_III__H
-#define __MGNSS__CONTROLLERS__WHEELS_ZMP_III__H
+#ifndef __MGNSS__CONTROLLERS__WHEELS_ZMP_IV__H
+#define __MGNSS__CONTROLLERS__WHEELS_ZMP_IV__H
 
 #include "mgnss/controllers/wheels_controller_extend.h"
 #include <mwoibn/hierarchical_control/tasks/aggravated.h>
@@ -30,14 +30,14 @@
 //TEMP
 #include <mwoibn/dynamic_models/basic_model.h>
 
-#include <mgnss/higher_level/state_machine_III.h>
-// #include <mgnss/higher_level/state_machine.h>
+#include <mgnss/higher_level/state_machine_IV.h>
+#include <mgnss/higher_level/state_machine.h>
 // #include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
-#include <mgnss/higher_level/qp/tasks/support_shaping_v6.h>
+#include <mgnss/higher_level/qp/tasks/support_shaping_v7.h>
 
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v3.h>
-#include <mgnss/higher_level/shape_action_II.h>
+#include <mgnss/higher_level/shape_action.h>
 
 #include "mwoibn/robot_points/constant.h"
 
@@ -46,11 +46,11 @@ namespace mgnss
 
 namespace controllers {
 
-class WheelsZMPIII : public WheelsControllerExtend
+class WheelsZMPIV : public WheelsControllerExtend
 {
 
 public:
-WheelsZMPIII( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMPIV( mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
@@ -63,7 +63,7 @@ WheelsZMPIII( mwoibn::robot_class::Robot& robot, std::string config_file, std::s
 
 
 
-WheelsZMPIII( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
+WheelsZMPIV( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControllerExtend(robot), centers__(_robot.getDofs()), _world(3, _robot.getDofs())
 {
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
@@ -72,7 +72,7 @@ WheelsZMPIII( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsCont
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
-virtual ~WheelsZMPIII() {
+virtual ~WheelsZMPIV() {
 }
 
 void compute();
@@ -238,8 +238,8 @@ protected:
   // std::unique_ptr<mgnss::higher_level::SupportShapingV4> shape__;
   // std::unique_ptr<mgnss::higher_level::SteeringShape> _steering_shape_ptr;
 
-  std::unique_ptr<mgnss::higher_level::StateMachineIII> state_machine__;
-  std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeActionII> shape_action__;
+  std::unique_ptr<mgnss::higher_level::StateMachineIV> state_machine__;
+  std::unique_ptr<mwoibn::hierarchical_control::actions::ShapeAction> shape_action__;
 
   mwoibn::robot_points::Handler<mwoibn::robot_points::LinearPoint> centers__;
   std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
@@ -287,6 +287,7 @@ private:
 
   mwoibn::VectorN _forces;
   std::string _log_name, _char;
+
 
 
 };

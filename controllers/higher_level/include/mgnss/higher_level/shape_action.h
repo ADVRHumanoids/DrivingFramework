@@ -73,7 +73,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        //std::cerr << "inf\t" << infs << std::endl;
+        std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -91,9 +91,15 @@ virtual void run(){
 
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
     _qr_task.task(0).transform(); //?
+    // std::cout << "wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
     // std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
     _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get().head<12>();
+    // std::cout << "jacobian\t" << _support_world.transpose() << std::endl;
     _support_world +=  _state_machine.cost_I.offset.get().head<8>();
+
+    // std::cout << "offset\t" <<  _state_machine.cost_I.offset.get().head<8>().transpose() << std::endl;
+
+    // std::cout << "solution\t" <<  _support_world.transpose() << std::endl;
     //
     // for(int i =0; i < 4; i++){
     //   test__ = mwoibn::Vector3::Zero();
@@ -114,6 +120,8 @@ virtual void run(){
       // _eigen_scalar[0] = _desired_steer[i];
       //_steering[i].setVelocity(_eigen_scalar);
       }
+
+      //std::cout << "steer\t" << _desired_steer.transpose() << std::endl;
     // }
 
     mwoibn::Vector3 support_i;
@@ -133,7 +141,7 @@ virtual void run(){
         _modified_support.segment<3>(3*i) = _contact_point.getCurrentWorld(i);
         _modified_support.segment<2>(2*i) += _support_world.segment<2>(2*i)*_robot.rate();
 
-        if(_support_world.segment<2>(2*i).norm() > 0.01){
+        if(_support_world.segment<2>(2*i).norm() > 0.0001){
 
         // std::cout << "get before\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
           vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
@@ -175,7 +183,7 @@ void log(  mwoibn::common::Logger& logger){
         logger.add("cost_", -mwoibn::NON_EXISTING );
     else
         logger.add("cost_", _qr_task.optimalCost() );
-  logger.add("_modified_support",_modified_support.norm() );
+  // logger.add("_modified_support",_modified_support.norm() );
 
 //    logger.add("elapsed_solve", elapsed_solve.count()     );
 

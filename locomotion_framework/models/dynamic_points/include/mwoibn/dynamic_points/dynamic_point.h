@@ -40,6 +40,11 @@ public:
     _point = _jacobian*_state.acceleration.get() + _constant;
   }
 
+  virtual void update(bool jacobian) {
+      if(jacobian)
+        computeJacobian();
+      compute();
+    }
 protected:
   // mwoibn::Matrix _dot_jacobian;
   mwoibn::VectorN _constant;

@@ -1,4 +1,4 @@
-#include "mgnss/controllers/wheels_zmp_II.h"
+#include "mgnss/controllers/wheels_zmp_IV.h"
 // #include "mgnss/higher_level/steering_v8.h"
 #include "mgnss/higher_level/steering_v8.h"
 #include "mgnss/higher_level/steering_reactif.h"
@@ -21,7 +21,7 @@
 
 #include <mwoibn/robot_points/handler.h>
 
-void mgnss::controllers::WheelsZMPII::compute()
+void mgnss::controllers::WheelsZMPIV::compute()
 {
         _com_ptr->update();
 
@@ -86,7 +86,7 @@ void mgnss::controllers::WheelsZMPII::compute()
 
 }
 
-void mgnss::controllers::WheelsZMPII::steering()
+void mgnss::controllers::WheelsZMPIV::steering()
 {
 
 
@@ -104,7 +104,7 @@ void mgnss::controllers::WheelsZMPII::steering()
 }
 
 
-void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
+void mgnss::controllers::WheelsZMPIV::_setInitialConditions(){
 
   // if(!_steering_select.all())
       _steering_ptr->reset();
@@ -185,7 +185,7 @@ void mgnss::controllers::WheelsZMPII::_setInitialConditions(){
 
 }
 
-void mgnss::controllers::WheelsZMPII::step(){
+void mgnss::controllers::WheelsZMPIV::step(){
         // _steering_ptr->setVelocity(_modified_support);
 
         _position += _linear_vel  * _robot.rate();
@@ -193,7 +193,7 @@ void mgnss::controllers::WheelsZMPII::step(){
         _heading  -= 6.28318531 * std::floor((_heading + 3.14159265) / 6.28318531); // limit -pi:pi
 }
 
-void mgnss::controllers::WheelsZMPII::_allocate(){
+void mgnss::controllers::WheelsZMPIV::_allocate(){
         _log_name.reserve(1000);
         WheelsControllerExtend::_allocate();
         _temp_4.setZero(4);
@@ -280,7 +280,7 @@ void mgnss::controllers::WheelsZMPII::_allocate(){
 //        _robot.states[GAINS].velocity.set(temp_);
 }
 
-void mgnss::controllers::WheelsZMPII::_initIK(YAML::Node config){
+void mgnss::controllers::WheelsZMPIV::_initIK(YAML::Node config){
 
     WheelsController::_initIK(config);
 
@@ -331,7 +331,7 @@ void mgnss::controllers::WheelsZMPII::_initIK(YAML::Node config){
 }
 
 
-void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
+void mgnss::controllers::WheelsZMPIV::_createTasks(YAML::Node config){
 
         _name = config["name"].as<std::string>();
 
@@ -397,9 +397,9 @@ void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
 
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
                                 _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
-            state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
+            state_machine__.reset(new mgnss::higher_level::StateMachineIV(_robot, config ));
             // mwoibn::VectorInt dofs__ = ;
-            _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShaping5>(new mgnss::higher_level::SupportShaping5(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
+            _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShaping7>(new mgnss::higher_level::SupportShaping7(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
             _qr_wrappers["SHAPE_WHEEL"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->state_I.jacobian.get(), state_machine__->state_I.offset.get(), _robot, 5*1e-6 ));
             _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE_WHEEL"], state_machine__->state_II.jacobian.get(), state_machine__->state_II.offset.get(), _robot, 1e-7 ));
             // _qr_wrappers["SHAPE_JOINT"] = std::unique_ptr<mgnss::higher_level::QRJointSpaceV2>(new mgnss::higher_level::QRJointSpaceV2(*_qr_wrappers["SHAPE"], state_machine__->cost_I.jacobian.get(), state_machine__->cost_I.offset.get(), _robot ));
@@ -449,7 +449,7 @@ void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
 
 
 
-void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double time){
+void mgnss::controllers::WheelsZMPIV::log(mwoibn::common::Logger& logger, double time){
   logger.add("time", time);
 //
   logger.add("th", _robot.state.position.get()[5]);

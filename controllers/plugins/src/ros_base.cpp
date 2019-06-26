@@ -75,6 +75,7 @@ bool mgnss::plugins::RosBase::init(robot_map& share_robots, std::shared_ptr<mwoi
   }
   _plugin_ptr->logger_ptr = logger_ptr;
   _plugin_ptr->initModule(config, plugin_config, share);
+  logger_ptr->prefix(name);
   _plugin_ptr->controller_ptr->log(*(_plugin_ptr->logger_ptr),0);
 
 }

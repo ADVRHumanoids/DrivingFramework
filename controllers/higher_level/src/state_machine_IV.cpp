@@ -1,24 +1,27 @@
-#include "mgnss/higher_level/state_machine_II.h"
+#include "mgnss/higher_level/state_machine_IV.h"
 
-mgnss::higher_level::StateMachineII::StateMachineII(mwoibn::robot_class::Robot& robot, YAML::Node config):
+mgnss::higher_level::StateMachineIV::StateMachineIV(mwoibn::robot_class::Robot& robot, YAML::Node config):
   StateMachine(robot, config){
 
-        int vars = _size*3+2+_size*3;
+        int vars = _size*3+2+_size*3+2+2*_size;
         _margins.setJacobian().setZero(_size, vars); // cp + base
         _workspace.setJacobian().setZero(_size, vars);
 
         state_I.offset.set().setZero(vars-_size);
         state_I.jacobian.set().setZero(vars-_size, vars);
-        state_I.jacobian.set().bottomRightCorner(3*_size+2,3*_size+2).setIdentity();
+        state_I.jacobian.set().bottomRightCorner(3*_size+2+2+2*_size,3*_size+2+2+2*_size).setIdentity();
 
         state_II.offset.set().setZero(vars);
         state_II.jacobian.set().setZero(vars, _robot.getDofs());
+
+        _pelvis.reset(new mwoibn::robot_points::LinearPoint("pelvis", _robot));
+
 }
 
 
 // Do I have a way to validate it?
 // Try to integrate and compare with next values m + dt J \dot q = m_1+i
-void mgnss::higher_level::StateMachineII::_marginJacobians(){
+void mgnss::higher_level::StateMachineIV::_marginJacobians(){
 
     _margins.setJacobian().setZero();
 
@@ -48,29 +51,36 @@ void mgnss::higher_level::StateMachineII::_marginJacobians(){
 
 }
 
-void mgnss::higher_level::StateMachineII::_workspaceJacobian(){
+void mgnss::higher_level::StateMachineIV::_workspaceJacobian(){
   for(int i = 0; i < _contact_points.size(); i++){
-    _workspace.setJacobian().block<1,3>(i,3*i) =  -(2*_workspace_points[i].get());
+    _workspace.setJacobian().block<1,2>(i,3*_size+2+3*_size+2+2*i) =  -(2*_workspace_points[i].get()).topRows<2>();
     // std::cout << "workspace.getJacobian()\t" << i << "\n" << _workspace.getJacobian().transpose() << std::endl;
-    _workspace.setJacobian().block<1,3>(i,3*_size+2+3*i) =   (2*_workspace_points[i].get()); // plus?
+    _workspace.setJacobian().block<1,3>(i,3*_size+2+3*i) =   (2*_workspace_points[i].get());
     // std::cout << "workspace.getJacobian()\t" << i << "\n" << _workspace.getJacobian().transpose() << std::endl;
   }
   // for(int i = 0; i < _contact_points.size(); i++)
   //   _workspace.jacobian.block<8,2>(0, 2*i) = _workspace.jacobian.block<8,2>(0, 2*i)*_contact_points[i].getJacobianWheel().block<2,2>(0,0);
 }
 
-void mgnss::higher_level::StateMachineII::update(){
+void mgnss::higher_level::StateMachineIV::update(){
   StateMachine::update();
+  _pelvis->update(true);
+  _wheels.update(true);
+
   state_I.jacobian.set().block(0,0,2*_size, 3*_size) = cost_I.jacobian.get();
   state_I.offset.set().head(2*_size) = cost_I.offset.get();
 
   state_II.jacobian.set().topRows(3*_size) = cost_II.jacobian.get();
   state_II.jacobian.set().row(3*_size) = _robot.centerOfMass().getJacobian().row(0);
   state_II.jacobian.set().row(3*_size+1) = _robot.centerOfMass().getJacobian().row(1);
-  state_II.jacobian.set().bottomRows(3*_size) = _hips.getJacobian();
+  state_II.jacobian.set().middleRows(3*_size+2, 3*_size) = _hips.getJacobian();
+  state_II.jacobian.set().middleRows(3*_size+2+3*_size, 2) = _pelvis->getJacobian().topRows<2>();
+  for(int i = 0; i < _size; i++)
+    state_II.jacobian.set().middleRows<2>(3*_size+2+3*_size+2+2*i) = _wheels[i].getJacobian().topRows<2>();
+
   //
-  // std::cout << "state_I.jacobian\n" << state_I.jacobian.get() << std::endl;
-  // std::cout << "state_I.offset\n" << state_I.offset.get().transpose() << std::endl;
-  // std::cout << "state_II.jacobian\n" << state_II.jacobian.get() << std::endl;
-  // std::cout << "state_II.offset\n" << state_II.offset.get().transpose() << std::endl;
+   // std::cout << "state_I.jacobian\n" << state_I.jacobian.get() << std::endl;
+   // std::cout << "state_I.offset\n" << state_I.offset.get().transpose() << std::endl;
+   // std::cout << "state_II.jacobian\n" << state_II.jacobian.get() << std::endl;
+   // std::cout << "state_II.offset\n" << state_II.offset.get().transpose() << std::endl;
 }
