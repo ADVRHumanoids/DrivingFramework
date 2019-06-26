@@ -538,6 +538,8 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 
 //
       for(int i = 0; i < 30; i++){
+        _char = std::to_string(i);
+        
         _log_name = "pos_qr_";
         _log_name += _char;
           logger.add(_log_name, _robot.states[QR].position.get()[i]);

@@ -35,6 +35,7 @@ bool mgnss::plugins::XbotBaseUnify::init_control_plugin(XBot::Handle::Ptr handle
         _plugin_ptr->logger_ptr.reset(new mwoibn::common::XbotLogger(_plugin_ptr->name));
 
         _plugin_ptr->initModule(config, plugin_config);
+        _plugin_ptr->logger_ptr->prefix(_plugin_ptr->name);
         _plugin_ptr->controller_ptr->startLog(*(_plugin_ptr->logger_ptr.get()));
 
         return true;
@@ -69,6 +70,7 @@ bool mgnss::plugins::XbotBaseUnify::init_control_plugin(XBot::Handle::Ptr handle
 
         _plugin_ptr->logger_ptr = logger_ptr;
         _plugin_ptr->initModule(config, plugin_config, share);
+        _plugin_ptr->logger_ptr->prefix(_plugin_ptr->name);
         _plugin_ptr->controller_ptr->log(*(_plugin_ptr->logger_ptr),0);
         return true;
 }

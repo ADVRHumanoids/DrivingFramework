@@ -152,7 +152,7 @@ void mgnss::state_estimation::OdometryV4::init(){
         _filter_ptr->reset(_base_pos);
         _vel_ptr->reset(_ang_vel);
         _estimation_ptr->reset(mwoibn::VectorN::Zero(4));
-        std::cout << "OdometryV4 filter: initial state: " << _base_pos.transpose() << std::endl;
+        //std::cout << "OdometryV4 filter: initial state: " << _base_pos.transpose() << std::endl;
 
         for(int i = 0; i < _estimated.size(); i++) {
                 _contact_points[i].noalias() = _wheels_frames[i].position.getWorld();

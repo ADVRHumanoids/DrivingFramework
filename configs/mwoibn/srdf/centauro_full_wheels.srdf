@@ -694,6 +694,20 @@
       <joint name="ankle_yaw_4" value="0.3"/>
    </group_state>
 
+   <group_state name="ankles_plus" group="chains">
+      <joint name="ankle_yaw_1" value="-0.3"/>
+      <joint name="ankle_yaw_2" value=" 0.3"/>
+      <joint name="ankle_yaw_3" value=" 0.3"/>
+      <joint name="ankle_yaw_4" value=" -0.3"/>
+   </group_state>
+
+   <group_state name="ankles_minus" group="chains">
+      <joint name="ankle_yaw_1" value=" 0.3"/>
+      <joint name="ankle_yaw_2" value=" -0.3"/>
+      <joint name="ankle_yaw_3" value=" -0.3"/>
+      <joint name="ankle_yaw_4" value=" 0.3"/>
+   </group_state>
+
    <group_state name="ankles" group="chains">
       <joint name="ankle_yaw_1" value="-0.6"/>
       <joint name="ankle_yaw_2" value=" 0.6"/>
