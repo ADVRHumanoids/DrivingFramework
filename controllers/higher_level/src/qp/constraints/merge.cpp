@@ -10,14 +10,18 @@ void mgnss::higher_level::constraints::Merge::update(){
       // std::cout << i << ", " << k << ":";
       if (!active[i]) continue;
       _jacobian.row(k) = _constraints[0].getJacobian().row(i);
+      // std::cout << "\tnew:\t";
 
       for (auto& constraint: _constraints){
-              // std::cout << "\tc:";
               if(constraint->active[i]){
                 _state[k] = std::min(_state[k], constraint->getState()[i]);
-                // std::cout << " " << constraint->getState()[i];
+                 // std::cout << " " << constraint->getState()[i];
                 }
+            //Do I need it?
+
+            _state[k] = std::max(_state[k], -0.1);
       }
+      // std::cout << "sol\t" << _state[k] << std::endl;
 //      std::cout << std::endl;
       k++;
     }

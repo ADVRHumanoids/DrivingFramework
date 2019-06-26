@@ -75,9 +75,12 @@ void mgnss::higher_level::constraints::JointConstraintV2::_init(std::vector<mwoi
 
 void mgnss::higher_level::constraints::JointConstraintV2::update(){
         _max_position = -_robot.state.position.get();
+        _max_commnad  = -_robot.command.position.get();
         _max_velocity = -_robot.state.velocity.get();
 
+        // std::cout << "min\t" << std::endl;
         _min.update();
+        // std::cout << "max\t" << std::endl;
         _max.update();
 
         _state.head(_min.active.count()) = _min.getState();
