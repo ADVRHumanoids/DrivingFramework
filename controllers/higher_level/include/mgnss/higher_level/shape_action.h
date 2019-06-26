@@ -73,7 +73,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        std::cerr << "inf\t" << infs << std::endl;
+        //std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -114,8 +114,16 @@ virtual void run(){
     }
 
     // if(_desired_steer.norm() > 0.02){
+    
     for(int i =0; i < 4; i++){
-      _steering[i].setReference(_current_steer[i] + _desired_steer[i]*_robot.rate());
+        // add saturation on the steering task up to     
+//        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+//        mwoibn::eigen_utils::limitToHalfPi(temp_);
+//        if(std::fabs(temp_) < 0.3) 
+            _steering[i].setReference(_current_steer[i] + _desired_steer[i]*_robot.rate());
+//       else if(_steering[i].getCurrent() < (_current_steer[i] + _desired_steer[i]*_robot.rate() )
+//            _steering[i].setReference(_steering[i].getCurrent() + 0.1*_robot.rate())
+        
       // _steering[i].setReference(_current_steer[i]);
       // _eigen_scalar[0] = _desired_steer[i];
       //_steering[i].setVelocity(_eigen_scalar);
@@ -145,6 +153,9 @@ virtual void run(){
 
         // std::cout << "get before\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
           vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
+//        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+//        mwoibn::eigen_utils::limitToHalfPi(temp_);
+//        if(std::fabs(temp_) < 0.3) 
           _contact_point.setReferenceWorld(i, vel__, false);
         // _contact_point.setReferenceWorld(i,_contact_point.getReferenceWorld(i), false);
         // std::cout << "vel__\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
@@ -178,6 +189,12 @@ void log(  mwoibn::common::Logger& logger){
    logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
+   double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+   mwoibn::eigen_utils::limitToHalfPi(temp_);
+
+   logger.add("is_steer_"   + std::to_string(i), temp_ );
+//   logger.add("current_steer_"   + std::to_string(i), _steering[i].getCurrent() );
+//   logger.add("desired_steer_"   + std::to_string(i), _steering[i].getReference() );
  }
     if(std::isinf(_qr_task.optimalCost()))
         logger.add("cost_", -mwoibn::NON_EXISTING );
