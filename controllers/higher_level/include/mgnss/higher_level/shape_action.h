@@ -22,7 +22,7 @@ namespace actions {
 class ShapeAction : public Primary {
 public:
 ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
-            std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
+            std::vector<mwoibn::hierarchical_control::tasks::SoftAngle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
              mgnss::higher_level::StateMachine& state_machine,
@@ -114,16 +114,16 @@ virtual void run(){
     }
 
     // if(_desired_steer.norm() > 0.02){
-    
+
     for(int i =0; i < 4; i++){
-        // add saturation on the steering task up to     
+        // add saturation on the steering task up to
 //        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
 //        mwoibn::eigen_utils::limitToHalfPi(temp_);
-//        if(std::fabs(temp_) < 0.3) 
+//        if(std::fabs(temp_) < 0.3)
             _steering[i].setReference(_current_steer[i] + _desired_steer[i]*_robot.rate());
 //       else if(_steering[i].getCurrent() < (_current_steer[i] + _desired_steer[i]*_robot.rate() )
 //            _steering[i].setReference(_steering[i].getCurrent() + 0.1*_robot.rate())
-        
+
       // _steering[i].setReference(_current_steer[i]);
       // _eigen_scalar[0] = _desired_steer[i];
       //_steering[i].setVelocity(_eigen_scalar);
@@ -155,7 +155,7 @@ virtual void run(){
           vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
 //        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
 //        mwoibn::eigen_utils::limitToHalfPi(temp_);
-//        if(std::fabs(temp_) < 0.3) 
+//        if(std::fabs(temp_) < 0.3)
           _contact_point.setReferenceWorld(i, vel__, false);
         // _contact_point.setReferenceWorld(i,_contact_point.getReferenceWorld(i), false);
         // std::cout << "vel__\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
@@ -193,7 +193,9 @@ void log(  mwoibn::common::Logger& logger){
    mwoibn::eigen_utils::limitToHalfPi(temp_);
 
    logger.add("is_steer_"   + std::to_string(i), temp_ );
-//   logger.add("current_steer_"   + std::to_string(i), _steering[i].getCurrent() );
+   logger.add("steer_error_"   + std::to_string(i), _steering[i].getError()[0] );
+   logger.add("caster_error_"   + std::to_string(i), _caster.getError()[i] );
+   logger.add("camber_error_"   + std::to_string(i), _camber.getError()[i] );
 //   logger.add("desired_steer_"   + std::to_string(i), _steering[i].getReference() );
  }
     if(std::isinf(_qr_task.optimalCost()))
@@ -211,7 +213,7 @@ protected:
   // hierarchical_control::State& _state;
   mgnss::higher_level::QpAggravated& _qr_task;
   mwoibn::hierarchical_control::tasks::ContactPoint &_contact_point;
-  std::vector<mwoibn::hierarchical_control::tasks::Angle> &_steering;
+  std::vector<mwoibn::hierarchical_control::tasks::SoftAngle> &_steering;
   mgnss::higher_level::SteeringReference& _steering_reference;
   mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
   mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;

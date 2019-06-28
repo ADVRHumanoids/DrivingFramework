@@ -21,7 +21,7 @@ namespace actions {
 class ShapeActionII : public Primary {
 public:
 ShapeActionII(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
-            std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
+            std::vector<mwoibn::hierarchical_control::tasks::SoftAngle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
              mgnss::higher_level::StateMachineIII& state_machine,
@@ -185,7 +185,7 @@ protected:
   // hierarchical_control::State& _state;
   mgnss::higher_level::QpAggravated& _qr_task;
   mwoibn::hierarchical_control::tasks::ContactPoint &_contact_point;
-  std::vector<mwoibn::hierarchical_control::tasks::Angle> &_steering;
+  std::vector<mwoibn::hierarchical_control::tasks::SoftAngle> &_steering;
   mgnss::higher_level::SteeringReference& _steering_reference;
   mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
   mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;

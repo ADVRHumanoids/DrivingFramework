@@ -104,6 +104,8 @@ mwoibn::Vector3T _tA, _tB;
 
 mwoibn::Matrix3 _mA, _mB, _mC,  _s_y, _s_n, _s_v2;
 
+virtual Camber* clone_impl() const {return new Camber(*this);}
+
 };
 
 }

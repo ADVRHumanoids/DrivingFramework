@@ -100,7 +100,7 @@ virtual void log(mwoibn::common::Logger& logger, double time);
 
 
 protected:
-std::map<std::string, std::pair<mwoibn::hierarchical_control::tasks::Aggravated, std::vector<mwoibn::hierarchical_control::tasks::Angle> > > _leg_tasks;
+std::map<std::string, std::pair<mwoibn::hierarchical_control::tasks::Aggravated, std::vector<mwoibn::hierarchical_control::tasks::SoftAngle> > > _leg_tasks;
 std::unique_ptr<mwoibn::hierarchical_control::tasks::Aggravated> _world_posture_ptr;
 
 mwoibn::VectorInt _reset_count;

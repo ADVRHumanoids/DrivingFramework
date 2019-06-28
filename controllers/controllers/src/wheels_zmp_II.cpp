@@ -539,7 +539,7 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //
       for(int i = 0; i < 30; i++){
         _char = std::to_string(i);
-        
+
         _log_name = "pos_qr_";
         _log_name += _char;
           logger.add(_log_name, _robot.states[QR].position.get()[i]);
@@ -558,18 +558,18 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //
       }
 //
-      for(int i = 0; i < 4; i++){
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get();
-          logger.add("camber_", _eigen_scalar[0]);
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get();
-          logger.add("camber_qr_", _eigen_scalar[0]);
-          _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get();
-          logger.add("camber_des_", _eigen_scalar[0]);
-          logger.add("camber_err_", (-30*_leg_tasks["CAMBER"].first.getError()[i]));
-          // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.command.velocity.get())[0] );
-          // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.state.velocity.get())[0] );
-
-        }
+      // for(int i = 0; i < 4; i++){
+      //     _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.state.velocity.get();
+      //     logger.add("camber_", _eigen_scalar[0]);
+      //     _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.states[QR].velocity.get();
+      //     logger.add("camber_qr_", _eigen_scalar[0]);
+      //     _eigen_scalar.noalias() = _leg_tasks["CAMBER"].second[i].getJacobian()*_robot.command.velocity.get();
+      //     logger.add("camber_des_", _eigen_scalar[0]);
+      //     logger.add("camber_err_", (-30*_leg_tasks["CAMBER"].first.getError()[i]));
+      //     // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.command.velocity.get())[0] );
+      //     // logger.add(_names[counter], (_steering_ptr->getJacobian().row(i)*_robot.state.velocity.get())[0] );
+      //
+      //   }
 
 //
 //        // for(int i = 0; i < 4 ; i++){

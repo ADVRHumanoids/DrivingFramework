@@ -97,6 +97,8 @@ mwoibn::Vector3 _vA;
 mwoibn::Vector3T _tA, _tB;
 
 mwoibn::Matrix3 _mA, _mB, _mC, _s_v1, _s_n, _s_v2;
+virtual Caster* clone_impl() const {return new Caster(*this);}
+
 };
 
 }
