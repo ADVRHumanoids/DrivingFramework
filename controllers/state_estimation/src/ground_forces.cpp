@@ -51,6 +51,7 @@ void mgnss::state_estimation::GroundForces::_checkConfig(YAML::Node config){
 }
 
 void mgnss::state_estimation::GroundForces::_allocate(){
+  _log_name.reserve(1000);
 
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE});
@@ -88,21 +89,6 @@ void mgnss::state_estimation::GroundForces::_allocate(){
       _wheel_centers.add(mwoibn::point_handling::AngularVelocity( _wheel_frames.end(0) ));// ??
 
     }
-
-//   for(int i = 0; i < 3; i++){
-//       _log_names.push_back(std::string("__com_")+char('x'+i));
-//       _log_names.push_back(std::string("__cop_")+char('x'+i));
-//   }
-
-   for(int contact = 0; contact < _robot.contacts().size(); contact++){
-       for(int i = 0; i < 3; i++)//{
-           _log_names.push_back(_name + std::string("__RF_")+std::to_string(contact) + "_" + char('x'+i));
-           // _log_names.push_back(_name + std::string("__ddot_cp_")+std::to_string(contact) + "_" + char('x'+i));
-        // }
-   }
-
-  // for(int i =6; i< _robot.getDofs(); i++)
-  //     _log_names.push_back(_name + std::string("__torque_") + _robot.getLinks(i));
 
 }
 
@@ -174,18 +160,28 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
         _robot.centerOfMass().compute();
         _robot.centerOfPressure().compute();
 
-        int id = 0;
+        // int id = 0;
 //        for(int i = 0; i < 3; i++){
 //           logger.add(_log_names[id], _robot.centerOfMass().get()[i]);
 //           logger.add(_log_names[id+1], _robot.centerOfPressure().get()[i]);
 //            id += 2;
 //        }
 
+
+
         for(int contact = 0; contact < _robot.contacts().size(); contact++){
-            for(int i = 0; i < 3; i++)//{
-              logger.add(_log_names[id], _robot.contacts()[contact].wrench().force.getWorld()[i]); ++id;
+            _log_name = "RF_";
+            //_log_name += std::to_string(contact);
+            _log_name += _robot.contacts()[contact].getName();
+            _log_name += "_";
+
+            for(int i = 0; i < 3; i++){
+              _char = char('x'+i);
+              _log_name += _char;
+              logger.add(_log_name, _robot.contacts()[contact].wrench().force.getWorld()[i]);
+              _log_name.pop_back();
               // logger.add(_log_names[id], _force_3[3*contact+i]); ++id;
-            // }
+            }
         }
 
         // for(int i =6; i< _robot.getDofs(); i++){

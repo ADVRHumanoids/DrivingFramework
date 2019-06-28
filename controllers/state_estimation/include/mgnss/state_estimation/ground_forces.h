@@ -55,7 +55,8 @@ void _checkConfig(YAML::Node config);
 void _initConfig(YAML::Node config);
 //void _initCallbacks(YAML::Node config);
 
-std::vector<std::string> _log_names;
+// std::vector<std::string> _log_names;
+std::string _log_name, _char;
 
 
 mwoibn::point_handling::Handler<mwoibn::point_handling::LinearAcceleration> _accelerations;
