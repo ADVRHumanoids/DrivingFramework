@@ -21,6 +21,8 @@
   <depend>visualization_tools</depend>
   <depend>robot_point_handling</depend>
   <depend>robot_class_ros_extension</depend>
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

@@ -1,7 +1,8 @@
 #include "mgnss/controllers/centralized_controller.h"
 
 
-mgnss::controllers::CentralizedController::CentralizedController(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name) :  modules::Base(robot){
+mgnss::controllers::CentralizedController::CentralizedController(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name)
+:  modules::Base(robot){
 
         YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
         config["name"] = name;
@@ -23,6 +24,7 @@ void mgnss::controllers::CentralizedController::_construct(YAML::Node config){
                         *_dynamic_model_ptr, _robot));
 
         _log_name.reserve(1000);
+
 }
 
 void mgnss::controllers::CentralizedController::init(){

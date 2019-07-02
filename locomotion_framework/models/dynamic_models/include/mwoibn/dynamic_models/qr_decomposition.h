@@ -43,7 +43,7 @@ virtual ~QrDecomposition() {
 virtual const mwoibn::VectorN& getNonlinearEffects()
 {
         _function_map[DYNAMIC_MODEL::NON_LINEAR]->count();
-
+        //std::cout << "NON_LINEAR" << std::endl;
         return _qr_non_linear;
 }
 
@@ -160,7 +160,6 @@ void _updateDecomposition()
 
         _q = _qr_ptr->householderQ()*_i;
         _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
-
 
         _independent = _q_cut.transpose();
 

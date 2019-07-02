@@ -17,6 +17,7 @@ public:
 CentralizedController(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name);
 CentralizedController(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
+
 virtual ~CentralizedController(){
 }
 
@@ -48,6 +49,8 @@ protected:
 virtual void _construct(YAML::Node config);
 // mwoibn::robot_class::Robot& _reference; // this passes current reference
 
+// mwoibn::dynamic_models::QrDecomposition _dynamic_model;
+//mwoibn::gravity_compensation::SimpleQRGravityCompensation _gravity_compensation;
 std::unique_ptr<mwoibn::dynamic_models::QrDecomposition> _dynamic_model_ptr;   // online set up
 std::unique_ptr<mwoibn::gravity_compensation::SimpleQRGravityCompensation> _gravity_compensation_ptr;
 // std::unique_ptr<mwoibn::motor_side_reference::SeaReference> _actuation_model_ptr;
