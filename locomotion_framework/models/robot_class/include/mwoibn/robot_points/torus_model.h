@@ -62,6 +62,7 @@ public:
 
   const mwoibn::Matrix3& frame();
   mwoibn::point_handling::SpatialVelocity& wheelVelocity(){return _v_centre;}
+  const mwoibn::Vector3& wheelAngularVelocity(){return _angular_world;}
   const mwoibn::Matrix3& getJacobianWheel(){return _wheel_jacobian;}
   const mwoibn::Vector3& positionOffset();
 
@@ -73,6 +74,7 @@ protected:  // should I add wrench here and attach the feedback to this? could b
 
   mwoibn::Matrix3 _frame;
   mwoibn::point_handling::SpatialVelocity _v_centre;
+  mwoibn::Vector3 _angular_world;
   const mwoibn::Vector3& _ground_normal;
   mwoibn::Axis _axis, _axis_world;
 

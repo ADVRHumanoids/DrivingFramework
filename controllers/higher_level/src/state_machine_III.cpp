@@ -242,9 +242,9 @@ void mgnss::higher_level::SupportStateII::update(){
 
     mat_1.noalias() = torus_acceleration[i].getDependant()*toPN;
     mat_1 -= _support_jacobian;
-    _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelAngularVelocity();
 
-    // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelAngularVelocity();
     _support_offset += torus_acceleration[i].getIndependant();
     _support_jacobian.noalias() += torus_acceleration[i].getDependant()*toN;
     mat_1 = _support_jacobian*_robot.rate();

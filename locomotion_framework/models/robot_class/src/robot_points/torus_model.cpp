@@ -43,6 +43,7 @@
 
   void mwoibn::robot_points::TorusModel::compute(){
 
+      _angular_world = _v_centre.angular().getWorld();
     // std::cout << "centre" << _centre.position.getWorld() << std::endl;
         _axis_world = _centre.rotation().getWorld() * _axis;
        _point = _centre.position.getWorld() + positionOffset();

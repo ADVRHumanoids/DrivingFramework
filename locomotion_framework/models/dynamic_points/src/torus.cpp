@@ -18,7 +18,7 @@ namespace dynamic_points
       double ksi = 1/std::sqrt(1 - scl2 );
 
 
-      mwoibn::Vector3 w_wheel = _torus._v_centre.angular().getWorld();
+      mwoibn::Vector3 w_wheel = _torus._angular_world;
 
       mwoibn::Matrix3 s_alf, eta, s_wheel, s_y;
       mwoibn::Matrix3 I = mwoibn::Matrix3::Identity();

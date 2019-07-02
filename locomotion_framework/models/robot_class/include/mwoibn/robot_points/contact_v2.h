@@ -107,7 +107,7 @@ virtual const mwoibn::Matrix& getPointJacobian(mwoibn::Matrix3 rotation_matrix);
 
 
 virtual const mwoibn::VectorN& getReactionForce();
-virtual mwoibn::VectorN getPosition();
+virtual const mwoibn::VectorN& getPosition();
 
 virtual void setPosition(mwoibn::Vector3 new_state)
 {
@@ -116,6 +116,14 @@ virtual void setPosition(mwoibn::Vector3 new_state)
         //_wrench.setPointWorld(new_state); // this should be done automatically now
 
 }   // PH
+
+virtual const mwoibn::VectorN& acceleration(){
+  return _acceleration;
+}
+
+virtual const mwoibn::VectorN& velocity(){
+  return _velocity;
+}
 
 protected:
 //
@@ -165,13 +173,17 @@ virtual void _resize(){
         _transformation.setZero(_state_size, _state_size);
         _directions.setZero(_state_size, _state_size);
         _point.setZero(_state_size);
-
+        _full_state.setZero(7);
+        _acceleration.setZero(_state_size);
+        _velocity.setZero(_state_size);
 }
 
-void _initDirections(mwoibn::Matrix6 directions);
+virtual void _initDirections(mwoibn::Matrix6 directions);
 virtual void _read(YAML::Node contact);
 mwoibn::Matrix _rotation, _transformation, _directions;
 
+private:
+  mwoibn::VectorN _full_state;
 //mwoibn::point_handling::Position _frame;
 
 };
