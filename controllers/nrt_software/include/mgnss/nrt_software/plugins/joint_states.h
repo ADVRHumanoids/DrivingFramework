@@ -26,7 +26,7 @@ virtual ~JointStates(){}
 protected:
 
 virtual void _resetPrt(YAML::Node config){
-        Generator_::controller_ptr.reset(new mgnss::controllers::JointStates(*Generator_::_robot_ptr.begin()->second));
+        Generator_::controller_ptr.reset(new mgnss::controllers::JointStates(*Generator_::_robot_ptr.begin()->second, config));
 }
 
 virtual void _initCallbacks(YAML::Node config){
