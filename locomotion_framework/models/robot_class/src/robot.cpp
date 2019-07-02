@@ -82,7 +82,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
         _actuation = mwoibn::VectorInt::Ones(getDofs());
 
 
-        _contacts.reset(new Contacts(getDofs()));
+        _contacts.reset(new Contacts2(getDofs()));
 
         _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
         _center_of_pressure.reset(new robot_points::CenterOfPressure(_model, state, *_contacts, *_center_of_mass));

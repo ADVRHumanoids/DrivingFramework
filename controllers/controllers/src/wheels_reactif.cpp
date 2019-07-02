@@ -34,7 +34,7 @@ void mgnss::controllers::WheelsReactif::_createTasks(YAML::Node config){
                                                                             pelvis));
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
-                        _robot.getLinks("wheels"), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
+                        config["track"].as<std::string>(), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
 
         _steering_ptr->subscribe(true, true, false);
         _tasks["CONTACT_POINTS"] = _steering_ptr.get();

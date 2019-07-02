@@ -46,7 +46,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
 
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
-                             _robot.getLinks("wheels"), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
+                             config["track"].as<std::string>(), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
 
         _steering_ptr->subscribe(true, true, false);
 

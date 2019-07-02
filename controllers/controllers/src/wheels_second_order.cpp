@@ -291,7 +291,7 @@ void mgnss::controllers::WheelsSecondOrder::_createTasks(YAML::Node config){
 
             _pelvis.reset(new mwoibn::robot_points::LinearPoint("pelvis", _robot));
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointSecondOrder(
-                                _robot.getLinks("wheels"), _robot, config, *_pelvis, "pelvis" ));
+                                config["track"].as<std::string>(), _robot, config, *_pelvis, "pelvis" ));
 
             // _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointSecondOrder(
             //                       _robot.getLinks("wheels"), _robot, config, _world, "ROOT" ));

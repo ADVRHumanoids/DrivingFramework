@@ -9,7 +9,7 @@
 
 #include "mwoibn/robot_points/contact_v2.h"
 
-#include "mwoibn/robot_class/contacts.h"
+#include "mwoibn/robot_class/contacts_2.h"
 
 #include "mwoibn/communication_modules/communications.h"
 #include "mwoibn/robot_class/actuators.h"
@@ -150,7 +150,7 @@ robot_points::CenterOfPressure& centerOfPressure() {
         return *(_center_of_pressure.get());
 }
 
-Contacts& contacts() {
+Contacts2& contacts() {
         return *(_contacts.get());
 }
 //! Keeps robot states
@@ -290,7 +290,7 @@ bool _is_static;
 std::string _name;
 double _rate = 0;
 //! Keeps data about considered contacts
-std::unique_ptr<Contacts> _contacts;
+std::unique_ptr<Contacts2> _contacts;
 
 //! Kepps center of mass data
 std::unique_ptr<robot_points::CenterOfMass> _center_of_mass;

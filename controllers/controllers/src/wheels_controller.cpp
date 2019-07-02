@@ -86,7 +86,7 @@ void mgnss::controllers::WheelsController::_setInitialConditions()
       _heading = _orientation.swingTwist(_robot.contacts().contact(0).getGroundNormal(), _orientation).angle();
       //_pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_robot.contacts().contact(0).getGroundNormal(), _heading));
       _pelvis_orientation_ptr->setReference(0,mwoibn::Quaternion());
-      
+
 }
 
 void mgnss::controllers::WheelsController::_createTasks(YAML::Node config){
@@ -245,6 +245,28 @@ void mgnss::controllers::WheelsController::_initIK(YAML::Node config){
   if(!config["chain"])
         throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'chain'."));
   _select_ik = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+  if(!config["track"])
+        throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'track'."));
+
+  std::string group_ = config["track"].as<std::string>();
+  std::vector<std::string> names = _robot.getLinks(group_);
+
+  // add wheels to the contact group
+  for(auto& name: names){
+    auto contact = ranges::find_if(_robot.contacts(), [&](auto& contact)-> bool{return _robot.getBodyName(contact->wrench().getBodyId()) == name;});
+    if ( contact != ranges::end(_robot.contacts()) )
+      _robot.contacts().toGroup((*contact)->getName(), group_);
+  }
+
+  // {
+  //     std::string name = _robot.getBodyName(contact->wrench().getBodyId());
+  //
+  //     if(!std::count(names.begin(), names.end(), name)){
+  //       std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+  //       names.erase(std::remove(names.begin(), names.end(), name), names.end());
+  //       continue;
+  // }
+
   _active_state.setZero(_select_ik.size());
 
   YAML::Node ik =  config["IK"];

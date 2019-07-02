@@ -77,7 +77,7 @@ WheelsSecondOrder( mwoibn::robot_class::Robot& robot, std::string config_file, s
         _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _select_ik.size()));
 
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name:  _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
@@ -94,7 +94,7 @@ WheelsSecondOrder( mwoibn::robot_class::Robot& robot, YAML::Node config) : mgnss
   _ik_ptr.reset(new mwoibn::hierarchical_control::controllers::Actions(_robot.rate(), _select_ik.size()));
 
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name: _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 

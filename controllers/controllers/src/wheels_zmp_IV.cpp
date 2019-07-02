@@ -396,7 +396,7 @@ void mgnss::controllers::WheelsZMPIV::_createTasks(YAML::Node config){
             std::cout << tunning << std::endl;
 
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
-                                _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
+                                config["track"].as<std::string>(), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
             state_machine__.reset(new mgnss::higher_level::StateMachineIV(_robot, config ));
             // mwoibn::VectorInt dofs__ = ;
             _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShaping7>(new mgnss::higher_level::SupportShaping7(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
