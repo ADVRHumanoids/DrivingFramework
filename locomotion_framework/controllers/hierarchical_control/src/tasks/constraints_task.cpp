@@ -10,7 +10,8 @@ void mwoibn::hierarchical_control::tasks::Constraints::updateJacobian()
 
   int i = 0;
   for(auto&& [contact, is]:  ranges::view::zip(_robot.contacts(), _selector )){
-    if(is) _jacobian.middleRows(i, contact->jacobianSize()) = contact->getJacobian();
+    if(!is) continue;
+    _jacobian.middleRows(i, contact->jacobianSize()) = contact->getJacobian();
     i += contact->jacobianSize();
   }
 
