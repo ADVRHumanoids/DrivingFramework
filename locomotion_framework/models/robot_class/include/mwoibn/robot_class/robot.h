@@ -6,6 +6,7 @@
 #include "mwoibn/robot_points/contact.h"
 #include "mwoibn/robot_points/wheel_contact.h"
 #include "mwoibn/robot_points/wheel_contact_v3.h"
+#include "mwoibn/robot_points/point_contact.h"
 
 #include "mwoibn/robot_points/contact_v2.h"
 

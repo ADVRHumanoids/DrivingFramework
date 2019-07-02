@@ -132,7 +132,7 @@ unsigned int getFullJacobianRows() const {
 virtual const mwoibn::Matrix& getPointJacobian() = 0;   // PH
 virtual const mwoibn::Matrix& getWorldJacobian() = 0;   // PH
 
-virtual mwoibn::VectorN getPosition() = 0;
+virtual const mwoibn::VectorN& getPosition() = 0;
 virtual void setPosition(mwoibn::Vector3 new_state) = 0;
 
 std::string getName(){
@@ -158,7 +158,12 @@ void setGroundNormal(const mwoibn::Vector3& ground_normal){_ground_normal = grou
 //const mwoibn::Matrix3& getRotationFrame(){return _frame.getRotationWorld();}
 point_handling::Frame& getFrame(){return _frame;}
 
+// add the acceleration assumptions here
+virtual const mwoibn::VectorN& acceleration() = 0;
+virtual const mwoibn::VectorN& velocity() = 0;
+
 protected:
+
 
 virtual void _resize(){
         _jacobian.setZero(_state_size, _state.velocity.size());
@@ -168,6 +173,7 @@ bool _is_active;   //!< whether a contact is active or not?
 
 point_handling::Frame _frame;
 point_handling::Wrench _wrench;
+mwoibn::VectorN _acceleration, _velocity;
 
 
 mwoibn::Vector3 _ground_normal;

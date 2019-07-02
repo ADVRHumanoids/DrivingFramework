@@ -553,10 +553,10 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                         //      contact.second["name"] = contact.first.as<std::string>();
                         std::string type = contact["type"].as<std::string>();
 
-                        if (type.compare("point_foot") == 0)
+                        if (type.compare("contact_point") == 0)
                         {
                                 _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
-                                                       new mwoibn::robot_points::ContactV2(
+                                                       new mwoibn::robot_points::PointContact(
                                                                _model, state, contact)));
                                 loaded_contacts[_contacts->end()[-1]->getName()] = contact;
                                 continue;
