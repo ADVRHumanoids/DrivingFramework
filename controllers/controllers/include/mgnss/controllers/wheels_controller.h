@@ -2,8 +2,8 @@
 #define __MGNSS_CONTROLLERS_WHEELS_CONTROLLER_H
 
 #include "mgnss/modules/base.h"
+#include "mgnss/controllers/ik_base.h"
 
-#include <mwoibn/hierarchical_control/controllers/basic.h>
 #include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/tasks/contact_point.h>
@@ -12,22 +12,12 @@
 #include <mwoibn/hierarchical_control/tasks/cartesian_selective_task.h>
 #include <mwoibn/hierarchical_control/tasks/orientation_selective_task.h>
 
-#include <mwoibn/hierarchical_control/controllers/actions.h>
-#include <mwoibn/hierarchical_control/actions/task.h>
-#include <mwoibn/hierarchical_control/actions/compute.h>
-
-#include <mgnss/higher_level/qp/qp_action.h>
-#include <mgnss/higher_level/qp/tasks/qp_aggravated.h>
-
-#include <mgnss/higher_level/qp/tasks/qr_task_wrapper.h>
-
-#include <chrono>
 namespace mgnss
 {
 
 namespace controllers {
 
-class WheelsController : public mgnss::modules::Base
+class WheelsController : public IKBase
 {
 
 public:
@@ -36,35 +26,6 @@ WheelsController(mwoibn::robot_class::Robot& robot);
 virtual ~WheelsController() {
 }
 
-virtual void init(){
-        _robot.wait();
-        _robot.get();
-        _robot.updateKinematics();
-        _robot.centerOfMass().update();
-
-        _setInitialConditions();
-}
-
-
-virtual void log(mwoibn::common::Logger& logger, double time){
-}
-
-virtual void stop(){
-        _command.setZero();
-        _robot.command.velocity.set(_command);
-        _robot.send();
-}
-
-virtual void send(){
-        _robot.send();
-}
-
-virtual void close(){}
-
-virtual void setRate(double rate){
-        mgnss::modules::Base::setRate(rate);
-        setRate();
-}
 
 virtual void update(){
         nextStep();
@@ -175,13 +136,8 @@ virtual void step();
 
 virtual void steering();
 
-virtual void compute();
 
 virtual double limit(const double th);
-
-virtual bool isRunning() {
-        return _robot.isRunning();
-}
 
 
 virtual const mwoibn::VectorN& getSupportReference()
@@ -213,40 +169,25 @@ std::unique_ptr<mwoibn::hierarchical_control::tasks::OrientationSelective> _pelv
 std::unique_ptr<mwoibn::hierarchical_control::tasks::ContactPoint> _steering_ptr;
 
 std::unique_ptr<mgnss::higher_level::SteeringReference> _steering_ref_ptr;
-// std::vector<std::unique_ptr<mgnss::higher_level::QrTaskWrapper> > _qr_wrappers;
-std::map<std::string, std::unique_ptr<mgnss::higher_level::QrTask> > _qr_wrappers;
-std::vector<std::unique_ptr<mgnss::higher_level::QpAggravated> > _qp_aggravated;
 
-
-std::unique_ptr<mwoibn::hierarchical_control::controllers::Actions> _ik_ptr;
-
-std::map<std::string, mwoibn::hierarchical_control::tasks::BasicTask*> _tasks;  // Adding that only helps with automatic IK generation
-std::map<std::string, std::shared_ptr<mwoibn::hierarchical_control::actions::Task> > _actions;  // Adding that only helps with automatic IK generation
 
 
 //double rate = 200;
-double _dt, orientation = 0, _heading;
-mwoibn::VectorN steerings, _command, _previous_command, _support, _support_vel;
+double orientation = 0, _heading;
+mwoibn::VectorN steerings, _previous_command, _support, _support_vel;
 mwoibn::Vector3 _position, _next_step, _angular_vel, _linear_vel;
-mwoibn::Axis _x, _y, _z;
 
 mwoibn::Quaternion _orientation;
 bool _reference = false;
-mwoibn::VectorInt _select_steer, _select_ik;
+mwoibn::VectorInt _select_steer;
 mwoibn::VectorN _l_limits, _u_limits;
-mwoibn::VectorN _active_state;
 int count = 0;
-std::vector<std::string> _log_names;
 
 virtual void _setInitialConditions();
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config);
-virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config, YAML::Node full_config);
 
-virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type, YAML::Node full_config);
-virtual double _readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain);
-
-virtual void _initIK(YAML::Node config);
+// virtual double _readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain);
 //virtual void _initSteering(YAML::Node config, std::function<>);
 
 

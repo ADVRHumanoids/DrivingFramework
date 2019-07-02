@@ -56,6 +56,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   ros_callbacks
   robot_class_ros_extension
   robot_class_xbot
+  mgnss_utils
 )
 
 if(VISUALIZATION_TOOLS)
@@ -192,21 +193,21 @@ target_link_libraries(shared
 )
 
 #### USED
-#  LIST( APPEND INSTALL_TARGETS joint_states )
-#
-#  add_library(joint_states SHARED
-#     src/plugins/joint_states.cpp
-#   )
-#  add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
-#  target_link_libraries(joint_states
-#     ${catkin_LIBRARIES}
-#     ${XCM_LIBRARIES}
-#  )
+  LIST( APPEND INSTALL_TARGETS joint_states )
 
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(joint_states)
-#  endif()
+  add_library(joint_states SHARED
+     src/plugins/joint_states.cpp
+   )
+  add_dependencies(joint_states ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(joint_states
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+  )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(joint_states)
+  endif()
 
 #### NOT USED
 #   LIST( APPEND INSTALL_TARGETS centralized )
@@ -255,22 +256,39 @@ target_link_libraries(shared
 #  endif()
 
 #### USED
-#
-#      LIST( APPEND INSTALL_TARGETS odometry3 )
-#
-#      add_library(odometry3 SHARED
-#         src/plugins/odometry_4.cpp
-#       )
-#      add_dependencies(odometry3 ${catkin_EXPORTED_TARGETS})
-#      target_link_libraries(odometry3
-#         ${catkin_LIBRARIES}
-#         ${XCM_LIBRARIES}
-#       )
-#    if ( Xenomai_FOUND )
-#      message(WARNING "set_xeno_flags")
-#      set_xeno_flags(odometry3)
-#    endif()
 
+      LIST( APPEND INSTALL_TARGETS odometry3 )
+
+      add_library(odometry3 SHARED
+         src/plugins/odometry_4.cpp
+       )
+      add_dependencies(odometry3 ${catkin_EXPORTED_TARGETS})
+      target_link_libraries(odometry3
+         ${catkin_LIBRARIES}
+         ${XCM_LIBRARIES}
+       )
+    if ( Xenomai_FOUND )
+      message(WARNING "set_xeno_flags")
+      set_xeno_flags(odometry3)
+    endif()
+
+
+#### USED
+  LIST( APPEND INSTALL_TARGETS UpperBodyIK )
+
+  add_library(UpperBodyIK SHARED
+     src/plugins/upper_body_ik.cpp
+   )
+  add_dependencies(UpperBodyIK ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(UpperBodyIK
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+  )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(UpperBodyIK)
+  endif()
 
 #    LIST( APPEND INSTALL_TARGETS NwheelsWorld )
 #
@@ -422,38 +440,38 @@ set_xeno_flags(NwheelsSecondOrder)
 endif()
 
 #### USED
-#     LIST( APPEND INSTALL_TARGETS ground_forces )
-#
-#     add_library(ground_forces SHARED
-#        src/plugins/ground_forces.cpp
-#      )
-#     add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
-#     target_link_libraries(ground_forces
-#        ${catkin_LIBRARIES}
-#        ${XCM_LIBRARIES}
-#    )
-#
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(ground_forces)
-#  endif()
+     LIST( APPEND INSTALL_TARGETS ground_forces )
 
-#      LIST( APPEND INSTALL_TARGETS gravity_compensation )
-#
-#      add_library(gravity_compensation SHARED
-#         src/plugins/gravity_compensation.cpp
-#       )
-#      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
-#      target_link_libraries(gravity_compensation
-#         ${catkin_LIBRARIES}
-#         ${XCM_LIBRARIES}
-#     )
+     add_library(ground_forces SHARED
+        src/plugins/ground_forces.cpp
+      )
+     add_dependencies(ground_forces ${catkin_EXPORTED_TARGETS})
+     target_link_libraries(ground_forces
+        ${catkin_LIBRARIES}
+        ${XCM_LIBRARIES}
+    )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(ground_forces)
+  endif()
+
+      LIST( APPEND INSTALL_TARGETS gravity_compensation )
+
+      add_library(gravity_compensation SHARED
+         src/plugins/gravity_compensation.cpp
+       )
+      add_dependencies(gravity_compensation ${catkin_EXPORTED_TARGETS})
+      target_link_libraries(gravity_compensation
+         ${catkin_LIBRARIES}
+         ${XCM_LIBRARIES}
+     )
 
 
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(gravity_compensation)
-#  endif()
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(gravity_compensation)
+  endif()
 
 #### USED
 #  LIST( APPEND INSTALL_TARGETS compliance_compensation )
