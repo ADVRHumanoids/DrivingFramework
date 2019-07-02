@@ -49,6 +49,11 @@
       <link name="imu_link"/>
    </group>
 
+   <group name="manipulation">
+      <link name="arm1_7"/>
+      <link name="arm2_7"/>
+   </group>
+
    <group name="wheels">
       <link name="wheel_1"/>
       <link name="wheel_2"/>
