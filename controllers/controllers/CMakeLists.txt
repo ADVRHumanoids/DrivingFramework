@@ -16,8 +16,8 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-#LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
-LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels)
+LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
+#LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels)
 LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules mgnss_higher_level robot_class)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -31,8 +31,8 @@ catkin_package(
           ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         mgnss_controllers_wheels
-#        mgnss_controllers_centralized
-#        mgnss_controllers_joint_space
+        mgnss_controllers_centralized
+        mgnss_controllers_joint_space
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -70,28 +70,28 @@ target_link_libraries(mgnss_controllers_wheels
  )
 
 
-#add_library(mgnss_controllers_centralized
+add_library(mgnss_controllers_centralized
 #   src/online_centralized_controller.cpp
 #   src/compliance_compensation.cpp
-#   src/centralized_controller.cpp
-# )
+   src/centralized_controller.cpp
+ )
 
-#add_dependencies(mgnss_controllers_centralized ${catkin_EXPORTED_TARGETS})
+add_dependencies(mgnss_controllers_centralized ${catkin_EXPORTED_TARGETS})
 
-#target_link_libraries(mgnss_controllers_centralized
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(mgnss_controllers_centralized
+   ${catkin_LIBRARIES}
+ )
 
 
-#add_library(mgnss_controllers_joint_space
-#   src/joint_states.cpp
-# )
+add_library(mgnss_controllers_joint_space
+   src/joint_states.cpp
+ )
 
-#add_dependencies(mgnss_controllers_joint_space ${catkin_EXPORTED_TARGETS})
+add_dependencies(mgnss_controllers_joint_space ${catkin_EXPORTED_TARGETS})
 
-#target_link_libraries(mgnss_controllers_joint_space
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(mgnss_controllers_joint_space
+   ${catkin_LIBRARIES}
+ )
 
 #MESSAGE( WARNING "CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX} )
 #MESSAGE( WARNING "CMAKE_DEVEL_PREFIX: " ${CMAKE_DEVEL_PREFIX} )
