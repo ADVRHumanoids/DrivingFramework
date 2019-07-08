@@ -271,7 +271,24 @@ virtual void loadControllers(YAML::Node full_config, std::string config_name,
 
 std::string name(){return _name;}
 
+
+virtual void srdfContactGroup(const std::string& srdf_group){
+  if(contacts().hasGroup(srdf_group)) return;
+
+  std::vector<std::string> names = getLinks(srdf_group);
+
+  // add wheels to the contact group
+  for(auto& name: names){
+      auto contact = ranges::find_if(contacts(), [&](auto& contact)-> bool{return getBodyName(contact->wrench().getBodyId()) == name;});
+      if ( contact != ranges::end(contacts()) )
+          contacts().toGroup((*contact)->getName(), srdf_group);
+  }
+
+}
+
 common::Flag  kinematics_update;
+
+
 
 protected:
 //! Alternative robot class initializer,

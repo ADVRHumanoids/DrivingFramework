@@ -42,7 +42,8 @@ void mgnss::higher_level::QrTask::init(){
     _inequality.setJacobian().block(hard_inequality.rows() + soft_inequality.rows(),_vars, soft_inequality.rows(), _slack ) = -mwoibn::Matrix::Identity(soft_inequality.rows(), _slack);
 
     _inequality.transpose();
-
+    _optimal_state.setZero();
+    _optimal_cost = 0;
     _solver.init(  _cost.size, _equality.rows(), _inequality.rows());
 }
 
@@ -131,8 +132,10 @@ void mgnss::higher_level::QrTask::solve(){
     _llt.compute(_cost.quadratic);
     _cost.trace = _cost.quadratic.trace();
 
-    if(std::isinf(_optimal_cost)) _optimal_state.setZero();
+    // if(std::isinf(_optimal_cost)) _optimal_state.setZero();
     _optimal_cost = _solver.solve_quadprog2(_llt, _trace, _cost.linear, _equality.getTransposed(), _equality.getState(), _inequality.getTransposed(), _inequality.getState(), _optimal_state);
+    if(std::isinf(_optimal_cost)) _optimal_state.setZero(); // if no solution found reset the inital conditions
+
     // std::cout << "_optimal_cost\t" << _optimal_cost << std::endl;
     _return_state = _optimal_state.head(_vars);
     _outputTransform();

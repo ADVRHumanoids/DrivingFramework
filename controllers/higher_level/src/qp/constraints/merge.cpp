@@ -19,7 +19,8 @@ void mgnss::higher_level::constraints::Merge::update(){
                 }
             //Do I need it?
 
-            _state[k] = std::max(_state[k], -0.1);
+            //_state[k] = std::max(_state[k], -0.1);
+            _state[k] = std::max(_state[k], 0.0);
       }
       // std::cout << "sol\t" << _state[k] << std::endl;
 //      std::cout << std::endl;

@@ -32,6 +32,9 @@ virtual void update(){
         compute();
 }
 
+void compute();
+
+
 virtual void setRate(){
         _dt = _robot.rate(); _steering_ref_ptr->setRate(_dt);
 }

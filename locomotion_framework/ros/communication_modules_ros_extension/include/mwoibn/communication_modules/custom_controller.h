@@ -23,10 +23,13 @@ class CustomController : public BasicController
 
 public:
   CustomController(mwoibn::robot_class::State& command,
+                 mwoibn::robot_class::State& lower_limits,
+                 mwoibn::robot_class::State& upper_limits,
                    mwoibn::robot_class::BiMap& map, std::string topic,
                    bool position = true, bool velocity = false,
                    bool torque = true)
-      : BasicController(command, map, position, velocity, torque)
+      : BasicController(command, map, position, velocity, torque), _lower_limits(lower_limits),
+        _upper_limits(upper_limits)
   {
     _init(map.reversed(), map.getDofs(), topic);
 
@@ -34,10 +37,13 @@ public:
   }
 
   CustomController(mwoibn::robot_class::State& command,
+                 mwoibn::robot_class::State& lower_limits,
+                 mwoibn::robot_class::State& upper_limits,
                    mwoibn::robot_class::BiMap&& map, std::string topic,
                    bool position = true, bool velocity = false,
                    bool torque = true)
-      : BasicController(command, map, position, velocity, torque)
+      : BasicController(command, map, position, velocity, torque), _lower_limits(lower_limits),
+        _upper_limits(upper_limits)
   {
     _init(map.reversed(), map.getDofs(), topic);
 
@@ -45,7 +51,8 @@ public:
   }
 
   CustomController(CustomController& other)
-      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name)
+      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name), _lower_limits(other._lower_limits),
+        _upper_limits(other._upper_limits)
   {
     std::string topic = other._command_pub.getTopic();
     other._command_pub.shutdown();
@@ -64,7 +71,8 @@ public:
     }
 
   CustomController(CustomController&& other)
-      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name)
+      : BasicController(other), _node(other._node), _des_q(other._des_q), _name(other._name), _lower_limits(other._lower_limits),
+        _upper_limits(other._upper_limits)
   {
     std::string topic = other._command_pub.getTopic();
     other._command_pub.shutdown();
@@ -83,18 +91,24 @@ public:
    }
 
   CustomController(
-      mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap& map,
+      mwoibn::robot_class::State& command,
+      mwoibn::robot_class::State& lower_limits,
+      mwoibn::robot_class::State& upper_limits, mwoibn::robot_class::BiMap& map,
       YAML::Node config)
-      : BasicController(command, map, config)
+      : BasicController(command, map, config), _lower_limits(lower_limits),
+        _upper_limits(upper_limits)
   {
     _init(config);
 
   }
 
   CustomController(
-      mwoibn::robot_class::State& command, mwoibn::robot_class::BiMap&& map,
+      mwoibn::robot_class::State& command,
+      mwoibn::robot_class::State& lower_limits,
+      mwoibn::robot_class::State& upper_limits, mwoibn::robot_class::BiMap&& map,
       YAML::Node config)
-      : BasicController(command, map, config)
+      : BasicController(command, map, config), _lower_limits(lower_limits),
+        _upper_limits(upper_limits)
   { _init(config);}
 
   virtual ~CustomController() {}
@@ -113,6 +127,8 @@ protected:
   custom_messages::CustomCmnd _des_q;
   ros::ServiceServer _load_gains_srv;
   std::string _name;
+  const mwoibn::robot_class::State& _lower_limits;
+  const mwoibn::robot_class::State& _upper_limits;
 
   template <typename Vector>
   void _init(const Vector& urdf_rbdl, unsigned int rbdl_dofs,
@@ -201,6 +217,24 @@ protected:
 
 
     std::cout << "Loaded direct controller " << config["name"] << std::endl;
+  }
+
+  void _limit(mwoibn::Interface interface)
+  {
+
+    for (int i = 0; i < _command[interface].size(); i++)
+    {
+      if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
+      if (_lower_limits[interface].get(i) == mwoibn::NON_EXISTING)
+          //std::cout << interface << "\t" << i << std::endl;
+          continue;
+      if (_command[interface].get(i) < _lower_limits[interface].get(i)){
+          _command[interface].set(_lower_limits[interface].get(i), i);
+      }
+      else if (_command[interface].get(i) > _upper_limits[interface].get(i)){
+               _command[interface].set(_upper_limits[interface].get(i), i);
+      }
+    }
   }
 
 

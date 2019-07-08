@@ -16,8 +16,13 @@ mgnss::controllers::CentralizedController::CentralizedController(mwoibn::robot_c
 void mgnss::controllers::CentralizedController::_construct(YAML::Node config){
 
         _name = config["name"].as<std::string>();
-        _dynamic_model_ptr.reset(
-                        new mwoibn::dynamic_models::QrDecomposition(_robot));
+
+        if(!config["track"])
+          _dynamic_model_ptr.reset(
+                new mwoibn::dynamic_models::QrDecomposition(_robot));
+        else
+          _dynamic_model_ptr.reset(
+                new mwoibn::dynamic_models::QrDecomposition(_robot, {}, config["track"].as<std::string>()));
 
         _gravity_compensation_ptr.reset(
                 new mwoibn::gravity_compensation::SimpleQRGravityCompensation(

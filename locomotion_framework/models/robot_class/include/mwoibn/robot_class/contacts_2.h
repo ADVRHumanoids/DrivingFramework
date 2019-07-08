@@ -81,12 +81,15 @@ virtual mwoibn::robot_points::Contact& operator[](const std::string& name) {
 }
 
 virtual const std::vector<mwoibn::robot_points::Contact*>& group(const std::string& name) const {
-        return _groups.at(name);
+  return _groups.at(name);
 }
 
 virtual std::vector<mwoibn::robot_points::Contact*>& group(const std::string& name) {
-        return _groups.at(name);
+     return _groups.at(name);
 }
+
+bool hasGroup(std::string group){return _groups.count(group);}
+
 protected:
 std::map<std::string, mwoibn::robot_points::Contact* > _names;
 std::map<std::string, std::vector<mwoibn::robot_points::Contact*> > _groups;

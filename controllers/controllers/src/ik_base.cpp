@@ -120,11 +120,12 @@ std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers:
         _qr_wrappers[task_name_]->init();
       }
 
-      for(auto& action: _actions){
-          if(action.first == task) continue;
-          _qp_aggravated.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
-      }
-      _qp_aggravated.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+      // for(auto& action: _actions){
+      //     if(action.first == task) continue;
+      //     _qp_aggravated.back()->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+      // }
+      // _qp_aggravated.back()->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+      _addConstraints(config, *_qp_aggravated.back(), task); // this should add the constrinats before the ones that should be removed
 
       _qp_aggravated.back()->init();
       return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qp_aggravated.back(), _ik_ptr->state);
@@ -146,13 +147,8 @@ std::shared_ptr<mwoibn::hierarchical_control::actions::Task> mgnss::controllers:
        _qr_wrappers[task] = std::unique_ptr<mgnss::higher_level::QrTaskWrapper>(new mgnss::higher_level::QrTaskWrapper(*_tasks[task], gain, task_damp_, _robot));
     }
 
-    for(auto& action: _actions){
-        if(action.first == task) continue;
-        if(!_tasks[action.first]) continue;
-        _qr_wrappers[task]->equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
-    }
-
-    _qr_wrappers[task]->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+    _addConstraints(config, *_qr_wrappers[task], task);
+    _addConstraints(config, *_qr_wrappers[task]); // this should add the constrinats before the ones that should be removed
 
     _qr_wrappers[task]->init();
     return std::make_shared<mwoibn::hierarchical_control::actions::QP>(*_qr_wrappers[task], _ik_ptr->state);
@@ -246,7 +242,16 @@ void mgnss::controllers::IKBase::_initIK(YAML::Node config){
 
 }
 
+void mgnss::controllers::IKBase::_addConstraints(YAML::Node config, mgnss::higher_level::QrTask& task, const std::string& name){
 
+  for(auto& action: _actions){
+      if(action.first == name) continue;
+      if(!_tasks[action.first]) continue;
+      task.equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+  }
+
+  task.hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+}
 
 
 //

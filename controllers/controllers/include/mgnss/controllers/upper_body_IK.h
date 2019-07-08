@@ -2,7 +2,7 @@
 #define __MGNSS_CONTROLLERS_UPPER_BODY_IK_H
 
 #include "mgnss/controllers/ik_base.h"
-
+#include "mwoibn/robot_points/norm.h"
 //#include <mwoibn/hierarchical_control/tasks/constraints_task.h>
 
 #include <mwoibn/hierarchical_control/tasks/cartesian_world_task.h>
@@ -45,7 +45,19 @@ virtual void step(){
     else
       _arms_ptr->setReference(i, _arms_ptr->getReference(i)+_direction.normalized()*_step);
   }
-  std::cout << _arms_ptr->getError().transpose() << std::endl;
+
+  _body_points.update(true);
+  _workspace_points.update(true);
+  _norms_points.update(true);
+  // std::cout << "state\t" << _qr_wrappers["ARMS"]->hard_inequality.getState().transpose() << std::endl;
+  // std::cout << "norms\t" << _norms_points.getState().transpose() << std::endl;
+  if(std::isinf(_qr_wrappers["ARMS"]->optimalCost())){
+    std::cerr << "upper_body:inf\t" << _infs << std::endl;
+    ++_infs;
+  }
+  // std::cout << _qr_wrappers["ARMS"]->hard_inequality[0].getState().transpose() << std::endl;
+
+  // std::cout << _arms_ptr->getError().transpose() << std::endl;
 }
 
 
@@ -70,7 +82,22 @@ virtual void _createTasks(YAML::Node config);
 mwoibn::VectorN _desried_pos;
 double _step = 0.01, _current_step;
 mwoibn::Vector3 _direction;
-
+mwoibn::VectorN _arm_workspace;
+mwoibn::robot_points::Handler<mwoibn::robot_points::Minus> _workspace_points;
+mwoibn::robot_points::Handler<mwoibn::robot_points::Norm> _norms_points;
+mwoibn::robot_points::Handler<mwoibn::robot_points::Point> _body_points;
+virtual void _addConstraints(YAML::Node config, mgnss::higher_level::QrTask& task);
+int _infs = 0;
+// virtual void _addConstraints(YAML::Node config, mgnss::higher_level::QrTask& task, const std::string& name){
+//   // for(auto& action: _actions){
+//   //     if(action.first == name) continue;
+//   //     if(!_tasks[action.first]) continue;
+//   //     task.equality.add(mgnss::higher_level::PreviousTask(*_tasks[action.first], _ik_ptr->state.command));
+//   // }
+//   //
+//   // task.hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
+//
+// }
 
 };
 }

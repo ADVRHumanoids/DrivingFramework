@@ -73,7 +73,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        //std::cerr << "inf\t" << infs << std::endl;
+        std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -111,6 +111,8 @@ virtual void run(){
       _desired_steer.setZero();
       _modified_support.setZero();
       _support_world.setZero();
+      for(auto& constraint: _qr_task.hard_inequality)
+        std::cout << constraint->getState().transpose() << std::endl;
     }
 
     // if(_desired_steer.norm() > 0.02){
@@ -206,6 +208,8 @@ void log(  mwoibn::common::Logger& logger){
 
 //    logger.add("elapsed_solve", elapsed_solve.count()     );
 
+  // for(int i = 0; i < _qr_task.hard_inequality.size(); i++)
+  //   logger.add("inequality_"+std::to_string(i), _qr_task.hard_inequality.getState()[i]);
 
 }
 

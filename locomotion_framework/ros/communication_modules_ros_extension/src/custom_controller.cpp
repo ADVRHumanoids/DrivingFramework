@@ -5,10 +5,12 @@ bool mwoibn::communication_modules::CustomController::run()
 
   if (_position)
   {
+    _limit("POSITION");
     mapTo(_command.position.get(), _des_q.position);
   }
   if (_torque)
   {
+    _limit("TORQUE");
     mapTo(_command.torque.get(), _des_q.effort);
   }
 

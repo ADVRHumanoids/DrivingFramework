@@ -45,6 +45,31 @@ void mgnss::controllers::WheelsController::steering()
         }
 }
 
+void mgnss::controllers::WheelsController::compute()
+{
+        // std::cout << "compute\t" << _robot.command.position.get().transpose() << std::endl;
+
+        _command.noalias() = _ik_ptr->update();
+
+        // std::cout << "IK\t" << _command.transpose() << std::endl;
+        // std::cout << "position\t" << _robot.command.velocity.set(_command, _select_ik) << std::endl;
+        _robot.command.velocity.set(_command, _select_ik);
+        _command.noalias() = _command * _robot.rate();
+        //_active_state = _command;
+        // std::cout << "position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
+
+        _robot.command.position.get(_active_state, _select_ik);
+
+        for(int i = 0; i < _select_ik.size(); i++)
+        _command[i] += _active_state[i];
+
+        _robot.command.position.set(_command, _select_ik);
+        // std::cout << "after position\t" << _robot.command.position.get().head<30>().transpose() << std::endl;
+
+
+}
+
+
 void mgnss::controllers::WheelsController::_setInitialConditions()
 {
       _pelvis_orientation_ptr->points().point(0).getOrientationWorld(_orientation);

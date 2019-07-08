@@ -118,6 +118,8 @@ virtual void _setInitialConditions() = 0;
 virtual void _allocate();
 virtual void _createTasks(YAML::Node config) = 0;
 virtual mwoibn::hierarchical_control::actions::Task& _createAction(std::string task, YAML::Node config, YAML::Node full_config);
+virtual void _addConstraints(YAML::Node config, mgnss::higher_level::QrTask& task){}
+virtual void _addConstraints(YAML::Node config, mgnss::higher_level::QrTask& task, const std::string& name);
 
 virtual std::shared_ptr<mwoibn::hierarchical_control::actions::Task> _taskAction(std::string task, YAML::Node config, std::string type, YAML::Node full_config);
 virtual double _readTask(YAML::Node config, std::string task, mwoibn::VectorN& gain);

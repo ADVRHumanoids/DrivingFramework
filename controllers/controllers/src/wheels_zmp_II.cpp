@@ -215,6 +215,7 @@ void mgnss::controllers::WheelsZMPII::_allocate(){
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_tasks["CASTER"]->getJacobian(),  0.1));
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
         //_shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY", "TORQUE"}));
+
         _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, _robot.getDof(_robot.getLinks("lower_body" ) ), {"POSITION","VELOCITY", "TORQUE"}, *_dynamic_ptr));
         for(auto& link: _robot.getLinks("hips")){
           _soft_hip.push_back(std::tuple<int, mwoibn::Matrix, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN>(_robot.getDof(link)[0], mwoibn::Matrix(1, _robot.getDofs()), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1)));

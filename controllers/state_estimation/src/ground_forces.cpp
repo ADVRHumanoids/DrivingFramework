@@ -126,7 +126,7 @@ void mgnss::state_estimation::GroundForces::update()
       _force_2 -= _accelerations.getWorld();
 
       for(int i = 0; i < _robot.contacts().size(); i++){
-          //_vec_1 = _wheel_frames[i].rotation().getWorld()*_robot.contacts()[i].getFrame().getLinearFixed(); // what about the contact assumptions here?
+          // _force_3.segment<3>(3*i) = _wheel_frames[i].rotation().getWorld()*_robot.contacts()[i].getFrame().getLinearFixed(); // what about the contact assumptions here?
           //_vec_2 = _wheel_centers[i].getWorld().head<3>().cross(_vec_1); // Add assummed acceleration
           _force_3.segment<3>(3*i) = _robot.contacts()[i].acceleration(); // this is true for the rolling motion, but not for the point contact
       }

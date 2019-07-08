@@ -6,6 +6,9 @@
 #include <mwoibn/hierarchical_control/tasks/center_of_mass_task.h>
 #include <mwoibn/hierarchical_control/tasks/aggravated.h>
 
+#include <mgnss/higher_level/state_machine_II.h>
+#include <mgnss/higher_level/state_machine.h>
+
 namespace mgnss
 {
 namespace controllers
@@ -41,6 +44,7 @@ void updateBase(){
         _com_ptr->setReference(_com_ref);
 
         WheelsController::updateBase();
+        state_machine__->update();
 }
 
 const mwoibn::VectorN& getComFull(){
@@ -92,6 +96,7 @@ protected:
   void _allocate(YAML::Node config);
 
   std::unique_ptr<mwoibn::hierarchical_control::tasks::CenterOfMass> _com_ptr;
+  std::unique_ptr<mgnss::higher_level::StateMachineII> state_machine__;
 
   mwoibn::VectorN _com_ref;
 
