@@ -171,7 +171,7 @@ void mgnss::state_estimation::OdometryV4::init(){
 
 
         update(); // in here I should set it up to zero
-        std::cout << _velocity_ptr->get().transpose() << std::endl;
+        // std::cout << _velocity_ptr->get().transpose() << std::endl;
 
 
 }

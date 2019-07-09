@@ -99,7 +99,7 @@ mwoibn:
                 direct:
                         list: [position_controller, velocity_controller]                        
                 position_reference:
-                        list: [whole_body]
+                        list: [upper_body]
                 torque_reference:
                         list: [torque_reference]
                 empty:
@@ -561,7 +561,17 @@ mwoibn:
                         mode: full
                         kinematics: false
                         dynamics: false
-                        model_change: false                        
+                        model_change: false
+                        chain: chains
+                joint_lower:
+                        layer: RT
+                        robot: joint_space
+                        controller: direct
+                        mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false
+                        chain: lower_body
                 joint_reference:
                         layer: RT
                         robot: default
@@ -572,7 +582,8 @@ mwoibn:
                         mode: full
                         kinematics: false
                         dynamics: false
-                        model_change: false                        
+                        model_change: false
+                        chain: upper_body
                 wheeled_motion:
                         layer: RT
                         robot: default
@@ -680,7 +691,7 @@ mwoibn:
                                         CONSTRAINTS: 1
                                         STEERING: 20 #50
                                         BASE: [0.10, 0.10, 4, 2, 2, 3]
-                                        CONTACT_POINTS: 4
+                                        CONTACT_POINTS: 4 # 8?
 #                                        CONTACT_POINTS: 0.01
                                         CAMBER: 0.7 # 4
                                         CASTER: 1.5 # 10

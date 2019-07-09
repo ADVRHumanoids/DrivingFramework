@@ -1,45 +1,61 @@
 #include "mgnss/controllers/joint_states.h"
 
-
-mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot)
-        : modules::Base(robot), _wheels("pelvis", robot)
-{
-
-        _vel_map = _robot.selectors().get("wheels").which();
-        _ankle_map = _robot.selectors().get("camber").which();
-        _yaw_map = _robot.selectors().get("yaws").which();
-
-        _velocity.setZero(_vel_map.size());
-        _vel_sign.setOnes(_vel_map.size());
-        _last_ankle.setZero(_ankle_map.size());
-        _des_ankle.setZero(_ankle_map.size());
-
-        _position = _robot.state.position.get();
-        _last_position = _position;
-
-        _pos_ref = _position;
-        _vel_ref = _velocity;
-        _init_ankle.setZero(_ankle_map.size());
-
-        for (auto link : _robot.getLinks("wheels"))
-                _wheels.addPoint(link);
+mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name): modules::Base(robot){
+  YAML::Node config = mwoibn::robot_class::Robot::getConfig(config_file)["modules"][name];
+  config["name"] = name;
+  _allocate(config);
 
 }
+mgnss::controllers::JointStates::JointStates(mwoibn::robot_class::Robot& robot, YAML::Node config): modules::Base(robot){
+  //config["name"] = name;
+  _allocate(config);
+
+}
+
+void mgnss::controllers::JointStates::_allocate(YAML::Node config){
+
+
+   if(!config["name"])
+        throw(std::invalid_argument("JointStates: Unknown controller name"));
+    
+  _name = config["name"].as<std::string>();
+        
+   mwoibn::VectorInt temp_ = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
+  _pos_map.setConstant(_robot.getDofs(), false);
+  for(int i = 0; i < temp_.size(); i++)
+    _pos_map[temp_[i]] = true;
+
+  _vel_map = _robot.selectors().get("wheels").which();
+  //_ankle_map = _robot.selectors().get("camber").which();
+  //_yaw_map = _robot.selectors().get("yaws").which();
+
+  _velocity.setZero(_vel_map.size());
+//  _vel_sign.setOnes(_vel_map.size());
+  // _last_ankle.setZero(_ankle_map.size());
+//  _des_ankle.setZero(_ankle_map.size());
+
+  _position = _robot.state.position.get();
+  _last_position = _position;
+
+  _pos_ref = _position;
+  _vel_ref = _velocity;
+//  _init_ankle.setZero(_ankle_map.size());
+
+}
+
 
 void mgnss::controllers::JointStates::init(){
 
         _position.noalias() = _robot.state.position.get();
 
-        _robot.state.position.get(_des_ankle, _ankle_map);
-        _robot.state.position.get(_init_ankle, _ankle_map);
+//        _robot.state.position.get(_des_ankle, _ankle_map);
+//        _robot.state.position.get(_init_ankle, _ankle_map);
 
         _pos_ref.noalias() = _position;
         _vel_ref.noalias() = _velocity;
 
-        _robot.state.position.get(_last_ankle, _ankle_map);
+        // _robot.state.position.get(_last_ankle, _ankle_map);
         _robot.command.position.set(_position);
-
-//      _wheels_positions = _wheels.getFullStatesReference();
 
 }
 
@@ -56,121 +72,12 @@ bool mgnss::controllers::JointStates::setFullPosition(std::string name)
         return true;
 
 }
-/*
-   bool mgnss::controllers::JointStates::setPosition(std::string name)
-   {
-    if (!_robot.groupStates().isDefined(name)) return false;
-    _init = true;
-
-    for(int i = 0; i < _pos_ref.size(); i++){
-        if(_robot.groupStates().get(name).get()[i] != mwoibn::NON_EXISTING)
-            _pos_ref[i] = _robot.groupStates().get(name).get()[i];
-    }
-
-    _wheels_positions = _wheels.getFullStatesReference();
-
-    _robot.state.position.set(_pos_ref);
-    _robot.updateKinematics();
-
-    for (int i = 0; i < _wheels.size(); i++)
-    {
-      _last = _wheels.getPointStateReference(i);
-      _error = _last - _wheels_positions[i];
-
-      std::cout << i << std::endl;
-      std::cout << _error << std::endl;
-
-    if(_error.norm() > 0.0001){
-      _des_ankle[i] = std::atan2(_error[1], _error[0]);
-      _pos_ref[_ankle_map[i]] = _des_ankle[i] - _position[_yaw_map[i]];
-
-    }
-
-
-     events::limit(_position[_ankle_map[i]], _pos_ref[_ankle_map[i]]);
-    double ankle = _pos_ref[_ankle_map[i]];
-
-
-
-    if ( ( ankle<
-            _robot.lower_limits.position.get(_ankle_map[i])) ||
-        ( ankle >
-            _robot.upper_limits.position.get(_ankle_map[i])))
-    {
-      _pos_ref[_ankle_map[i]] += 3.1415926;
-      mwoibn::eigen_utils::wrapToPi(_pos_ref[_ankle_map[i]]);
-      _vel_sign[i] = -1;
-    }
-    else
-      _vel_sign[i] = 1;
-    _init_ankle[i] = _pos_ref[_ankle_map[i]];
-    //_des_ankle[i] = _pos_ref[_ankle_map[i]];
-    std::cout  << _pos_ref[_ankle_map[i]] << std::endl;
-
-    }
-
-
-    return true;
-    }
- */
-//  bool setVelocity(double vel) {
-//    for(int i = 0; i < _vel_map.size(); i++){
-//      if(_vel_map[i])
-//      _vel_ref[i] =  vel; }
-//  }
 
 void mgnss::controllers::JointStates::update()
 {
-        _robot.state.position.get(_last_ankle, _ankle_map);
-        /*
-           if(_init && _ankle_map.size()){
-
-           for (int k = 0; k < _ankle_map.size(); k++)
-           {
-            int i = _ankle_map[k];
-            if (std::fabs(_pos_ref[i] - _position[i]) > _step)
-            {
-              if (_pos_ref[i] - _position[i] > 0)
-                _position[i] += _step;
-              else
-                _position[i] -= _step;
-            }
-            else
-              _position[i] = _pos_ref[i];
-
-           }
-
-           _velocity.setZero();
-           if ((_last_ankle - _init_ankle).cwiseAbs().maxCoeff() < 0.0005)
-            _init = false;
-
-           return;
-           }
-         */
+        // _robot.state.position.get(_last_ankle, _ankle_map);
 
         _last_position.noalias() = _position;
-
-//    for (int i = 0; i < _wheels.size(); i++)
-//    {
-//      double pr = _pos_ref[_ankle_map[i]];
-//      _pos_ref[_ankle_map[i]] = _des_ankle[i] - _position[_yaw_map[i]];
-//      events::limit(pr, _pos_ref[_ankle_map[i]]);
-//      double ankle = _pos_ref[_ankle_map[i]];
-
-//      if ( ( ankle<
-//              _robot.lower_limits.position.get(_ankle_map[i])) ||
-//          ( ankle >
-//              _robot.upper_limits.position.get(_ankle_map[i])))
-//      {
-//        _pos_ref[_ankle_map[i]] += 3.1415926;
-//        mwoibn::eigen_utils::wrapToPi(_pos_ref[_ankle_map[i]]);
-//        _vel_sign[i] = -1;
-//      }
-
-//      else
-//        _vel_sign[i] = 1;
-
-//    }
         for (int i = 0; i < _position.size(); i++)
         {
                 if(_pos_ref[i] == mwoibn::NON_EXISTING) continue;
@@ -185,24 +92,11 @@ void mgnss::controllers::JointStates::update()
                         _position[i] = _pos_ref[i];
         }
 
-        /*
-           for (int i = 0; i < _wheels.size(); i++)
-           {
-            _last = _wheels_positions[i];
-            _wheels_positions[i] = _wheels.getPointStateReference(i);
-            _error = _wheels_positions[i] - _last;
-
-            _velocity[i] = _vel_sign[i] * _error.norm() / _robot.rate();
-
-           }
-         */
-//    std::cout << _velocity.transpose() << std::endl;
 }
 
 void mgnss::controllers::JointStates::send()
 {
-        _robot.command.position.set(_position);
-        // std::cout << "joint_states\t" << _robot.command.position.get().transpose() << std::endl;
+        _robot.command.position.set(_position, _pos_map);
         _robot.command.velocity.set(_velocity, _vel_map);
         _robot.send();
 

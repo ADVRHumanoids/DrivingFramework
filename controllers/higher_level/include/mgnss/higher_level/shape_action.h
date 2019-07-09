@@ -61,7 +61,6 @@ virtual void run(){
     _angles.update();
     _state_machine.update();
 
-//    _qr_task._update();
 
 //    now = std::chrono::high_resolution_clock::now();
     _qr_task.solve();

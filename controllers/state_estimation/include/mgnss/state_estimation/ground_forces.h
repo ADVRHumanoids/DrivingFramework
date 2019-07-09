@@ -72,7 +72,7 @@ mwoibn::VectorN _world_contacts, _force_1, _force_2, _force_3, _state, _state_2,
 std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_torque_ptr;
 
 mwoibn::Matrix _contacts_jacobian, _contacts_inversed, _contacts_temp, _contacts_transposed;
-mwoibn::Vector3 _des_com, _temp_vector;
+mwoibn::Vector3 _des_com, _temp_vector, _vec_2;
 mwoibn::VectorN _set_force;
 const std::string _unfiltered_torque = "UNFILTERED_TORQUE";
 

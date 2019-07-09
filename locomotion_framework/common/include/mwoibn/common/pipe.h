@@ -147,7 +147,7 @@ protected:
 mwoibn::VectorN _state;
 
 template<typename Vector1, typename Vector2>
-void _select(const Vector1& new_state, Vector2& state, mwoibn::VectorBool& selector)
+void _select(const Vector1& new_state, Vector2& state, const mwoibn::VectorBool& selector)
 {
         for (int i = 0; i < selector.size(); i++)
                 if (selector[i])

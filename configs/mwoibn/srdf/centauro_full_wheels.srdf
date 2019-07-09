@@ -449,7 +449,7 @@
       <joint name="ankle_pitch_4" value="0.0"/>
       <joint name="ankle_yaw_4" value="0.0"/>
    </group_state>
-  
+
   <group_state name="reactive_1" group="chains">
 
       <joint name="torso_yaw" value="0.0"/>
@@ -739,11 +739,13 @@
    </group_state>
 
    <group_state name="ankles_plus" group="chains">
-      <joint name="ankle_yaw_1" value="-0.3"/>
-      <joint name="ankle_yaw_2" value=" 0.3"/>
-      <joint name="ankle_yaw_3" value=" 0.3"/>
-      <joint name="ankle_yaw_4" value=" -0.3"/>
+      <joint name="ankle_yaw_1" value="-0.15"/>
+      <joint name="ankle_yaw_2" value=" 0.15"/>
+      <joint name="ankle_yaw_3" value=" 0.15"/>
+      <joint name="ankle_yaw_4" value=" -0.15"/>
    </group_state>
+
+
 
    <group_state name="ankles_minus" group="chains">
       <joint name="ankle_yaw_1" value=" 0.3"/>
