@@ -492,7 +492,8 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //        }
       }
 //
-      for(int i = 0; i < 30; i++){
+      for(int i = 0; i < _robot.getDofs(); i++){
+        
         _char = std::to_string(i);
 
         _log_name = "pos_des_";

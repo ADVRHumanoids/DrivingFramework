@@ -35,6 +35,16 @@
       <group name="rear_left_leg"/>
    </group>
 
+   <group name="manipulation">
+      <link name="arm1_7"/>
+      <link name="arm2_7"/>
+   </group>
+
+   <group name="arm_base">
+      <link name="arm1_1"/>
+      <link name="arm2_1"/>
+   </group>
+
    <group name="arms">
       <group name="left_arm"/>
       <group name="right_arm"/>

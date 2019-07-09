@@ -111,8 +111,8 @@ virtual void run(){
       _desired_steer.setZero();
       _modified_support.setZero();
       _support_world.setZero();
-      for(auto& constraint: _qr_task.hard_inequality)
-        std::cout << constraint->getState().transpose() << std::endl;
+      // for(auto& constraint: _qr_task.hard_inequality)
+      //   std::cout << constraint->getState().transpose() << std::endl;
     }
 
     // if(_desired_steer.norm() > 0.02){
