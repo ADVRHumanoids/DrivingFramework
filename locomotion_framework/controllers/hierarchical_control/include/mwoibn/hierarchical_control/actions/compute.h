@@ -74,6 +74,7 @@ virtual ~Compute(){
 }
 
 virtual void run(){
+        _task.update();
         _errors.noalias() = -(_gains.asDiagonal() * _task.getError() + _task.getVelocity());
         // std::cout << "_errors\t" << _errors.transpose() << std::endl;
         // std::cout << "velocity\t" << _task.getVelocity().transpose() << std::endl;

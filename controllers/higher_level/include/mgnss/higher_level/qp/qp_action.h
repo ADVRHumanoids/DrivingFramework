@@ -17,7 +17,7 @@ QP(mgnss::higher_level::QrTask& task, hierarchical_control::State& state) : Prim
 
 
 virtual void run(){
-    _qr_task._update();
+    //_qr_task._update();
     _qr_task.solve();
     // std::cout << "previous solution\t" << _state.command.transpose() << std::endl;
     _state.command = _qr_task.get();
