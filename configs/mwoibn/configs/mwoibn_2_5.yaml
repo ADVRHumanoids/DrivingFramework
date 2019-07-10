@@ -583,7 +583,12 @@ mwoibn:
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
-
+                        #margins: [0.4, 0.215, 0.215, 0.40]
+                        #margins: [0.5, 0.23, 0.23, 0.45]
+                        margins: [0.5, 0.3, 0.3, 0.6]
+                        workspaces: [0.65, 0.65, 0.65, 0.65]
+                        margin_gain: 5e1
+                        workspace_gain: 12e1 #8e1
                         reference_axis:
                                 wheel_1:
                                   x: 0
@@ -896,7 +901,7 @@ mwoibn:
                         # plugins: [odometry2::odometry, gravity_compensation]
                         #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-#                        plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
-                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+#                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]

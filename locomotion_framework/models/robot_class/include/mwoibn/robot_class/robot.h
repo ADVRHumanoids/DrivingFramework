@@ -240,6 +240,9 @@ getJoints(const std::vector<std::string>& link_names);
 robot_class::BiMap readBiMap(YAML::Node config);
 
 static std::string readPath(YAML::Node config);
+static YAML::Node checkEntry(YAML::Node config, const std::string& key, const std::string& caller);
+static void checkEntries(YAML::Node config, std::vector<std::string>&& keys, const std::string& caller);
+
 /** @brief creates a map from a vector of links in a new map
  */
 robot_class::BiMap makeBiMap(

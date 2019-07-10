@@ -1115,6 +1115,19 @@ std::string mwoibn::robot_class::Robot::readPath(YAML::Node config)
         return file;
 }
 
+YAML::Node mwoibn::robot_class::Robot::checkEntry(YAML::Node config, const std::string& key, const std::string& caller){
+  if(!config[key])
+    throw std::invalid_argument(caller + std::string(": Could not find required field '" + key + "' in the configuration."));
+
+  return config[key];
+}
+
+static void checkEntries(YAML::Node config, std::vector<std::string>&& keys, const std::string& caller){
+  for(auto& key: keys)
+    if(!config[key])
+      throw std::invalid_argument(caller + std::string(": Could not find required field '" + key + "' in the configuration."));
+}
+
 std::string mwoibn::robot_class::Robot::_readSrdf(YAML::Node config)
 {
 

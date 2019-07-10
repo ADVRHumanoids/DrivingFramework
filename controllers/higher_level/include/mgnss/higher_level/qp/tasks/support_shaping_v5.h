@@ -49,6 +49,7 @@ protected:
   mwoibn::VectorN _safety, _max_workspace;
   bool _is_margin;
   const mgnss::higher_level::Limit &_margin, &_workspace;
+  double _margin_gain, _workspace_gain;
 
   std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& _wheel_transforms;
 
