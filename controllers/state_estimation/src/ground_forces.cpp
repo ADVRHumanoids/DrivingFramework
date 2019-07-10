@@ -140,7 +140,6 @@ void mgnss::state_estimation::GroundForces::update()
             _robot.contacts()[i].wrench().synch();
       }
 
-
       _state_no_torque.noalias() = _contacts_transposed*_robot.contacts().getReactionForce();
 
       _state_no_torque -= _gravity.getNonlinearEffects();

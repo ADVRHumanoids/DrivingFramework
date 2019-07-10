@@ -145,10 +145,11 @@ void mgnss::plugins::XbotShared::control_loop(double time)
 
   for(auto& controller: _controller_ptrs){
 
-    if(controller->kinematics.get()){
-        if(!controller->model().get()) return;
+    if(!controller->model().get()) return;
+
+    if(controller->kinematics.get())
         controller->model().updateKinematics();
-    }
+    
 
     controller->update();
     controller->send();

@@ -65,7 +65,7 @@ mwoibn:
                                 feedback: false
                 joint_space:
                         feedback:
-                                list: [link_side_online] # , upper_body
+                                list: [link_side_online]
                         actuators:
                                 read: true
                         contacts:
@@ -805,7 +805,6 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         ARMS: 0.5 #0.04
-
                 odometry:
                         layer: NRT
                         robot: odometry
@@ -824,14 +823,13 @@ mwoibn:
                         layer: NRT
                         robot: default
                         controller: torque_reference
-#                        secondary_file:
-#                             path: *support
-#                             file: lower_body.yaml
+                        secondary_file:
+                             path: *support
+                             file: lower_body.yaml
                         mode: full
                         kinematics: true
                         dynamics: false
                         model_change: false
-                        track: wheels
                         # type: online
                         # reference: reference
                         # compliance: True

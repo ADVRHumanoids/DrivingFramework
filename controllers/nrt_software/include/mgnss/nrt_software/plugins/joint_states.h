@@ -30,8 +30,9 @@ virtual void _resetPrt(YAML::Node config){
 }
 
 virtual void _initCallbacks(YAML::Node config){
+            
         Generator_::_srv.push_back(Generator_::n->template advertiseService<custom_services::jointStateCmnd::Request,
-                                   custom_services::jointStateCmnd::Response>( "trajectory",
+                                   custom_services::jointStateCmnd::Response>( Generator_::controller_ptr->name() + "/trajectory",
                                     boost::bind(&mgnss::ros_callbacks::joint_states::referenceHandler,
                                    _1, _2, static_cast<mgnss::controllers::JointStates*>(Generator_::controller_ptr.get()))));
 
