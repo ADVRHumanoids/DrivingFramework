@@ -7,17 +7,26 @@
 
 void mgnss::controllers::UpperBodyIK::_setInitialConditions()
 {
-      for(int i = 0; i < _arms_ptr->points().size(); i++){
-        _desried_pos.segment<3>(3*i) = _arms_ptr->points().getPointStateWorld(i);
-        _arms_ptr->setReference(i, _desried_pos.segment<3>(3*i));
-      }
+      // for(int i = 0; i < _arms_ptr->points().size(); i++){
+      //   _desired.segment<3>(3*i) = _arms_ptr->points().getPointStateWorld(i);
+      //   _arms_ptr->setReference(i, _desired.segment<3>(3*i));
+      // }
+      // for(int i = 0; i < _handler_task.handler.size(); i++)
+      _handler_task.resetReference();
+      _handler_task.update();
+      for(auto&& [reference, point]:  ranges::view::zip(_desired, _handler_task.handler))
+        reference = point->get();
 }
 
 void mgnss::controllers::UpperBodyIK::_createTasks(YAML::Node config){
         if(!config["track"])
               throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'track'."));
+        if(!config["reference"])
+                    throw std::invalid_argument(std::string("Wheels Controller: configuration doesn't containt required filed 'reference'."));
 
         std::string group_ = config["track"].as<std::string>();
+        std::string reference_ = config["reference"].as<std::string>();
+
         std::vector<std::string> names = _robot.getLinks(group_);
 
         // add wheels to the contact group
@@ -28,13 +37,27 @@ void mgnss::controllers::UpperBodyIK::_createTasks(YAML::Node config){
         }
 
         // Set-up hierachical controller
-        _arms_ptr.reset( new mwoibn::hierarchical_control::tasks::CartesianWorld(
-            mwoibn::point_handling::PositionsHandler("ROOT", _robot, names)));
-            for(auto group: _robot.getLinks(group_))
-              std::cout << group << std::endl;
-        _tasks["ARMS"] = _arms_ptr.get();
+        // _arms_ptr.reset( new mwoibn::hierarchical_control::tasks::CartesianWorld(
+        //     mwoibn::point_handling::PositionsHandler("ROOT", _robot, names)));
 
-        auto origin_names = _robot.getLinks(config["arm_base"].as<std::string>());
+        if(reference_.compare("world") == 0){
+          for(auto& name: names)
+            _handler_task.handler.add(mwoibn::robot_points::LinearPoint(name, _robot));
+        }
+        else{
+          _handler_task.support_points.add(mwoibn::robot_points::LinearPoint(reference_, _robot));
+          for(auto& name: names){
+            _handler_task.support_points.add(mwoibn::robot_points::LinearPoint(name, _robot));
+            _handler_task.handler.add(mwoibn::robot_points::Minus(_handler_task.support_points.end(0), _handler_task.support_points[0]));
+          }
+        }
+            // for(auto group: _robot.getLinks(group_))
+            //   std::cout << group << std::endl;
+        _tasks["ARMS"] = &_handler_task;
+
+        //_tasks["ARMS"] = _arms_ptr.get();
+
+        auto origin_names = _robot.getLinks(config["workspace_init"].as<std::string>());
         for( auto&& [origin, end]:  ranges::view::zip(origin_names, names) ) {
             _body_points.add(mwoibn::robot_points::LinearPoint(origin, _robot));
             _body_points.add(mwoibn::robot_points::LinearPoint(end, _robot));

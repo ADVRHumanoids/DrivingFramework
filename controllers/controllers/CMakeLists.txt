@@ -84,7 +84,7 @@ target_link_libraries(mgnss_controllers_wheels
  )
 
 
-#add_library(mgnss_controllers_centralized
+add_library(mgnss_controllers_centralized
 #   src/online_centralized_controller.cpp
    src/compliance_compensation.cpp
    src/centralized_controller.cpp

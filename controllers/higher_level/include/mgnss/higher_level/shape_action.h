@@ -167,11 +167,11 @@ virtual void run(){
     // std::cout << "_support world\t" << _support_world.transpose() << std::endl;
     // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
-      _caster.update();
-
-
-    _contact_point.update();
-    _aggravated.update(); // steering
+//       _caster.update();
+//
+// // THIS SHOULD BE UPDATED LATER IN THE STACK
+//     _contact_point.update();
+//     _aggravated.update(); // steering
 
 }
 
