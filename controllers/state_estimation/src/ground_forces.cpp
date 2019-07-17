@@ -161,12 +161,16 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
         _robot.centerOfMass().compute();
         _robot.centerOfPressure().compute();
 
-        // int id = 0;
-//        for(int i = 0; i < 3; i++){
-//           logger.add(_log_names[id], _robot.centerOfMass().get()[i]);
-//           logger.add(_log_names[id+1], _robot.centerOfPressure().get()[i]);
-//            id += 2;
-//        }
+        for(int i = 0; i < 3; i++){
+          _log_name = "com_";
+          _char = char('x'+i);
+          _log_name += _char;
+           logger.add(_log_name, _robot.centerOfMass().get()[i]);
+           _log_name = "cop_";
+           _log_name += _char;
+           logger.add(_log_name, _robot.centerOfPressure().get()[i]);
+        }
+
 
 
 

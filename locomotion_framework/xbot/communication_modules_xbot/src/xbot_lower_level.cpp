@@ -10,7 +10,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::run()
     _limit("POSITION");
     mapTo(_command.position.get(), pub);
 //    std::cout << "position after\t" << pub.transpose() << std::endl;
-    
+
     _robot.setPositionReference(pub);
   }
   if (_velocity)
@@ -38,4 +38,40 @@ bool mwoibn::communication_modules::XBotLowerLevel::run()
   _robot.setStiffness(stiffness);
   _robot.setDamping(damping);
   return true;
+}
+
+
+bool mwoibn::communication_modules::XBotLowerLevel::loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res){
+    YAML::Node config;
+    try
+    {
+            config = YAML::LoadFile(req.file);
+    }
+    catch (const YAML::BadFile& e)
+    {
+            res.message = "Couldn\t find the configuration file: " + req.file;
+            res.success = false;
+            return false;
+    }
+    catch (...)
+    {
+      res.message = "Unkown error reading file: " + req.file;
+      res.success = false;
+      return false;
+    }
+
+    if(!config[_name]) {
+      res.message = "Couldn't find robot configuration in the config file: " + req.file + "\t" + _name;
+      res.success = false;
+      return false;
+    }
+
+    _readGains(config[_name]);
+
+
+
+
+    res.success = true;
+
+    return true;
 }

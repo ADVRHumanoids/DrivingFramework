@@ -578,14 +578,16 @@ mwoibn:
 #                        tunning: ZMP_INDIRECT
                         steering: reactif
 #                        position_gain: 200
-                        tunning: disturb
-#                        tunning: compliance
+#                        tunning: disturb
+                        tunning: compliance2
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
                         #margins: [0.4, 0.215, 0.215, 0.40]
                         #margins: [0.5, 0.23, 0.23, 0.45]
-                        margins: [0.5, 0.3, 0.3, 0.6]
+                        #margins: [0.45, 0.26, 0.26, 0.6]
+                        #margins: [0.45, 0.22, 0.22, 0.6]
+                        margins: [0.48, 0.22, 0.22, 0.6]
                         workspaces: [0.65, 0.65, 0.65, 0.65]
                         margin_gain: 5e1
                         workspace_gain: 12e1 #8e1
@@ -678,10 +680,36 @@ mwoibn:
                                         CONSTRAINTS: 1
                                         STEERING: 0.5 #50
                                         BASE: [0.004, 0.004, 0.1, 0.5, 0.5, 0.5]
-                                        CONTACT_POINTS: 0.5
+                                        CONTACT_POINTS: 2
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 0.1 # 4
-                                        CASTER: 0.05 # 10
+                                        CAMBER: 0.7 # 4
+                                        CASTER: 1.5 # 10
+                                        CAMBER_DAMP: 0.08 #0.04
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
+                                compliance2: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 20 #50
+                                        BASE: [0.05, 0.05, 0.1, 0.5, 0.5, 0.5]
+                                        CONTACT_POINTS: 8
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 0.7 # 4
+                                        CASTER: 1.5 # 10
+                                        CAMBER_DAMP: 0.08 #0.04
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
+                                compliance3: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 20 #50
+                                        BASE: [0.03, 0.03, 0.1, 0.5, 0.5, 0.5]
+                                        CONTACT_POINTS: 4
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 0.7 # 4
+                                        CASTER: 1.5 # 10
                                         CAMBER_DAMP: 0.08 #0.04
                                         CASTER_DAMP: 0.12
                                         COP: 0
@@ -900,8 +928,8 @@ mwoibn:
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
                         # plugins: [odometry2::odometry, gravity_compensation]
                         #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
-                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+#                        # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+#                        plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
-#                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
