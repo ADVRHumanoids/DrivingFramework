@@ -56,6 +56,7 @@ LIST( APPEND CATKIN_DEPENDS_SET
   ros_callbacks
   robot_class_ros_extension
   robot_class_xbot
+  mgnss_utils
 )
 
 if(VISUALIZATION_TOOLS)
@@ -272,6 +273,23 @@ target_link_libraries(shared
     endif()
 
 
+#### USED
+  LIST( APPEND INSTALL_TARGETS UpperBodyIK )
+
+  add_library(UpperBodyIK SHARED
+     src/plugins/upper_body_ik.cpp
+   )
+  add_dependencies(UpperBodyIK ${catkin_EXPORTED_TARGETS})
+  target_link_libraries(UpperBodyIK
+     ${catkin_LIBRARIES}
+     ${XCM_LIBRARIES}
+  )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(UpperBodyIK)
+  endif()
+
 #    LIST( APPEND INSTALL_TARGETS NwheelsWorld )
 #
 #    add_library(NwheelsWorld SHARED
@@ -289,21 +307,21 @@ target_link_libraries(shared
 #  endif()
 
 #### USED
-#    LIST( APPEND INSTALL_TARGETS Nwheels3 )
-#
-#    add_library(Nwheels3 SHARED
-#       src/plugins/wheels_3.cpp
-#     )
-#    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
-#    target_link_libraries(Nwheels3
-#       ${catkin_LIBRARIES}
-#       ${XCM_LIBRARIES}
-#     )
+    LIST( APPEND INSTALL_TARGETS Nwheels3 )
 
-#  if ( Xenomai_FOUND )
-#    message(WARNING "set_xeno_flags")
-#    set_xeno_flags(Nwheels3)
-#  endif()
+    add_library(Nwheels3 SHARED
+       src/plugins/wheels_3.cpp
+     )
+    add_dependencies(Nwheels3 ${catkin_EXPORTED_TARGETS})
+    target_link_libraries(Nwheels3
+       ${catkin_LIBRARIES}
+       ${XCM_LIBRARIES}
+     )
+
+  if ( Xenomai_FOUND )
+    message(WARNING "set_xeno_flags")
+    set_xeno_flags(Nwheels3)
+  endif()
 
 #     LIST( APPEND INSTALL_TARGETS NwheelsReactif )
 #

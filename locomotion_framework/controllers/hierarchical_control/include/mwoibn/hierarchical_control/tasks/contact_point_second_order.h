@@ -40,7 +40,7 @@ public:
  ********prevent outside user from modifying a controlled point
  *
  */
-ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Robot& robot, YAML::Node config,
+ContactPointSecondOrder(const std::string& group, mwoibn::robot_class::Robot& robot, YAML::Node config,
                         mwoibn::robot_points::Point& base_point, std::string base_link)
         : ContactPoint(base_point), _robot(robot), _contacts(_robot.getDofs()), _base_point(base_point),
          _base( base_link, robot.getModel(), robot.state), _base_ang_vel(_base),
@@ -51,14 +51,15 @@ ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Rob
       _update.push_back(_manager.signIn(std::bind(&ContactPointSecondOrder::_updateState, this)));
 
 
-      for(auto& contact: _robot.contacts())
-      {
+
+        for(auto& contact: _robot.contacts().group(group))
+        {
           std::string name = _robot.getBodyName(contact->wrench().getBodyId());
-          if(!std::count(names.begin(), names.end(), name)){
-            std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
-            names.erase(std::remove(names.begin(), names.end(), name), names.end());
-            continue;
-          }
+          // if(!std::count(names.begin(), names.end(), name)){
+          //   std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+          //   names.erase(std::remove(names.begin(), names.end(), name), names.end());
+          //   continue;
+          // }
 
           std::unique_ptr<mwoibn::robot_points::TorusModel> torus_(new mwoibn::robot_points::TorusModel(
                              _robot.getModel(), _robot.state, mwoibn::point_handling::FramePlus(name,

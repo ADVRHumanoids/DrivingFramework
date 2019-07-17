@@ -65,7 +65,7 @@ mwoibn:
                                 feedback: false
                 joint_space:
                         feedback:
-                                list: [link_side_online] # , upper_body
+                                list: [link_side_online]
                         actuators:
                                 read: true
                         contacts:
@@ -583,7 +583,12 @@ mwoibn:
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
-
+                        #margins: [0.4, 0.215, 0.215, 0.40]
+                        #margins: [0.5, 0.23, 0.23, 0.45]
+                        margins: [0.5, 0.3, 0.3, 0.6]
+                        workspaces: [0.65, 0.65, 0.65, 0.65]
+                        margin_gain: 5e1
+                        workspace_gain: 12e1 #8e1
                         reference_axis:
                                 wheel_1:
                                   x: 0
@@ -798,14 +803,14 @@ mwoibn:
                         chain: upper_body
                         tunning: disturb
                         track: manipulation
-                        arm_base: arm_base
+                        workspace_init: arm_base
+                        reference: pelvis
                         IK: [qp::ARMS]
                         tunnings:
                                 disturb: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
                                         ARMS: 0.5 #0.04
-
                 odometry:
                         layer: NRT
                         robot: odometry
@@ -831,7 +836,6 @@ mwoibn:
                         kinematics: true
                         dynamics: false
                         model_change: false
-                        track: wheels
                         # type: online
                         # reference: reference
                         # compliance: True
@@ -900,4 +904,4 @@ mwoibn:
                         plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
-                        # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+#                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]

@@ -80,7 +80,6 @@ void mgnss::controllers::WheelsZMPII::compute()
         // _robot.state[CONTROLLER_TORQUES].set(_temp_state);
 
 
-        // std::cout << "wheels\t" << _robot.command.position.get().transpose() << std::endl;
         // _robot.command.torque.set( ( _robot.command.velocity.get() - _robot.state.velocity.get() )/_robot.rate() );
         // .states[QR].torque.set( ( _robot.states[QR].velocity.get() - _robot.state.velocity.get() )/_robot.rate() );
 
@@ -216,6 +215,7 @@ void mgnss::controllers::WheelsZMPII::_allocate(){
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::MaximumLimit(_tasks["CASTER"]->getJacobian(),  0.1));
         // _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::JointConstraint(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY"}));
         //_shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, mwoibn::eigen_utils::iota(_robot.getDofs()), {"POSITION","VELOCITY", "TORQUE"}));
+
         _shape_extend_ptr->hard_inequality.add(mgnss::higher_level::constraints::JointConstraintV2(_robot, _robot.getDof(_robot.getLinks("lower_body" ) ), {"POSITION","VELOCITY", "TORQUE"}, *_dynamic_ptr));
         for(auto& link: _robot.getLinks("hips")){
           _soft_hip.push_back(std::tuple<int, mwoibn::Matrix, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN, mwoibn::VectorN>(_robot.getDof(link)[0], mwoibn::Matrix(1, _robot.getDofs()), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1), mwoibn::VectorN::Zero(1)));
@@ -396,7 +396,7 @@ void mgnss::controllers::WheelsZMPII::_createTasks(YAML::Node config){
             std::cout << tunning << std::endl;
 
             _steering_ptr.reset( new mwoibn::hierarchical_control::tasks::ContactPointZMPV2(
-                                _robot.getLinks("wheels"), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
+                                config["track"].as<std::string>(), _robot, config, _world, "ROOT", tunning["COP"].as<double>()));
             state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
             // mwoibn::VectorInt dofs__ = ;
             _qr_wrappers["SHAPE"] = std::unique_ptr<mgnss::higher_level::SupportShaping5>(new mgnss::higher_level::SupportShaping5(_robot, config, state_machine__->steeringFrames(), state_machine__->margin(), state_machine__->workspace()));
@@ -492,7 +492,8 @@ void mgnss::controllers::WheelsZMPII::log(mwoibn::common::Logger& logger, double
 //        }
       }
 //
-      for(int i = 0; i < 30; i++){
+      for(int i = 0; i < _robot.getDofs(); i++){
+        
         _char = std::to_string(i);
 
         _log_name = "pos_des_";

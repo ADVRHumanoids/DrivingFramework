@@ -43,6 +43,7 @@
   <depend>controllers</depend>
   <depend>custom_messages</depend>
   <depend>custom_services</depend>
+  <depend>mgnss_utils</depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

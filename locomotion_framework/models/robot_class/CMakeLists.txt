@@ -97,6 +97,7 @@ target_link_libraries(communication
                  src/robot_points/center_of_mass.cpp
                  src/robot_points/center_of_pressure.cpp
 								 src/robot_points/point.cpp
+								 src/robot_points/point_contact.cpp
 								 src/robot_points/rotation.cpp
                 # src/robot_points/center_of_pressure_fast.cpp
                  src/robot_points/torus_model.cpp

@@ -57,7 +57,7 @@ WheelsZMPII( mwoibn::robot_class::Robot& robot, std::string config_file, std::st
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name: _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
@@ -68,7 +68,7 @@ WheelsZMPII( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsContr
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name: _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 

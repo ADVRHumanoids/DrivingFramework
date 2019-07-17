@@ -43,7 +43,6 @@ void mgnss::controllers::JointStates::_allocate(YAML::Node config){
 
 }
 
-
 void mgnss::controllers::JointStates::init(){
 
         _position.noalias() = _robot.state.position.get();
@@ -73,11 +72,13 @@ bool mgnss::controllers::JointStates::setFullPosition(std::string name)
 
 }
 
+
 void mgnss::controllers::JointStates::update()
 {
         // _robot.state.position.get(_last_ankle, _ankle_map);
 
         _last_position.noalias() = _position;
+
         for (int i = 0; i < _position.size(); i++)
         {
                 if(_pos_ref[i] == mwoibn::NON_EXISTING) continue;

@@ -65,8 +65,32 @@ mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robo
         _workspace.limit.setZero(_size);
         //_margins.limit << 0.40, 0.18, 0.18, 0.40;
         //_margins.limit << 0.40, 0.10, 0.10, 0.40;
-        _margins.limit << 0.40, 0.215, 0.215, 0.40;
-        _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
+
+        // RANGES_FOR?
+        YAML::Node config_ = mwoibn::robot_class::Robot::checkEntry(config, "margins", "StateMachine");
+        std::cout << "State Machine read safety margins ";
+        for (auto&& [id, entry] : ranges::view::enumerate(config_)){
+          _margins.limit[id] = entry.as<double>();
+          std::cout << entry << "\t";
+        }
+        std::cout << std::endl;
+
+        // std::cout << "State Machine read workspace limits ";
+        // for (auto&& [entry, id] : ranges::view::zip(config["workspaces"], ranges::view::indices)){
+        //   _workspace.limit[id] = entry.as<double>();
+        //   std::cout << entry << "\t";
+        // }
+        // std::cout << std::endl;
+        config_ = mwoibn::robot_class::Robot::checkEntry(config, "workspaces", "StateMachine");
+        std::cout << "State Machine read workspace limits ";
+        for (auto&& [id, entry] :  ranges::view::enumerate(config_)){
+          _workspace.limit[id] = entry.as<double>();
+          std::cout << entry << "\t";
+        }
+        std::cout << std::endl;
+
+        // _margins.limit << 0.40, 0.215, 0.215, 0.40;
+        // _workspace.limit << 0.65, 0.65, 0.65, 0.65; // 0.70
         _margins.setState().setZero(_size);
         _workspace.setState().setZero(_size);
         _margins.setJacobian().setZero(_size, _size*3+2); // cp + base
@@ -215,9 +239,9 @@ void mgnss::higher_level::SupportState::update(){
     //
     // mat_1.noalias() = torus_acceleration[i].getDependant()*toPN;
     // mat_1 -= _support_jacobian;
-    // _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    // _support_offset.noalias() =  mat_1*torus_acceleration[i].torus().wheelAngularVelocity();
     //
-    // // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelVelocity().angular().getWorld();
+    // // _support_offset =    (torus_acceleration[i].getDependant()*toPN -_support_jacobian )*torus_acceleration[i].torus().wheelAngularVelocity();
     // _support_offset += torus_acceleration[i].getIndependant();
     // _support_jacobian.noalias() += torus_acceleration[i].getDependant()*toN;
     // mat_1 = _support_jacobian*_robot.rate();

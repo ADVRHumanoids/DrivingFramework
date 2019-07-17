@@ -82,7 +82,7 @@ void mwoibn::robot_class::Robot::_init(std::string urdf_description,
         _actuation = mwoibn::VectorInt::Ones(getDofs());
 
 
-        _contacts.reset(new Contacts(getDofs()));
+        _contacts.reset(new Contacts2(getDofs()));
 
         _center_of_mass.reset(new robot_points::CenterOfMass(_model, state));
         _center_of_pressure.reset(new robot_points::CenterOfPressure(_model, state, *_contacts, *_center_of_mass));
@@ -553,10 +553,10 @@ void mwoibn::robot_class::Robot::_loadContacts(YAML::Node contacts_config)
                         //      contact.second["name"] = contact.first.as<std::string>();
                         std::string type = contact["type"].as<std::string>();
 
-                        if (type.compare("point_foot") == 0)
+                        if (type.compare("contact_point") == 0)
                         {
                                 _contacts->add(std::unique_ptr<mwoibn::robot_points::ContactV2>(
-                                                       new mwoibn::robot_points::ContactV2(
+                                                       new mwoibn::robot_points::PointContact(
                                                                _model, state, contact)));
                                 loaded_contacts[_contacts->end()[-1]->getName()] = contact;
                                 continue;
@@ -1113,6 +1113,19 @@ std::string mwoibn::robot_class::Robot::readPath(YAML::Node config)
         std::cout << "from file:\t" << file << std::endl;
 
         return file;
+}
+
+YAML::Node mwoibn::robot_class::Robot::checkEntry(YAML::Node config, const std::string& key, const std::string& caller){
+  if(!config[key])
+    throw std::invalid_argument(caller + std::string(": Could not find required field '" + key + "' in the configuration."));
+
+  return config[key];
+}
+
+static void checkEntries(YAML::Node config, std::vector<std::string>&& keys, const std::string& caller){
+  for(auto& key: keys)
+    if(!config[key])
+      throw std::invalid_argument(caller + std::string(": Could not find required field '" + key + "' in the configuration."));
 }
 
 std::string mwoibn::robot_class::Robot::_readSrdf(YAML::Node config)

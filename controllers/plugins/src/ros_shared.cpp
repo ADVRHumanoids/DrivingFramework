@@ -152,9 +152,9 @@ void mgnss::plugins::RosShared::control_loop(double time)
 
   for(auto& controller: _controller_ptrs){
     // std::cout << "controller\t" << controller->name() << std::endl;
+    controller->model().get();
 
     if(controller->kinematics.get()){
-        controller->model().get();
         // if (controller->model().kinematics_update.get()) std::cout << "updateKinematics" << std::endl;
         controller->model().updateKinematics();
     }

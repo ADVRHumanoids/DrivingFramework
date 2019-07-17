@@ -5,6 +5,9 @@
 mgnss::higher_level::SupportShaping5::SupportShaping5(mwoibn::robot_class::Robot& robot, YAML::Node config,  std::vector<std::unique_ptr<mwoibn::robot_points::Rotation>>& steering_frames, const mgnss::higher_level::Limit& margin, const mgnss::higher_level::Limit& workspace, bool is_margin):
   QrTask(8+2+12, 8), _robot(robot), _margin(margin), _wheel_transforms(steering_frames), _workspace(workspace), _is_margin(is_margin){
     if(!_is_margin) resize(8,0);
+
+    _margin_gain = mwoibn::robot_class::Robot::checkEntry(config, "margin_gain", "StateMachine").as<double>();
+    _workspace_gain = mwoibn::robot_class::Robot::checkEntry(config, "workspace_gain", "StateMachine").as<double>();
 }
 
 void mgnss::higher_level::SupportShaping5::_allocate(){
@@ -18,8 +21,8 @@ void mgnss::higher_level::SupportShaping5::_allocate(){
           hard_inequality.clear();
 
             // if(_is_margin)
-              addSoft(Constraint(4,_vars), 5e1); // margin
-              addSoft(Constraint(4,_vars), 8e1); // wirkspace
+              addSoft(Constraint(4,_vars), _margin_gain); // margin
+              addSoft(Constraint(4,_vars), _workspace_gain); // wirkspace
 
               QrTask::init();
               _cost.quadratic.setZero();

@@ -114,7 +114,7 @@ void mgnss::controllers::WheelsControllerExtend::_createTasks(YAML::Node config)
         for(auto& name_: {"STEERING", "CASTER", "CAMBER"})
                 _leg_tasks[name_] = {mwoibn::hierarchical_control::tasks::Aggravated(), std::vector<mwoibn::hierarchical_control::tasks::SoftAngle>{}};
 
-        for(auto& name_: _robot.getLinks("wheels")){
+        for(auto& name_: _robot.getLinks(config["track"].as<std::string>())){
           ax_  = mwoibn::Axis(config["reference_axis"][name_]["x"].as<double>(),
                              config["reference_axis"][name_]["y"].as<double>(),
                              config["reference_axis"][name_]["z"].as<double>());

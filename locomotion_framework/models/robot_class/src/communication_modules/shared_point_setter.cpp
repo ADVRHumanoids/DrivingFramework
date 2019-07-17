@@ -35,6 +35,6 @@ void mwoibn::communication_modules::SharedPointSetter::_init(std::string name){
 
             _shared.add(_name, temp);
 
-          std::cout << "Initialized shared point " << _name << " ";
+          std::cout << "Initialized shared point " << _name << std::endl;
 
   }

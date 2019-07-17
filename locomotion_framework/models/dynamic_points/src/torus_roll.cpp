@@ -23,8 +23,8 @@ namespace dynamic_points
 
 
     // wheel angular velocity
-    mwoibn::Vector3 wheel_ = _torus._v_centre.angular().getWorld();
-    //mwoibn::Vector3 n_wheel_ = _torus._ground_normal*_torus._ground_normal.transpose()*_torus._v_centre.angular().getWorld();
+    mwoibn::Vector3 wheel_ = _torus._angular_world;
+    //mwoibn::Vector3 n_wheel_ = _torus._ground_normal*_torus._ground_normal.transpose()*_torus._angular_world;
     double n_y_ =  _torus._ground_normal.transpose()*_torus._axis_world;
     mwoibn::Vector3 alf_ = _torus._axis_world*n_y_;
     // auxiliary variables

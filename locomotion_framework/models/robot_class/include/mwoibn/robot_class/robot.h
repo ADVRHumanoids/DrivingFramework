@@ -6,10 +6,11 @@
 #include "mwoibn/robot_points/contact.h"
 #include "mwoibn/robot_points/wheel_contact.h"
 #include "mwoibn/robot_points/wheel_contact_v3.h"
+#include "mwoibn/robot_points/point_contact.h"
 
 #include "mwoibn/robot_points/contact_v2.h"
 
-#include "mwoibn/robot_class/contacts.h"
+#include "mwoibn/robot_class/contacts_2.h"
 
 #include "mwoibn/communication_modules/communications.h"
 #include "mwoibn/robot_class/actuators.h"
@@ -150,7 +151,7 @@ robot_points::CenterOfPressure& centerOfPressure() {
         return *(_center_of_pressure.get());
 }
 
-Contacts& contacts() {
+Contacts2& contacts() {
         return *(_contacts.get());
 }
 //! Keeps robot states
@@ -239,6 +240,9 @@ getJoints(const std::vector<std::string>& link_names);
 robot_class::BiMap readBiMap(YAML::Node config);
 
 static std::string readPath(YAML::Node config);
+static YAML::Node checkEntry(YAML::Node config, const std::string& key, const std::string& caller);
+static void checkEntries(YAML::Node config, std::vector<std::string>&& keys, const std::string& caller);
+
 /** @brief creates a map from a vector of links in a new map
  */
 robot_class::BiMap makeBiMap(
@@ -270,7 +274,24 @@ virtual void loadControllers(YAML::Node full_config, std::string config_name,
 
 std::string name(){return _name;}
 
+
+virtual void srdfContactGroup(const std::string& srdf_group){
+  if(contacts().hasGroup(srdf_group)) return;
+
+  std::vector<std::string> names = getLinks(srdf_group);
+
+  // add wheels to the contact group
+  for(auto& name: names){
+      auto contact = ranges::find_if(contacts(), [&](auto& contact)-> bool{return getBodyName(contact->wrench().getBodyId()) == name;});
+      if ( contact != ranges::end(contacts()) )
+          contacts().toGroup((*contact)->getName(), srdf_group);
+  }
+
+}
+
 common::Flag  kinematics_update;
+
+
 
 protected:
 //! Alternative robot class initializer,
@@ -290,7 +311,7 @@ bool _is_static;
 std::string _name;
 double _rate = 0;
 //! Keeps data about considered contacts
-std::unique_ptr<Contacts> _contacts;
+std::unique_ptr<Contacts2> _contacts;
 
 //! Kepps center of mass data
 std::unique_ptr<robot_points::CenterOfMass> _center_of_mass;

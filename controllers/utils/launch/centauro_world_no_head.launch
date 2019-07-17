@@ -53,7 +53,10 @@
   <arg name="wheels_actuators" default="true"/>
   <arg name="head_actuators" default="true"/>
 
-  <arg name="world_name" default="$(find centauro_gazebo)/worlds/centauro.world"/>
+  <arg name="world" default="centauro"/>
+  <arg name="world_name" default="$(find centauro_gazebo)/worlds/$(arg world).world"/>
+
+  <!--arg name="world_name" default="$(find centauro_gazebo)/worlds/centauro.world"/-->
 
   <include file="$(find centauro_gazebo)/launch/centauro_world.launch">
       <arg name="arm_sensors" value="$(arg arm_sensors)"/>
@@ -131,7 +134,7 @@
   <param name="robot_upper_body"
          command="$(find xacro)/xacro --inorder '$(find centauro)/centauro_urdf/urdf/centauro.urdf.xacro'
                    GAZEBO:=false                        MIDDLEWARE:=none                   XBOT_CONFIG_FILE:=none
-                   STATIC:=false                        LEFT_END_EFFECTOR:=stick     RIGHT_END_EFFECTOR:=stick   MASS:=0
+                   STATIC:=false                        LEFT_END_EFFECTOR:=$(arg left_end_effector)     RIGHT_END_EFFECTOR:=$(arg right_end_effector)   MASS:=0
                    ARMS:=true                            LEGS:=false                               TORSO:=true                             WHEELS:=true                           HEAD:=false
                    ARM_ACTUATORS:=true          LEG_ACTUATORS:=true             TORSO_ACTUATORS:=true         WHEELS_ACTUATORS:=true       HEAD_ACTUATORS:=false
                    ARM_SENSORS:=false             LEG_SENSORS:=true

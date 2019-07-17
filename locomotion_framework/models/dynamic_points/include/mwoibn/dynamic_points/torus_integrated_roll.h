@@ -57,7 +57,8 @@ public:
         //std::cout << "velocity\t" << (acceleration.getJacobianVelocity()*_robot.rate()) << std::endl;
         mwoibn::Matrix3 temp_2_ = temp_1_*_null_space;
         temp_2_ += torus().getJacobianWheel();
-        _constant.noalias() = temp_2_*_torus._v_centre.angular().getWorld();
+        _constant.noalias() = temp_2_*_torus._angular_world;
+      //  _constant.noalias() = temp_2_*_torus._v_centre.angular().getWorld();
         //std::cout << "1\t" << temp_1_ << std::endl;
         // std::cout << "2\t" << torus().getJacobianWheel() << std::endl;
 

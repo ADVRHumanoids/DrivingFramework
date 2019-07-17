@@ -208,7 +208,7 @@ void mgnss::state_estimation::OdometryV4::update()
         // std::cout << "v_twist\t" << _velocity_ptr->get()[3] << std::endl;
 
         // _twist_es = mwoibn::Quaternion::fromAxisAngle(_z, _twist_ptr->get());
-        
+
 
         _poseEstimation();
         _filter();

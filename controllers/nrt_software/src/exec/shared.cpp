@@ -10,10 +10,10 @@ int main(int argc, char** argv)
         controller.start(ros::Time::now().toSec());
 
         while (ros::ok())
-        // for(int i =0; i < 25000; i++)
+        // for(int i =0; i < 100; i++)
         {
             // if(i%100 == 0)
-                // std::cout << (i+1) << "/" << 10000 << std::endl;
+                // std::cout << (i+1) << "/" << 100 << std::endl;
                 controller.control_loop(ros::Time::now().toSec());
         }
 

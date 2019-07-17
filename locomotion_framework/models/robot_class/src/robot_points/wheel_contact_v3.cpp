@@ -36,6 +36,9 @@ void mwoibn::robot_points::WheelContactV3::_resize()
 
         if (_directions.rows() == 6 && _directions.cols() == 6)
                 _directions = _directions.bottomRightCorner<3, 3>();
+
+        _acceleration.setZero(_state_size);
+        _velocity.setZero(_state_size);
 }
 
 const mwoibn::Matrix&

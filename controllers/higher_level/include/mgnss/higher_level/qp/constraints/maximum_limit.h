@@ -30,8 +30,6 @@ class MaximumLimit: public mgnss::higher_level::Constraint{
     const mwoibn::Matrix& _other_jacobian;
     const mwoibn::VectorN& _limits;
 
-
-
 };
 
 }

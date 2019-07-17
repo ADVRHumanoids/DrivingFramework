@@ -16,8 +16,8 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
-#LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels)
+#LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
+LIST( APPEND INSTALL_TARGETS mgnss_ik mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
 LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules mgnss_higher_level robot_class)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -31,6 +31,7 @@ catkin_package(
           ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         mgnss_controllers_wheels
+        mgnss_ik
         mgnss_controllers_centralized
         mgnss_controllers_joint_space
   CATKIN_DEPENDS
@@ -45,6 +46,18 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
 )
 
+add_library(mgnss_ik
+
+   src/ik_base.cpp
+   src/upper_body_IK.cpp
+
+ )
+
+add_dependencies(mgnss_ik ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(mgnss_ik
+   ${catkin_LIBRARIES}
+ )
 
 add_library(mgnss_controllers_wheels
 
@@ -66,13 +79,14 @@ add_library(mgnss_controllers_wheels
 add_dependencies(mgnss_controllers_wheels ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(mgnss_controllers_wheels
+   mgnss_ik
    ${catkin_LIBRARIES}
  )
 
 
 add_library(mgnss_controllers_centralized
 #   src/online_centralized_controller.cpp
-#   src/compliance_compensation.cpp
+   src/compliance_compensation.cpp
    src/centralized_controller.cpp
  )
 
