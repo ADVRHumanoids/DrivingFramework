@@ -1,4 +1,4 @@
-# include "mwoibn/hierarchical_control/controllers/actions.h"
+#include "mwoibn/hierarchical_control/controllers/actions.h"
 #include "mwoibn/hierarchical_control/actions/compute.h"
 
 
@@ -142,10 +142,6 @@ void mwoibn::hierarchical_control::controllers::Actions::removeTask(tasks::Basic
 const mwoibn::VectorN&
 mwoibn::hierarchical_control::controllers::Actions::update()
 {
-        // for (maps::ActionsMap::key_iter it = _map.keyBegin(); it!=_map.keyEnd(); it++)
-        // {
-        //         (*it)->update();
-        // }
         compute();
 
         return getCommand();
@@ -156,15 +152,12 @@ void mwoibn::hierarchical_control::controllers::Actions::compute()
         _command.setZero();
         _P.setIdentity();
 
-        for (auto& action : _active_stack)
+        for (auto& action : _active_stack){
                 action->run(); // shouldn't this just update the task?
-
+              }
 
         for (auto& action : _active_stack) {
                 action = &action->next();
-                //if(action == next) continue;
-                //action->release();
-                //action = next;
         }
 }
 

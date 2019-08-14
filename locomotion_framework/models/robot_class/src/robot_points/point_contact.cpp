@@ -19,6 +19,17 @@ void mwoibn::robot_points::PointContact::_initDirections(
 }
 
 
+const mwoibn::Matrix& mwoibn::robot_points::PointContact::getWorldJacobian()
+{
+    _jacobian.setZero();
+
+    if (!_is_active) return _jacobian;
+
+    _jacobian.noalias() = _frame.getPositionJacobian();
+
+    return _jacobian;
+}
+
 const mwoibn::Matrix&
 mwoibn::robot_points::PointContact::getPointJacobian(mwoibn::Matrix3 rotation_matrix)
 {

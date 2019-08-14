@@ -16,11 +16,13 @@ namespace dynamic_points
     _point_transposed = _point_jacobian.transpose();
 
     _point_inverse.noalias() = _point_jacobian*_dynamic_model.getInertiaInverse();
+
     _point_temp.noalias() = _point_inverse*_point_transposed;
 
     _contacts_inverse->compute(_point_temp);
 
     _jacobian_temp.noalias() = _contacts_inverse->get()*_point_inverse;
+    //std::cout << _contacts_inverse->get() << std::endl;
     _point.noalias() = _jacobian_temp*(_state[_interface].get());
     _point += _contacts_inverse->get()*_frame.getConstant();
 

@@ -38,12 +38,15 @@ class Constraint{
 
     auto clone() {return std::unique_ptr<Constraint>(clone_impl()); }
 
-    void resize(int size, int vars){
+    void resize(int size, int vars, bool reset_active = true){
       if(vars == 0) size = 0;
 
       _jacobian.setZero(size, vars);
       _transposed.setZero(vars, size);
       _state.setZero(size);
+      if(!reset_active) return;
+      active_dofs = mwoibn::eigen_utils::iota(vars);
+      active.setConstant(size, true);
     }
 
     const mwoibn::VectorN& get(){return _state;}

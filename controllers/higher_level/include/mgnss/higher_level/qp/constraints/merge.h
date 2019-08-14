@@ -28,8 +28,9 @@ class Merge: public mgnss::higher_level::Constraint{
           _constraints.add(constraint->clone());
     }
 
-    Merge(Merge&& other): Constraint(other), _constraints(other._constraints){
-
+    Merge(Merge&& other): Constraint(other){
+        for(auto& constraint: other._constraints)
+          _constraints.add(constraint->clone());
     }
 
     template<typename Other>
@@ -56,6 +57,10 @@ class Merge: public mgnss::higher_level::Constraint{
             int idx = -i - 1;
             // std::cout << "idx\t" << idx << std::endl;
             return *(_constraints.end()[idx]);
+    }
+
+    virtual Constraint& operator[](int i) {
+            return _constraints[i];
     }
 
   protected:

@@ -51,6 +51,8 @@ const mwoibn::VectorN& getReactionForce(){
 virtual const mwoibn::Matrix&
 getPointJacobian(mwoibn::Matrix3 rotation_matrix);
 
+virtual const mwoibn::Matrix& getWorldJacobian();
+
 // virtual void setPosition(mwoibn::Vector3 new_state)
 // {
 //         _offset_pos = new_state;

@@ -1,7 +1,7 @@
 #include "mgnss/higher_level/state_machine.h"
 
 mgnss::higher_level::StateMachine::StateMachine(mwoibn::robot_class::Robot& robot, YAML::Node config):
-  _robot(robot), _base(_robot.centerOfMass()), _contact_points(_robot.getDofs()),
+  _robot(robot), _base(_robot.centerOfPressure()), _contact_points(_robot.getDofs()),
    _points(_robot.getDofs()), _base_points(_robot.getDofs()),
    _hips(robot.getDofs()), _wheels(robot.getDofs()), _workspace_points(robot.getDofs()), cost_I(robot){
 
@@ -191,7 +191,7 @@ void mgnss::higher_level::StateMachine::_workspaceJacobian(){
 
 
 void mgnss::higher_level::StateMachine::_update(){
-
+    _robot.centerOfPressure().update();
     _contact_points.update(true);
     _points.update(false);
     _base_points.update(true);// false

@@ -26,6 +26,10 @@ public:
   Point( Point&& other): _jacobian(other._jacobian), _point(other._point){
   }
 
+  virtual void resize(unsigned int state, unsigned int dofs){
+    _jacobian.setZero(state, dofs);
+    _point.setZero(state);
+  }
 
   virtual ~Point() {}
 

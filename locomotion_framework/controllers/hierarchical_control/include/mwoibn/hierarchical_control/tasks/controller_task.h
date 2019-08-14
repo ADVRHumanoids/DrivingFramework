@@ -59,7 +59,7 @@ const mwoibn::VectorN& getVelocity() const {
         return _velocity;
 }
 
-virtual void setVelocity(mwoibn::VectorN& velocity){_velocity = velocity;}
+virtual void setVelocity(const mwoibn::VectorN& velocity){_velocity = velocity;}
 
 //! Returnes previous task error
 const mwoibn::VectorN& getPreviousError() const {
@@ -67,11 +67,11 @@ const mwoibn::VectorN& getPreviousError() const {
 }
 
 //! updates task Jacobian based on the parsed argument
-void updateJacobian(mwoibn::Matrix jacobian){
+void updateJacobian(const mwoibn::Matrix& jacobian){
         _last_jacobian = _jacobian; _jacobian = jacobian;
 }
 //! updates task error based on the parsed argument
-void updateError(mwoibn::VectorN error){
+void updateError(const mwoibn::VectorN& error){
         _last_error = _error; _error = error;
 }
 //! generic function to provide the same syntax for Jacobian update of all derived classes

@@ -65,11 +65,17 @@ virtual void updateError();
 //that order
 
 virtual void update();
+virtual void setVelocity(const mwoibn::VectorN& velocity){
+    _my_velocity = velocity;
+}
+
 
 protected:
-std::vector < std::tuple<mwoibn::VectorBool, BasicTask&, mwoibn::VectorN> > _tasks_ptrs;
-void _verify(BasicTask& task, mwoibn::VectorBool selector)
-{
+  mwoibn::VectorN _my_velocity;
+  std::vector < std::tuple<mwoibn::VectorBool, BasicTask&, mwoibn::VectorN> > _tasks_ptrs;
+
+  void _verify(BasicTask& task, mwoibn::VectorBool selector)
+  {
         if (task.getTaskSize() != selector.size())
                 throw std::invalid_argument(std::string(
                                                     "Aggravated Task: task and selector sizes do not match."));
@@ -80,7 +86,7 @@ void _verify(BasicTask& task, mwoibn::VectorBool selector)
                 throw std::invalid_argument(
                               std::string("Aggravated Task: couldn't append a task, state sizes do "
                                           "not match."));
-}
+  }
 };
 }
 } // namespace package

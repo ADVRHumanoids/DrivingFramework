@@ -71,6 +71,7 @@ void transform(){
   _outputTransform();
 }
 
+bool verbose = false;
 
 // void addTask(mwoibn::hierarchical_control::tasks::BasicTask& task){_other_tasks.push_back(&task);}
 //

@@ -59,6 +59,12 @@ public:
 
   }
 
+  virtual void update(bool jacobian) {
+      compute();
+      if(jacobian)
+        computeJacobian();
+    }
+
   using DynamicPoint::operator=;
 
     virtual void compute();
@@ -76,10 +82,11 @@ protected:
   mwoibn::dynamic_points::DynamicPoint& _frame;
   mwoibn::Interface _interface;
   void _init(){
+    resize(_frame.rows(), _frame.cols());
     _dynamic_model.subscribe(mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE);
 
     //_inertia_inverse.reset(new mwoibn::PseudoInverse(mwoibn::Matrix::Zero(_state.acceleration.size(), _state.acceleration.size())));
-    _contacts_inverse.reset(new mwoibn::Inverse(mwoibn::Matrix3::Zero()));
+    _contacts_inverse.reset(new mwoibn::Inverse(mwoibn::Matrix::Zero(_frame.size(), _frame.size())));
     _jacobian.setZero(_frame.size(), _frame.size());
     _jacobian_temp.setZero(_frame.size(), _frame.cols());
 

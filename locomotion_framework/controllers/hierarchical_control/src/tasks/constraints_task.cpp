@@ -1,6 +1,9 @@
 #include "mwoibn/hierarchical_control/tasks/constraints_task.h"
 
-void mwoibn::hierarchical_control::tasks::Constraints::updateError() {}
+void mwoibn::hierarchical_control::tasks::Constraints::updateError() {
+
+  //std::cout << "velocity constraints: " << _velocity.transpose() << std::endl;
+}
 
 void mwoibn::hierarchical_control::tasks::Constraints::updateJacobian()
 {

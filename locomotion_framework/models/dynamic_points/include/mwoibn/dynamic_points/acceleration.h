@@ -19,21 +19,21 @@ class Acceleration: public DynamicPoint
     Acceleration(Body body, mwoibn::robot_class::Robot& robot): DynamicPoint(robot.getModel(), robot.state),
                  _frame(body, robot.getModel(), robot.state)
     {
-      _point.setZero(3);
       _acceleration.reset(new AccelerationType(_frame, "ZERO"));
       _velocity.reset(new VelocityType(_frame));
+      resize(_acceleration->size(), robot.getDofs());
     }
 
     Acceleration(const Acceleration& other): DynamicPoint(other), _frame(other._frame){
-      _point.setZero(3);
       _acceleration.reset(new AccelerationType(_frame, "ZERO"));
       _velocity.reset(new VelocityType(_frame));
+      //_resize(_acceleration->size(), robot.getDofs());
     }
 
     Acceleration(Acceleration&& other): DynamicPoint(other), _frame(other._frame){
-      _point.setZero(3);
       _acceleration.reset(new AccelerationType(_frame, "ZERO"));
       _velocity.reset(new VelocityType(_frame));
+      //_resize(_acceleration->size(), robot.getDofs());
     }
 
     using DynamicPoint::operator=;

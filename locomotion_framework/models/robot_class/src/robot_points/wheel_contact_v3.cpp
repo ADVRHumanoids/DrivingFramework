@@ -41,6 +41,17 @@ void mwoibn::robot_points::WheelContactV3::_resize()
         _velocity.setZero(_state_size);
 }
 
+const mwoibn::Matrix& mwoibn::robot_points::WheelContactV3::getWorldJacobian()
+{
+    _jacobian.setZero();
+
+    if (!_is_active) return _jacobian;
+
+    _jacobian.noalias() = _frame.getPositionJacobian();
+
+    return _jacobian;
+}
+
 const mwoibn::Matrix&
 mwoibn::robot_points::WheelContactV3::getPointJacobian(mwoibn::Matrix3 rotation_matrix)
 {

@@ -107,7 +107,7 @@ set(const Vector& state, const Selector& selector)
 
 template <typename Vector>
 void
-set(const Vector& state, std::vector<int>& selector)
+set(const Vector& state, const std::vector<int>& selector)
 {
         for (int i = 0; i < selector.size(); i++)
                 if (selector[i] != NON_EXISTING)

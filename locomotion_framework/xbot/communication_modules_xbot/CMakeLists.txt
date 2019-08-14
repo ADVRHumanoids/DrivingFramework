@@ -27,7 +27,7 @@ set(DEPENDS_OPTIONAL "")
 set(INSTALL_TARGETS "")
 
 LIST( APPEND INSTALL_TARGETS  communication_modules_xbot )
-LIST( APPEND CATKIN_DEPENDS_SET robot_class custom_services)
+LIST( APPEND CATKIN_DEPENDS_SET robot_class custom_services )
 LIST( APPEND SOURCE_FILES src/xbot_lower_level.cpp src/xbot_feedback_online.cpp src/xbot_operational_euler.cpp)
 
 find_package(catkin REQUIRED COMPONENTS

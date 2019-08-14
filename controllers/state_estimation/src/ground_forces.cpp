@@ -37,6 +37,7 @@ void mgnss::state_estimation::GroundForces::_initConfig(YAML::Node config){
 
         _name = config["name"].as<std::string>();
         _filter_torque_ptr.reset(new mwoibn::filters::IirSecondOrder(_robot.getDofs(), config["filter"]["torque"]["cut_off_frequency"].as<double>(), config["filter"]["torque"]["damping"].as<double>()));
+        _base_ptr.reset(new mwoibn::filters::IirSecondOrder(6, config["filter"]["torque"]["cut_off_frequency"].as<double>(), 3));
         _allocate();
 
         // for(auto& contact: _robot.contacts()){
@@ -54,10 +55,11 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _log_name.reserve(1000);
 
   _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR, mwoibn::dynamic_models::DYNAMIC_MODEL::NON_LINEAR});
-  _gravity.subscribe({mwoibn::dynamic_models::DYNAMIC_MODEL::INERTIA_INVERSE});
 
   _robot.state.add("OVERALL_FORCE", _robot.getDofs());
   _robot.state.add("BIAS_FORCE", _robot.getDofs());
+  _robot.state.add("FEEDBACK_FORCE", _robot.getDofs());
+
   _robot.state.add(_unfiltered_torque, _robot.getDofs());
 
 
@@ -79,6 +81,9 @@ void mgnss::state_estimation::GroundForces::_allocate(){
   _set_force.setZero(3);
 
   _filter_torque_ptr->reset(_robot.state.torque.get());
+  _base_temp.setZero(6);
+  _base_ptr->reset(_base_temp);
+  std::cout << "reset" << std::endl;
 
   for(auto& contact: _robot.contacts()){
       _accelerations.add(mwoibn::point_handling::LinearAcceleration(contact->wrench().frame, "ZERO"));
@@ -89,7 +94,10 @@ void mgnss::state_estimation::GroundForces::_allocate(){
       _wheel_centers.add(mwoibn::point_handling::AngularVelocity( _wheel_frames.end(0) ));// ??
 
     }
-
+    _base_temp.setZero(6);
+    _base_frame.add(mwoibn::point_handling::FramePlus( "pelvis", _robot.getModel(), _robot.state));
+    _base_wrench.add(mwoibn::point_handling::Wrench(_base_frame[0]));
+    _base_velocity.add(mwoibn::point_handling::SpatialVelocity(_base_frame[0]));
 }
 
 
@@ -99,7 +107,7 @@ void mgnss::state_estimation::GroundForces::init(){
         _robot.updateKinematics();
 
         _filter_torque_ptr->computeCoeffs(_robot.rate());
-
+        _base_ptr->computeCoeffs(_robot.rate());
         update();
         _filter_torque_ptr->reset(_robot.state.torque.get());
 }
@@ -109,6 +117,7 @@ void mgnss::state_estimation::GroundForces::update()
       _robot.state[_unfiltered_torque].set(_robot.state.torque);
 
       _filter_torque_ptr->update(_robot.state.torque);
+
       //_robot.updateKinematics();
 
       // Without explicit acceleration estimation
@@ -128,7 +137,7 @@ void mgnss::state_estimation::GroundForces::update()
       for(int i = 0; i < _robot.contacts().size(); i++){
           // _force_3.segment<3>(3*i) = _wheel_frames[i].rotation().getWorld()*_robot.contacts()[i].getFrame().getLinearFixed(); // what about the contact assumptions here?
           //_vec_2 = _wheel_centers[i].getWorld().head<3>().cross(_vec_1); // Add assummed acceleration
-          _force_3.segment<3>(3*i) = _robot.contacts()[i].acceleration(); // this is true for the rolling motion, but not for the point contact
+          _force_3.segment<3>(3*i) = _robot.contacts()[i].acceleration();
       }
 
       _force_2 += _force_3;
@@ -141,13 +150,15 @@ void mgnss::state_estimation::GroundForces::update()
       }
 
       _state_no_torque.noalias() = _contacts_transposed*_robot.contacts().getReactionForce();
-
       _state_no_torque -= _gravity.getNonlinearEffects();
-
       _state = _state_no_torque + _robot.state.torque.get();
       _robot.state["OVERALL_FORCE"].set(_state); // ACTING FORCE?
       _robot.state["BIAS_FORCE"].set(_state_no_torque);
+      _base_ptr->update(_base_temp);
 
+      // _robot.state["OVERALL_FORCE"].set(_base_temp, _base_ids);
+
+      std::cout << "est_force\t" << _state.head<6>().transpose() << std::endl;
       // ACCELERATION ESTIMATION
       //_state_2.noalias() = _gravity.getInertiaInverse()*_state;
       //_robot.state.acceleration.set(_state_2);
@@ -189,10 +200,17 @@ void mgnss::state_estimation::GroundForces::log(mwoibn::common::Logger& logger, 
             }
         }
 
-        // for(int i =6; i< _robot.getDofs(); i++){
-        //       logger.add(_log_names[id], _robot.state.torque.get()[i]);
-        //       id++;
-        // }
+        for(int i =0; i< 6; i++){
+              _char = char('x'+i);
+
+              _log_name = "flitered_F_";
+              _log_name += _char;
+               logger.add(_log_name, _robot.state["OVERALL_FORCE"].get()[i]);
+
+               _log_name = "est_F_";
+               _log_name += _char;
+               logger.add(_log_name, _robot.state["FEEDBACK_FORCE"].get()[i]);
+        }
 
         // std::cout << "com_inertia matrix\n" << _linear_force.getJacobian() << std::endl;
         // std::cout << "robot mass " << _robot.centerOfMass().mass() << std::endl;

@@ -49,6 +49,7 @@ virtual ~PointContact() { }
 using Point::operator=;
 
 virtual const mwoibn::Matrix& getPointJacobian(mwoibn::Matrix3 rotation_matrix); // contact specific
+virtual const mwoibn::Matrix& getWorldJacobian();
 virtual const mwoibn::VectorN& getPosition();
 
 const mwoibn::VectorN& getReactionForce(){

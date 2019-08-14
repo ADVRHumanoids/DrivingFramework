@@ -42,6 +42,9 @@ class SoftConstraint: public Constraint{
 
     SoftConstraint(const SoftConstraint& other): Constraint(other), _constraint(other._constraint->clone()), _gain(other._gain){ }
 
+
+    virtual void init(){_constraint->init();}
+
     auto clone() {return std::unique_ptr<SoftConstraint>(clone_impl()); }
 
     const mwoibn::VectorN& getGain(){return _gain;}

@@ -1,0 +1,11 @@
+# request field
+float64 min
+float64 max
+
+int32 nr
+-----
+# response
+bool success
+string message
+
+

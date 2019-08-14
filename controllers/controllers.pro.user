@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.1.0, 2019-04-12T16:16:50. -->
+<!-- Written by QtCreator 4.1.0, 2019-08-14T11:49:22. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -523,10 +523,10 @@
      <value type="QString">ROS_PACKAGE_PATH=/home/malgorzata/catkin_ws/install_debug/share:/opt/ros/kinetic/share:/home/malgorzata/ADVR-Humanoids/advr-superbuild/build/install/share</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Arguments">rosrun nrt_software shared  __ns:=centauro</value>
-    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">/home/malgorzata/catkin_ws/install_debug/lib/nrt_software/shared</value>
+    <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.Executable">/home/malgorzata/catkin_ws/install_debug/lib/mgnss_plugins_shared/shared</value>
     <value type="bool" key="ProjectExplorer.CustomExecutableRunConfiguration.UseTerminal">false</value>
     <value type="QString" key="ProjectExplorer.CustomExecutableRunConfiguration.WorkingDirectory">/home/malgorzata/catkin_ws</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run /home/malgorzata/catkin_ws/install_debug/lib/nrt_software/shared</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run /home/malgorzata/catkin_ws/install_debug/lib/mgnss_plugins_shared/shared</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">shared</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>

@@ -40,6 +40,13 @@ public:
     _point = _jacobian*_state.acceleration.get() + _constant;
   }
 
+  virtual void resize(unsigned int state, unsigned int dofs){
+    _jacobian.setZero(state, dofs);
+    _point.setZero(state);
+    _constant.setZero(state);    
+  }
+
+
   virtual void update(bool jacobian) {
       if(jacobian)
         computeJacobian();

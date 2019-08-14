@@ -8,6 +8,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task){
         _verify(task, selector);
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
+        _my_velocity.setZero(getTaskSize());
         mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
         _tasks_ptrs.push_back(std::make_tuple(selector, std::ref(task), test__));
 
@@ -18,6 +19,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, m
         _verify(task, selector);
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
+        _my_velocity.setZero(getTaskSize());
         mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
         _tasks_ptrs.push_back(std::make_tuple(selector, std::ref(task), test__));
 }
@@ -31,6 +33,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, u
                 throw(std::invalid_argument("Couldn't add task to the aggravated task, requested number is too high."));
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
+        _my_velocity.setZero(getTaskSize());
         mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
         _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_tuple(selector, std::ref(task), test__));
 
@@ -44,6 +47,7 @@ void mwoibn::hierarchical_control::tasks::Aggravated::addTask(BasicTask& task, m
                 throw(std::invalid_argument("Couldn't add task to the aggravated task, requested number is too high."));
 
         _init(getTaskSize()+selector.count(), task.getTaskDofs());
+        _my_velocity.setZero(getTaskSize());
         mwoibn::VectorN test__ = mwoibn::VectorN::Constant(task.getTaskSize(), 1);
 
         _tasks_ptrs.insert(_tasks_ptrs.begin()+i, std::make_tuple(selector, std::ref(task), test__));
@@ -66,16 +70,20 @@ void mwoibn::hierarchical_control::tasks::Aggravated::updateJacobian(){
 void mwoibn::hierarchical_control::tasks::Aggravated::updateError(){
 
         _last_error.noalias() = _error;
-        int row = 0;
+        int row = 0, id = 0;
+        _velocity.setZero();
         for(auto& task : _tasks_ptrs) {
                 std::get<1>(task).updateError();
                 for(int i = 0; i < std::get<0>(task).size(); i++) {
                         if(!std::get<0>(task)[i]) continue;
                         _error[row] = std::get<2>(task)[i]*std::get<1>(task).getError()[i];
                         _velocity[row] = std::get<2>(task)[i]*std::get<1>(task).getVelocity()[i];
+                        _velocity[row] += _my_velocity[id];
                         row++;
+                        ++id;
                 }
         }
+
 }
 //! updates whole task in one call, calls updateError() and updateJacobin() in
 //that order
