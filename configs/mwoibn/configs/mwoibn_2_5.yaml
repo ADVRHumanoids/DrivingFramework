@@ -901,7 +901,7 @@ mwoibn:
                         # plugins: [odometry2::odometry, gravity_compensation]
                         #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+                        plugins: [odometry3::odometry, ground_forces]
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
 #                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]

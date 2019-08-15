@@ -5,16 +5,22 @@
 #include "mgnss/state_estimation/ground_forces.h"
 #include "mwoibn/communication_modules/ros_point_feeback.h"
 #include "mwoibn/communication_modules/shared_point_setter.h"
+#include "mwoibn/communication_modules/ros_set_linear_point.h"
+
+#include "mgnss/ros_callbacks/ground_forces.h"
+
+#include "geometry_msgs/WrenchStamped.h"
+
 
 namespace mgnss
 {
 namespace nrt_software {
 namespace plugins
 {
-  template<typename Subscriber, typename Service, typename Node>
-  class GroundForces : public mgnss::plugins::Generator<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class GroundForces : public mgnss::plugins::Generator<Subscriber, Service, Node, Publisher>
   {
-    typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+    typedef mgnss::plugins::Generator<Subscriber, Service, Node, Publisher> Generator_;
 
 
 public:
@@ -36,6 +42,7 @@ virtual void _resetPrt(YAML::Node config){
 
 virtual void _initCallbacks(YAML::Node config){
 
+  Generator_::_robot_ptr.begin()->second->controllers.add( mwoibn::communication_modules::RosSetRobotPoint<Publisher, Node>(Generator_::_robot_ptr.begin()->second->centerOfPressure(), "center_of_pressure", Generator_::n), "centerOfPressure");
   if(!config["contact_source"])
     throw(std::invalid_argument(__PRETTY_FUNCTION__ + std::string(" Could not find a contact source.")));
 
@@ -46,8 +53,13 @@ virtual void _initCallbacks(YAML::Node config){
 
   for(auto& contact: Generator_::_robot_ptr.begin()->second->contacts()){
       std::cout << "contact " << contact->getName() << std::endl;
-          //_robot_ptr.begin()->second->controllers.add( mwoibn::communication_modules::RosPointSet(contact, contacts[contact.getName()]));
+      Generator_::_robot_ptr.begin()->second->controllers.add(mwoibn::communication_modules::RosSetLinearPoint<Publisher, Node>(contact->wrench().force, contact->getName(), Generator_::n), "ros_"+contact->getName());
+        //mwoibn::communication_modules::RosPointSet(, contacts[contact.getName()]));
   }
+
+  // Generator_::_sub.push_back(Generator_::n->template subscribe<geometry_msgs::WrenchStamped>("/centauro/j_ft_pelvis_ft_sensor", 1, boost::bind(&mgnss::ros_callbacks::ground_forces::wrench,
+  //   _1, static_cast<mgnss::state_estimation::GroundForces*>(Generator_::controller_ptr.get()))));
+
 }
 
 virtual void _initCallbacks(YAML::Node config, mwoibn::communication_modules::Shared& share){
@@ -83,6 +95,12 @@ virtual void _initCallbacks(YAML::Node config, mwoibn::communication_modules::Sh
   for(auto& contact: Generator_::_robot_ptr.begin()->second->contacts())
       Generator_::_robot_ptr.begin()->second->controllers.add(mwoibn::communication_modules::SharedPointSetter(
                               loaded[contact->getName()], share, contact->wrench()), prefix+contact->getName());
+  //
+  // Generator_::_sub.push_back(Generator_::n->template subscribe<geometry_msgs::WrenchStamped>("/centauro/j_ft_pelvis_ft_sensor", 1, boost::bind(&mgnss::ros_callbacks::ground_forces::wrench,
+  //       _1, static_cast<mgnss::state_estimation::GroundForces*>(Generator_::controller_ptr.get()))));
+
+  //_initCallbacks(config);
+
 }
 
 

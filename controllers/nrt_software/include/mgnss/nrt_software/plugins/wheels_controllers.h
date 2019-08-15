@@ -31,10 +31,10 @@ namespace mgnss {
 namespace nrt_software {
 namespace plugins {
 
-  template<typename Subscriber, typename Service, typename Node>
-  class WheelsControllerExtend : public mgnss::plugins::Generator<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class WheelsControllerExtend : public mgnss::plugins::Generator<Subscriber, Service, Node, Publisher>
   {
-    typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+    typedef mgnss::plugins::Generator<Subscriber, Service, Node, Publisher> Generator_;
 
   public:
     WheelsControllerExtend() : Generator_("wheeled_motion"){
@@ -70,10 +70,10 @@ namespace plugins {
 
 
 
-    template<typename Subscriber, typename Service, typename Node>
-    class WheelsSecondOrder : public mgnss::plugins::Generator<Subscriber, Service, Node>
+    template<typename Subscriber, typename Service, typename Node, typename Publisher>
+    class WheelsSecondOrder : public mgnss::plugins::Generator<Subscriber, Service, Node, Publisher>
     {
-      typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+      typedef mgnss::plugins::Generator<Subscriber, Service, Node, Publisher> Generator_;
 
       public:
         WheelsSecondOrder() : Generator_("wheeled_motion"){}
@@ -105,10 +105,10 @@ namespace plugins {
     };
 
 
-template<typename Subscriber, typename Service, typename Node>
-class WheeledMotionEvent3 : public WheelsControllerExtend<Subscriber, Service, Node>
+template<typename Subscriber, typename Service, typename Node, typename Publisher>
+class WheeledMotionEvent3 : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
 {
-  typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+  typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
 public:
 
@@ -133,10 +133,10 @@ protected:
 
 };
 
-template<typename Subscriber, typename Service, typename Node>
-class WheelsReactif : public WheeledMotionEvent3<Subscriber, Service, Node>
+template<typename Subscriber, typename Service, typename Node, typename Publisher>
+class WheelsReactif : public WheeledMotionEvent3<Subscriber, Service, Node, Publisher>
 {
-  typedef WheeledMotionEvent3<Subscriber, Service, Node> Precedesor_;
+  typedef WheeledMotionEvent3<Subscriber, Service, Node, Publisher> Precedesor_;
 
 public:
 
@@ -152,10 +152,10 @@ public:
   };
 
 
-  template<typename Subscriber, typename Service, typename Node>
-  class WheeledMotionWorld : public WheelsControllerExtend<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class WheeledMotionWorld : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
   {
-    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+    typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
   public:
   WheeledMotionWorld() : Precedesor_(){}
@@ -168,10 +168,10 @@ public:
   }
   };
 
-  template<typename Subscriber, typename Service, typename Node>
-  class WheelsZMP : public WheelsControllerExtend<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class WheelsZMP : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
   {
-    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+    typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
 public:
   WheelsZMP() : Precedesor_(){}
@@ -184,10 +184,10 @@ protected:
   }
 };
 
-  template<typename Subscriber, typename Service, typename Node>
-  class WheelsZMPII : public WheelsControllerExtend<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class WheelsZMPII : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
   {
-    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+    typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
     public:
       WheelsZMPII() : Precedesor_(){}
@@ -200,10 +200,10 @@ protected:
       }
    };
 
-  template<typename Subscriber, typename Service, typename Node>
-  class WheelsZMPIII : public WheelsControllerExtend<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class WheelsZMPIII : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
   {
-    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+    typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
     public:
       WheelsZMPIII() : Precedesor_(){}
@@ -216,10 +216,10 @@ protected:
       }
    };
 
-   template<typename Subscriber, typename Service, typename Node>
-   class WheelsZMPIV : public WheelsControllerExtend<Subscriber, Service, Node>
+   template<typename Subscriber, typename Service, typename Node, typename Publisher>
+   class WheelsZMPIV : public WheelsControllerExtend<Subscriber, Service, Node, Publisher>
    {
-     typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+     typedef WheelsControllerExtend<Subscriber, Service, Node, Publisher> Precedesor_;
 
      public:
        WheelsZMPIV() : Precedesor_(){}
@@ -233,10 +233,10 @@ protected:
     };
 
 
-template<typename Subscriber, typename Service, typename Node>
-class WheeledMotionMergeV1 : public WheeledMotionEvent3<Subscriber, Service, Node>
+template<typename Subscriber, typename Service, typename Node, typename Publisher>
+class WheeledMotionMergeV1 : public WheeledMotionEvent3<Subscriber, Service, Node, Publisher>
 {
-  typedef WheeledMotionEvent3<Subscriber, Service, Node> Precedesor_;
+  typedef WheeledMotionEvent3<Subscriber, Service, Node, Publisher> Precedesor_;
 
 public:
 

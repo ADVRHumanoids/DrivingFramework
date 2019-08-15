@@ -49,6 +49,7 @@ LIST( APPEND CATKIN_DEPENDS_SET roscpp)
 
 if(ROS_CONTROL)
 	LIST( APPEND CATKIN_DEPENDS_SET custom_controller custom_services custom_messages)
+	LIST( APPEND CATKIN_DEPENDS_BUILD message_generation )
         LIST( APPEND SOURCE_FILES src/custom_controller.cpp  src/velocity_controller.cpp)
 endif(ROS_CONTROL)
 
@@ -61,6 +62,14 @@ find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_BUILD}
 )
 
+ add_message_files(DIRECTORY msg
+   FILES
+   linear_point.msg
+)
+generate_messages(
+   DEPENDENCIES std_msgs
+ )
+
 catkin_package(
   INCLUDE_DIRS include
         ${catkin_INCLUDE_DIRS}                
@@ -70,6 +79,7 @@ catkin_package(
   CATKIN_DEPENDS
         roscpp
         ${CATKIN_DEPENDS_SET}
+        message_runtime
   DEPENDS
         ${DEPENDS_OPTIONAL}
 )
