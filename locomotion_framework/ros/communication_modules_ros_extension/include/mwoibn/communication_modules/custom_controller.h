@@ -159,12 +159,12 @@ protected:
                     name+"/load_gains",
                     boost::bind(&CustomController::loadGains, this, _1, _2));
 
-    _map = _initMap(urdf_rbdl, rbdl_dofs);
+    _map = _initMap(urdf_rbdl, rbdl_dofs, name);
   }
 
   template <typename Vector>
 
-  mwoibn::robot_class::BiMap _initMap(const Vector& external_map, int dofs)
+  mwoibn::robot_class::BiMap _initMap(const Vector& external_map, int dofs, const std::string& name)
   {
       custom_controller::MapToUrdf map;
 
@@ -193,7 +193,7 @@ protected:
           rbdl_controller[external_map[i]] = urdf[i];
       }
 
-      return mwoibn::robot_class::BiMap("controller", rbdl_controller);
+      return mwoibn::robot_class::BiMap("ros_control::"+name, rbdl_controller);
   }
 
 
