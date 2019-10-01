@@ -16,10 +16,16 @@
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
   <depend>roscpp</depend> <!-- ALL -->
   <depend>simple_log</depend> <!-- ALL -->
   <depend>robot_class</depend> <!-- ALL -->
 
+
+  <depend>std_msgs</depend>
   <depend>custom_controller</depend>
   <depend>custom_messages</depend>
   <depend>custom_services</depend>

@@ -130,7 +130,7 @@ public:
   }
 
   std::string getMapName(){ return _map.getName();}
-
+  mwoibn::robot_class::BiMap& shareMap(){return _map;}
 
 protected:
   mwoibn::robot_class::BiMap _map;

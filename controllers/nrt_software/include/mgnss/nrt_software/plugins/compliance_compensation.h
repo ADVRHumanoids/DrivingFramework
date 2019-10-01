@@ -11,10 +11,10 @@ namespace nrt_software {
 namespace plugins {
 
 
-  template<typename Subscriber, typename Service, typename Node>
-  class ComplianceCompensation : public mgnss::plugins::Generator<Subscriber, Service, Node>
+  template<typename Subscriber, typename Service, typename Node, typename Publisher>
+  class ComplianceCompensation : public mgnss::plugins::Generator<Subscriber, Service, Node, Publisher>
   {
-    typedef mgnss::plugins::Generator<Subscriber, Service, Node> Generator_;
+    typedef mgnss::plugins::Generator<Subscriber, Service, Node, Publisher> Generator_;
 
 
     public:

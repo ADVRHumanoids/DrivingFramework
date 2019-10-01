@@ -19,25 +19,26 @@ void mgnss::controllers::JointStates::_allocate(YAML::Node config){
         throw(std::invalid_argument("JointStates: Unknown controller name"));
     
   _name = config["name"].as<std::string>();
+        
    mwoibn::VectorInt temp_ = _robot.getDof(_robot.getLinks(config["chain"].as<std::string>()));
   _pos_map.setConstant(_robot.getDofs(), false);
   for(int i = 0; i < temp_.size(); i++)
     _pos_map[temp_[i]] = true;
 
-        _vel_map = _robot.selectors().get("wheels").which();
+  _vel_map = _robot.selectors().get("wheels").which();
   //_ankle_map = _robot.selectors().get("camber").which();
   //_yaw_map = _robot.selectors().get("yaws").which();
 
-        _velocity.setZero(_vel_map.size());
+  _velocity.setZero(_vel_map.size());
 //  _vel_sign.setOnes(_vel_map.size());
   // _last_ankle.setZero(_ankle_map.size());
 //  _des_ankle.setZero(_ankle_map.size());
 
-        _position = _robot.state.position.get();
-        _last_position = _position;
+  _position = _robot.state.position.get();
+  _last_position = _position;
 
-        _pos_ref = _position;
-        _vel_ref = _velocity;
+  _pos_ref = _position;
+  _vel_ref = _velocity;
 //  _init_ankle.setZero(_ankle_map.size());
 
 }

@@ -308,8 +308,10 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
                                 continue;
                         }
 
+                        auto controller_ = std::unique_ptr<mwoibn::communication_modules::BasicController>(new mwoibn::communication_modules::CustomController(command, lower_limits, upper_limits,  map,  entry.second));
+                        if(! biMaps().isDefined(controller_->shareMap().getName())) biMaps().add(BiMap(controller_->shareMap()));
 
-                        controllers.add( mwoibn::communication_modules::CustomController(command, lower_limits, upper_limits,  map,  entry.second), entry.first.as<std::string>());
+                        controllers.add( std::move(controller_), entry.first.as<std::string>());
 
                         continue;
                 }
@@ -321,10 +323,14 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
                                 " has not been initialized." << std::endl;
                                 continue;
                         }
-                        controllers.add(
-                                std::unique_ptr<mwoibn::communication_modules::BasicController>(
-                                        new mwoibn::communication_modules::VelocityController(
-                                                command, map, entry.second)),  entry.first.as<std::string>());
+
+                        auto controller_ = std::unique_ptr<mwoibn::communication_modules::BasicController>(
+                                new mwoibn::communication_modules::VelocityController(
+                                        command, map, entry.second));
+                        if(! biMaps().isDefined(controller_->shareMap().getName())) biMaps().add(BiMap(controller_->shareMap()));
+
+                        controllers.add(std::move(controller_) ,  entry.first.as<std::string>());
+
                         continue;
                 }
 #endif

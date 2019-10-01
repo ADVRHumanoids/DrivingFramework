@@ -22,7 +22,7 @@ namespace mgnss
 namespace plugins
 {
 
-template<typename Subscriber, typename Service, typename Node>
+template<typename Subscriber, typename Service, typename Node, typename Publisher>
 class Generator
 {
   typedef  std::map<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> robot_map;

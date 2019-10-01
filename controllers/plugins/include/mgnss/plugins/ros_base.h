@@ -7,10 +7,53 @@
 #include "mwoibn/std_utils/map.h"
 
 
+namespace mgnss::plugins
+{
+class RosPublisher{
+
+public:
+  RosPublisher(std::shared_ptr<ros::NodeHandle> node){
+    _node.reset(new ros::NodeHandle());
+  }
+  ~RosPublisher(){
+    _pub.shutdown();
+  }
+
+  template<typename Message>
+  void reset(const RosPublisher& other){
+      std::string topic = other._pub.getTopic();
+      //other._pub.shutdown();
+      _pub = _node->advertise<Message>(topic, 1);
+  }
+
+  template<typename Message>
+  void reset(RosPublisher&& other){
+      std::string topic = other._pub.getTopic();
+      other._pub.shutdown();
+      _pub = _node->advertise<Message>(topic, 1);
+  }
+
+  template<typename Message>
+  void publish(const Message& msg ){
+    _pub.publish(msg);
+  }
+
+  template<typename Message>
+ void advertise(const std::string& topic){
+   _pub = _node->advertise<Message>(topic, 1);
+ }
+
+protected:
+  std::shared_ptr<ros::NodeHandle> _node;
+  ros::Publisher _pub;
+};
+}
+
+
 #define MGNSS_REGISTER_ROS_PLUGIN_(constructor) \
 extern "C" mgnss::plugins::RosBase* make() \
 { \
-  return new mgnss::plugins::RosPlugin<constructor<ros::Subscriber, ros::ServiceServer, ros::NodeHandle>>(); \
+  return new mgnss::plugins::RosPlugin<constructor<ros::Subscriber, ros::ServiceServer, ros::NodeHandle, mgnss::plugins::RosPublisher>>(); \
 } \
 
 namespace mgnss
@@ -24,7 +67,7 @@ class RosBase
   typedef  std::map<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> robot_map;
   typedef  MapKeyIterator<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> _key_iter;
   typedef  MapValueIterator<std::string, std::shared_ptr<mwoibn::robot_class::Robot>> _val_iter;
-  typedef  mgnss::plugins::Generator<ros::Subscriber, ros::ServiceServer, ros::NodeHandle> RosGenerator_;
+  typedef  mgnss::plugins::Generator<ros::Subscriber, ros::ServiceServer, ros::NodeHandle, RosPublisher> RosGenerator_;
 public:
 // RosBase(int argc, char** argv, std::string name): _name(name){
 //    _init(argc, argv);

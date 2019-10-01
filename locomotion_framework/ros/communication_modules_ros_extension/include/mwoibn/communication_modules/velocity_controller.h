@@ -162,7 +162,7 @@ protected:
                         boost::bind(&VelocityController::loadGains, this, _1, _2));
 
 
-    _map = mwoibn::robot_class::BiMap(name, rbdl_controller);
+    _map = mwoibn::robot_class::BiMap("ros_control::"+name, rbdl_controller);
   }
 };
 }
