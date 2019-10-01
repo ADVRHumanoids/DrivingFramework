@@ -6,7 +6,7 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
@@ -31,7 +31,7 @@ if(VISUALIZATION_TOOLS)
  add_definitions(-DVISUALIZATION_TOOLS)
 if(ROS_CONTROL)
  LIST( APPEND INSTALL_TARGETS real_robot_tracker)
- LIST( APPEND CATKIN_DEPENDS_SET visualization_tools robot_point_handling roscpp robot_class_ros_extension )
+ LIST( APPEND CATKIN_DEPENDS_SET visualization_tools robot_point_handling roscpp robot_class_ros_extension message_runtime)
 endif(ROS_CONTROL)
 endif(VISUALIZATION_TOOLS)
 
@@ -44,19 +44,48 @@ endif(VISUALIZATION_TOOLS)
  LIST( APPEND PYTHON_INSTALL circular_reference_wheels collision_test load_fixed_transforms )
 
 
+# LIST( APPEND CATKIN_DEPENDS_SET message_runtime)
+ LIST( APPEND CATKIN_DEPENDS_BUILD message_generation )
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
   ${CATKIN_DEPENDS_BUILD}
 )
+
+
+# Generate services in the 'srv' folder
+add_service_files(
+   FILES
+   point.srv
+ )
+
+generate_messages()
 
 catkin_package(
   INCLUDE_DIRS ${catkin_INCLUDE_DIRS} launch
   LIBRARIES
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
+        message_runtime
   DEPENDS
 	${DEPENDS_OPTIONAL}
 )
+
+
+
+## Generate actions in the 'action' folder
+# add_action_files(
+#   FILES
+#   Action1.action
+#   Action2.action
+# )
+
+## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   # Or other packages containing msgs
+# )
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

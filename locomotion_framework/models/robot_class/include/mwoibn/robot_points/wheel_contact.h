@@ -111,7 +111,7 @@ virtual ~WheelContactV2() {
 virtual void _resize();
 
 
-virtual mwoibn::VectorN getPosition()
+virtual const mwoibn::VectorN& getPosition()
 {
         compute();
         return _point;

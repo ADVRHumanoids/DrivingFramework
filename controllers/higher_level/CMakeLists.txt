@@ -6,7 +6,7 @@ set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
@@ -68,13 +68,19 @@ add_library(steering
     src/qp/constraints/merge.cpp
 
     src/qp/tasks/support_shaping_v4_0.cpp
-    src/qp/tasks/support_shaping_v6_0.cpp
-    #src/qp/tasks/qr_tracking.cpp
+    src/qp/tasks/support_shaping_v5.cpp
+#    src/qp/tasks/support_shaping_v6.cpp
+    src/qp/tasks/support_shaping_v7.cpp
+
+# src/qp/tasks/qr_tracking.cpp
     src/qp/tasks/qr_task.cpp
     src/qp/tasks/qr_joint_space_v2.cpp
-    src/qp/tasks/qr_joint_space_v3.cpp
+#    src/qp/tasks/qr_joint_space_v3.cpp
     src/qp/tasks/qp_aggravated.cpp
     src/state_machine.cpp
+    src/state_machine_II.cpp
+#    src/state_machine_III.cpp
+    src/state_machine_IV.cpp
   )
   add_dependencies(support_shaping ${catkin_EXPORTED_TARGETS})
 

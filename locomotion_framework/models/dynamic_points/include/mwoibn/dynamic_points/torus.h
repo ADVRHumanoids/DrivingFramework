@@ -14,7 +14,7 @@ namespace mwoibn
 namespace dynamic_points
 {
 
-  // Computes the point force given desired accleration
+  // Computes the torus acceleration
 class Torus: public DynamicPoint
 {
 
@@ -56,8 +56,8 @@ public:
 
     const mwoibn::Matrix& getDependant(){return _dependend;}
     const mwoibn::VectorN& getIndependant(){return _independend;}
-    const mwoibn::Vector3& getVelocity(){return last_;}
-    const mwoibn::Vector3& getEstimate(){return est_;}
+    // const mwoibn::Vector3& getVelocity(){return last_;}
+    // const mwoibn::Vector3& getEstimate(){return est_;}
     robot_points::TorusModel& torus(){return _torus;}
 
 protected:
@@ -65,7 +65,7 @@ protected:
   robot_class::Robot& _robot;
   mwoibn::Matrix _dependend;
   mwoibn::VectorN _independend;
-  mwoibn::Vector3 est_, last_;
+  // mwoibn::Vector3 est_, last_;
   void _init(){
     _dependend.setZero(rows(),3);
     _independend.setZero(rows());

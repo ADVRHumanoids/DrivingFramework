@@ -93,21 +93,42 @@ bool mgnss::plugins::XbotShared::init_control_plugin(XBot::Handle::Ptr handle)
 void mgnss::plugins::XbotShared::on_start(double time)
 {
         _start = time;
-
-        for(auto& robot: _robot_ptr)  //_valid = robot.second->get() && _valid;
-        _valid = robot.second->get() &&  robot.second->feedbacks.reset() && _valid;
-
-
         _rate = true;
 
-        if (_valid)
-        {
-          for(auto& robot: _robot_ptr) robot.second->updateKinematics();
-          for(auto& controller: _controller_ptrs)  controller->init();
+        _init(time);
+}
 
-          _initialized = true;
+void mgnss::plugins::XbotShared::_init(double time){
+
+  for(auto& controller: _controller_ptrs){
+    if(!controller->model().get()) return;
+    if(controller->kinematics.get()) controller->model().updateKinematics();
+
+    controller->init();
+            //controller->update();
+    controller->send();
+    if(controller->modify.get()) controller->model().kinematics_update.set(true);
+
+    _logger_ptr->prefix(controller->name());
+    controller->log(*_logger_ptr.get(), time-_start);
         }
 
+  _logger_ptr->write();
+  _resetUpdates();
+  if(_rate)  _initialized = true;
+
+}
+
+void mgnss::plugins::XbotShared::_resetUpdates(){
+      _robot_ptr.begin()->second->wait(true);
+
+  // std::cout << "reset kinematics" << std::endl;
+  for(auto& robot: _robot_ptr)
+    robot.second->kinematics_update.set(false);
+
+  for(auto& controller: _controller_ptrs){
+    if(controller->kinematics.get()) controller->model().kinematics_update.set(true);
+  }
 }
 
 void mgnss::plugins::XbotShared::on_stop(double time) {
@@ -117,53 +138,31 @@ void mgnss::plugins::XbotShared::on_stop(double time) {
 void mgnss::plugins::XbotShared::control_loop(double time)
 {
     
-      _valid = true;
-  for(auto& robot: _robot_ptr)
-    _valid = robot.second->get() && _valid;
-        if (!_valid)
 
-                return;
+  if (!_initialized) { _init(time); return; }
   
-  for(auto& robot: _robot_ptr)
-        robot.second->updateKinematics();
+  // std::cout << "CONTROLER LOOP" << std::endl;
  
-  if (!_initialized)
-  {
-          if(_valid){
-
-              for(auto& controller: _controller_ptrs) {controller->init();
-                controller->send();
-                for(auto& robot: _robot_ptr)
-                    robot.second->get();
-              }
-          }
-
-          if(_rate && _valid)  _initialized = true;
-  }
-
   for(auto& controller: _controller_ptrs){
 
-    for(auto& robot: _robot_ptr)
-        robot.second->get(); // this will cause unecessary update on external feedbacks (think how to separate both), but it should not be expensive
-        
-//        now = std::chrono::high_resolution_clock::now();
-        controller->update();
-//        end = std::chrono::high_resolution_clock::now();
-//        elapsed = end - now;
-//        _logger_ptr->add("update_"+std::to_string(i), elapsed.count());
-        
+    if(!controller->model().get()) return;
+
+    if(controller->kinematics.get())
+        controller->model().updateKinematics();
+
+
+    controller->update();
         controller->send();
 
+    if(controller->modify.get()) controller->model().kinematics_update.set(true);
+    _logger_ptr->prefix(controller->name());
         controller->log(*_logger_ptr.get(), time-_start);
 
   }
   
   _logger_ptr->write();
 
-//    for(auto& robot: _robot_ptr)
-//        robot.second->wait(); // this will be problematic for NRT impelmentation, but for now lets' ingonre it // it would be good to do sense only once for all robots? - It is a shared pointer anyway
-
-    _robot_ptr.begin()->second->wait(true);
+  _resetUpdates();
 
 }
 

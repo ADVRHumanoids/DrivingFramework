@@ -10,7 +10,7 @@ namespace mwoibn
 namespace dynamic_points
 {
 
-  // Computes the point force given desired accleration
+  // Esitmates a torus velocity from acceleration
 class TorusVelocity: public Torus
 {
 

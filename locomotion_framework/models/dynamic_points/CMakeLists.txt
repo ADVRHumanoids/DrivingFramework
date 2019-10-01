@@ -35,13 +35,16 @@ include_directories(
         ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 ## Declare a C++ library
 add_library(mwoibn_dynamic_points
                 src/force.cpp
 //                src/linear_force.cpp
                 src/torus.cpp
+                src/torus2.cpp
+                src/torus_roll.cpp
+
                 src/torus_velocity.cpp
 )
 

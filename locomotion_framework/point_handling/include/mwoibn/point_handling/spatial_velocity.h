@@ -24,7 +24,7 @@ public:
   {
   }
 
-  SpatialVelocity(Point::Current current,
+  SpatialVelocity(const Point::Current& current,
         point_handling::FramePlus& frame, std::string name = "")
       : Velocity(current, frame, name),
        _linear(frame, name), _angular(frame, name)
@@ -51,6 +51,7 @@ public:
   {  }
 
   virtual ~SpatialVelocity() {}
+  virtual SpatialVelocity* clone_impl() const {return new SpatialVelocity(*this);}
 
   /** @brief get Position in a world frame */
   virtual const Point::Current&
@@ -58,10 +59,10 @@ public:
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
 
-  virtual Point::Current
-  getWorld(bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // virtual Point::Current
+  // getWorld(bool update = false) const {
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const {
@@ -73,11 +74,11 @@ public:
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
 
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const{
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // /** @brief get Position in a user-defined reference frame */
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const{
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {
@@ -91,7 +92,7 @@ public:
   }
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false);
-  virtual mwoibn::Matrix getJacobian(bool update = false) const;
+  // virtual mwoibn::Matrix getJacobian(bool update = false) const;
   virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const;
 
   LinearVelocity& linear(){return _linear;} // add synchronization mechanism

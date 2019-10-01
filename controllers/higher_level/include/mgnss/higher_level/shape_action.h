@@ -22,7 +22,7 @@ namespace actions {
 class ShapeAction : public Primary {
 public:
 ShapeAction(mgnss::higher_level::QpAggravated& task, mwoibn::hierarchical_control::tasks::ContactPoint& contact_point,
-            std::vector<mwoibn::hierarchical_control::tasks::Angle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
+            std::vector<mwoibn::hierarchical_control::tasks::SoftAngle>& steering, mgnss::higher_level::SteeringReference& steering_reference,
             mwoibn::hierarchical_control::tasks::Aggravated& aggravated, mwoibn::hierarchical_control::tasks::Aggravated& angles,
             mwoibn::hierarchical_control::tasks::Aggravated& caster, mwoibn::hierarchical_control::tasks::Aggravated& camber,
              mgnss::higher_level::StateMachine& state_machine,
@@ -61,7 +61,6 @@ virtual void run(){
     _angles.update();
     _state_machine.update();
 
-//    _qr_task._update();
 
 //    now = std::chrono::high_resolution_clock::now();
     _qr_task.solve();
@@ -73,7 +72,7 @@ virtual void run(){
     if(std::isinf(_qr_task.optimalCost())){
         ++infs;
         _robot.states[QR].velocity.set(mwoibn::VectorN::Zero(_robot.states[QR].velocity.size()));
-        //std::cerr << "inf\t" << infs << std::endl;
+        std::cerr << "inf\t" << infs << std::endl;
     }
 
     for(int i =0; i < 4; i++){
@@ -86,14 +85,20 @@ virtual void run(){
     }
 
 
-    // mwoibn::VectorN _modified_support  =  _state_machine.stateJacobian()*_qr_task.raw().head(_contact_point.getJacobian().cols());
+    // mwoibn::VectorN _modified_support  =  _state_machine.cost_I.jacobian.get()*_qr_task.raw().head(_contact_point.getJacobian().cols());
     // mwoibn::VectorN _modified_support(8);
 
     _qr_task.task(0).set(_robot.states[QR].velocity.get());
     _qr_task.task(0).transform(); //?
-    //std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
-    _support_world.noalias()  =  _state_machine.stateJacobian()*_qr_task.task(0).get();
-    _support_world +=  _state_machine.stateOffset();
+    // std::cout << "wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
+    // std::cout << "desired wheel velocity\t" << _qr_task.task(0).get().transpose() << std::endl;
+    _support_world.noalias()  =  _state_machine.cost_I.jacobian.get()*_qr_task.task(0).get().head<12>();
+    // std::cout << "jacobian\t" << _support_world.transpose() << std::endl;
+    _support_world +=  _state_machine.cost_I.offset.get().head<8>();
+
+    // std::cout << "offset\t" <<  _state_machine.cost_I.offset.get().head<8>().transpose() << std::endl;
+
+    // std::cout << "solution\t" <<  _support_world.transpose() << std::endl;
     //
     // for(int i =0; i < 4; i++){
     //   test__ = mwoibn::Vector3::Zero();
@@ -105,15 +110,24 @@ virtual void run(){
       _desired_steer.setZero();
       _modified_support.setZero();
       _support_world.setZero();
+      // for(auto& constraint: _qr_task.hard_inequality)
+      //   std::cout << constraint->getState().transpose() << std::endl;
     }
 
     // if(_desired_steer.norm() > 0.02){
     for(int i =0; i < 4; i++){
+        // add saturation on the steering task up to
+//        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+//        mwoibn::eigen_utils::limitToHalfPi(temp_);
+//        if(std::fabs(temp_) < 0.3)
       _steering[i].setReference(_current_steer[i] + _desired_steer[i]*_robot.rate());
+//       else if(_steering[i].getCurrent() < (_current_steer[i] + _desired_steer[i]*_robot.rate() )
+//            _steering[i].setReference(_steering[i].getCurrent() + 0.1*_robot.rate())
       // _steering[i].setReference(_current_steer[i]);
       // _eigen_scalar[0] = _desired_steer[i];
       //_steering[i].setVelocity(_eigen_scalar);
       }
+      //std::cout << "steer\t" << _desired_steer.transpose() << std::endl;
     // }
 
     mwoibn::Vector3 support_i;
@@ -133,25 +147,28 @@ virtual void run(){
         _modified_support.segment<3>(3*i) = _contact_point.getCurrentWorld(i);
         _modified_support.segment<2>(2*i) += _support_world.segment<2>(2*i)*_robot.rate();
 
-        if(_support_world.segment<2>(2*i).norm() > 0.01){
+        if(_support_world.segment<2>(2*i).norm() > 0.0001){
 
         // std::cout << "get before\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
           vel__ = _contact_point.getReferenceWorld(i)+  support_i*_robot.rate();
+//        double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+//        mwoibn::eigen_utils::limitToHalfPi(temp_);
+//        if(std::fabs(temp_) < 0.3)
           _contact_point.setReferenceWorld(i, vel__, false);
         // _contact_point.setReferenceWorld(i,_contact_point.getReferenceWorld(i), false);
         // std::cout << "vel__\t" << _contact_point.getReferenceWorld(i).transpose() << std::endl;
       }
     }
     // _contact_point.setVelocity(_modified_support);
+    //
+    // std::cout << "_support world\t" << _support_world.transpose() << std::endl;
+    // std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
 
-    //std::cout << "_support world\t" << _support_world.transpose() << std::endl;
-    //std::cout << "_modified_support\t" << _modified_support.transpose() << std::endl;
-
-      _caster.update();
-
-
-    _contact_point.update();
-    _aggravated.update(); // steering
+//       _caster.update();
+//
+// // THIS SHOULD BE UPDATED LATER IN THE STACK
+//     _contact_point.update();
+//     _aggravated.update(); // steering
 
 }
 
@@ -170,15 +187,25 @@ void log(  mwoibn::common::Logger& logger){
    logger.add("cp_"   + std::to_string(i) + "_y", _contact_point.getCurrentWorld(i)[1] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_x", temp_qr[3*i] );
 //    logger.add("cp_qr_"   + std::to_string(i) + "_y", temp_qr[3*i+1] );
+   double temp_ = _steering[i].getCurrent() - (_current_steer[i] + _desired_steer[i]*_robot.rate());
+   mwoibn::eigen_utils::limitToHalfPi(temp_);
+
+   logger.add("is_steer_"   + std::to_string(i), temp_ );
+   logger.add("steer_error_"   + std::to_string(i), _steering[i].getError()[0] );
+   logger.add("caster_error_"   + std::to_string(i), _caster.getError()[i] );
+   logger.add("camber_error_"   + std::to_string(i), _camber.getError()[i] );
+//   logger.add("desired_steer_"   + std::to_string(i), _steering[i].getReference() );
  }
     if(std::isinf(_qr_task.optimalCost()))
         logger.add("cost_", -mwoibn::NON_EXISTING );
     else
         logger.add("cost_", _qr_task.optimalCost() );
-  logger.add("_modified_support",_modified_support.norm() );
+  // logger.add("_modified_support",_modified_support.norm() );
 
 //    logger.add("elapsed_solve", elapsed_solve.count()     );
 
+  // for(int i = 0; i < _qr_task.hard_inequality.size(); i++)
+  //   logger.add("inequality_"+std::to_string(i), _qr_task.hard_inequality.getState()[i]);
 
 }
 
@@ -186,7 +213,7 @@ protected:
   // hierarchical_control::State& _state;
   mgnss::higher_level::QpAggravated& _qr_task;
   mwoibn::hierarchical_control::tasks::ContactPoint &_contact_point;
-  std::vector<mwoibn::hierarchical_control::tasks::Angle> &_steering;
+  std::vector<mwoibn::hierarchical_control::tasks::SoftAngle> &_steering;
   mgnss::higher_level::SteeringReference& _steering_reference;
   mwoibn::hierarchical_control::tasks::Aggravated& _aggravated; // steering
   mwoibn::hierarchical_control::tasks::Aggravated &_angles, &_caster, &_camber;

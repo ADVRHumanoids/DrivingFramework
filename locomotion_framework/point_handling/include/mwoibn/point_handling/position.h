@@ -27,7 +27,7 @@ public:
   //   _current_fixed.setZero(size);
   // }
   template<typename Body>
-  Position(Point::Current current, Body body_id,
+  Position(const Point::Current& current, Body body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         std::string name = "")
       : Point(current, body_id, model, state, 3, name)
@@ -43,12 +43,14 @@ public:
 
   virtual ~Position() {}
 
+  virtual Position* clone_impl() const {return new Position(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false);
-
-  virtual Point::Current
-  getWorld(bool update = false) const;
+  //
+  // virtual Point::Current
+  // getWorld(bool update = false) const;
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const;
@@ -60,9 +62,9 @@ public:
   virtual void setWorld(const Point::Current& current,
                         bool update = false);
 
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const;
+  // /** @brief get Position in a user-defined reference frame */
+  virtual const Point::Current&
+  getReference(unsigned int refernce_id, bool update = false);
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

@@ -1,7 +1,7 @@
 #ifndef __MWOIBN__ROBOT_CLASS__ROBOT_POINTS__CENTER_OF_PRESSURE_H
 #define __MWOIBN__ROBOT_CLASS__ROBOT_POINTS__CENTER_OF_PRESSURE_H
 
-#include "mwoibn/robot_class/contacts.h"
+#include "mwoibn/robot_class/contacts_2.h"
 #include "mwoibn/robot_points/state.h"
 #include "mwoibn/robot_points/center_of_mass.h"
 

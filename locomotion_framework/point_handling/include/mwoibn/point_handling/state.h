@@ -42,19 +42,21 @@ public:
 
   virtual ~State() {}
 
+  // virtual State* clone_impl() const {return new State(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false) = 0;
 
-  virtual Point::Current
-  getWorld(bool update = false) const = 0;
+  // virtual Point::Current
+  // getWorld(bool update = false) const = 0;
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Point::Current& current,
                         bool update = false) = 0;
 
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const = 0;
+  // /** @brief get Position in a user-defined reference frame */
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const = 0;
 
   virtual void setReference(const Point::Current& current,
                             unsigned int reference_id,

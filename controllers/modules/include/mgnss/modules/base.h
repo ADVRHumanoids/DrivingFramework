@@ -8,11 +8,14 @@ namespace mgnss
 {
 namespace modules
 {
+
+
+
 class Base
 {
 
 public:
-Base(mwoibn::robot_class::Robot& robot) : _robot(robot){
+Base(mwoibn::robot_class::Robot& robot) : _robot(robot), kinematics(true), modify(false), dynamics(false){
 }
 
 virtual ~Base() {
@@ -33,9 +36,18 @@ virtual void startLog(mwoibn::common::Logger& logger){
 }
 
 virtual void log(mwoibn::common::Logger& logger, double time) = 0;
+
+mwoibn::robot_class::Robot& model(){return _robot;};
+
+mwoibn::common::Flag kinematics;
+mwoibn::common::Flag modify;
+mwoibn::common::Flag dynamics;
+const std::string& name(){return _name;}
+
 protected:
 mwoibn::robot_class::Robot& _robot;
 std::string _name = "";
+
 };
 }
 }

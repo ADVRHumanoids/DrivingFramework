@@ -41,6 +41,7 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <depend>robot_class</depend>
+  <depend>custom_services</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

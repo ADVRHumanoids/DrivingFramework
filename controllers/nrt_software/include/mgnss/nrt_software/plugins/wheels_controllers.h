@@ -7,6 +7,10 @@
 
 #include "mgnss/controllers/wheeled_motion_event_v3.h"
 #include "mgnss/controllers/wheels_zmp.h"
+#include "mgnss/controllers/wheels_zmp_II.h"
+#include "mgnss/controllers/wheels_zmp_III.h"
+#include "mgnss/controllers/wheels_zmp_IV.h"
+
 #include "mgnss/controllers/wheels_second_order.h"
 
 #include "mgnss/controllers/wheels_reactif.h"
@@ -179,6 +183,54 @@ protected:
           Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMP(*Precedesor_::_robot_ptr.begin()->second, config));
   }
 };
+
+  template<typename Subscriber, typename Service, typename Node>
+  class WheelsZMPII : public WheelsControllerExtend<Subscriber, Service, Node>
+  {
+    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+    public:
+      WheelsZMPII() : Precedesor_(){}
+      virtual ~WheelsZMPII(){
+      }
+
+    protected:
+      virtual void _resetPrt(YAML::Node config){
+              Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMPII(*Precedesor_::_robot_ptr.begin()->second, config));
+      }
+   };
+
+  template<typename Subscriber, typename Service, typename Node>
+  class WheelsZMPIII : public WheelsControllerExtend<Subscriber, Service, Node>
+  {
+    typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+    public:
+      WheelsZMPIII() : Precedesor_(){}
+      virtual ~WheelsZMPIII(){
+      }
+
+    protected:
+      virtual void _resetPrt(YAML::Node config){
+              Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMPIII(*Precedesor_::_robot_ptr.begin()->second, config));
+      }
+   };
+
+   template<typename Subscriber, typename Service, typename Node>
+   class WheelsZMPIV : public WheelsControllerExtend<Subscriber, Service, Node>
+   {
+     typedef WheelsControllerExtend<Subscriber, Service, Node> Precedesor_;
+
+     public:
+       WheelsZMPIV() : Precedesor_(){}
+       virtual ~WheelsZMPIV(){
+       }
+
+     protected:
+       virtual void _resetPrt(YAML::Node config){
+               Precedesor_::controller_ptr.reset(new mgnss::controllers::WheelsZMPIV(*Precedesor_::_robot_ptr.begin()->second, config));
+       }
+    };
 
 
 template<typename Subscriber, typename Service, typename Node>

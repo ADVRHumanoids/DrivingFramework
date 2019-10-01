@@ -36,6 +36,8 @@ mwoibn::Scalar get(){
 const mwoibn::Matrix& getJacobian(){
         return _J;
 }
+auto clone() {return std::unique_ptr<Basic>(clone_impl()); }
+
 
 protected:
 mwoibn::Axis _axis;
@@ -45,6 +47,7 @@ mwoibn::point_handling::Frame _point;
 mwoibn::robot_class::Robot& _robot;
 
 mwoibn::Matrix _J;
+virtual Basic* clone_impl() const = 0;
 
 
 };

@@ -6,7 +6,7 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
@@ -16,7 +16,8 @@ set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
-LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
+#LIST( APPEND INSTALL_TARGETS mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
+LIST( APPEND INSTALL_TARGETS mgnss_ik mgnss_controllers_wheels mgnss_controllers_centralized mgnss_controllers_joint_space)
 LIST( APPEND CATKIN_DEPENDS_SET hierarchical_control dynamic_models gravity_compensation motor_side_reference modules mgnss_higher_level robot_class)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -30,8 +31,9 @@ catkin_package(
           ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
   LIBRARIES
         mgnss_controllers_wheels
+        mgnss_ik
         mgnss_controllers_centralized
-        mgnss_controllers_joint_space        
+        mgnss_controllers_joint_space
   CATKIN_DEPENDS
 	${CATKIN_DEPENDS_SET}
   DEPENDS
@@ -44,30 +46,46 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/../../locomotion_framework/third_party/range-v3/include
 )
 
+add_library(mgnss_ik
+
+   src/ik_base.cpp
+   src/upper_body_IK.cpp
+
+ )
+
+add_dependencies(mgnss_ik ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(mgnss_ik
+   ${catkin_LIBRARIES}
+ )
 
 add_library(mgnss_controllers_wheels
 
    src/wheels_controller.cpp
    src/wheels_controller_extend.cpp
    src/wheeled_motion_event_v3.cpp
-#   src/wheels_second_order.cpp
+   src/wheels_second_order.cpp
 
 #   src/wheeled_motion_actions.cpp
 #   src/wheeled_motion_merge_v1.cpp
 #   src/wheeled_motion_world.cpp
 #   src/wheels_reactif.cpp
    src/wheels_zmp.cpp
+   src/wheels_zmp_II.cpp
+   src/wheels_zmp_IV.cpp
+#   src/wheels_zmp_III.cpp
  )
 
 add_dependencies(mgnss_controllers_wheels ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(mgnss_controllers_wheels
+   mgnss_ik
    ${catkin_LIBRARIES}
  )
 
 
 add_library(mgnss_controllers_centralized
-   src/online_centralized_controller.cpp
+#   src/online_centralized_controller.cpp
    src/compliance_compensation.cpp
    src/centralized_controller.cpp
  )

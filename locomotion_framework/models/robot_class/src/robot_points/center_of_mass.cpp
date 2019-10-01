@@ -32,10 +32,10 @@ void CenterOfMass::compute()
 {
   double mass;
 
-  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
-                                              mass, _com, nullptr, nullptr, false);
-//        RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), nullptr,
-//                                                   mass, _com, nullptr, nullptr, nullptr, nullptr,false);
+  // RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
+  //                                             mass, _com, nullptr, nullptr, false);
+       RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), nullptr,
+                                                  mass, _com, nullptr, nullptr, nullptr, nullptr,false);
 
 
 
@@ -47,21 +47,21 @@ void CenterOfMass::compute()
 void CenterOfMass::computeDerivative()
 {
   double mass;
-  
-  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
-                                              mass, _com, &_d_com, nullptr, false);
-//  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), nullptr,
-//                                              mass, _com, &_d_com, nullptr, nullptr, nullptr, false);
+
+  //RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
+  //                                            mass, _com, &_d_com, nullptr, false);
+   RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), nullptr,
+                                               mass, _com, &_d_com, nullptr, nullptr, nullptr, false);
   _point.noalias() = _com;
 }
 
 void CenterOfMass::accelerationComponent(){
   double mass;
-  
-  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
-                                              mass, _com, &_d_com, nullptr, false);
-//  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), &_state.zero.get(),
-//                                              mass, _com, &_d_com, &_dd_com, nullptr, nullptr, false);
+
+  //RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(),
+  //                                               mass, _com, &_d_com, nullptr, false);
+  RigidBodyDynamics::Utils::CalcCenterOfMass(_model, _state.position.get(), _state.velocity.get(), &_state.zero.get(),
+                                              mass, _com, &_d_com, &_dd_com, nullptr, nullptr, false);
   _point.noalias() = _com;
 }
 

@@ -74,11 +74,15 @@ virtual ~Compute(){
 }
 
 virtual void run(){
+        _task.update();
         _errors.noalias() = -(_gains.asDiagonal() * _task.getError() + _task.getVelocity());
+        // std::cout << "_errors\t" << _errors.transpose() << std::endl;
+        // std::cout << "velocity\t" << _task.getVelocity().transpose() << std::endl;
+
         _errors.noalias() -= _task.getJacobian() * _command;
+        // std::cout << "_errors2\t" << _errors.transpose() << std::endl;
 
         _inverser_ptr->compute(_task.getJacobian(), _P);
-
 
         // std::cout << "inverse jacobian\n" << _inverser_ptr->getInverse() << std::endl;
         // std::cout << "_P\n" << _P << std::endl;

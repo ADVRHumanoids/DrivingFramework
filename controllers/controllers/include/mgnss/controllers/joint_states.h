@@ -13,7 +13,8 @@ class JointStates : public mgnss::modules::Base
 {
 
 public:
-JointStates(mwoibn::robot_class::Robot& robot);
+JointStates(mwoibn::robot_class::Robot& robot, std::string config_file, std::string name);
+JointStates(mwoibn::robot_class::Robot& robot, YAML::Node config);
 
 virtual ~JointStates() {
 }
@@ -45,17 +46,17 @@ virtual void log(mwoibn::common::Logger& logger, double time){
         logger.add("time", time);
 }
 protected:
-mwoibn::VectorN _position, _velocity, _last_ankle, _last_position, _des_ankle, _init_ankle;
+mwoibn::VectorN _position, _velocity, _last_position;//, _des_ankle;//, _init_ankle;
 mwoibn::VectorN _pos_ref, _vel_ref;
-mwoibn::VectorInt _vel_map, _ankle_map, _vel_sign, _yaw_map;
+mwoibn::VectorInt _vel_map;//, _vel_sign;//, _yaw_map;
+mwoibn::VectorBool _pos_map;
 mwoibn::Vector3 _error, _last;
-mwoibn::point_handling::PositionsHandler _wheels;
 //  std::vector<mwoibn::Vector3> _wheels_positions;
 //mwoibn::robot_class::Robot& _robot;
 double _step, _dt, _max_vel = 2.0;
 bool _init;
 
-
+void _allocate(YAML::Node config);
 
 };
 }

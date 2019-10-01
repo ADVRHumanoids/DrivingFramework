@@ -27,7 +27,7 @@ public:
   }
 
   template<typename Body>
-  Point(Point::Current current, Body body_id,
+  Point(Point::Current& current, Body body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         std::string name = "")
       : Base(current, body_id, model, state, current.size(), name)
@@ -42,6 +42,8 @@ public:
       : Base(other)
   {  }
 
+  // virtual Point* clone_impl() const {return new Point(*this);}
+
     template<typename Source>
     Point( Source&& other, int size, std::string name = "")
         : Base(other, size, name)
@@ -55,12 +57,12 @@ public:
         _temp_world.setZero(size); }
 
     template<typename Source>
-    Point(Point::Current current,  Source&& other, std::string name = "")
+    Point(const Point::Current& current,  Source&& other, std::string name = "")
         : Base(other, current.size(), name)
     {  }
 
     template<typename Source>
-    Point(Point::Current current, const Source& other, std::string name = "")
+    Point(const Point::Current& current, const Source& other, std::string name = "")
         : Base(other, current.size(), name)
     {  }
 

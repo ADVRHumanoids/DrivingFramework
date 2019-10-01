@@ -57,13 +57,14 @@ void mwoibn::hierarchical_control::tasks::SoftAngle::updateError()
 
         _error[0] = _ref - _angle_ptr->get();
 
-        _limit2PI();
+        // _limit2PI();
+        //
+        // mwoibn::eigen_utils::wrapToPi(_error[0]);
+        // mwoibn::eigen_utils::wrapToPi(_ref);
+        eigen_utils::limitToHalfPi(_error); // make a bigger limit to avoid chattering
 
-        mwoibn::eigen_utils::wrapToPi(_error[0]);
-        mwoibn::eigen_utils::wrapToPi(_ref);
-
-        _reverse( 50*mwoibn::PI/180);
-        _saturation(30*mwoibn::PI/180);
+        // _reverse( 50*mwoibn::PI/180);
+        _hard_saturation(_limit);
 
 }
 
@@ -84,10 +85,22 @@ void mwoibn::hierarchical_control::tasks::SoftAngle::_reverse(double limit){
 }
 
 void mwoibn::hierarchical_control::tasks::SoftAngle::_saturation(double limit){
-        if (_error[0] > limit)
+        if (_error[0] > limit)//{
                 _error[0] = limit;
-        else if (_error[0] < -limit)
+                // std::cout << "+!" << std::endl;
+              // }
+        else if (_error[0] < -limit)//{
                 _error[0] = -limit;
+                // std::cout << "-!" << std::endl;
+              // }
+
+}
+
+void mwoibn::hierarchical_control::tasks::SoftAngle::_hard_saturation(double limit){
+    // std::cout << "hard" << std::endl;
+        _saturation(limit);
+        // std::cout << _error[0] << "\t" << _limit << "\t" << limit << std::endl;
+        _ref = _angle_ptr->get()+_error[0];
 }
 
 bool mwoibn::hierarchical_control::tasks::SoftAngle::resteer(){

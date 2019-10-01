@@ -6,7 +6,7 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -18,7 +18,7 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 LIST( APPEND INSTALL_TARGETS ros_callbacks)
-LIST( APPEND CATKIN_DEPENDS_SET controllers custom_services custom_messages)
+LIST( APPEND CATKIN_DEPENDS_SET controllers custom_services custom_messages mgnss_utils)
 
 find_package(catkin REQUIRED COMPONENTS
   ${CATKIN_DEPENDS_SET}
@@ -46,6 +46,8 @@ include_directories(
 
 add_library(ros_callbacks
    src/joint_states.cpp
+   src/upper_body_ik.cpp
+
    src/wheels_controller_extend.cpp
    src/wheels_controller_events.cpp
    src/wheels_controller_second_order.cpp

@@ -18,32 +18,47 @@ class QrDecomposition : public BasicModel
 {
 
 public:
-QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<dynamic_models::DYNAMIC_MODEL> update = {}) : BasicModel(robot, update)
+QrDecomposition(mwoibn::robot_class::Robot& robot, std::initializer_list<dynamic_models::DYNAMIC_MODEL> update = {}, const std::string& contact_group = "")
+  : BasicModel(robot, update), _contact_group(contact_group)
 {
 
-        std::cout << _robot.contacts().jacobianCols() << "\t" << _robot.contacts().jacobianRows() << std::endl;
-        _resize(std::min(_robot.contacts().jacobianCols(),
-                         _robot.contacts().jacobianRows()));
+        int i =0;
+        if(_contact_group.empty()){
+           i = _robot.contacts().jacobianRows();
+          _contacts_transpose = _robot.contacts().getJacobian().transpose();
+        }
+        else{
 
+          _robot.srdfContactGroup(_contact_group);
+          if(!_robot.contacts().hasGroup(_contact_group)){
+             i = _robot.contacts().jacobianRows();
         _contacts_transpose = _robot.contacts().getJacobian().transpose();
+          }
+          else{
+            for(auto& contact: _robot.contacts().group(_contact_group)) i += contact->jacobianSize();
+              _contacts_transpose.setZero(i,_robot.getDofs());
+          }
+        }
+        _resize(std::min(_robot.contacts().jacobianCols(), i));
         _qr_ptr.reset(new Eigen::ColPivHouseholderQR<mwoibn::MatrixLimited>(_contacts_transpose));
         _qr_ptr->compute(_contacts_transpose);
 }
 virtual ~QrDecomposition() {
 }
 
-virtual const mwoibn::VectorN& getGravity()
-{
-        _function_map[DYNAMIC_MODEL::GRAVITY]->count();
-
-        return _qr_gravity;
-}
+// virtual const mwoibn::VectorN& getGravity()
+// {
+//         _function_map[DYNAMIC_MODEL::GRAVITY]->count();
+//
+//         return _qr_gravity;
+// }
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamics, computed for a non-constrained directions **/
 virtual const mwoibn::VectorN& getNonlinearEffects()
 {
         _function_map[DYNAMIC_MODEL::NON_LINEAR]->count();
 
+        //std::cout << "NON_LINEAR" << std::endl;
         return _qr_non_linear;
 }
 
@@ -110,12 +125,13 @@ int _rank;
 bool _changed;
 mwoibn::MatrixLimited _q;
 mwoibn::Matrix _contacts_transpose, _i, _independent, _q_cut;
-mwoibn::VectorN _qr_gravity, _qr_non_linear;
+mwoibn::VectorN _qr_non_linear;
+std::string _contact_group;
 void _resize(int rank)
 {
         _rank = rank;
         _independent.setZero(_robot.getDofs()-_rank, _robot.getDofs());
-        _qr_gravity.setZero(_robot.getDofs()-_rank);
+        // _qr_gravity.setZero(_robot.getDofs()-_rank);
         _qr_non_linear.setZero(_robot.getDofs()-_rank);
         _qr_inertia.setZero(_robot.getDofs()-rank, _robot.getDofs());
         _q.setZero(_robot.getDofs(), _robot.getDofs());
@@ -130,11 +146,11 @@ void _resize(int rank)
 
 
 
-virtual void _updateGravity()
-{
-        BasicModel::_updateGravity();
-        _qr_gravity.noalias() =  _independent * BasicModel::getGravity();
-}
+// virtual void _updateGravity()
+// {
+//         BasicModel::_updateGravity();
+//         _qr_gravity.noalias() =  _independent * BasicModel::getGravity();
+// }
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamics, computed for a non-constrained directions **/
 virtual void _updateNonlinearEffects()
@@ -153,14 +169,21 @@ virtual void _updateInertia()
 
 void _updateDecomposition()
 {
+        if(_contact_group.empty())
         _contacts_transpose.noalias() = _robot.contacts().getJacobian().transpose();
+        else{
+          int i =0;
+          for(auto& contact: _robot.contacts().group(_contact_group)){
+            _contacts_transpose.middleRows(i, contact->jacobianSize()) = contact->getJacobian();
+            i += contact->jacobianSize();
+          }
+        }
 
         _qr_ptr->compute(_contacts_transpose);
 
 
         _q = _qr_ptr->householderQ()*_i;
         _q_cut.noalias() = _q.rightCols(_robot.getDofs() - _rank);
-
 
         _independent = _q_cut.transpose();
 

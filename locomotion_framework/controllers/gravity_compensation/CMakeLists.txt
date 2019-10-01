@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gravity_compensation)
 
-add_definitions(-std=c++11)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -19,18 +20,43 @@ find_package(catkin REQUIRED COMPONENTS
 LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 
 catkin_package(
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
 	include
-  LIBRARIES 
-  CATKIN_DEPENDS 
-	roscpp 
+  LIBRARIES
+    gravity_compensation_controllers
+  CATKIN_DEPENDS
+	roscpp
 	robot_class
 	eigen_utils
 	simple_log
         basic_controllers
         dynamic_models
-  DEPENDS 
+  DEPENDS
 )
+
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+# include_directories(include)
+include_directories(
+  include
+  ${PROJECT_NAME}
+  ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
+)
+
+## Declare a C++ library
+   add_library(gravity_compensation_controllers
+        src/simple_qr_gravity_compensation.cpp
+        )
+
+   add_dependencies(gravity_compensation_controllers ${catkin_EXPORTED_TARGETS})
+
+   target_link_libraries(gravity_compensation_controllers
+     ${catkin_LIBRARIES}
+   )
+
+
 
 ###########
 ## Build ##
@@ -94,5 +120,9 @@ endif()
    PATTERN ".svn" EXCLUDE
  )
 
-
-
+ ## Mark executables and/or libraries for installation
+  install(TARGETS gravity_compensation_controllers
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )

@@ -92,6 +92,7 @@ mwoibn::Vector3 _vA;
 mwoibn::Vector3T _tA, _tB;
 
 mwoibn::Matrix3 _mA, _mB, _s_y, _s_n, _s_v1;
+virtual Steering* clone_impl() const {return new Steering(*this);}
 
 };
 

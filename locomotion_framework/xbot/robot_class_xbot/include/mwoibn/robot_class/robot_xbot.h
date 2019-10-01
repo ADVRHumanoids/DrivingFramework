@@ -33,7 +33,7 @@ public:
   RobotXBot(YAML::Node full_config, std::string config_name, std::string controller_source);
 
   virtual ~RobotXBot() {}
-  virtual void wait(bool spin = true){}
+  virtual void wait(bool spin = true){kinematics_update.set(true);}
 
 protected:
   RobotXBot(){}

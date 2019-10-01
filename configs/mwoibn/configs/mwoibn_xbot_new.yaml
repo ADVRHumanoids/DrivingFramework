@@ -97,9 +97,9 @@ mwoibn:
                 joint:
                         list: [position_controller, velocity_controller]
                 direct:
-                        list: [position_controller, velocity_controller]                        
+                        list: [position_controller, velocity_controller]
                 position_reference:
-                        list: [whole_body]
+                        list: [upper_body]
                 torque_reference:
                         list: [torque_reference]
                 empty:
@@ -303,7 +303,7 @@ mwoibn:
                                 position: false
                                 velocity: false
                                 effort: true
-                        initialize: link_side_online                        
+                        initialize: link_side_online
                 velocity_controller:
                         type: ""
                         dofs:
@@ -559,6 +559,19 @@ mwoibn:
                         robot: joint_space
                         controller: joint
                         mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false
+                        chain: chains
+                joint_lower:
+                        layer: RT
+                        robot: joint_space
+                        controller: direct
+                        mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false
+                        chain: lower_body
                 joint_reference:
                         layer: RT
                         robot: default
@@ -567,12 +580,19 @@ mwoibn:
                             path: *support
                             file: upper_body.yaml
                         mode: full
+                        kinematics: false
+                        dynamics: false
+                        model_change: false
+                        chain: upper_body
                 wheeled_motion:
                         layer: RT
                         robot: default
                         # controller: position_reference
                         controller: direct
                         mode: full
+                        kinematics: true
+                        dynamics: true
+                        model_change: false                        
                         chain: lower_body
                         secondary_file:
                             path: *support
@@ -580,7 +600,7 @@ mwoibn:
 #                        tunning: ZMP_INDIRECT
                         steering: whole_body
 #                        position_gain: 200
-                        tunning: whole_body
+                        tunning: disturb
                         minor_axis: 0.068
                         major_axis: 0.01
                         track: wheels
@@ -652,17 +672,42 @@ mwoibn:
                                         damp: 0.0004
                                         tracking: 1.0
                         tunnings:
+                                reactif: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 45
+                                        BASE: [0.1, 0.1, 4, 2, 2, 3]
+                                        CONTACT_POINTS: 4
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 2 # 100
+                                        CASTER: 1.5 # 14
+                                        CAMBER_DAMP: 0.01
+                                        CASTER_DAMP: 0.12
+                                        COP: 0
+                                disturb: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 20 #50
+                                        BASE: [0.10, 0.10, 4, 2, 2, 3]
+                                        CONTACT_POINTS: 4 # 8?
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 0.7 # 4
+                                        CASTER: 1.5 # 10
+                                        CAMBER_DAMP: 0.08 #0.04
+                                        CASTER_DAMP: 0.12
+                                        COP: 0                                        
                                 whole_body: # drive without caster - this should work only for zero camber angle (at least for now)
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 20
-                                        BASE: [0.5, 0.5, 0.5, 3, 3, 3]
-                                        CONTACT_POINTS: 4
-#                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 0.7 # 100
+                                        STEERING: 30
+                                        BASE: [0.1, 0.1, 3, 2, 2, 3]
+                                        CONTACT_POINTS: 4 
+                                        CAMBER: 4 # 100
                                         CASTER: 1.5 # 14
-                                        CAMBER_DAMP: 0.08
+                                        CAMBER_DAMP: 0.07
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 RT: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -739,6 +784,9 @@ mwoibn:
                             file: odometry.yaml
 #                        mode: full
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: true                        
                         wheel_radius: 0.078
                         chain: wheels
                 gravity_compensation:
@@ -749,6 +797,9 @@ mwoibn:
                              path: *support
                              file: lower_body.yaml
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                 compliance_compensation:
                         layer: RT
                         robot: default
@@ -757,6 +808,9 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
 #                        type: online
 #                        reference: reference
 #                        compliance: True
@@ -765,6 +819,9 @@ mwoibn:
                         robot: default
                         controller: empty
                         mode: full
+                        kinematics: true
+                        dynamics: true
+                        model_change: false                        
                         secondary_file:
                             path: *support
                             file: lower_body.yaml
@@ -776,6 +833,9 @@ mwoibn:
                         robot: force_test
                         controller: empty
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                         secondary_file:
                             path: *support
                             file: torque.yaml
@@ -793,10 +853,13 @@ mwoibn:
                         robot: joint_space
                         controller: direct
                         mode: full
+                        kinematics: true
+                        dynamics: false
+                        model_change: false                        
                 shared:
                         layer: RT
                         #plugins: [odometry, ground_forces, Nwheels3::wheeled_motion, gravity_compensation, ground_forces::gravity_forces]
-                        plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]

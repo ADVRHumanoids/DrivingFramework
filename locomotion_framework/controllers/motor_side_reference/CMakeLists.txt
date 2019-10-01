@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.3)
 project(motor_side_reference)
 
 add_definitions(-std=c++11)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
@@ -24,7 +26,7 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
 catkin_package(
   INCLUDE_DIRS
 	include
-    ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include    
+    ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
   LIBRARIES
 	motor_side_reference
   CATKIN_DEPENDS
@@ -42,7 +44,7 @@ include_directories(
   include
   ${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include  
+  ${PROJECT_SOURCE_DIR}/../../third_party/range-v3/include
 )
 
 ## Declare a C++ library

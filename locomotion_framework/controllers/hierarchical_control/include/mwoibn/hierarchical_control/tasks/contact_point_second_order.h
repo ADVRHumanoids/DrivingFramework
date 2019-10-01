@@ -14,7 +14,8 @@
 
 #include "mwoibn/robot_points/ground_wheel.h"
 #include "mwoibn/robot_points/torus_model.h"
-#include "mwoibn/dynamic_points/torus_velocity.h"
+// #include "mwoibn/dynamic_points/torus_velocity.h"
+#include "mwoibn/dynamic_points/torus_integrated_roll.h"
 
 
 namespace mwoibn
@@ -39,7 +40,7 @@ public:
  ********prevent outside user from modifying a controlled point
  *
  */
-ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Robot& robot, YAML::Node config,
+ContactPointSecondOrder(const std::string& group, mwoibn::robot_class::Robot& robot, YAML::Node config,
                         mwoibn::robot_points::Point& base_point, std::string base_link)
         : ContactPoint(base_point), _robot(robot), _contacts(_robot.getDofs()), _base_point(base_point),
          _base( base_link, robot.getModel(), robot.state), _base_ang_vel(_base),
@@ -50,14 +51,15 @@ ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Rob
       _update.push_back(_manager.signIn(std::bind(&ContactPointSecondOrder::_updateState, this)));
 
 
-      for(auto& contact: _robot.contacts())
-      {
+
+        for(auto& contact: _robot.contacts().group(group))
+        {
           std::string name = _robot.getBodyName(contact->wrench().getBodyId());
-          if(!std::count(names.begin(), names.end(), name)){
-            std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
-            names.erase(std::remove(names.begin(), names.end(), name), names.end());
-            continue;
-          }
+          // if(!std::count(names.begin(), names.end(), name)){
+          //   std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+          //   names.erase(std::remove(names.begin(), names.end(), name), names.end());
+          //   continue;
+          // }
 
           std::unique_ptr<mwoibn::robot_points::TorusModel> torus_(new mwoibn::robot_points::TorusModel(
                              _robot.getModel(), _robot.state, mwoibn::point_handling::FramePlus(name,
@@ -71,7 +73,7 @@ ContactPointSecondOrder(std::vector<std::string> names, mwoibn::robot_class::Rob
           _wheel_transforms.push_back(std::unique_ptr<mwoibn::robot_points::Rotation>(
                     new mwoibn::robot_points::GroundWheel(torus_->axis(), torus_->groundNormal())));
           _support.add(std::move(torus_));
-          _contacts.add(mwoibn::dynamic_points::TorusVelocity(_support.end(0), _robot));
+          _contacts.add(mwoibn::dynamic_points::TorusIntegratedRoll(_support.end(0), _robot));
 
       }
 
@@ -165,6 +167,16 @@ virtual void updateState() final {
       return _baseToWorld(reference);
     }
 
+    virtual mwoibn::Vector3 getCurrentWorld(int i)
+    {
+
+          mwoibn::Vector3 current;
+          current = _minus[i].get().head<3>();
+
+          return _baseToWorld(current);
+        }
+
+
     virtual const mwoibn::Vector3& getVelocityReference(int i)
     {
       _point.noalias() = _q_twist.transposed().rotate(_wheel_transforms[i]->rotation*_velocity.segment<3>(3*i));
@@ -172,7 +184,7 @@ virtual void updateState() final {
     }
     virtual const mwoibn::Vector3& getPointStateReference(int i)
     {
-      _point.noalias() = _worldToBase(_contacts[i].get());
+      _point.noalias() = _worldToBase(_support[i].get());
       return _point;
     }
 
@@ -243,8 +255,8 @@ protected:
 
     for (int i = 0; i < _contacts.size(); i++)
     {
-
-      _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
+      std::cout << "_reference\t" << _reference.transpose() << std::endl;
+      _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) -  (_support[i].get() - _base_point.get());//_minus[i].get();
       _error.segment<2>(2 * i).noalias() = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)).head<2>(); // 10 is for a task gain should be automatic
 
       // if (_selector[i])
@@ -252,10 +264,12 @@ protected:
 
       _force.segment<3>(3*i).noalias() =  _wheel_transforms[i]->rotation.transpose()*(_robot.contacts()[i].wrench().force.getWorld());
 
-      _velocity.segment<2>(2*i) = (_wheel_transforms[i]->rotation.transpose()*(_velocity_ref.segment<3>(3*i) + _contacts[i].getConstant())).head<2>();
+      _velocity.segment<2>(2*i) = (_wheel_transforms[i]->rotation.transpose()*(_velocity_ref.segment<3>(3*i) - _contacts[i].getConstant())).head<2>();// - _contacts[i].getConstant())).head<2>();
     }
 
     std::cout << "_error\t" << _error.transpose() << std::endl;
+    std::cout << "_velocity\t" << _velocity.transpose() << std::endl;
+    std::cout << "_velocity_ref\t" << _velocity_ref.transpose() << std::endl;
 
   }
 

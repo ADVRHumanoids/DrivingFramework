@@ -51,6 +51,8 @@
   <depend>ros_callbacks</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
 
   <depend>common</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>mgnss_utils</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+
   <export>
     <!-- Other tools can request additional information be placed here -->
 

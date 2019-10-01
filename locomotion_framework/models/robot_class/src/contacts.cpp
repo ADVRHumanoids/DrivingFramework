@@ -19,7 +19,7 @@ bool mwoibn::robot_class::Contacts::remove(int i)
 int mwoibn::robot_class::Contacts::getId(std::string name) const
 {
   auto foundItem = std::find_if(_contacts.begin(), _contacts.end(),
-                                [&name](std::unique_ptr<robot_points::Contact> const& contact)
+                                [&name](auto const& contact)
                                 {
                                   return contact->getName() == name;
                                 });
@@ -196,6 +196,7 @@ const mwoibn::VectorN& mwoibn::robot_class::Contacts::getReactionForce()
 
   for (auto& contact : _contacts)
   {
+    // std::cout << contact->getName() << "\t" << contact->jacobianSize() << "\t\t\t" <<  contact->getReactionForce().transpose() << std::endl;
     _forces.segment(i,contact->jacobianSize()) = contact->getReactionForce();
     i += contact->jacobianSize();
   }

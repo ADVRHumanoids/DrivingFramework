@@ -26,7 +26,7 @@ class JointConstraintV2: public Constraint{
     mwoibn::robot_class::Robot& _robot;
     mwoibn::Matrix _support_jacobian;
     std::vector<mwoibn::Interface> _interfaces;
-    mwoibn::VectorN _max_position, _max_velocity, _max_torque, _min_torque;
+    mwoibn::VectorN _max_position, _max_velocity, _max_torque, _min_torque, _max_commnad;
     mwoibn::dynamic_models::BasicModel& _gravity;
     mwoibn::VectorInt _inactive_dofs;
     mwoibn::VectorN _test_inactive;
@@ -43,7 +43,10 @@ class JointConstraintV2: public Constraint{
       // create constraing
       _min.add(mgnss::higher_level::constraints::Integrate(mgnss::higher_level::constraints::MinimumLimit(_support_jacobian, _robot.lower_limits["POSITION"].get()), _robot.rate(), _robot.state.position.get()));
       _max.add(mgnss::higher_level::constraints::Integrate(mgnss::higher_level::constraints::MaximumLimit(_support_jacobian, _robot.upper_limits["POSITION"].get()), _robot.rate(), _max_position));
+      _init("POSITION", _min.end(0), _max.end(0));
 
+      _min.add(mgnss::higher_level::constraints::Integrate(mgnss::higher_level::constraints::MinimumLimit(_support_jacobian, _robot.lower_limits["POSITION"].get()), _robot.rate(), _robot.command.position.get()));
+      _max.add(mgnss::higher_level::constraints::Integrate(mgnss::higher_level::constraints::MaximumLimit(_support_jacobian, _robot.upper_limits["POSITION"].get()), _robot.rate(), _max_commnad));
       _init("POSITION", _min.end(0), _max.end(0));
 
     }

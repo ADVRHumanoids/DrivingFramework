@@ -30,6 +30,11 @@ template<typename Other>
           //_init(1, robot.getDofs());
   }
 
+
+  Angle(const Angle& other): BasicTask(other), _angle_ptr(other._angle_ptr->clone()){
+
+  }
+
   virtual ~Angle() {
   }
 
@@ -49,18 +54,25 @@ template<typename Other>
 protected:
 double _ref;
 std::unique_ptr<robot_class::angles::Basic> _angle_ptr;
+
 };
 
 class SoftAngle : public Angle {
 
 public:
   template<typename Other>
-    SoftAngle(Other angle, mwoibn::robot_class::Robot& robot)
-            : Angle(angle, robot)
+    SoftAngle(Other angle, mwoibn::robot_class::Robot& robot, double limit)
+            : Angle(angle, robot), _limit(limit)
     {
             _resteer = false;
     }
 
+  SoftAngle(SoftAngle&& other): Angle(other), _resteer(other._resteer), _limit(other._limit)
+  {  }
+
+  SoftAngle(const SoftAngle& other): Angle(other), _resteer(other._resteer), _limit(other._limit)
+  {  }
+  
 virtual ~SoftAngle() {
 }
 
@@ -71,7 +83,9 @@ protected:
 bool _resteer;
 void _reverse(double limit);
 void _saturation(double limit);
+void _hard_saturation(double limit);
 void _limit2PI();
+double _limit;
 
 };
 }

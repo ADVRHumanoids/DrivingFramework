@@ -20,7 +20,7 @@ namespace dynamic_models
  enum class DYNAMIC_MODEL
  {
    INERTIA,
-   GRAVITY,
+   // GRAVITY,
    NON_LINEAR,
    INERTIA_INVERSE
  };
@@ -34,7 +34,7 @@ BasicModel(mwoibn::robot_class::Robot& robot, std::initializer_list<DYNAMIC_MODE
             {
 
         _zero.setZero(_robot.getDofs());
-        _gravity.setZero( _robot.getDofs());
+        // _gravity.setZero( _robot.getDofs());
         _non_linear.setZero(_robot.getDofs());
         _inertia.setZero(_robot.getDofs(),
                          _robot.getDofs());
@@ -57,11 +57,11 @@ mwoibn::robot_class::Robot& getRobot() const {
         return _robot;
 }
 
-virtual const mwoibn::VectorN& getGravity()
-{
-        _function_map[DYNAMIC_MODEL::GRAVITY]->count();
-        return _gravity;
-}
+// virtual const mwoibn::VectorN& getGravity()
+// {
+//         _function_map[DYNAMIC_MODEL::GRAVITY]->count();
+//         return _gravity;
+// }
 
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamic **/
@@ -106,13 +106,13 @@ virtual void subscribe(std::vector<DYNAMIC_MODEL> interfaces){
 
 protected:
 mwoibn::robot_class::Robot& _robot;
-mwoibn::VectorN _gravity, _non_linear, _zero;
+mwoibn::VectorN _non_linear, _zero;
 mwoibn::Matrix _inertia;
 mwoibn::update::UpdateManager _manager;
 std::unique_ptr<mwoibn::Inverse> _inverser_ptr;
 
 std::map<DYNAMIC_MODEL, std::pair< std::function<void()>, std::vector<DYNAMIC_MODEL> > > _update_map = {
-          {DYNAMIC_MODEL::GRAVITY, {std::bind(&dynamic_models::BasicModel::_updateGravity, this),{} } },
+          // {DYNAMIC_MODEL::GRAVITY, {std::bind(&dynamic_models::BasicModel::_updateGravity, this),{} } },
           {DYNAMIC_MODEL::INERTIA, {std::bind(&dynamic_models::BasicModel::_updateInertia, this),{} } },
           {DYNAMIC_MODEL::NON_LINEAR, {std::bind(&dynamic_models::BasicModel::_updateNonlinearEffects, this), {} } },
           {DYNAMIC_MODEL::INERTIA_INVERSE, {std::bind(&dynamic_models::BasicModel::_updateInertiaInverse, this), {DYNAMIC_MODEL::INERTIA} } }
@@ -121,13 +121,13 @@ std::map<DYNAMIC_MODEL, std::pair< std::function<void()>, std::vector<DYNAMIC_MO
 std::map<DYNAMIC_MODEL, std::shared_ptr<mwoibn::update::Function> > _function_map;
 
 /** @brief returns gravity effect computed **/
-virtual void _updateGravity()
-{
-        _gravity.setZero();
-        RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
-                                            _robot.state.position.get(), _zero, _gravity);
-
-}
+// virtual void _updateGravity()
+// {
+//         _gravity.setZero();
+//         RigidBodyDynamics::NonlinearEffects(_robot.getModel(),
+//                                             _robot.state.position.get(), _robot.state.velocity.get(), _gravity);
+//
+// }
 
 /** @brief returns all modeled nonlinear effects including gravity in robots
  * dynamic **/

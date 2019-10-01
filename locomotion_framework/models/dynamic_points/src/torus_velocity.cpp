@@ -14,7 +14,7 @@ namespace dynamic_points
      // VELOCITY
      _support_jacobian = _torus.getJacobianWheel()/_robot.rate();
 
-     _constant =    (getDependant()*toPN -_support_jacobian )*_torus.wheelVelocity().angular().getWorld();
+     _constant =    (getDependant()*toPN -_support_jacobian )*_torus.wheelAngularVelocity();
      _constant += getIndependant();
      _support_jacobian += getDependant()*toN;
      _support_jacobian = _support_jacobian*_robot.rate();
@@ -25,8 +25,6 @@ namespace dynamic_points
 
      // std::cout << "_support_jacobian\t" << _support_jacobian << std::endl;
      // std::cout << "angular\t" <<  _torus._v_centre.angular().getJacobian() << std::endl;
-
-
   }
 
   void TorusVelocity::compute(){

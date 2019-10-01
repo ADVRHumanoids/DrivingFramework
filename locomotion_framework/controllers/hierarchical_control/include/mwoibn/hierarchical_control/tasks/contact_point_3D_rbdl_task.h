@@ -31,19 +31,19 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  ContactPoint3DRbdl(std::vector<std::string> names, mwoibn::robot_class::Robot& robot, YAML::Node config,
+  ContactPoint3DRbdl(const std::string& group, mwoibn::robot_class::Robot& robot, YAML::Node config,
                           mwoibn::robot_points::Point& base_point, std::string base_link)
       : ContactPointTracking(robot, base_point, base_link)
   {
 
-    for(auto& contact: _robot.contacts())
+    for(auto& contact: _robot.contacts().group(group))
     {
         std::string name = _robot.getBodyName(contact->wrench().getBodyId());
-        if(!std::count(names.begin(), names.end(), name)){
-          std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
-          names.erase(std::remove(names.begin(), names.end(), name), names.end());
-          continue;
-        }
+        // if(!std::count(names.begin(), names.end(), name)){
+        //   std::cout << "Tracked point " << name << " could not be initialized" << std::endl;
+        //   names.erase(std::remove(names.begin(), names.end(), name), names.end());
+        //   continue;
+        // }
 
         std::unique_ptr<mwoibn::robot_points::TorusModel> torus_(new mwoibn::robot_points::TorusModel(
                            _robot.getModel(), _robot.state, mwoibn::point_handling::FramePlus(name,
@@ -119,7 +119,7 @@ protected:
       //_jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
 
       _jacobian.row(i) = _temp_jacobian.row(0);
-      _jacobian.row(i) -= (_rot*_base_ang_vel.getJacobian()).row(0);
+      _jacobian.row(i) -= (_rot*_base_ang_vel.getJacobian()).row(0); // here I have only a 1D task
       //_jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
       // if (_selector[i])
         // _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();

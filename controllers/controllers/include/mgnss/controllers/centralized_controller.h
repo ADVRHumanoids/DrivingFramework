@@ -35,7 +35,9 @@ virtual void log(mwoibn::common::Logger& logger, double time){
         logger.add("time", time);
         int counter = 0;
         for(int i = 0; i < 30; i++){
-          logger.add(_names[counter], _robot.command.torque.get()[i]); ++counter;
+          _log_name = "tau_des_";
+          _log_name += std::to_string(i);
+          logger.add(_log_name, _robot.command.torque.get()[i]); ++counter;
 //          logger.add(_names[counter], _log_command[i]); ++counter;
         }
 }
@@ -45,14 +47,17 @@ protected:
 virtual void _construct(YAML::Node config);
 // mwoibn::robot_class::Robot& _reference; // this passes current reference
 
+// mwoibn::dynamic_models::QrDecomposition _dynamic_model;
+//mwoibn::gravity_compensation::SimpleQRGravityCompensation _gravity_compensation;
 std::unique_ptr<mwoibn::dynamic_models::QrDecomposition> _dynamic_model_ptr;   // online set up
 std::unique_ptr<mwoibn::gravity_compensation::SimpleQRGravityCompensation> _gravity_compensation_ptr;
 // std::unique_ptr<mwoibn::motor_side_reference::SeaReference> _actuation_model_ptr;
 
 bool _motor_side = true;
-std::vector<std::string> _names;
+// std::vector<std::string> _names;
 std::vector<int> _inactive_dofs;
 mwoibn::VectorN _temp_command, _log_command;
+std::string _log_name;
 //  bool _valid = false;
 
 };

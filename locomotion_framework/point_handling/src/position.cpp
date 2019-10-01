@@ -14,11 +14,11 @@ Position::getWorld(bool update)
   return _temp_world;
 }
 
-Point::Current
-Position::getWorld(bool update) const{
-  return CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
-                                             _current_fixed, update);
-}
+// Point::Current
+// Position::getWorld(bool update) const{
+//   return CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
+//                                              _current_fixed, update);
+// }
 
 void Position::getWorld(Point::Current& current, bool update) const{
   current.head<3>() = CalcBodyToBaseCoordinates(_model, _state.position.get(), _body_id,
@@ -37,11 +37,12 @@ void Position::setWorld(const Point::Current& position,
                                         position, update);
 }
 
-Point::Current
-Position::getReference(unsigned int refernce_id, bool update) const
+const Point::Current&
+Position::getReference(unsigned int refernce_id, bool update)
 {
-  return  CalcBaseToBodyCoordinates(_model, _state.position.get(), refernce_id,
+  _temp_world.head<3>() = CalcBaseToBodyCoordinates(_model, _state.position.get(), refernce_id,
                                 getWorld(), update);
+  return _temp_world;
 }
 
 

@@ -58,6 +58,11 @@ void mgnss::higher_level::SupportShapingV4::_update(){
       soft_inequality[0].setState() = (_margin.getState() - _margin.limit)/_robot.rate();
 
     QrTask::_update();
+    // 
+    // std::cout << "soft_inequality 0\n" << soft_inequality[0].getJacobian() << std::endl;
+    // std::cout << "soft_inequality 1\n" << soft_inequality[1].getJacobian() << std::endl;
+    // std::cout << "cost quadratic\n" << _cost.quadratic << std::endl;
+    // std::cout << "cost linear\n" << _cost.linear<< std::endl;
     // std::cout << "soft_inequality\n" << soft_inequality[0].getJacobian() << std::endl;
     // std::cout << "hard_inequality\n" << hard_inequality[0].getJacobian() << std::endl;
     // std::cout << "margin.getState()\t" << soft_inequality[0].getState().transpose() << std::endl;
@@ -74,8 +79,9 @@ void mgnss::higher_level::SupportShapingV4::log(mwoibn::common::Logger& logger){
        logger.add("optimal_cp_" + std::to_string(i), _optimal_state[i]);
 
     for (int i = 0; i < _size; i++){
-       logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
-       logger.add(std::string("error_workspace_") + std::to_string(i), _inequality.getState()[4+i]);
+       //logger.add(std::string("workspace_") + std::to_string(i), std::sqrt(_workspace.getState()[i]));
+       logger.add(std::string("error_workspace_") + std::to_string(i), soft_inequality[1].getState()[i]);
+       logger.add(std::string("error_margin_") + std::to_string(i), soft_inequality[0].getState()[i]);
      }
 
     for (int i = 0; i < _slack; i++)

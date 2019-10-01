@@ -19,7 +19,7 @@ public:
       : Velocity(frame, 3, name)
   {  }
 
-  LinearVelocity(Point::Current current,
+  LinearVelocity(const Point::Current& current,
         point_handling::FramePlus& frame, std::string name = "")
       : Velocity(current, frame, name)
   { }
@@ -42,6 +42,8 @@ public:
 
   virtual ~LinearVelocity() {}
 
+  virtual LinearVelocity* clone_impl() const {return new LinearVelocity(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Point::Current&
   getWorld(bool update = false){
@@ -50,10 +52,10 @@ public:
     // throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
 
-  virtual Point::Current
-  getWorld(bool update = false) const {
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // virtual Point::Current
+  // getWorld(bool update = false) const {
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
 
   virtual void
@@ -67,11 +69,11 @@ public:
     throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
   }
 
-  /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const{
-    throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
-  }
+  // /** @brief get Position in a user-defined reference frame */
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const{
+  //   throw mwoibn::std_utils::notImplemented(__PRETTY_FUNCTION__);
+  // }
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const {
@@ -85,7 +87,7 @@ public:
   }
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false);
-  virtual mwoibn::Matrix getJacobian(bool update = false) const;
+  // virtual mwoibn::Matrix getJacobian(bool update = false) const;
   virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const;
 
 };

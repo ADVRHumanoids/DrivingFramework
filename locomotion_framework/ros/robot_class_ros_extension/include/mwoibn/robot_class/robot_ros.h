@@ -43,6 +43,7 @@ public:
 
   virtual void wait(bool spin = true){
     _spined = !spin;
+    kinematics_update.set(true);
     _rate_ptr->sleep();
   }
 

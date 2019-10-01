@@ -52,9 +52,10 @@ mwoibn::robot_points::ContactV2::getPointJacobian(mwoibn::Matrix3 rotation_matri
   return _jacobian;
 }
 
-mwoibn::VectorN mwoibn::robot_points::ContactV2::getPosition()
+const mwoibn::VectorN& mwoibn::robot_points::ContactV2::getPosition()
 {
-  return _frame.getFullStateWorld();
+  _full_state = _frame.getFullStateWorld();
+  return _full_state;
 }
 
 const mwoibn::VectorN& mwoibn::robot_points::ContactV2::getReactionForce(){

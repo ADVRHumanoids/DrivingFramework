@@ -21,7 +21,7 @@ namespace dynamic_points
   void LinearForce::compute(){
     computeJacobian();
 
-    _point.noalias() = _jacobian*_des_acc;
+    _point.noalias() = _jacobian*_des_acc; //?
 
   }
 

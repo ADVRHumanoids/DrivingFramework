@@ -15,25 +15,27 @@ class Integrate: public mgnss::higher_level::Constraint{
     // }
 
     //template<typename ConstraintType>
-    Integrate(Constraint&& constraint, double dt, const mwoibn::VectorN& current ): Constraint(), _dt(dt), _current(current), _constraint(constraint.clone())
+    Integrate(Constraint&& constraint, double dt, const mwoibn::VectorN& current, bool positive_sign = true): Constraint(), _dt(dt), _current(current), _constraint(constraint.clone())
     {
+      _sign = (positive_sign) ? 1 : -1;
       resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
       active.setConstant(_constraint->getJacobian().rows(), true);
     }
 
     template<typename ConstraintType>
-    Integrate(std::unique_ptr<ConstraintType> constraint, double dt, const mwoibn::VectorN& current ): Constraint(), _dt(dt), _current(current) {
+    Integrate(std::unique_ptr<ConstraintType> constraint, double dt, const mwoibn::VectorN& current, bool positive_sign = true ): Constraint(), _dt(dt), _current(current) {
+      _sign = (positive_sign) ? 1 : -1;
       _constraint.reset(std::move(constraint));
       resize(_constraint->getJacobian().rows(), _constraint->getJacobian().cols());
       active.setConstant(_constraint->getJacobian().rows(), true);
     }
 
 
-    Integrate(Integrate&& other): Constraint(other), _dt(other._dt), _current(other._current){
+    Integrate(Integrate&& other): Constraint(other), _dt(other._dt), _current(other._current), _sign(other._sign){
       _constraint = std::move(other._constraint);
     }
 
-    Integrate(const Integrate& other): Constraint(other), _constraint(other._constraint->clone()), _dt(other._dt), _current(other._current){ }
+    Integrate(const Integrate& other): Constraint(other), _constraint(other._constraint->clone()), _dt(other._dt), _current(other._current), _sign(other._sign){ }
 
 
     virtual void init() override {
@@ -45,15 +47,14 @@ class Integrate: public mgnss::higher_level::Constraint{
         _constraint->update();
         _jacobian = _constraint->getJacobian();
         _state = _constraint->getState();
-        _state.noalias() += _current;
+        _state.noalias() += _sign*_current;
 
 
 
         _state = _state/_dt;
-
-//        std::cout << "_constraint->state\t_state\t_current\n";
-//        for(int i = 0; i < active.size(); i++)
-//          std::cout << _constraint->getState()[i] << "\t" << _state[i] << "\t" << _current[i] << "\n";
+        // std::cout << "_constraint->state\t_state\t_current\t" << _sign << std::endl;
+        // for(int i = 0; i < active.size(); i++)
+          // std::cout << _constraint->getState()[i] << "\t" << _state[i] << "\t" << _current[i] << "\n";
 
         //std::cout << "current\t" << _current.transpose() << std::endl;
         // std::cout << "jacobian\n" << jacobian << std::endl;
@@ -68,7 +69,7 @@ class Integrate: public mgnss::higher_level::Constraint{
     const mwoibn::VectorN& _current;
     //const mwoibn::robot_class::Pipe& _robot_state;
     virtual Integrate* clone_impl() const override {return new Integrate(*this);}
-
+    int _sign;
 
 };
 

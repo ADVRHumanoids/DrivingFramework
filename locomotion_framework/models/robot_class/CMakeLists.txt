@@ -66,7 +66,7 @@ ${catkin_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
@@ -97,6 +97,7 @@ target_link_libraries(communication
                  src/robot_points/center_of_mass.cpp
                  src/robot_points/center_of_pressure.cpp
 								 src/robot_points/point.cpp
+								 src/robot_points/point_contact.cpp
 								 src/robot_points/rotation.cpp
                 # src/robot_points/center_of_pressure_fast.cpp
                  src/robot_points/torus_model.cpp

@@ -7,7 +7,7 @@
 #include <mwoibn/dynamic_models/basic_model.h>
 //#include <mwoibn/robot_points/joint.h>
 #include "mwoibn/point_handling/linear_acceleration.h"
-#include "mwoibn/point_handling/linear_velocity.h"
+#include "mwoibn/point_handling/angular_velocity.h"
 #include "mwoibn/robot_points/torus_model.h"
 
 #include "mwoibn/point_handling/handler.h"
@@ -55,12 +55,15 @@ void _checkConfig(YAML::Node config);
 void _initConfig(YAML::Node config);
 //void _initCallbacks(YAML::Node config);
 
-std::vector<std::string> _log_names;
+// std::vector<std::string> _log_names;
+std::string _log_name, _char;
 
 
 mwoibn::point_handling::Handler<mwoibn::point_handling::LinearAcceleration> _accelerations;
 mwoibn::dynamic_models::BasicModel _gravity;
-// mwoibn::robot_points::Handler<mwoibn::dynamic_points::Force> _points_force;
+mwoibn::point_handling::Handler<mwoibn::point_handling::AngularVelocity> _wheel_centers;
+mwoibn::point_handling::Handler<mwoibn::point_handling::FramePlus> _wheel_frames;
+
 // mwoibn::robot_points::Handler<mwoibn::dynamic_points::Force> _linear_force;
 
 std::unique_ptr<mwoibn::PseudoInverse> _inertia_inverse, _contacts_inverse;
@@ -69,7 +72,7 @@ mwoibn::VectorN _world_contacts, _force_1, _force_2, _force_3, _state, _state_2,
 std::unique_ptr<mwoibn::filters::IirSecondOrder> _filter_torque_ptr;
 
 mwoibn::Matrix _contacts_jacobian, _contacts_inversed, _contacts_temp, _contacts_transposed;
-mwoibn::Vector3 _des_com;
+mwoibn::Vector3 _des_com, _vec_1, _vec_2;
 mwoibn::VectorN _set_force;
 const std::string _unfiltered_torque = "UNFILTERED_TORQUE";
 

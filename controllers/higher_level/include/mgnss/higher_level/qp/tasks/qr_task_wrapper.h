@@ -39,13 +39,13 @@ public:
   virtual void resize(int vars, int slack){
     _qr_base.resize(_basic_task.getTaskSize(),0);
     QRJointSpaceV2::resize(vars, slack);
-
   }
 
 
 virtual void _update(){
       _basic_task.update();
 
+      // std::cout << _basic_task.getJacobian() << std::endl;
       _task_state = _gain.cwiseProduct(_basic_task.getError()) + _basic_task.getVelocity();
       QRJointSpaceV2::_update();
 

@@ -30,7 +30,7 @@ public:
   {   }
 
   template<typename Type>
-  FramePlus(Point::Current linear, Type body_id,
+  FramePlus(const Point::Current& linear, Type body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         Orientation::O quat = Orientation::O(),  std::string name = "")
       : TempBase(body_id, model, state, 7, name), position(body_id, model, state, name), orientation(body_id, model, state, name)
@@ -48,6 +48,7 @@ public:
   {  }
 
   virtual ~FramePlus() {}
+  virtual FramePlus* clone_impl() const {return new FramePlus(*this);}
 
 
   point_handling::Rotation& rotation(){return orientation.rotation();};

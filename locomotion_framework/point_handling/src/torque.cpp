@@ -12,10 +12,10 @@ namespace point_handling
         return _temp_world;
   }
 
-  Point::Current
-  Torque::getWorld(bool update) const {
-        return frame.rotation().getWorld(update)*(_current_fixed + frame.position.getWorld(false).head<3>().cross(force.getFixed().head<3>()));
-  }
+  // Point::Current
+  // Torque::getWorld(bool update) const {
+  //       return frame.rotation().getWorld(update)*(_current_fixed + frame.position.getWorld(false).head<3>().cross(force.getFixed().head<3>()));
+  // }
 
   void Torque::getWorld(Point::Current& angular, bool update) const {
 
@@ -30,11 +30,11 @@ namespace point_handling
 
   }
 
-  Point::Current
-  Torque::getReference(unsigned int reference_id, bool update) const {
-
-            return frame.rotation().getReference(reference_id, update)*(_current_fixed + frame.position.getReference(reference_id, false).head<3>().cross(force.getFixed().head<3>()));
-  }
+  // Point::Current
+  // Torque::getReference(unsigned int reference_id, bool update) const {
+  //
+  //           return frame.rotation().getReference(reference_id, update)*(_current_fixed + frame.position.getReference(reference_id, false).head<3>().cross(force.getFixed().head<3>()));
+  // }
 
   void Torque::getReference(Point::Current& current, unsigned int reference_id, bool update) const {
         current.head<3>()= frame.rotation().getReference(reference_id, update)*(_current_fixed + frame.position.getReference(reference_id, false).head<3>().cross(force.getFixed().head<3>()));

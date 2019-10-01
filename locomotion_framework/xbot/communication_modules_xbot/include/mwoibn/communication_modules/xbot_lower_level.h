@@ -4,6 +4,10 @@
 #include "mwoibn/common/all.h"
 #include "mwoibn/communication_modules/basic_controller.h"
 #include <XBotInterface/RobotInterface.h>
+#include <XBotCore-interfaces/XBotRosUtils.h>
+#include <custom_services/loadGains.h>
+
+
 
 namespace mwoibn
 {
@@ -21,7 +25,10 @@ public:
       : BasicController(command, map, config), _lower_limits(lower_limits),
         _upper_limits(upper_limits), _robot(robot)
   {
-    std::cout << "Loading direct controller to the robot - " << config["name"]
+
+    _name = config["name"].as<std::string>();
+
+    std::cout << "Loading direct controller to the robot - " << _name
               << std::endl;
 
     if (_position)
@@ -36,7 +43,68 @@ public:
     _robot.getStiffness(stiffness);
     _robot.getDamping(damping);
 
-    for (auto entry : config["gains"])
+    _readGains(config["gains"]);
+
+
+    _robot.setStiffness(stiffness);
+    _robot.setDamping(damping);
+
+//    std::cout << stiffness << std::endl;
+
+
+    pub.setZero(_robot.getJointNum());
+
+    _load_gains_srv =
+            _node->advertiseService<custom_services::loadGains::Request,
+                                  custom_services::loadGains::Response>(
+                                    _name+"/load_gains",
+                                    boost::bind(&XBotLowerLevel::loadGains, this, _1, _2));
+
+
+
+  }
+
+  virtual ~XBotLowerLevel() {}
+
+  virtual bool run();
+  bool loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res);
+
+
+
+protected:
+  std::shared_ptr<XBot::RosUtils::RosHandle> _node;
+
+  XBot::RobotInterface& _robot;
+  mwoibn::VectorN pub;
+  mwoibn::VectorN stiffness;
+  mwoibn::VectorN damping;
+  const mwoibn::robot_class::State& _lower_limits;
+  const mwoibn::robot_class::State& _upper_limits;
+
+  XBot::RosUtils::ServiceServerWrapper::Ptr _load_gains_srv;
+
+  std::string _name;
+
+  void _limit(mwoibn::Interface interface)
+  {
+
+    for (int i = 0; i < _command[interface].size(); i++)
+    {
+      if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
+      if (_lower_limits[interface].get(i) == mwoibn::NON_EXISTING)
+          //std::cout << interface << "\t" << i << std::endl;
+          continue;
+      if (_command[interface].get(i) < _lower_limits[interface].get(i)){
+          _command[interface].set(_lower_limits[interface].get(i), i);
+      }
+      else if (_command[interface].get(i) > _upper_limits[interface].get(i)){
+               _command[interface].set(_upper_limits[interface].get(i), i);
+      }
+    }
+  }
+
+  void _readGains(YAML::Node config){
+    for (auto entry : config)
     {
       if (!entry.second.IsMap())
         continue;
@@ -61,44 +129,6 @@ public:
           entry.second["a_Kp"].as<double>();
       damping[_robot.getDofIndex(entry.second["name"].as<std::string>())] =
           entry.second["a_Kd"].as<double>();
-    }
-
-    _robot.setStiffness(stiffness);
-    _robot.setDamping(damping);
-
-//    std::cout << stiffness << std::endl;
-
-
-    pub.setZero(_robot.getJointNum());
-  }
-
-  virtual ~XBotLowerLevel() {}
-
-  virtual bool run();
-
-protected:
-  XBot::RobotInterface& _robot;
-  mwoibn::VectorN pub;
-  mwoibn::VectorN stiffness;
-  mwoibn::VectorN damping;
-  const mwoibn::robot_class::State& _lower_limits;
-  const mwoibn::robot_class::State& _upper_limits;
-
-  void _limit(mwoibn::Interface interface)
-  {
-
-    for (int i = 0; i < _command[interface].size(); i++)
-    {
-      if(_map.get()[i] == mwoibn::NON_EXISTING) continue;
-      if (_lower_limits[interface].get(i) == mwoibn::NON_EXISTING)
-          //std::cout << interface << "\t" << i << std::endl;
-          continue;
-      if (_command[interface].get(i) < _lower_limits[interface].get(i)){
-          _command[interface].set(_lower_limits[interface].get(i), i);
-      }
-      else if (_command[interface].get(i) > _upper_limits[interface].get(i)){
-               _command[interface].set(_upper_limits[interface].get(i), i);
-      }
     }
   }
 };

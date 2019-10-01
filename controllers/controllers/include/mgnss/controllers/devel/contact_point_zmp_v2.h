@@ -30,14 +30,14 @@ public:
    *prevent outside user from modifying a controlled point
    *
    */
-  ContactPointZMPV2(std::vector<std::string> names, mwoibn::robot_class::Robot& robot, YAML::Node config, mwoibn::robot_points::Point& base_point, std::string base_link, double gain)
-      : ContactPoint3DRbdl(names, robot, config, base_point, base_link), _gain(gain)
+  ContactPointZMPV2(const std::string& group, mwoibn::robot_class::Robot& robot, YAML::Node config, mwoibn::robot_points::Point& base_point, std::string base_link, double gain)
+      : ContactPoint3DRbdl(group, robot, config, base_point, base_link), _gain(gain)
   {  _tracking = true;}
 
   double forceFactor() {return 1-_force_factor;}
   double comFactor() {return _force_factor;}
   void tracking() { _tracking = true; }
-  void balance(){ _tracking = false; _error.setZero();}
+//  void balance(){ _tracking = false; _error.setZero();}
 
 protected:
   double _force_factor, _gain;
@@ -45,7 +45,7 @@ protected:
 
 
   virtual void _updateError(){
-    // if(_tracking) 
+    // if(_tracking)
     ContactPoint3DRbdl::_updateError();
     // else {  _error.setZero(); _full_error.setZero();}
 

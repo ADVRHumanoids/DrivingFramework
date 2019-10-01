@@ -22,7 +22,7 @@ public:
     _J.setZero(size, _state.velocity.size());
   }
 
-  Velocity(Point::Current& current,
+  Velocity(const Point::Current& current,
         point_handling::FramePlus& frame, std::string name = "")
       : State(current, frame, name)
 
@@ -48,10 +48,11 @@ public:
     {  }
 
   virtual ~Velocity() {}
+  // virtual Velocity* clone_impl() const {return new Velocity(*this);}
 
 
   virtual const mwoibn::Matrix& getJacobian(bool update = false) = 0;
-  virtual mwoibn::Matrix getJacobian(bool update = false) const = 0;
+  virtual mwoibn::Matrix getJacobian(bool update = false) const final { throw mwoibn::std_utils::depracated(__PRETTY_FUNCTION__);}
   virtual void getJacobian(mwoibn::Matrix& current, bool update = false) const = 0;
 
 

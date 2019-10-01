@@ -30,6 +30,8 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         // Set-up hierachical controller
         WheelsControllerExtend::_createTasks(config);
 
+        state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
+
         mwoibn::Vector3 pelvis;
         pelvis << 1, 1, 1;
         mwoibn::point_handling::PositionsHandler pelvis_ph("ROOT", _robot,
@@ -46,9 +48,10 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
 
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
-                             _robot.getLinks("wheels"), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
+                             config["track"].as<std::string>(), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
 
         _steering_ptr->subscribe(true, true, false);
+
 
 
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
@@ -113,5 +116,6 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
 
   // std::cout << _robot.state.velocity.get().head<6>().transpose() << std::endl;
+  state_machine__->log(logger);
 
 }

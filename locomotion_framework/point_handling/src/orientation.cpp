@@ -16,10 +16,11 @@ namespace point_handling
   }
   /** @brief get orientation in a world frame as a quaternion
    */
-  Orientation::O Orientation::getWorld(bool update) const
+   void Orientation::getWorld(Orientation::O& orientation, bool update) const
   {
-    return _set(_rotation.getWorld(update));
+    orientation =  _set(_rotation.getWorld(update));
   }
+
 
   /** @brief set new tracked point giving data in a world frame
    */
@@ -30,13 +31,13 @@ namespace point_handling
 
   }
 
-  /** @brief get Position in a user-defined reference frame
-   */
-  Orientation::O
-  Orientation::getReference(unsigned int reference_id, bool update) const
-  {
-    return _set(_rotation.getReference(reference_id, update));
-  }
+  // /** @brief get Position in a user-defined reference frame
+  //  */
+  // Orientation::O
+  // Orientation::getReference(unsigned int reference_id, bool update) const
+  // {
+  //   return _set(_rotation.getReference(reference_id, update));
+  // }
 
 
   /** @brief set new tracked point giving data in a user-defined reference

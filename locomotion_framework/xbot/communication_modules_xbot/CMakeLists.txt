@@ -12,7 +12,7 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (LOG_INFO ${PROJECT_NAME})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -27,7 +27,7 @@ set(DEPENDS_OPTIONAL "")
 set(INSTALL_TARGETS "")
 
 LIST( APPEND INSTALL_TARGETS  communication_modules_xbot )
-LIST( APPEND CATKIN_DEPENDS_SET robot_class)
+LIST( APPEND CATKIN_DEPENDS_SET robot_class custom_services)
 LIST( APPEND SOURCE_FILES src/xbot_lower_level.cpp src/xbot_feedback_online.cpp src/xbot_operational_euler.cpp)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -90,6 +90,3 @@ install(TARGETS ${INSTALL_TARGETS}
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
-
-

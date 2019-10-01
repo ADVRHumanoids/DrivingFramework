@@ -309,7 +309,7 @@ void mwoibn::robot_class::RobotRosNRT::_loadControllers(YAML::Node config)
                         }
 
 
-                        controllers.add( mwoibn::communication_modules::CustomController(command, map,  entry.second), entry.first.as<std::string>());
+                        controllers.add( mwoibn::communication_modules::CustomController(command, lower_limits, upper_limits,  map,  entry.second), entry.first.as<std::string>());
 
                         continue;
                 }

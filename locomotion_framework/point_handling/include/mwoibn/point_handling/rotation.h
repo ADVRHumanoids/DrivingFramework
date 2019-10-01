@@ -24,7 +24,7 @@ public:
     _temp_world.setIdentity();}
 
   template<typename Body>
-  Rotation(Rotation::R current, Body body_id,
+  Rotation(const Rotation::R& current, Body body_id,
         RigidBodyDynamics::Model& model, const mwoibn::robot_class::State& state,
         std::string name = "")
       : Base(current, body_id, model, state, 9, name)
@@ -57,12 +57,18 @@ public:
 
   virtual ~Rotation() {}
 
+  virtual Rotation* clone_impl() const {return new Rotation(*this);}
+
   /** @brief get Position in a world frame */
   virtual const Rotation::R&
   getWorld(bool update = false);
 
+  virtual void
+  getWorld(Rotation::R& rotation, bool update = false) const;
+
   virtual Rotation::R
   getWorld(bool update = false) const;
+
   /** @brief set new tracked point giving data in a world frame*/
   virtual void setWorld(const Rotation::R& current,
                         bool update = false);
@@ -70,8 +76,8 @@ public:
   virtual void setFixed(const Rotation::R& current){ _current_fixed.noalias() = current; }
 
   /** @brief get Position in a user-defined reference frame */
-  virtual Rotation::R
-  getReference(unsigned int refernce_id, bool update = false) const;
+  // virtual Rotation::R
+  // getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void setReference(const Rotation::R& current,
                             unsigned int reference_id,

@@ -112,24 +112,24 @@ void mgnss::controllers::WheelsControllerExtend::_createTasks(YAML::Node config)
         mwoibn::Axis ax_;
 
         for(auto& name_: {"STEERING", "CASTER", "CAMBER"})
-                _leg_tasks[name_] = {mwoibn::hierarchical_control::tasks::Aggravated(), std::vector<mwoibn::hierarchical_control::tasks::Angle>{}};
+                _leg_tasks[name_] = {mwoibn::hierarchical_control::tasks::Aggravated(), std::vector<mwoibn::hierarchical_control::tasks::SoftAngle>{}};
 
-        for(auto& name_: _robot.getLinks("wheels")){
+        for(auto& name_: _robot.getLinks(config["track"].as<std::string>())){
           ax_  = mwoibn::Axis(config["reference_axis"][name_]["x"].as<double>(),
                              config["reference_axis"][name_]["y"].as<double>(),
                              config["reference_axis"][name_]["z"].as<double>());
-          _leg_tasks["CAMBER"].second.push_back(mwoibn::hierarchical_control::tasks::Angle(
-                     mwoibn::robot_class::angles::Camber(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot));
-          _leg_tasks["STEERING"].second.push_back(mwoibn::hierarchical_control::tasks::Angle(
-                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot));
+          _leg_tasks["CAMBER"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
+                     mwoibn::robot_class::angles::Camber(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 2.0));
+          _leg_tasks["STEERING"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
+                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 0.1));
         }
 
         for(auto& name_: _robot.getLinks("camber")){
           ax_  = mwoibn::Axis(config["reference_axis"][name_]["x"].as<double>(),
                              config["reference_axis"][name_]["y"].as<double>(),
                              config["reference_axis"][name_]["z"].as<double>());
-          _leg_tasks["CASTER"].second.push_back(mwoibn::hierarchical_control::tasks::Angle(
-                     mwoibn::robot_class::angles::Caster(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot));
+          _leg_tasks["CASTER"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
+                     mwoibn::robot_class::angles::Caster(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 2.0));
         }
 
         for(auto& item_: _leg_tasks){

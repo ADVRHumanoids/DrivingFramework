@@ -22,7 +22,7 @@ public:
     _temp.setZero(3);
   }
 
-  Wrench(Point::Current current, point_handling::FramePlus& frame, std::string name = "")
+  Wrench(const Point::Current& current, point_handling::FramePlus& frame, std::string name = "")
       : State(current, frame, name), force(frame, name), torque(force, name)
   {
     _temp.setZero(3);
@@ -47,12 +47,14 @@ public:
 
   virtual ~Wrench() {}
 
+  virtual Wrench* clone_impl() const {return new Wrench(*this);}
+
   virtual const Point::Current&
   getWorld(bool update = false);
 
-
-  virtual Point::Current
-  getWorld(bool update = false) const;
+  //
+  // virtual Point::Current
+  // getWorld(bool update = false) const;
 
   virtual void
   getWorld(Point::Current& current, bool update = false) const;
@@ -66,8 +68,8 @@ public:
 
 
   /** @brief get Position in a user-defined reference frame */
-  virtual Point::Current
-  getReference(unsigned int refernce_id, bool update = false) const;
+  // virtual Point::Current
+  // getReference(unsigned int refernce_id, bool update = false) const;
 
   virtual void
   getReference(Point::Current& current, unsigned int refernce_id, bool update = false) const;

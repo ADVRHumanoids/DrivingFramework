@@ -13,6 +13,9 @@ namespace mwoibn
 
   namespace dynamic_points{
     class Torus;
+    class Torus2;
+    class TorusRoll;
+    class TorusIntegratedRoll;
     class TorusVelocity;
   }
 
@@ -40,6 +43,9 @@ public:
   TorusModel(const TorusModel& other);
 
   friend class dynamic_points::Torus;
+  friend class dynamic_points::Torus2;
+  friend class dynamic_points::TorusRoll;
+  friend class dynamic_points::TorusIntegratedRoll;
   friend class dynamic_points::TorusVelocity;
 
   virtual ~TorusModel() {}
@@ -56,7 +62,9 @@ public:
 
   const mwoibn::Matrix3& frame();
   mwoibn::point_handling::SpatialVelocity& wheelVelocity(){return _v_centre;}
+  const mwoibn::Vector3& wheelAngularVelocity(){return _angular_world;}
   const mwoibn::Matrix3& getJacobianWheel(){return _wheel_jacobian;}
+  const mwoibn::Vector3& positionOffset();
 
 protected:  // should I add wrench here and attach the feedback to this? could be easier
   mwoibn::point_handling::FramePlus _centre;
@@ -66,6 +74,7 @@ protected:  // should I add wrench here and attach the feedback to this? could b
 
   mwoibn::Matrix3 _frame;
   mwoibn::point_handling::SpatialVelocity _v_centre;
+  mwoibn::Vector3 _angular_world;
   const mwoibn::Vector3& _ground_normal;
   mwoibn::Axis _axis, _axis_world;
 
@@ -74,7 +83,6 @@ protected:  // should I add wrench here and attach the feedback to this? could b
   mwoibn::Vector3 _temp, _position_offset;
   double _r, _R;
 
-  const mwoibn::Vector3& _positionOffset();
   const mwoibn::Matrix& _jacobianOffset();
 
 

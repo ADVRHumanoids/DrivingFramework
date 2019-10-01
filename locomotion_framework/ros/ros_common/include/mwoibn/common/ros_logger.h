@@ -68,17 +68,27 @@ virtual void _start(){
 
 
 virtual void _addField(const std::string& name, double init_value){
+
+        _full_name = _prefix;
+        _full_name += ":";
+        _full_name += name;
+
         if(!_print.size())
-                _file << name;
+                _file << _full_name;
         else
-                _file << "," << name;
-        _map.insert(std::pair<std::string, double>(name, _print.size()));
+                _file << "," << _full_name;
+
+
+        _map.insert(std::pair<std::string, double>(_full_name, _print.size()));
         _print.conservativeResize(_print.size()+1);
         _print.tail<1>()[0] = init_value;
 
 }  //allocates memory, slow
 virtual void _addEntry(const std::string& name, double value){
-        _print[_map[name]] = value;
+      _full_name = _prefix;
+      _full_name += ":";
+      _full_name += name;
+      _print[_map[_full_name]] = value;
 }  // doesn't allocate memory
 
 

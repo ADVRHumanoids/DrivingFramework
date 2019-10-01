@@ -12,20 +12,20 @@ namespace point_handling
     return _J;
     }
 
-
-  mwoibn::Matrix SpatialVelocity::getJacobian(bool update) const{
-    mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
-
-    CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), J, update);
-
-    return J;
-  }
+  // 
+  // mwoibn::Matrix SpatialVelocity::getJacobian(bool update) const{
+  //   mwoibn::Matrix J = mwoibn::Matrix::Zero(_J.rows(), _J.cols());
+  //
+  //   CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), J, update);
+  //
+  //   return J;
+  // }
 
   void SpatialVelocity::getJacobian(mwoibn::Matrix& current, bool update) const{
     current.setZero();
 
     CalcPointJacobian6D(_model, _state.position.get(), _body_id, frame.position.getFixed(), current, update);
-    
+
   }
 
 } // namespace package

@@ -43,10 +43,10 @@
 
   void mwoibn::robot_points::TorusModel::compute(){
 
+      _angular_world = _v_centre.angular().getWorld();
     // std::cout << "centre" << _centre.position.getWorld() << std::endl;
         _axis_world = _centre.rotation().getWorld() * _axis;
-       _point = _centre.position.getWorld() + _positionOffset();
-    // std::cout << "torus_model" << _point << std::endl;
+       _point = _centre.position.getWorld() + positionOffset();
   }
 
   void mwoibn::robot_points::TorusModel::computeJacobian() {
@@ -60,13 +60,11 @@
 
     mwoibn::eigen_utils::skew(_position_offset, _wheel_jacobian);
 
-    _wheel_jacobian += _contact_3*_R*norm;
-    // std::cout << "_wheel_jacobian\n" << _wheel_jacobian<< std::endl;
-    // std::cout << "_contact_3\n" << _contact_3*_R*norm << std::endl;
+    _wheel_jacobian = _contact_3*_R*norm;
 
   }
 
-  const mwoibn::Vector3& mwoibn::robot_points::TorusModel::_positionOffset(){
+  const mwoibn::Vector3& mwoibn::robot_points::TorusModel::positionOffset(){
       double norm = 1/(_ground_normal - _axis_world*_ground_normal.transpose()*_axis_world).norm();
       _position_offset = -(_ground_normal - _axis_world*_ground_normal.transpose()*_axis_world)*norm*_R;
       _position_offset -= (_ground_normal)*_r;

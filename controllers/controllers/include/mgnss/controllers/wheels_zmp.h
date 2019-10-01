@@ -32,7 +32,6 @@
 
 #include <mgnss/higher_level/state_machine.h>
 #include <mgnss/higher_level/qp/tasks/support_shaping_v4_0.h>
-#include <mgnss/higher_level/qp/tasks/support_shaping_v6_0.h>
 
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v2.h>
 #include <mgnss/higher_level/qp/tasks/qr_joint_space_v3.h>
@@ -56,7 +55,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, std::string config_file, std::stri
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name: _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
@@ -67,7 +66,7 @@ WheelsZMP( mwoibn::robot_class::Robot& robot, YAML::Node config) : WheelsControl
 
         _dynamic_ptr.reset(new mwoibn::dynamic_models::BasicModel(_robot));
         _create(config);
-        for(auto& name: _robot.getLinks("wheels"))
+        for(auto& name: _robot.getLinks(config["track"].as<std::string>()))
           centers__.add(mwoibn::robot_points::LinearPoint(name, _robot));
 }
 
@@ -182,7 +181,7 @@ virtual void nextStep(){
       // std::cout << "raw SHAPE\t" << _qr_wrappers["SHAPE"]->raw().transpose() << std::endl;
       // std::cout << "get SHAPE_JOINT\t" << _qr_wrappers["SHAPE_JOINT"]->get().transpose() << std::endl;
       // std::cout << "raw SHAPE_JOINT\t" << _qr_wrappers["SHAPE_JOINT"]->raw().transpose() << std::endl;
-      // std::cout << "fin SHAPE_JOINT\t" << (state_machine__->stateJacobian()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->stateOffset()).transpose() << std::endl;
+      // std::cout << "fin SHAPE_JOINT\t" << (state_machine__->cost_I.jacobian.get()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->cost_I.offset.get()).transpose() << std::endl;
       // std::cout << "CAMBER error\t" << (_leg_tasks["CAMBER"].first.getError()).transpose() << std::endl;
       // std::cout << "CAMBER solution\t" << (_leg_tasks["CAMBER"].first.getJacobian()*_robot.command.velocity.get()).transpose() << std::endl;
       // std::cout << "CAMBER SHAPE_JOINT\t" << ( _leg_tasks["CAMBER"].first.getJacobian()*_qr_wrappers["SHAPE_JOINT"]->raw()).transpose() << std::endl;
@@ -204,7 +203,7 @@ virtual void nextStep(){
       // for(int i = 0; i < 4; i++){
       //   mwoibn::Vector3 temp__;
       //   temp__.setZero();
-      //   temp__.head<2>() = (state_machine__->stateJacobian()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->stateOffset()).segment<2>(2*i);
+      //   temp__.head<2>() = (state_machine__->cost_I.jacobian.get()*_qr_wrappers["SHAPE_JOINT"]->get() + state_machine__->cost_I.offset.get()).segment<2>(2*i);
       //   // std::cout << i << "\tste SHAPE_JOINT\t" << (state_machine__->steeringFrames()[i]->rotation*(temp__ )).transpose() << std::endl;
       // }
 
@@ -272,7 +271,7 @@ virtual void _updateSupport()
 }
 
 private:
-  std::vector<std::string> _names;
+  // std::vector<std::string> _names;
   // const std::string QR_TASK_VELOCITY = "QR_TASK_VELOCITY";
   // const std::string QR_TASK_POSITION = "QR_TASK_POSITION";
   // const std::string QR_TASK_ACCELERATION = "QR_TASK_ACCELERATION";
@@ -283,9 +282,8 @@ private:
   const std::string ESTIMATED_TORQUES = "ESTIMATED_TORQUES";
   const std::string CONTROLLER_TORQUES = "CONTROLLER_TORQUES";
 
-
   mwoibn::VectorN _forces;
-
+  std::string _log_name, _char;
 
 
 };

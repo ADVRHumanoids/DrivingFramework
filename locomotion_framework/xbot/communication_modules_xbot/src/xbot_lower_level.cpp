@@ -17,6 +17,7 @@ bool mwoibn::communication_modules::XBotLowerLevel::run()
   {
     _robot.getVelocityReference(pub);
 //    std::cout << "velocity before\t" << pub.transpose() << std::endl;
+//    std::cout << "velocity command\t" << _command.velocity.get.transpose() << std::endl;
 
     _limit("VELOCITY");
     mapTo(_command.velocity.get(), pub);
@@ -31,11 +32,47 @@ bool mwoibn::communication_modules::XBotLowerLevel::run()
 //    std::cout << "torque before\t" << pub.transpose() << std::endl;
     _limit("TORQUE");
     mapTo(_command.torque.get(), pub);
+
 //    std::cout << "torque after\t" << pub.transpose() << std::endl;
     _robot.setEffortReference(pub);
   }
 
   _robot.setStiffness(stiffness);
   _robot.setDamping(damping);
+  return true;
+}
+
+
+bool mwoibn::communication_modules::XBotLowerLevel::loadGains(custom_services::loadGains::Request& req, custom_services::loadGains::Response& res){
+    YAML::Node config;
+    try
+    {
+            config = YAML::LoadFile(req.file);
+    }
+    catch (const YAML::BadFile& e)
+    {
+            res.message = "Couldn\t find the configuration file: " + req.file;
+            res.success = false;
+            return false;
+    }
+    catch (...)
+    {
+      res.message = "Unkown error reading file: " + req.file;
+      res.success = false;
+      return false;
+    }
+
+    if(!config[_name]) {
+      res.message = "Couldn't find robot configuration in the config file: " + req.file + "\t" + _name;
+      res.success = false;
+      return false;
+    }
+
+    _readGains(config[_name]);
+
+
+
+
+    res.success = true;
   return true;
 }

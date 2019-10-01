@@ -56,7 +56,7 @@ ${catkin_INCLUDE_DIRS}
 ${LOGGER_INCLUDE_DIRS}
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 14)
 
 
 #############

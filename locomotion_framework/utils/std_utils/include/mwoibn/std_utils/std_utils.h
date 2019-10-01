@@ -14,6 +14,11 @@ public:
     notImplemented(std::string function) : std::logic_error(function + ": Function not yet implemented") { };
 };
 
+class depracated : public std::logic_error
+{
+public:
+    depracated(std::string function) : std::logic_error(function + ": Function is depracated due to an upredicted Eigen behaviour") { };
+};
 
 inline std::string separate(std::string full, std::string delimiter, std::string& back){
 
