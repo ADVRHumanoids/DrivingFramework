@@ -27,7 +27,7 @@ if(XBOT)
   find_package(XBotInterface REQUIRED)
 
   LIST( APPEND INSTALL_TARGETS gravity_test_communication base_to_rt odometry_to_rt)
-  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf controllers custom_services custom_messages)
+  LIST( APPEND CATKIN_DEPENDS_SET robot_class gazebo_msgs roscpp tf custom_services custom_messages)
 
 endif(XBOT)
 

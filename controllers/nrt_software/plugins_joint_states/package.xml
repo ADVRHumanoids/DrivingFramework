@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>communication</name>
+  <name>mgnss_plugins_joint_states</name>
   <version>0.0.0</version>
-  <description>The communication package</description>
+  <description>The nrt_software package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/communication</url> -->
+  <!-- <url type="website">http://wiki.ros.org/nrt_software</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -40,19 +40,18 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
-  <depend>robot_class</depend> 
-  <depend>robot_class_xbot</depend> 
 
-  <depend>hierarchical_control</depend> <!--TRAJECTORY_GENERATION -->
-  <!-- <depend>reference_generation</depend> TRAJECTORY_GENERATION -->
+  <depend>roscpp</depend> <!-- all programs -->
+  <depend>robot_class_ros_extension</depend> <!-- all programs -->
+  <depend>robot_class_xbot</depend> <!-- all programs -->
 
+  <depend>mgnss_controllers_joint_states</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>plugins</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>mgnss_ros_callbacks_joint_states</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
 
-  <depend>gazebo_msgs</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>tf</depend> <!--TRAJECTORY_GENERATION -->
-  <depend>custom_services</depend>
-  <depend>custom_messages</depend>
-  <!-- The export tag contains other, unspecified, tags -->
+  <depend>common</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+  <depend>mgnss_utils</depend> <!--CENTER_OF_MASS_CONTROLLER/VISUALIZATION_TOOLS -->
+
   <export>
     <!-- Other tools can request additional information be placed here -->
 
