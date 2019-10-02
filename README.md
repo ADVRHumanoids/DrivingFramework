@@ -3,7 +3,7 @@
 # required third party software
 Eigen,
 RBDL,
-ros-control, ros-controllers
+ros-control, ros-controllers,
 srdfdom,
 ranges (a copy included in this repository),
 eiquadprog (a copy included in this repository),
