@@ -66,6 +66,3 @@ include_directories(
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
-
-
-

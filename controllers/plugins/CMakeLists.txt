@@ -34,13 +34,22 @@ set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
 
 find_package(Eigen3 REQUIRED)
-find_package(XCM REQUIRED)
 
+if(XBOT)
+find_package(XCM REQUIRED)
 LIST( APPEND CATKIN_DEPENDS_SET
   robot_class_xbot
+  mwoibn_xbot_common
+)
+else()
+  set (XCM_INCLUDE_DIRS "")
+  set (XCM_LIBRARIES "")
+  set (XCM_EXPORTED_TARGETS "")
+endif()
+
+LIST( APPEND CATKIN_DEPENDS_SET
   modules
   roscpp
-  mwoibn_xbot_common
   mwoibn_ros_common
   loaders
 
@@ -123,18 +132,19 @@ target_link_libraries(plugin
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 ## Mark executables and/or libraries for installation
+if(XBOT)
  install(TARGETS ${INSTALL_TARGETS}
    ARCHIVE DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
    LIBRARY DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/lib/
    RUNTIME DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/bin/
  )
-
 # Mark cpp header files for installation
  install(DIRECTORY include/mgnss/${PROJECT_NAME}
    DESTINATION ${ADVR_SUPERBUILD_DIR}/build/install/include/mgnss/
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
  )
+ endif()
 
 #################################################
 ############### RESTORE VARIABLES ###############
