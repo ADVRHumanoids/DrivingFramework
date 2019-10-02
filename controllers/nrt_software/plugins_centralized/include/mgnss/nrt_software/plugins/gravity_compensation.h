@@ -3,7 +3,7 @@
 
 #include "mgnss/plugins/generator.h"
 #include "mgnss/controllers/centralized_controller.h"
-#include "mgnss/ros_callbacks/centralized.h"
+// #include "mgnss/ros_callbacks/centralized.h"
 #include <mwoibn/loaders/robot.h>
 
 namespace mgnss {
