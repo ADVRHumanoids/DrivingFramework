@@ -12,11 +12,11 @@ This repository contains implemented controllers and state estimators that have 
 It has been developed to simplify the author PhD work, and it has not been designed as a package to be released. As a utilitarian tool developed with a very restricted time limit, no unit test has been developed, and the comments are scarcare to none.
 
 
-# required third party software
-Eigen,
-RBDL,
-ros-control, ros-controllers,
-srdfdom,
-ranges (a copy included in this repository),
+# Third Party Software
+Eigen [http://eigen.tuxfamily.org/index.php?title=Main_Page], 
+RBDL [https://rbdl.bitbucket.io/],
+ros-control, ros-controllers [https://github.com/ros-controls], 
+srdfdom [https://github.com/ros-planning/srdfdom],
+ranges (a copy included in this repository) [https://github.com/ericniebler/range-v3],
 eiquadprog (a copy included in this repository),
 XBotCore (can be removed with the XBOT compiler flag - the packages.xml have to adjusted by hand).
