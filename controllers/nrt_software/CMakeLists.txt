@@ -14,7 +14,13 @@ if ( ${ENABLE_XENO} )
    find_package(RTnet REQUIRED)
 endif()
 
-find_package(XCM REQUIRED)
+if(XBOT)
+  find_package(XCM REQUIRED)
+else()
+  set (XCM_INCLUDE_DIRS "")
+  set (XCM_LIBRARIES "")
+  set (XCM_EXPORTED_TARGETS "")
+endif()
 
 # set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD 14)
@@ -48,6 +54,11 @@ set(INSTALL_TARGETS "")
 set(CATKIN_DEPENDS_SET "")
 set(CATKIN_DEPENDS_BUILD "")
 set(DEPENDS_OPTIONAL "")
+if(XBOT)
+LIST( APPEND CATKIN_DEPENDS_SET
+  robot_class_xbot
+)
+endif()
 
 LIST( APPEND CATKIN_DEPENDS_SET
   controllers
@@ -55,7 +66,6 @@ LIST( APPEND CATKIN_DEPENDS_SET
   plugins
   ros_callbacks
   robot_class_ros_extension
-  robot_class_xbot
   mgnss_utils
 )
 
@@ -567,6 +577,7 @@ endif()
 # )
 
 #message(WARNING "ADVR_SUPERBUILD_DIR: " ${ADVR_SUPERBUILD_DIR})
+if(XBOT)
 
  # Mark executables and/or libraries for installation
   install(TARGETS ${INSTALL_TARGETS}
@@ -581,13 +592,12 @@ endif()
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE
   )
-
+endif()
  #################################################
  ############### RESTORE VARIABLES ###############
  #################################################
 
 # set(CMAKE_INSTALL_PREFIX ${MASTER_PATH})
-
   ## Mark executables and/or libraries for installation
    install(TARGETS ${INSTALL_TARGETS}
      ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
