@@ -13,10 +13,10 @@ It has been developed to simplify the author PhD work, and it has not been desig
 
 
 # Third Party Software
-Eigen [http://eigen.tuxfamily.org/index.php?title=Main_Page], 
-RBDL [https://rbdl.bitbucket.io/],
-ros-control, ros-controllers [https://github.com/ros-controls], 
-srdfdom [https://github.com/ros-planning/srdfdom],
-ranges (a copy included in this repository) [https://github.com/ericniebler/range-v3],
-eiquadprog (a copy included in this repository),
-XBotCore (can be removed with the XBOT compiler flag - the packages.xml have to adjusted by hand).
+* Eigen [http://eigen.tuxfamily.org/index.php?title=Main_Page], 
+* RBDL [https://rbdl.bitbucket.io/],
+* ros-control, ros-controllers [https://github.com/ros-controls], 
+* srdfdom [https://github.com/ros-planning/srdfdom],
+* ranges (a copy included in this repository) [https://github.com/ericniebler/range-v3],
+* eiquadprog (a copy included in this repository),
+* XBotCore (can be removed with the XBOT compiler flag - the packages.xml have to adjusted by hand).
