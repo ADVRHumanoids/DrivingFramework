@@ -13,6 +13,7 @@ namespace mgnss
 namespace plugins
 {
 
+//! Function to dynamically generate XBOT plugins
 mgnss::plugins::XbotBaseUnify* xbot_make(std::string name){
         void *hndl = dlopen( ("lib" + name + ".so").c_str(), RTLD_NOW);
         if(hndl == NULL) {
@@ -22,8 +23,7 @@ mgnss::plugins::XbotBaseUnify* xbot_make(std::string name){
         void *mkr = dlsym(hndl, "create_instance");
 
         return reinterpret_cast<mgnss::plugins::XbotBaseUnify* (*)()>(mkr)();
-        //return static_cast<mgnss::plugins::RosBase *()>(mkr)();
       }
 }
 }
-#endif // RT_MY_TEST_H
+#endif // __MGNSS_PLUGINS_XBOT_FACTORY_H

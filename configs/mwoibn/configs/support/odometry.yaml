@@ -1,15 +1,14 @@
 mwoibn:
         controller:
-                position_controller:
+                position_controller: # control only the robot lower-body
                         dofs:
                                 chain: position_lower_body
-        ros:
+        ros: # change the robot urdf source to the lower-body urdf
                 source:
                        urdf: "/robot_lower_body"
                        srdf: "/robot_srdf"
-        xbot:
+        xbot: # change the robot urdf source to the lower-body urdf
                 source:
                         urdf:
                                 file: "mwoibn/urdf/centauro_lower_body.urdf"
-#                        srdf:
-#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
+

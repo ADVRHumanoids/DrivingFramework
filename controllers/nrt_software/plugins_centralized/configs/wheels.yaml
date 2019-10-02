@@ -1,0 +1,14 @@
+mwoibn:
+        robot:
+                name: "centauro"
+                default:
+                        rate: 200
+                        controller: 
+                                layer: ""
+                        feedback: 
+                                layer: "online"
+                        actuators: 
+                                read: ""
+                        contacts: 
+                                read: ""
+                                feedback: false

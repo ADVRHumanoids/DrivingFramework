@@ -47,7 +47,6 @@
   <depend>hierarchical_control</depend> <!--TRAJECTORY_GENERATION -->
   <!-- <depend>reference_generation</depend> TRAJECTORY_GENERATION -->
 
-  <depend>controllers</depend> <!--TRAJECTORY_GENERATION -->
 
   <depend>gazebo_msgs</depend> <!--TRAJECTORY_GENERATION -->
   <depend>tf</depend> <!--TRAJECTORY_GENERATION -->
