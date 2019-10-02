@@ -4,7 +4,7 @@ mwoibn:
         #         position_controller:
         #                 dofs:
         #                         chain: upper_body
-        ros:
+        ros: # cheange the urdf to the upper-body
                 source:
                        urdf: "/robot_upper_body"
         xbot:
@@ -14,14 +14,7 @@ mwoibn:
 
         controllers:
                 position_reference:
-                        list: [upper_body]
+                        list: [upper_body] # control only the upper-body
         feedbacks:
-                online: [link_side_online]
+                online: [link_side_online] # remove the state estimation from the deafult feedbacks, upper-body is a static model
 
-#                       srdf: "/robot_srdf"
-#        xbot:
-#                source:
-#                        urdf:
-#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/urdf/centauro_lower_body.urdf"
-#                        srdf:
-#                                file: "DrivingFramework/locomotion_framework/xbot/robot_class_xbot/include/configs/srdf/centauro_full_wheels.srdf"
