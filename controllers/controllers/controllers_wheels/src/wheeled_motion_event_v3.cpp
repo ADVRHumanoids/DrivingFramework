@@ -17,8 +17,11 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
         WheelsController::_initIK(config);
 
         YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
+        std::cout << "Loaded sttering" << std::endl;
+        for(auto entry : steering)
+              std::cout << "\t" << entry.first << ": " << entry.second << std::endl;
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                 _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
 
@@ -30,7 +33,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         // Set-up hierachical controller
         WheelsControllerExtend::_createTasks(config);
 
-        state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
+        //state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
 
         mwoibn::Vector3 pelvis;
         pelvis << 1, 1, 1;
@@ -97,16 +100,29 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
          for(int k = 0; k < 4; k++){
 
-           logger.add("cp_"   + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getPointStateReference(k)[i]);
+           logger.add("cp_"   + std::to_string(k) + "_" + char('x'+i), _steering_ptr->getPointStateReference(k)[i]);
 
-           logger.add("r_cp_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getReference()[k*3+i]);
+           logger.add("r_cp_" + std::to_string(k) + "_" + char('x'+i), _steering_ptr->getReference()[k*3+i]);
 
-           logger.add("full_error_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getFullError()[k*3+i]);
+           logger.add("full_error_" + std::to_string(k) + "_" + char('x'+i), _steering_ptr->getFullError()[k*3+i]);
 
-           logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
+           logger.add("getForce_" + std::to_string(k) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
 
 
          }
+
+         for(int i = 0; i < 4 ; i++){
+           logger.add("st_icm_" + std::to_string(i), _steering_ref_ptr->getICM()[i]);
+           logger.add("st_sp_" + std::to_string(i), _steering_ref_ptr->getSP()[i]);
+           logger.add("r_st_" + std::to_string(i), _steering_ref_ptr->get()[i]);
+           logger.add("v_icm_" + std::to_string(i), _steering_ref_ptr->vICM()[i]);
+           logger.add("v_sp_" + std::to_string(i), _steering_ref_ptr->vSP()[i]);
+           logger.add("v_" + std::to_string(i), _steering_ref_ptr->v()[i]);
+           logger.add("tan_sp_" + std::to_string(i), _steering_ref_ptr->getDampingSP()[i]);
+           logger.add("tan_icm_" + std::to_string(i), _steering_ref_ptr->getDampingICM()[i]);
+           logger.add("tan_" + std::to_string(i), _steering_ref_ptr->damp()[i]);
+         }
+
        }
 
 
@@ -116,6 +132,6 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
 
   // std::cout << _robot.state.velocity.get().head<6>().transpose() << std::endl;
-  state_machine__->log(logger);
+  //state_machine__->log(logger);
 
 }

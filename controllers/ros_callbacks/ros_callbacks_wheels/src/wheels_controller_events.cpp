@@ -46,16 +46,17 @@ bool mgnss::ros_callbacks::wheels_controller_events::stateHandler(const custom_m
                 controller_ptr->setCamber(3, msg->cs[3]);
         }
         if(msg->cm.size() == 4) {
-                controller_ptr->setCastor(0, msg->cs[0]);
-                controller_ptr->setCastor(1, msg->cs[1]);
-                controller_ptr->setCastor(2, msg->cs[2]);
-                controller_ptr->setCastor(3, msg->cs[3]);
+                controller_ptr->setCastor(0, msg->cm[0]);
+                controller_ptr->setCastor(1, msg->cm[1]);
+                controller_ptr->setCastor(2, msg->cm[2]);
+                controller_ptr->setCastor(3, msg->cm[3]);
         }
         if(msg->st.size() == 4) {
                 controller_ptr->setSteering(0, msg->st[0]);
                 controller_ptr->setSteering(1, msg->st[1]);
                 controller_ptr->setSteering(2, msg->st[2]);
                 controller_ptr->setSteering(3, msg->st[3]);
+                std::cout << "set steering\t" << msg->st[0] << ", " << msg->st[1] << ", " << msg->st[2] << ", " << msg->st[3] << std::endl;
         }
 
         return true;

@@ -22,6 +22,9 @@ void mgnss::controllers::WheelsControllerExtend::resetSteering()
 void mgnss::controllers::WheelsControllerExtend::compute()
 {
         mgnss::controllers::WheelsController::compute();
+        std::cout << "new" << std::endl;
+        for (auto& task_: _leg_tasks["STEERING"].second)
+            std::cout << task_.getReference() << std::endl;
         _correct();
 
 }
@@ -121,7 +124,7 @@ void mgnss::controllers::WheelsControllerExtend::_createTasks(YAML::Node config)
           _leg_tasks["CAMBER"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
                      mwoibn::robot_class::angles::Camber(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 2.0));
           _leg_tasks["STEERING"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
-                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 0.1));
+                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 3.5));
         }
 
         for(auto& name_: _robot.getLinks("camber")){
@@ -177,8 +180,6 @@ void mgnss::controllers::WheelsControllerExtend::_setInitialConditions(){
 
         if(_steering_ptr != nullptr)
           _steering_ptr->start();
-
-
 }
 
 

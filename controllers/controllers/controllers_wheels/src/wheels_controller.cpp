@@ -23,6 +23,7 @@ double mgnss::controllers::WheelsController::limit(const double th)
 
 
 void mgnss::controllers::WheelsController::step(){
+
         _support  += _support_vel * _robot.rate();
         _position += _linear_vel  * _robot.rate();
         _heading  += _angular_vel[2] * _robot.rate();
@@ -52,7 +53,8 @@ void mgnss::controllers::WheelsController::compute()
         _command.noalias() = _ik_ptr->update();
 
         // std::cout << "IK\t" << _command.transpose() << std::endl;
-        // std::cout << "position\t" << _robot.command.velocity.set(_command, _select_ik) << std::endl;
+
+        // std::cout << __PRETTY_FUNCTION__ << "\tvelocity\t" << _robot.command.velocity.get().head<3>().transpose() << std::endl;
         _robot.command.velocity.set(_command, _select_ik);
         _command.noalias() = _command * _robot.rate();
         //_active_state = _command;
@@ -69,13 +71,13 @@ void mgnss::controllers::WheelsController::compute()
 
 
 void mgnss::controllers::WheelsController::_setInitialConditions()
-        {
+{
       _pelvis_orientation_ptr->points().point(0).getOrientationWorld(_orientation);
       _heading = _orientation.swingTwist(_robot.contacts().contact(0).getGroundNormal(), _orientation).angle();
       //_pelvis_orientation_ptr->setReference(0, mwoibn::Quaternion::fromAxisAngle(_robot.contacts().contact(0).getGroundNormal(), _heading));
       _pelvis_orientation_ptr->setReference(0,mwoibn::Quaternion());
 
-        }
+}
 
 void mgnss::controllers::WheelsController::_createTasks(YAML::Node config){
         if(!config["track"])
@@ -126,7 +128,8 @@ void mgnss::controllers::WheelsController::nextStep()
         _next_step[2] =
                 (_angular_vel[2]); // just limit the difference
 
-        steering();
+
+        //steering();
 }
 
 void mgnss::controllers::WheelsController::_allocate(){
