@@ -22,9 +22,9 @@ void mgnss::controllers::WheelsControllerExtend::resetSteering()
 void mgnss::controllers::WheelsControllerExtend::compute()
 {
         mgnss::controllers::WheelsController::compute();
-        std::cout << "new" << std::endl;
-        for (auto& task_: _leg_tasks["STEERING"].second)
-            std::cout << task_.getReference() << std::endl;
+        // std::cout << "new" << std::endl;
+        // for (auto& task_: _leg_tasks["STEERING"].second)
+        //     std::cout << task_.getReference() << std::endl;
         _correct();
 
 }

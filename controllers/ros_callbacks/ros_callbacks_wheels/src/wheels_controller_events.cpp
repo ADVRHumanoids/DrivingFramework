@@ -56,7 +56,7 @@ bool mgnss::ros_callbacks::wheels_controller_events::stateHandler(const custom_m
                 controller_ptr->setSteering(1, msg->st[1]);
                 controller_ptr->setSteering(2, msg->st[2]);
                 controller_ptr->setSteering(3, msg->st[3]);
-                std::cout << "set steering\t" << msg->st[0] << ", " << msg->st[1] << ", " << msg->st[2] << ", " << msg->st[3] << std::endl;
+              //  std::cout << "set steering\t" << msg->st[0] << ", " << msg->st[1] << ", " << msg->st[2] << ", " << msg->st[3] << std::endl;
         }
 
         return true;
