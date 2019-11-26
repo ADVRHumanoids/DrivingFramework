@@ -128,7 +128,7 @@ void mgnss::controllers::WheelsController::nextStep()
         _next_step[2] =
                 (_angular_vel[2]); // just limit the difference
 
-        steering();
+        //steering();
 }
 
 void mgnss::controllers::WheelsController::_allocate(){

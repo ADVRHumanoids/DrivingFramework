@@ -576,9 +576,10 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
 #                        tunning: ZMP_INDIRECT
-                        steering: reactif
+                        steering: whole_body
 #                        position_gain: 200
-                        tunning: disturb
+#                        tunning: disturb
+                        tunning: camber_home
 #                        tunning: compliance
                         minor_axis: 0.068
                         major_axis: 0.01
@@ -623,7 +624,7 @@ mwoibn:
                                   y: -1
                                   z: 0
                         # IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT]
-                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER, CASTER]
+                        IK: [CONSTRAINTS, BASE, STEERING, CONTACT_POINTS, CAMBER]
                         # IK: [qp::CONSTRAINTS, qp::BASE, qA::SUPPORT, qp::CASTER]
                         # IK: [qp::CONSTRAINTS, qp::BASE, qp::CONTACT_POINTS, qA::SUPPORT]
                         SUPPORT: [CASTER, CAMBER]
@@ -789,6 +790,19 @@ mwoibn:
                                         CAMBER_DAMP: 0.08
                                         CASTER_DAMP: 0.12
                                         COP: 0
+                                camber_home: # drive without caster - this should work only for zero camber angle (at least for now)
+                                        ratio: 1.0
+                                        damping: 0.0001
+                                        CONSTRAINTS: 1
+                                        STEERING: 5
+                                        BASE:  [0.10, 0.10, 0.2, 1.1, 1.1, 0.05]
+                                        CONTACT_POINTS: 4
+#                                        CONTACT_POINTS: 0.01
+                                        CAMBER: 4.0 # 4
+                                        CASTER: 8.0 # 10
+                                        CAMBER_DAMP: 0.06 #0.04
+                                        CASTER_DAMP: 0.1
+                                        COP: 0
                 upper_body_ik:
                         layer: NRT
                         robot: default
@@ -901,7 +915,8 @@ mwoibn:
                         # plugins: [odometry2::odometry, gravity_compensation]
                         #plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, gravity_compensation, NwheelsZMP::wheeled_motion, compliance_compensation]
                         # plugins: [joint_states::joint_reference, odometry2::odometry, ground_forces, NwheelsZMP::wheeled_motion]
-                        plugins: [odometry3::odometry, ground_forces]
+#                        plugins: [odometry3::odometry, ground_forces]
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
 #                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, Nwheels3::wheeled_motion]

@@ -18,7 +18,7 @@ void mgnss::controllers::WheeledMotionEvent3::_initIK(YAML::Node config){
 
         YAML::Node steering = config["steerings"][config["steering"].as<std::string>()];
 
-        _steering_ref_ptr.reset(new mgnss::higher_level::SteeringReactif(
+        _steering_ref_ptr.reset(new mgnss::higher_level::Steering8(
                                 _robot, *_steering_ptr, _support_vel, steering["icm"].as<double>(), steering["sp"].as<double>(), steering["tracking"].as<double>(), _robot.rate(), steering["damp_icm"].as<double>(), steering["damp_sp"].as<double>(), steering["damp"].as<double>()));
 
 
@@ -30,7 +30,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         // Set-up hierachical controller
         WheelsControllerExtend::_createTasks(config);
 
-        state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
+        //state_machine__.reset(new mgnss::higher_level::StateMachineII(_robot, config ));
 
         mwoibn::Vector3 pelvis;
         pelvis << 1, 1, 1;
@@ -116,6 +116,6 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
 
   // std::cout << _robot.state.velocity.get().head<6>().transpose() << std::endl;
-  state_machine__->log(logger);
+  //state_machine__->log(logger);
 
 }

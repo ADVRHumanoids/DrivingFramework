@@ -121,7 +121,7 @@ void mgnss::controllers::WheelsControllerExtend::_createTasks(YAML::Node config)
           _leg_tasks["CAMBER"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
                      mwoibn::robot_class::angles::Camber(_robot,  mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 2.0));
           _leg_tasks["STEERING"].second.push_back(mwoibn::hierarchical_control::tasks::SoftAngle(
-                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 0.1));
+                     mwoibn::robot_class::angles::Steering(_robot, mwoibn::point_handling::Frame(name_, _robot.getModel(), _robot.state), ax_), _robot, 3.5));
         }
 
         for(auto& name_: _robot.getLinks("camber")){
