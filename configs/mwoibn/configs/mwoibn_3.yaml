@@ -222,6 +222,7 @@ mwoibn:
                                 velocity: false
                                 effort: false
                         function: "state"
+                        initialize: "odometry"
                 velocity_reference:
                         space: JOINT
                         dofs:
