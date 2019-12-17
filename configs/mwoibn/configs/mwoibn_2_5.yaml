@@ -576,10 +576,10 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
 #                        tunning: ZMP_INDIRECT
-                        steering: whole_body
+                        steering: open_loop
 #                        position_gain: 200
 #                        tunning: disturb
-                        tunning: camber_home
+                        tunning: disturb #camber_home
 #                        tunning: compliance
                         minor_axis: 0.068
                         major_axis: 0.01
@@ -690,13 +690,13 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 20 #50
-                                        BASE: [0.10, 0.10, 4, 2, 2, 3]
-                                        CONTACT_POINTS: 8
+                                        STEERING: 4 #1
+                                        BASE: [0.2, 0.2, 2.5, 1.0, 1.0, 2.5]
+                                        CONTACT_POINTS: [2, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1]
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 0.7 # 4
+                                        CAMBER: 1.0 # 4
                                         CASTER: 1.5 # 10
-                                        CAMBER_DAMP: 0.08 #0.04
+                                        CAMBER_DAMP: 0.07 #0.04
                                         CASTER_DAMP: 0.12
                                         COP: 0
                                 reactif: # drive without caster - this should work only for zero camber angle (at least for now)
@@ -795,13 +795,13 @@ mwoibn:
                                         damping: 0.0001
                                         CONSTRAINTS: 1
                                         STEERING: 5
-                                        BASE:  [0.10, 0.10, 0.2, 1.1, 1.1, 0.05]
-                                        CONTACT_POINTS: 4
+                                        BASE:  [0.10, 0.10, 0.1, 0.5, 0.5, 0.5]
+                                        CONTACT_POINTS: 6
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 4.0 # 4
-                                        CASTER: 8.0 # 10
-                                        CAMBER_DAMP: 0.06 #0.04
-                                        CASTER_DAMP: 0.1
+                                        CAMBER: 0.7 # 4
+                                        CASTER: 1.5 # 10
+                                        CAMBER_DAMP: 0.08 #0.04
+                                        CASTER_DAMP: 0.12
                                         COP: 0
                 upper_body_ik:
                         layer: NRT

@@ -48,7 +48,7 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
 
         _steering_ptr.reset(
                 new mwoibn::hierarchical_control::tasks::ContactPoint3DRbdl(
-                             config["track"].as<std::string>(), _robot, config, *_pelvis, _robot.getLinks("base")[0]));
+                             config["track"].as<std::string>(), _robot, config, _robot.centerOfMass(), _robot.getLinks("base")[0]));
 
         _steering_ptr->subscribe(true, true, false);
 
@@ -94,6 +94,8 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
          logger.add(std::string("com_") + char('x'+i), _robot.centerOfMass().get()[i]);
          logger.add(std::string("r_base_") + char('x'+i), getBaseReference()[i]);
          logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
+         logger.add(std::string("e_base_rot_") + char('x'+i), _pelvis_orientation_ptr->getError()[i]);
+         logger.add(std::string("e_base_pos_") + char('x'+i), _pelvis_position_ptr->getError()[i]);
 
          for(int k = 0; k < 4; k++){
 
@@ -105,10 +107,11 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
            logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
 
-
          }
        }
-
+         for(int k = 0; k < 4; k++){
+           logger.add("camber_"   + std::to_string(k+1), _leg_tasks["CAMBER"].second[k].getCurrent());
+         }
 
               // std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
 

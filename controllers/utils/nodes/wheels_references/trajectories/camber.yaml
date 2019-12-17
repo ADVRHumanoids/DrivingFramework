@@ -1,9 +1,9 @@
 base now: [0.0, 0.0,  0.93, 0.0]
 
-base_const_vel: [0.00, 0.0, 0.0, 0.05] # [0.04, 0.0, 0.0, 0.05]
+base_const_vel: [0.0, 0.0, 0.0, 0.0]
 
 # default velocity, controller step
-vel:  0.012
+vel:  0.05
 dt:   0.01
 
 # initial support position
@@ -20,7 +20,7 @@ x cp ref:
   - [0.25, 0.45, -0.55, -0.43]
   - [0.30, 0.40, -0.55, -0.75]
   - [0.30, 0.40, -0.55, -0.55]
-  - [0.30, 0.40, -0.55, -0.65]
+
 # predefined y references
 y cp ref:
   - [0.225,  -0.225,  0.225, -0.225]
@@ -40,39 +40,35 @@ z cp ref:
   - [0.3035,  0.3035,  0.3035, 0.32]
   - [0.3035,  0.3035,  0.3035, 0.40]
   - [0.5,  0.3035,  0.3035, 0.3035]
-  - [0.3035,  0.3035,  0.3035, 0.295] # 0.295 # 0.28
+  - [0.3035,  0.3035,  0.3035, 0.29]
 # predefined base references
 base ref:
   - [0.0, 0.0, 0.93, 0.0]
-  - [0.000, 0.0, 1.02, 0.0]
+  - [0.000, 0.0, 0.93, 1.5]
   - [0.000, 0.0, 1.11, 0.0]
   - [0.000, -0.0, 1.07, 0.0]
-  - [0.000, -0.0, 0.93, 0.0]
 
 cs ref:
   - [0.0, 0.0, 0.0, 0.0]
-  - [ 0.1, -0.15, -0.15, 0.1]
-  - [ 0.0, 0.0, 0.05, 0.0]
+  - [ -0.2, -0.2, -0.2, -0.2]
+  - [ 0.1, 0.1, 0.1, 0.1]
+  - [ -0.1, -0.1, -0.1,  -0.1]
 # pattern
 pattern:
   1:
     type: speed
     motions:
-      - [1,0,0.02]
+      - [1,0,0.01]
   2:
     type: move
     x_cp: 0
     y_cp: 0
     z_cp: 0
     base: 0
-    cs: 0
+    cs: 1
   3:
-    type: move
-    x_cp: 0
-    y_cp: 1
-    z_cp: 0
-    base: 0
-    cs: 0
+    type: wait
+    steps: 200
   4:
     type: speed
     motions:
@@ -90,134 +86,52 @@ pattern:
       - [2,3,0.01]
   5:
     type: move
-    x_cp: 1
-    y_cp: 2
+    x_cp: 0
+    y_cp: 0
     z_cp: 0
-    base: 0
-    cs: 0
+    base: 1
+    cs: 1
   6:
-    type: wait
-    steps: 20
-  7:
-    type: move
-    x_cp: 1
-    y_cp: 2
-    z_cp: 0
-    base: 1
-    cs: 0
-  8:
-    type: move
-    x_cp: 2
-    y_cp: 2
-    z_cp: 0
-    base: 1
-    cs: 0
-  9:
-    type: move
-    x_cp: 2
-    y_cp: 3
-    z_cp: 0
-    base: 1
-    cs: 0
-  10:
-    type: claim
-    leg: 3
-  11:
-    type: move
-    x_cp: 2
-    y_cp: 3
-    z_cp: 2
-    base: 1
-    cs: 0
-  12:
-    type: move
-    x_cp: 5
-    y_cp: 4
-    z_cp: 1
-    base: 2
-    cs: 0
-  13:
-    type: move
-    x_cp: 6
-    y_cp: 4
-    z_cp: 3
-    base: 2
-    cs: 2
-  14:
-    type: move
-    x_cp: 3
-    y_cp: 4
-    z_cp: 3
-    base: 2
-    cs: 2
-  15:
-    type: move
-    x_cp: 3
-    y_cp: 4
-    z_cp: 5
-    base: 2
-    cs: 2
-  16:
-    type: wait
-    steps: 200
-  17:
-    type: release
-    leg: 3
-  18:
-    type: move
-    x_cp: 4
-    y_cp: 5
-    z_cp: 5
-    base: 3
-    cs: 0
-#  17:
-#    type: wait
-#    steps: 200
-  19:
-    type: move
-    x_cp: 7
-    y_cp: 6
-    z_cp: 5
-    base: 3
-    cs: 0
-  20:
     type: move
     x_cp: 0
     y_cp: 0
     z_cp: 0
-    base: 4
+    base: 1
+    cs: 3
+  7:
+    type: wait
+    steps: 500
+  8:
+    type: move
+    x_cp: 1
+    y_cp: 2
+    z_cp: 0
+    base: 1
+    cs: 3
+  9:
+    type: move
+    x_cp: 2
+    y_cp: 2
+    z_cp: 0
+    base: 1
+    cs: 3
+  10:
+    type: wait
+    steps: 500
+  11:
+    type: move
+    x_cp: 2
+    y_cp: 2
+    z_cp: 0
+    base: 1
     cs: 0
-#  20:
-#    type: move
-#    x_cp: 6
-#    y_cp: 7
-#    z_cp: 0
-#    base: 3
-#    cs: 0
-#  20:
-#    type: speed
-#    motions:
-#      - [0,2,0.001]
-#      - [1,2,0.001]
-#  21:
-#    type: move
-#    x_cp: 6
-#    y_cp: 8
-#    z_cp: 0
-#    base: 3
-#    cs: 0
-#  22:
-#    type: wait
-#    steps: 200
-#  23:
-#    type: claim
-#    leg: 0
-#  24:
-#    type: move
-#    x_cp: 7
-#    y_cp: 8
-#    z_cp: 3
-#    base: 3
-#  22:
-#    type: wait
-#    steps: 200
+  12:
+    type: wait
+    steps: 2000
+  13:
+    type: move
+    x_cp: 2
+    y_cp: 2
+    z_cp: 0
+    base: 1
+    cs: 2

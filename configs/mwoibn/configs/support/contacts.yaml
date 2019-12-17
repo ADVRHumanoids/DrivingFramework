@@ -96,37 +96,37 @@ centauro:
              x: 0
              y: 0
              z: -1
-      contact4:
-         name: left_arm
-         end_frame: arm1_7
-         position: [0.0, 0.0, 0.0]
-         offset: [0.0, 0.0, 0.0]
-         constraint_matrix:
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
-            force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
-            force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
-            momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
-            momentum_2: [0, 0, 0, 0, 0, 0] # direction of a second contraint on momentum
-            momentum_3: [0, 0, 0, 0, 0, 0] # direction of a third contraint on momentum
-         type: contact_point
-         #topic: contacts_wheel_4
-         active: true
-         initialize: true
-         interface: fixed
-      contact5:
-         name: right_arm
-         end_frame: arm2_7
-         position: [0.0, 0.0, 0.0]
-         offset: [0.0, 0.0, 0.0]
-         constraint_matrix:
-            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
-            force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
-            force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
-            momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
-            momentum_2: [0, 0, 0, 0, 0, 0] # direction of a second contraint on momentum
-            momentum_3: [0, 0, 0, 0, 0, 0] # direction of a third contraint on momentum
-         type: contact_point
-         #topic: contacts_wheel_4
-         active: true
-         initialize: true
-         interface: fixed
+#      contact4:
+#         name: left_arm
+#         end_frame: arm1_7
+#         position: [0.0, 0.0, 0.0]
+#         offset: [0.0, 0.0, 0.0]
+#         constraint_matrix:
+#            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
+#            force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
+#            force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
+#            momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
+#            momentum_2: [0, 0, 0, 0, 0, 0] # direction of a second contraint on momentum
+#            momentum_3: [0, 0, 0, 0, 0, 0] # direction of a third contraint on momentum
+#         type: contact_point
+#         #topic: contacts_wheel_4
+#         active: true
+#         initialize: true
+#         interface: fixed
+#      contact5:
+#         name: right_arm
+#         end_frame: arm2_7
+#         position: [0.0, 0.0, 0.0]
+#         offset: [0.0, 0.0, 0.0]
+#         constraint_matrix:
+#            force_1: [0, 0, 0, 1, 0, 0] # direction of a first contraint on force
+#            force_2: [0, 0, 0, 0, 1, 0] # direction of a second contraint on force
+#            force_3: [0, 0, 0, 0, 0, 1] # direction of a third contraint on force
+#            momentum_1: [0, 0, 0, 0, 0, 0] # direction of a first contraint on momentum
+#            momentum_2: [0, 0, 0, 0, 0, 0] # direction of a second contraint on momentum
+#            momentum_3: [0, 0, 0, 0, 0, 0] # direction of a third contraint on momentum
+#         type: contact_point
+#         #topic: contacts_wheel_4
+#         active: true
+#         initialize: true
+#         interface: fixed

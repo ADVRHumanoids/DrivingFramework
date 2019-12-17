@@ -66,7 +66,14 @@ virtual void reset()
 
   for (int i = 0; i < _contacts.size(); i++)
   {
-    _reference.segment<3>(3 * i) = getPointStateReference(i);
+
+    mwoibn::Vector3 basePoint = _contacts[i].get();
+//    basePoint -= _base_point.get();
+    basePoint.head<2>() -= _base_point.get().head<2>();
+
+    _reference.segment<3>(3 * i) = _q_twist.transposed().rotate(basePoint);
+
+//    _reference.segment<3>(3 * i) = getPointStateReference(i);
   }
 }
 
@@ -244,7 +251,7 @@ protected:
 
   virtual void _allocate(){
     // _init(_contacts.rows(), _contacts.cols());
-    _init(4, _contacts.cols());
+    _init(4*3, _contacts.cols());
     _selector = mwoibn::VectorBool::Constant( _robot.contacts().size(), true); // on init assume all constacts should be considered in a task
     _reference.setZero(_contacts.rows());
     _velocity_reference.setZero(_contacts.rows());
@@ -265,6 +272,8 @@ protected:
 
 
     virtual void _updateState(){
+
+      _base_point.update(true);
       _contacts.update(true);
       _q_twist = _base.orientation.getWorld().twistSwing(_ground_normal); // this has heading
       for(auto& wheel: _wheel_transforms)

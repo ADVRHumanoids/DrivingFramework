@@ -1,0 +1,126 @@
+base now: [0.0, 0.0,  0.0, 0.0]
+
+base_const_vel: [0.0, 0.0, 0.0, 0.1]
+
+# default velocity, controller step
+vel:  0.004
+dt:   0.01
+
+# initial support position
+x cp: [0.0,    0.0,   -0.0,  -0.0 ]
+y cp: [0.0 , -0.0 ,  0.0 , -0.0 ]
+z cp: [0.0,  0.0,  0.0,  0.0]
+
+# predefined x references
+x cp ref:
+  - [0.02, 0.02, -0.02, -0.02]
+  - [0.10, 0.10, -0.10, -0.10]
+  - [0.20, 0.20, -0.20, -0.20]
+  - [0.15, 0.15, -0.15, -0.15]
+# predefined y references
+y cp ref:
+  - [0.02, -0.02, 0.02, -0.02]
+  - [0.10, -0.10, 0.10, -0.10]
+  - [0.05, -0.05, 0.05, -0.05]
+# predefined z references
+z cp ref:
+  - [0.0, 0.0, -0.0, -0.0]
+# predefined base references
+base ref:
+  - [0.0, 0.0, 0.0, 0.0]
+  - [0.0, 0.0, -0.02, 0.0]
+cs ref:
+  - [0.0, 0.0, 0.0, 0.0]
+  - [0.2, 0.2, -0.2, 0.2]
+  - [0.25, 0.25, -0.25, 0.25]
+  - [0.3, 0.3, -0.3, 0.3]
+# pattern
+pattern:
+  1:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 1
+    cs: 0
+  2:
+    type: move
+    x_cp: 1
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 0
+  3:
+    type: move
+    x_cp: 1
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 1
+  4:
+    type: wait
+    steps: 250
+  5:
+    type: move
+    x_cp: 2
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 2
+  6:
+    type: wait
+    steps: 250
+  7:
+    type: move
+    x_cp: 2
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 2
+  8:
+    type: wait
+    steps: 250
+  9:
+    type: move
+    x_cp: 2
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 3
+  10:
+    type: wait
+    steps: 250
+  11:
+    type: move
+    x_cp: 3
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 3
+  12:
+    type: move
+    x_cp: 1
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 3
+  13:
+    type: wait
+    steps: 500
+  14:
+    type: move
+    x_cp: 1
+    y_cp: 1
+    z_cp: 0
+    base: 0
+    cs: 0
+  15:
+    type: wait
+    steps: 500
+  16:
+    type: move
+    x_cp: 0
+    y_cp: 0
+    z_cp: 0
+    base: 0
+    cs: 0

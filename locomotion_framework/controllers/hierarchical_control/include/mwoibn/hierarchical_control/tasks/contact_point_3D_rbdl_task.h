@@ -73,7 +73,6 @@ public:
 protected:
   virtual void _updateError()
   {
-    _base_point.update(true);
     // std::cout << "_updateError" << std::endl;
     _last_error.noalias() = _error; // save previous state
 
@@ -82,14 +81,17 @@ protected:
     for (int i = 0; i < _contacts.size(); i++)
     {
 
-      _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3)) - _minus[i].get();
+      _full_error.segment<3>(3*i) = _q_twist.rotate(_reference.segment<3>(i*3));// - _minus[i].get();
+      _full_error.segment<2>(3*i) -=  _minus[i].get().head<2>();
+      _full_error[3*i+2] -=  _contacts[i].get()[2];
+
       // _error.segment<3>(3*i) = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i)); // 10 is for a task gain should be automatic
       mwoibn::Vector3 test__;
       test__.noalias() = (_wheel_transforms[i]->rotation.transpose()*_full_error.segment<3>(3*i));
-      _error[i] = test__[0];
+      _error.segment<3>(3*i) = test__;
       test__.noalias() = (_wheel_transforms[i]->rotation.transpose()*_velocity_reference.segment<3>(3*i));
       _velocity[i] = test__[0];
-
+      _velocity.segment<3>(3*i) = test__;
       // std::cout << "_minus\t" << _minus[i].get().transpose() << std::endl;
 
       // if (_selector[i])
@@ -114,15 +116,15 @@ protected:
       _temp_jacobian.noalias() = -_wheel_transforms[i]->rotation.transpose()*(_minus[i].getJacobian());
       _projected.noalias() = _ground_normal*_ground_normal.transpose();
       mwoibn::eigen_utils::skew(_q_twist.rotate(_reference.segment<3>(i*3)), _rot);
-      _rot_project.noalias() = _rot*_projected;
+      _rot_project.noalias() = _rot;//*_projected;
       _rot.noalias() = _wheel_transforms[i]->rotation.transpose()*_rot_project;
       //_jacobian.block(3*i, 0, 3, _jacobian.cols()).noalias() -= _rot*_base_ang_vel.getJacobian();
 
-      _jacobian.row(i) = _temp_jacobian.row(0);
-      _jacobian.row(i) -= (_rot*_base_ang_vel.getJacobian()).row(0); // here I have only a 1D task
+      _jacobian.middleRows<3>(3*i) = _temp_jacobian;
+      _jacobian.middleRows<3>(3*i) -= (_rot*_base_ang_vel.getJacobian()); // here I have only a 1D task
       //_jacobian.row(i) = (_temp_jacobian - _rot*_base_ang_vel.getJacobian()).row(0);
-      // if (_selector[i])
-        // _jacobian.block(3*i+1, 0, 2, _jacobian.cols()).setZero();
+      if (_selector[i])
+        _jacobian.middleRows<2>(3*i+1).setZero();
     }
 
     // std::cout << "_jacobian\n" << _jacobian.transpose() << std::endl;
