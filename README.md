@@ -1,4 +1,4 @@
-# DrivingFramework
+# Simplifying Operations in Locomotion - Framework for Efficient Research (SOL-FER)
 
 This repository contains the software framework designed as a tool for the locomotion research.  
 
@@ -8,7 +8,7 @@ A Robot Points interface has been developed to simplify a definition of the loco
 
 This repository contains modules implementing the controllers and state estimators designed for the Centauro robot. These real-time safe modules have been tested in the simulation and in the experiments with the Centauro robot. Included are: a centralized controller with a whole-body gravity compensation, a gravity compensation for the series elastic actuators, an inverse-kinematics scheme, a hybrid legged-wheeled locomotion module, a reactive control for the hybrid-legged wheeled robot, a joint-space controller as well as a simple state estimation and an estimation of the ground reaction forces.    
 
-# Warning
+# Disclaimer
 This software has been developed to simplify the author's PhD work, and it has not been designed as a package to be released. As a utilitarian tool developed with a very restricted time limit, no unit test has been developed, and the comments are scarce to none.
 
 # Third Party Software
