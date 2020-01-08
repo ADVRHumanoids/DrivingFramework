@@ -6,7 +6,6 @@ support_path: &support /home/malgorzata/catkin_ws/src/DrivingFramework/configs/m
 mwoibn:
         middleware: ROS
         system: SM # SM
-
         layers:
             RT:
                         path: *config

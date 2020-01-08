@@ -108,6 +108,7 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
 
            logger.add("getForce_" + std::to_string(k+1) + "_" + char('x'+i), _steering_ptr->getForce()[k*3+i]);
 
+
          }
        }
          for(int k = 0; k < 4; k++){
