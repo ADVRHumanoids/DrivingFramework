@@ -114,6 +114,7 @@ void mgnss::controllers::WheelsController::_createTasks(YAML::Node config){
 
 void mgnss::controllers::WheelsController::nextStep()
 {
+        _robot.contacts().update(true);
         _robot.centerOfMass().update();
 
         step();

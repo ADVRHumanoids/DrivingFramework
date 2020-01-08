@@ -6,6 +6,7 @@ support_path: &support /home/malgorzata/catkin_ws/src/DrivingFramework/configs/m
 mwoibn:
         middleware: ROS
         system: SM # SM
+
         layers:
             RT:
                         path: *config
@@ -576,7 +577,7 @@ mwoibn:
                             path: *support
                             file: lower_body.yaml
 #                        tunning: ZMP_INDIRECT
-                        steering: open_loop
+                        steering: camber #open_loop
 #                        position_gain: 200
 #                        tunning: disturb
                         tunning: disturb #camber_home
@@ -644,6 +645,13 @@ mwoibn:
                                         damp_sp: 0.0015
                                         damp: 0.001
                                         tracking: 1.0
+                                camber:
+                                        icm: 1.00
+                                        sp:  0.01
+                                        damp_icm: 0.0008
+                                        damp_sp: 0.0015
+                                        damp: 0.001
+                                        tracking: 1.0
                                 whole_body:
                                         icm: 1.00 # 0.95
                                         sp: 0.05 # 0.05
@@ -690,11 +698,11 @@ mwoibn:
                                         ratio: 1.0
                                         damping: 0.0001
                                         CONSTRAINTS: 1
-                                        STEERING: 4 #1
-                                        BASE: [0.2, 0.2, 2.5, 1.0, 1.0, 2.5]
+                                        STEERING: 10 #4
+                                        BASE: [0.2, 0.2, 2.5, 1.2, 1.2, 2.5]
                                         CONTACT_POINTS: [2, 2, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1]
 #                                        CONTACT_POINTS: 0.01
-                                        CAMBER: 1.0 # 4
+                                        CAMBER: 4.0 # 4
                                         CASTER: 1.5 # 10
                                         CAMBER_DAMP: 0.07 #0.04
                                         CASTER_DAMP: 0.12
@@ -899,6 +907,7 @@ mwoibn:
                         filter:
                             torque:
                                 damping: 1.0
+                                damping: 1.0
                                 cut_off_frequency: 200
 
                 acceleration_test:
@@ -919,4 +928,4 @@ mwoibn:
 #                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, NwheelsZMPII::wheeled_motion]
                         # plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, ground_forces, gravity_compensation, NwheelsZMPII::wheeled_motion]
 #                        plugins: [UpperBodyIK::upper_body_ik, odometry3::odometry, gravity_compensation, ground_forces, NwheelsZMPII::wheeled_motion]
-                        plugins: [joint_states::joint_reference, odometry3::odometry, ground_forces, Nwheels3::wheeled_motion]
+                        plugins: [joint_states::joint_reference, odometry3::odometry, Nwheels3::wheeled_motion]

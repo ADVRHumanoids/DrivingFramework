@@ -57,10 +57,10 @@ void mgnss::controllers::WheeledMotionEvent3::_createTasks(YAML::Node config){
         _world_posture_ptr.reset(new mwoibn::hierarchical_control::tasks::Aggravated());
 
         _world_posture_ptr->addTask(*_pelvis_orientation_ptr);
-        // _world_posture_ptr->addTask(*_com_ptr);
+        _world_posture_ptr->addTask(*_com_ptr);
 
         mwoibn::VectorBool select(3);
-        select << true, true, true;
+        select << false, false, true;
         _world_posture_ptr->addTask(*_pelvis_position_ptr, select);
 
         _tasks["CONTACT_POINTS"] = _steering_ptr.get();
@@ -96,6 +96,7 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
          logger.add(std::string("base_") + char('x'+i), _steering_ptr->base.get()[i]);
          logger.add(std::string("e_base_rot_") + char('x'+i), _pelvis_orientation_ptr->getError()[i]);
          logger.add(std::string("e_base_pos_") + char('x'+i), _pelvis_position_ptr->getError()[i]);
+         logger.add(std::string("e_com_pos_") + char('x'+i), _com_ptr->getError()[i]);
 
          for(int k = 0; k < 4; k++){
 
@@ -111,6 +112,16 @@ void mgnss::controllers::WheeledMotionEvent3::log(mwoibn::common::Logger& logger
        }
          for(int k = 0; k < 4; k++){
            logger.add("camber_"   + std::to_string(k+1), _leg_tasks["CAMBER"].second[k].getCurrent());
+           logger.add("r_camber_"   + std::to_string(k+1), _leg_tasks["CAMBER"].second[k].getReference());
+         }
+
+         for(int k = 0; k < _robot.getDofs(); k++){
+           logger.add("q_"   + std::to_string(k), _robot.state.position.get()[k]);
+           logger.add("dq_"   + std::to_string(k), _robot.state.velocity.get()[k]);
+           logger.add("q_des_"   + std::to_string(k), _robot.command.position.get()[k]);
+           logger.add("dq_des_"   + std::to_string(k), _robot.command.velocity.get()[k]);
+           logger.add("tau_"   + std::to_string(k), _robot.state.torque.get()[k]);
+
          }
 
               // std::cout << "wheels position\t" << _robot.state.position.get().head<6>().transpose() << std::endl;
